@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q140">
+            <p th:utext="#{questions.block.professionOcupation}"></p>
+
+            <div class="field inline">
+                <select id="activityType" name="activityType" data-placeholder="Elige una Profesión">
+                    <option value="" hidden="hidden">Elige una Profesi&oacute;n</option>
+                    <option th:each="profession: ${professions}" th:value="${profession?.id}"
+                            th:text="${profession?.occupation}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#activityType').on('select2:select', function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--Google maps-->
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q175">
+        <div class="form q175">
+            <p th:utext="${finalMessage}"></p>
+
+            <div th:if="${showLoading}" class="process-loading-container circle-progress-question" style="height: auto !important; position: relative !important;">
+                <div class="loading-content">
+                    <div class="sk-circle">
+                        <div class="sk-circle1 sk-child"></div>
+                        <div class="sk-circle2 sk-child"></div>
+                        <div class="sk-circle3 sk-child"></div>
+                        <div class="sk-circle4 sk-child"></div>
+                        <div class="sk-circle5 sk-child"></div>
+                        <div class="sk-circle6 sk-child"></div>
+                        <div class="sk-circle7 sk-child"></div>
+                        <div class="sk-circle8 sk-child"></div>
+                    </div>
+                    <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                </div>
+            </div>
+
+            <th:block th:if="${showAgencies}">
+
+                <!--                <button type="button" class="button bg-red show-map">Ver Agencias</button>-->
+                <div class="map-agencies">
+                    <div id="loanApplicationMap163" style="height: 300px;width: 70%;margin-left: auto;margin-right: auto;"></div>
+                    <div id="selectedAgency" style="display: none; margin-top: 10px;margin-bottom: 10px;">
+                        <h5 style="margin-bottom: 5px;">Agencia: <span id="agencyName"></span></h5>
+                        <h5 style="margin-bottom: 5px;">Dirección: <span id="agencyAddress"></span></h5>
+                        <h5>Distrito: <span id="agencyDistrict"></span></h5>
+                    </div>
+                </div>
+
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var agencies = /*[[ ${agencies} ]]*/[];
+                    var navLatitude = /*[[ ${navLatitude} ]]*/null;
+                    var navLongitude = /*[[ ${navLongitude} ]]*/null;
+                    var closestAgency = /*[[ ${closestAgency} ]]*/null;
+                    var markers = [];
+                    var selectedAgency =/*[[ ${selectedAgency} ]]*/null;
+                    var prevInfoWindow = false;
+
+                    function showAgencyData(agency){
+                        $("#sendButtonNext").removeClass("disabled-option");
+                        $("h5 > span#agencyName").text(agency.agency);
+                        $("h5 > span#agencyAddress").text(agency.address);
+                        $("h5 > span#agencyDistrict").text(agency.district);
+                        $("#selectedAgency").show();
+                    }
+
+                    function selectAgency(codAgency){
+                        for (let marker of markers) {
+                            if(marker.codAgency == codAgency){
+                                marker.setIcon("https://solven-public.s3.amazonaws.com/img/markers/marker_azteca.png");
+                                selectedAgency = codAgency;
+                                let agency = agencies.find(x => x.codAgency == codAgency);
+                                if(agency) showAgencyData(agency);
+                            }
+                            else marker.setIcon(null);
+                        }
+                    }
+
+                    $(document).ready(function () {
+                        if(selectedAgency) $("#sendButtonNext").removeClass("disabled-option");
+                        // Mapa
+                        if (agencies) {
+
+                            var loanApplicationMap = new google.maps.Map(document.getElementById('loanApplicationMap163'), {
+                                center: { lat: navLatitude, lng: navLongitude },
+                                zoom: 11
+                            });
+                            var bounds = new google.maps.LatLngBounds();
+
+                            // Marker IP
+                            for (let agency of agencies) {
+                                if (!agency.geolocation) continue;
+                                let agencyLocationMaper = new google.maps.Marker({
+                                    map: loanApplicationMap,
+                                    draggable: false,
+                                    animation: google.maps.Animation.DROP,
+                                    position: { lat: agency.geolocation.latitude, lng: agency.geolocation.longitude },
+                                    title: agency.agency,
+                                    codAgency : agency.codAgency,
+                                    icon : agency.codAgency == selectedAgency ? "https://solven-public.s3.amazonaws.com/img/markers/marker_azteca.png" : null
+                                });
+
+                                if(agency.codAgency == selectedAgency) showAgencyData(agency);
+
+                                let link = createLinkGoogleMaps(agency.geolocation.latitude, agency.geolocation.longitude)
+                                let infowindow = new google.maps.InfoWindow({
+                                    content: `${agency.agency} <br> ${agency.address || ''} <br> ${link}`
+                                });
+
+                                // <br> <a href='#' data='${agency.codAgency}' className="select-agency">Seleccionar agencia</a>
+
+                                google.maps.event.addListener(agencyLocationMaper, 'click', function () {
+                                    infowindow.open(loanApplicationMap, agencyLocationMaper);
+                                    if(prevInfoWindow && prevInfoWindow.content != infowindow.content) prevInfoWindow.close();
+                                    prevInfoWindow = infowindow;
+                                    if(agencyLocationMaper.codAgency) selectAgency(agencyLocationMaper.codAgency);
+                                });
+
+                                google.maps.event.addListener(infowindow, 'domready', function(){
+                                    $("a.select-agency").click(function(e){
+                                        let codAgency = $(this).attr("data");
+                                        selectAgency(codAgency);
+                                    })
+                                });
+
+                                markers.push(agencyLocationMaper);
+                            }
+
+                            var showError = function (e) {
+                                console.log(e);
+                            };
+
+                            function createLinkGoogleMaps(lat, lng) {
+                                return `<a target="_blank" href='https://www.google.com/maps/search/?api=1&query=${lat},${lng}'><span>Ver en Google Maps</span> </a>`
+                            }
+
+                            function findClosestMarker(lat, lng) {
+                                var distances = [];
+                                var closest = -1;
+                                for (i = 0; i < markers.length; i++) {
+                                    var d = google.maps.geometry.spherical.computeDistanceBetween(markers[i].position, new google.maps.LatLng(lat, lng));
+                                    distances.push({
+                                        distance: d,
+                                        marker: markers[i]
+                                    })
+                                    if (closest == -1 || d < distances[closest]["distance"]) {
+                                        closest = i;
+                                    }
+                                }
+                                let closest_markers = distances.sort((a, b) => { return a.distance - b.distance }).slice(0, 2)
+                                return closest_markers.map((item) => { return item.marker })
+                            }
+
+                            function showPosition(lat, long) {
+                                var latlng = new google.maps.LatLng(lat, long);
+                                let closestMarker = findClosestMarker(lat, long);
+                                if (closestMarker.length) {
+                                    bounds = new google.maps.LatLngBounds();
+                                    loanApplicationMap.setCenter(closestMarker[0].position);
+                                    bounds.extend(closestMarker[0].position);
+                                    loanApplicationMap.fitBounds(bounds);
+                                    loanApplicationMap.setZoom(11);
+                                }
+                            }
+
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(function (position) {
+                                    showPosition(position.coords.latitude, position.coords.longitude);
+                                }, showError);
+                            }
+
+                            $("#allBranches").click(function () {
+                                bounds = new google.maps.LatLngBounds();
+                                for (let marker of markers) {
+                                    bounds.extend(marker.position);
+                                }
+                                loanApplicationMap.fitBounds(bounds);
+                            })
+
+                            // bounds.extend(new google.maps.LatLng( closestAgency ? closestAgency.latitude : (navLatitude || -12.046465), closestAgency ? closestAgency.longitude : (navLongitude || -77.042767)));
+                            // DIspara el Resize del mapa despues de 1000ms
+                            setTimeout(function () {
+                                google.maps.event.trigger(loanApplicationMap, "resize");
+                                // Centrar mapa con puntos
+                                showPosition(navLatitude, navLongitude);
+                            }, 1000);
+                        }
+                    })
+
+                    /*]]>*/
+                </script>
+            </th:block>
+
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var actualStatus = /*[[${loanStatus}]]*/;
+        var runVerifyStatus = /*[[${runVerifyStatus}]]*/;
+
+        $(document).ready(function(){
+            if(runVerifyStatus) verifyStatus();
+        })
+
+        function verifyStatus(){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "GET",
+                data: {},
+                success: function (data) {
+                    if(actualStatus == data) {
+                        setTimeout(()=>{
+                            verifyStatus();
+                        },5000)
+                    }
+                    else location.reload();
+                }
+            }, "verify_status");
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

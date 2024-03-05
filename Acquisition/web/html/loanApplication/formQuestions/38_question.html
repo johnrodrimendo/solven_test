@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q38">
+            <p th:utext="#{questions.block.ownerBusinessRUC}"></p>
+
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="display-block w-input-ruc">
+                    <input type="text" class="input-outline" th:field="*{ruc}" pattern="[0-9]*"/>
+                    <div class="errorContainer"></div>
+                    <span class="w-list">
+                        <label for="imNotLegal" class="custom-check">
+                            <span class="check-inner"><i class="icon icon-check"></i></span>
+                            <span class="check-label"> No estoy constituido legalmente.</span>
+                            <input type="checkbox" th:field="*{notLegal}" class="real-check" id="imNotLegal"/>
+                        </label>
+                    </span>
+                </div>
+                <div class="display-block w-list-radio">
+                    <div class="field inline" th:each="regime : ${regimes}">
+                        <label class="h-input-radio">
+                            <input type="radio" name="regime" th:value="${regime.code}"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <div class="radio inline"></div>
+                                    <h5 class="inline" th:text="${regime.description}"></h5>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="display-block">
+                    <button id="sendButton" type="button" class="button bg-red hidden" th:text="#{button.next}"></button>
+                </div>
+
+            </form>
+            <small style="font-size: .65em;" class="display-block text-black" th:utext="#{questions.block.companyRUC.small2}"></small>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+
+    <script th:inline="javascript">
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        var sendButton = $('#sendButton');
+
+        sendButton.click(function () {
+            sendForm();
+        });
+
+        function sendForm() {
+            if ($('#imNotLegal').is(':checked') || $('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: sendButton,
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        }
+    </script>
+
+    <script th:inline="javascript" th:unless="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        /*<![CDATA[*/
+        sendButton.removeClass('hidden');
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        /*<![CDATA[*/
+        // var $document2input = $('.document2-input');
+        var $check = $('#imNotLegal');
+        var listradio = $('.w-list-radio');
+        var $ruc = $('#ruc');
+        var enabled = false;
+
+        function isRegimenSelected(){
+            return listradio.find('.radio-selected').length > 0 ? true : false;
+        }
+        function performSubmission(){
+            $('#questionForm').data('validatorJson').rules.ruc.required = true;
+            $('#questionForm').data('validatorJson').rules.ruc.maxlength = 11;
+            $('#questionForm').data('validatorJson').rules.ruc.minlength = 11;
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+            sendForm();
+        }
+
+        $ruc.on('paste input propertychange', function (e) {
+            if(isRegimenSelected())
+                performSubmission();
+        });
+
+        listradio.change(function() {
+            performSubmission();
+        });
+        // setTimeout(function () {
+        //     $document2input.focus();
+        // }, 300);
+
+        $check.click(function () {
+            if(isRegimenSelected())
+                listradio.find('label').removeClass('radio-selected');
+
+            listradio.stop().slideToggle();
+            if (enabled == true) {
+                $ruc.prop('disabled', false);
+                sendButton.addClass('hidden');
+            }else {
+                $ruc.prop('disabled', true);
+                sendButton.removeClass('hidden');
+                $('#ruc').val('');
+            }
+            $ruc.toggleClass('disabled');
+            enabled = !enabled;
+            if ($(this).is(':checked')) {
+                $('#ruc').val('');
+                sendButton.removeClass('hidden');
+                $('#questionForm').data('validatorJson').rules.ruc.required = false;
+                $('#questionForm').data('validatorJson').rules.ruc.maxlength = 0;
+                $('#questionForm').data('validatorJson').rules.ruc.minlength = 0;
+            } else {
+                $ruc.prop('disabled', false);
+                sendButton.addClass('hidden');
+                $('#questionForm').data('validatorJson').rules.ruc.required = true;
+                $('#questionForm').data('validatorJson').rules.ruc.maxlength = 11;
+                $('#questionForm').data('validatorJson').rules.ruc.minlength = 11;
+            }
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+        /*]]>*/
+    </script>
+
+
+</th:block>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <head>
+        <style>
+            .congratulations-title{
+                margin-bottom: 10px;
+            }
+
+            .card {
+                position: relative;
+                display: -ms-flexbox;
+                display: flex;
+                -ms-flex-direction: column;
+                flex-direction: column;
+                min-width: 0;
+                word-wrap: break-word;
+                background-color: #fff;
+                background-clip: border-box;
+                border-radius: 0.25rem;
+                border: 2px solid #20A6FF;
+                font-size: 14px;
+                max-width: 410px;
+                margin: auto;
+                min-height: 290px;
+            }
+
+            .card-body {
+                -ms-flex: 1 1 auto;
+                flex: 1 1 auto;
+                padding: 1.25rem;
+            }
+
+            .row-desktop{
+                font-size: 15px;
+                color: #656363;
+                margin-top: 10px;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .column {
+                flex: 33.33%;
+                text-align: start;
+            }
+
+            .icon-check{
+                width: 30px;
+                height: 30px;
+                fill: none;
+                stroke: #20A6FF;
+                transform: translate(0px, -6px);
+            }
+            .box{
+                display: flex;
+                color: black;
+                justify-content: start;
+            }
+            .sub-title{
+                font-weight: bold;
+                /*font-size: 22px;*/
+                color: #20A6FF;
+                margin-bottom: 2rem;
+                font-size: 1.14em;
+                text-align: left;
+            }
+            .text-footer{
+                color: black;
+                margin-top: 4rem;
+            }
+
+            .button{
+                margin-top: 0rem;
+                padding: 16px;
+                display: inline-block;
+            }
+
+
+            .title{
+                font-weight: 600;
+                color: black;
+                /*font-size: 18px;*/
+                margin-bottom: 1rem;
+            }
+
+            .box-footer{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 350px;
+                margin: 15px auto auto 10px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .button.btn-link{
+                box-shadow: none;
+                color: #20A6FF;
+                text-decoration: underline;
+            }
+            .box-subtitle{
+                max-width: 350px;
+                margin: auto;
+            }
+            .text-footer.mobile{
+                display: flex;
+                margin-top: 1.5rem;
+                margin-left: 0rem;
+                font-size: 0.8em;
+                max-width: 350px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .box-icon{
+                height: 23px;
+            }
+            .banbif .tittle-desc {
+                margin-bottom: 20px;
+            }
+
+            .banbif-description-text-color{
+                color: #656363;
+            }
+
+            .card.left{
+                margin-right: 30px;
+            }
+            .card.right{
+                border: 2px solid #AD96DC;
+                margin-left: 30px;
+                /*height: 280px;*/
+                max-height: 340px;
+            }
+            .card-security-info{
+                text-align: start;
+                max-width: 880px;
+                margin: auto;
+                margin-top: 10px;
+                padding: 20px;
+                border: 2px solid #cdcdcd;
+            }
+            .list-security-tips{
+                list-style: disc;
+                margin-bottom: 10px;
+                padding: 0 50px;
+            }
+
+            @media only screen and (max-width: 940px){
+                .card-security-info{
+                    max-width: 340px;
+                }
+                .list-security-tips{
+                    padding: 0 20px;
+                }
+
+                .card {
+                    max-width: 340px;
+                }
+
+                .card.left{
+                    margin-right: auto;
+                }
+                .card.right{
+                    margin-left: auto;
+                }
+            }
+            @media only screen and (max-width: 839px){
+
+                .order{
+                    /*order: 1;*/
+                    margin-bottom: 20px;
+                }
+                .col-6{
+                    padding-right: 10px;
+                    padding-left: 10px;
+                }
+            }
+            @media only screen and (max-width: 420px){
+
+                .button {
+                    min-width: 130px;
+                }
+
+            }
+        </style>
+    </head>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q159 banbif">
+            <form id="questionForm" th:object="${form}">
+                <th:block th:if="${entityProductParamId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_TARJETA_CREDITO_MAS_EFECTIVO}">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="congratulations-title">
+                               <!-- <b>¡Felicitaciones, concluiste tu solicitud de tu Tarjeta de Crédito +Efectivo!</b>-->
+                            </div>
+                            <div class="tittle-desc">
+                                <span>
+                                    ¡Felicidades tu Tarjeta de Crédito +Efectivo esta en camino! <br/>
+                                    En breve te enviaremos la confirmación de tu solicitud al correo electrónico indicado.<br/>
+                                    En caso de no recibir el correo de confirmación, comunícate con nuestra Banca Telefónica al 01 631-9000 (Lima) o 0-801-0-0456 (provincias).
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+                <th:block th:unless="${entityProductParamId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_TARJETA_CREDITO_MAS_EFECTIVO}">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div>
+                                <b>¡Felicitaciones, concluiste tu solicitud de tu Tarjeta de Crédito BanBif!</b>
+                            </div>
+                            <div class="tittle-desc">
+                                <span th:if="${ banBifLoanApplicationType == T(com.affirm.common.model.transactional.LoanApplication).BANBIF_LOAN_APPLICATION_TYPE_ONLINE }">
+                                    En breve te llegará la confirmación de tu solicitud al correo indicado, en caso no llegará en correo de confirmación, comunícate con nuestra Banca Telefónica <br/>
+                                    01 631-9000 (Lima) <br/>
+                                    0-801-0-0456 (Provincias) <br/>
+                                </span>
+                                <div class="card-security-info">
+                                    <div style="margin-bottom: 10px"><b>MEDIDAS DE SEGURIDAD PARA ENTREGA DE LA TARJETA:</b></div>
+                                    <div style="margin-bottom: 10px">Nuestro proveedor de distribución tarjetas se apersonará y realizará el siguiente protocolo:</div>
+                                    <div>
+                                        <ul class="list-security-tips">
+                                            <li>Solicitará su DNI original.</li>
+                                            <li>Toma de dos huellas dactilares para el cargo de entrega.</li>
+                                            <li>Validación biométrica de hasta 2 huellas dactilares previa desinfección de ambas manos.</li>
+                                            <li>Toma de una fotografía con el cargo y la tarjeta.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px">Una vez entregada, BanBif lo contactará al número celular indicado en ésta solicitud a fin de culminar el proceso de
+                                        activación mediante validación biométrica facial y captura de imagen de su DNI original. Brindarle seguridad es una prioridad para nosotros,
+                                        por lo cual agradecemos su gentil colaboración.</div>
+                                    <div><b>IMPORTANTE:</b> No entregues tu Tarjeta a nadie, BanBif nunca te solicitará que nos la entregues.</div>
+                                </div>
+                                <span th:unless="${ banBifLoanApplicationType == T(com.affirm.common.model.transactional.LoanApplication).BANBIF_LOAN_APPLICATION_TYPE_ONLINE }">
+                                    Un ejecutivo se contactar&aacute; contigo al n&uacute;mero
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" th:unless="${ banBifLoanApplicationType == T(com.affirm.common.model.transactional.LoanApplication).BANBIF_LOAN_APPLICATION_TYPE_ONLINE }">
+                        <div class="col-lg-12">
+                            <div style="display: flex;justify-content: center;align-items: center;margin-bottom: 60px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="50" viewBox="0 0 22.865 45.75" style="margin-right: 20px">
+                                    <path id="Icon_ionic-ios-phone-portrait" data-name="Icon ionic-ios-phone-portrait"
+                                          d="M29.7,2.25h-16.2a3.36,3.36,0,0,0-3.38,3.36V44.518A3.46,3.46,0,0,0,13.505,48H29.691a3.391,3.391,0,0,0,3.3-3.482V5.61A3.277,3.277,0,0,0,29.7,2.25ZM20.031,4.6h3.064a.408.408,0,1,1,0,.817H20.031a.408.408,0,0,1,0-.817Zm1.583,41.869a1.777,1.777,0,1,1,1.777-1.777A1.778,1.778,0,0,1,21.614,46.468Zm9.548-5h-19.2a.2.2,0,0,1-.2-.2V7.662a.2.2,0,0,1,.2-.2h19.2a.2.2,0,0,1,.2.2v33.6A.2.2,0,0,1,31.162,41.464Z" transform="translate(-10.125 -2.25)" fill="#151515"/>
+                                </svg>
+                                <b style="font-size: 20px;" th:utext="${@utilService.getHyphenatedPhoneNumber(phoneNumber)}"></b>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+              <!--  <div class="row" th:if="${ banBifLoanApplicationType == T(com.affirm.common.model.transactional.LoanApplication).BANBIF_LOAN_APPLICATION_TYPE_ONLINE }">
+                    <div class="col-lg-12">
+                        <button id="btnGoToWebBanBif" class="button banbif-btn" type="button">Ir a la p&aacute;gina Web</button>
+                    </div>
+                </div> -->
+
+                <div class="row" style="font-family: Helvetica, Arial, sans-serif;display: flex;
+                                flex-direction: row;
+                                flex-wrap: wrap;
+                               margin-bottom: 40px;">
+                    <div class="col-12" style="flex: 100%;">
+                        <div class="title" style="margin-bottom: 12px;">Descubre nuevos productos pensados para ti</div>
+                    </div>
+                    <div class="col-6 order" style="flex: 50%;">
+                        <div class="card left">
+                            <div class="card-body">
+                                <div class="box-subtitle">
+                                    <div class="sub-title">Abre y activa una Cuenta de Ahorros Digital desde tu celular sin ir al banco</div>
+                                    <div class="row-mobile" style="margin-bottom: 4.6rem;">
+                                        <div class="column" >
+                                            <div class="box">
+                                                <div class="box-icon">
+                                                    <svg class="icon-check" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                         viewBox="0 0 58 58"  xml:space="preserve">
+                                                    <polyline style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" points="
+                                                        42,20 26,38 16,30 "/>
+                                                    </svg>
+                                                </div>
+                                                <div class="banbif-description-text-color">
+                                                    5.5% TREA en S/
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="column" >
+                                            <div class="box">
+                                                <div class="box-icon">
+                                                    <svg class="icon-check" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                         viewBox="0 0 58 58"  xml:space="preserve">
+                                                    <polyline style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" points="
+                                                        42,20 26,38 16,30 "/>
+                                                    </svg>
+                                                </div>
+                                                <div class="banbif-description-text-color">
+                                                    Sin costo por mantenimiento
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="column" >
+                                            <div class="box">
+                                                <div class="box-icon">
+                                                    <svg class="icon-check" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                         viewBox="0 0 58 58"  xml:space="preserve">
+                                                    <polyline style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" points="
+                                                        42,20 26,38 16,30 "/>
+                                                    </svg>
+                                                </div>
+                                                <div class="banbif-description-text-color">
+                                                    Retiros ilimitados por cajeros GlobalNet
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div>
+                                        <a href="https://www.banbif.com.pe/personas/Cuenta-Digital-moneda?utm_source=Referral&amp;utm_medium=Solven_PasoFinal&amp;utm_campaign=Captaci%C3%B3n_CAD" target="_blank" class="button bg-red">Abrir cuenta ahora</a>
+                                    </div>
+                                    <div >
+                                        <a class="button btn-link" target="_blank" href="https://www.banbif.com.pe/Personas/Cuenta-de-Ahorro/Cuenta-Ahorro-Digital" >Conocer más</a>
+                                    </div>
+                                </div>
+                                <div class="text-footer mobile banbif-description-text-color">*Obtenla del 30.06.23 al 28.09.23</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6" style="flex: 50%;">
+                        <div class="card right">
+                            <div class="card-body">
+                                <div class="box-subtitle">
+                                    <div class="row-mobile">
+                                        <div class="column" >
+                                            <div class="box">
+                                                <div>
+                                                    <div class="sub-title" style="color: #AD96DC">¿Miedo a las compras fraudulentas por internet?</div>
+                                                </div>
+                                            </div>
+                                            <div class="box">
+                                                <div>
+                                                    <div style="text-align: justify" class="banbif-description-text-color">Protege tus tarjetas BanBif y de otros bancos a solo S/9.50 al mes gana
+                                                        tranquilidad con nuestro seguro de Protección de Tarjetas Cyber.</div>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <img style="width: 110px;object-fit: contain;" src="https://solven-public.s3.amazonaws.com/img/banbif/candado+banbif+.png" alt="" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div>
+                                        <a class="button" href="https://www.reinventabanbif.pe/seguro" target="_blank" style="background: #AD96DC;color: white">Afíliate ahora</a>
+                                    </div>
+                                    <div >
+                                        <a class="button btn-link" style="color: #AD96DC" href=" https://www.banbif.com.pe/Personas/Fondos-Mutuos-y-Seguros/Seguros/Seguro-Protecci%C3%B3n-de-Tarjetas-Cyber" target="_blank" >Conocer más</a>
+                                    </div>
+                                </div>
+                                <div class="text-footer mobile">&nbsp;</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#btnGoToWebBanBif').click(function () {
+            window.open('https://www.banbif.com.pe/Personas', '_blank')
+        });
+
+        $(".footer-159").hidden();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

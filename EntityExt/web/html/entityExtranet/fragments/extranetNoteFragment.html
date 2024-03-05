@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="noteFragment">
+    <table class="table table-striped table-bordered table-hover" id="tableNote">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Tipo</th>
+            <th>Detalle</th>
+        </tr>
+        </thead>
+        <tbody>
+            <th:block th:if="${not #lists.isEmpty(notes)}" th:each="note : ${notes}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(note.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(note?.registerDate)}"></td>
+                    <td th:text="${note.username}"></td>
+                    <td>
+                        <th:block th:switch="${note.type}">
+                            <th:block th:case="'P'"><span class="label label-xs label-warning" th:text="${note.getTypeDescription()}"></span></th:block>
+                            <th:block th:case="'D'"><span class="label label-xs label-success" th:text="${note.getTypeDescription()}"></span></th:block>
+                        </th:block>
+                    </td>
+                    <td>
+                        <div style="cursor: pointer;max-width: 99%;text-overflow: ellipsis;white-space: nowrap;-webkit-box-orient: vertical;-webkit-line-clamp: 1;overflow: hidden;" th:data="${note.getDataToRow()}" th:text="${note?.note}" class="open-detail-note truncate-text"></div>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(notes)}">
+                <tr>
+                    <td colspan="4">
+                        No hay resultados
+                    </td>
+                </tr>
+            </th:block>
+        </tbody>
+    </table>
+
+</th:block>
+
+<th:block th:fragment="noteFormFragment">
+    <script>
+
+        function fillExtranetNoteForm(note, type, id){
+            $('#registerNoteForm').find("#type").val(type);
+            $('#registerNoteForm').find("#type").change();
+            $('#registerNoteForm').find("#note").val(note);
+            $('#registerNoteForm').find("#extranetNoteId").val(id);
+
+            $(".create-note-title").hide();
+            $(".register-note-button-text").hide();
+            $(".edit-note-title").show();
+            $(".edit-note-button-text").show();
+
+        }
+
+        function clearExtranetNoteForm(){
+            $('#registerNoteForm').find("#type").val("P");
+            $('#registerNoteForm').find("#note").val(null);
+            $('#registerNoteForm').find("#extranetNoteId").val(null);
+            $('#registerNoteForm').find("#type").change();
+
+            $(".create-note-title").show();
+            $(".register-note-button-text").show();
+            $(".edit-note-title").hide();
+            $(".edit-note-button-text").hide();
+
+        }
+
+        $(document).ready(function(){
+            $('#type').selectpicker();
+
+            $("#createNoteSubmit").click(function(){
+                let requestNoteForm = $('#registerNoteForm').serializeObject();
+                if(requestNoteForm.note == null || requestNoteForm.note == "") {
+                    $("#noteError").show();
+                    return;
+                }
+                createNewNote(requestNoteForm.note,requestNoteForm.type,requestNoteForm.id == "" ? null : requestNoteForm.id);
+            })
+
+        })
+    </script>
+    <div id="noteForm" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal create-note-title">Nueva nota</h4>
+                        <h4 class="title-modal edit-note-title" style="display: none">Editar nota</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <form id="registerNoteForm" method="post" class="modal-body">
+                    <input type="hidden" name="id" id="extranetNoteId"/>
+                    <div class="col-12 field">
+                        <label>Tipo</label>
+                        <select class="form-control selectpicker" id="type" name="type">
+                            <option value="P">Publicidad</option>
+                            <option value="D">Desarrollo</option>
+                        </select>
+                    </div>
+                    <br/>
+                    <div class="col-12 field">
+                        <label>Nota</label>
+                        <textarea id="note" name="note" row="4" class="form-control" maxlength="500" />
+                        <div class="errorContainer" id="noteError" style="display: none">
+                            <span class="help-block form-field-error-message">Campo es requerido</span>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" id="cancelButtonSaveButton" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="createNoteSubmit" type="button" class="btn btn-danger">
+                        <span class="register-note-button-text">Registrar</span>
+                        <span class="edit-note-button-text" style="display:none;">Editar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="noteFormDetailFragment">
+    <div id="noteFormDetail" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Nota</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div style="width: 100%;padding: 1rem 1.5rem;">
+                    <div class="col-12" style="margin-bottom: 5px"><b>Fecha:</b> <span id="dateNote"></span></div>
+                    <div class="col-12" style="margin-bottom: 5px"><b>Usuario:</b> <span id="userNote"></span></div>
+                    <div class="col-12" style="margin-bottom: 5px"><b>Tipo:</b>
+                        <span class="label label-xs" id="typeNote"></span>
+                    </div>
+                    <div class="col-12" style="margin-bottom: 5px;word-wrap: break-word;">
+                        <b>Nota:</b>
+                        <br/>
+                        <p style="text-align: justify;" id="descriptionNote"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelButtonSaveButton" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <th:block th:if="${not #lists.isEmpty(notes)}" th:each="note : ${notes}">
+        <tr>
+            <td th:text="${@utilService.datetimeShortFormat(note.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(note?.registerDate)}"></td>
+            <td th:text="${note.username}"></td>
+            <td>
+                <th:block th:switch="${note.type}">
+                    <th:block th:case="'P'"><span class="label label-xs label-warning" th:text="${note.getTypeDescription()}"></span></th:block>
+                    <th:block th:case="'D'"><span class="label label-xs label-success" th:text="${note.getTypeDescription()}"></span></th:block>
+                </th:block>
+            </td>
+            <td>
+                <div style="cursor: pointer;max-width: 99%;text-overflow: ellipsis;white-space: nowrap;-webkit-box-orient: vertical;-webkit-line-clamp: 1;overflow: hidden;" th:data="${note.getDataToRow()}" th:text="${note?.note}" class="open-detail-note truncate-text"></div>
+            </td>
+        </tr>
+    </th:block>
+    <th:block th:if="${#lists.isEmpty(notes)}">
+        <tr>
+            <td colspan="4">
+                No hay resultados
+            </td>
+        </tr>
+    </th:block>
+</th:block>
+
+</html>

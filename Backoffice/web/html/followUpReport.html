@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Reporte de follow Up</title>
+    <!-- TableFilter -->
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/css/bootstrap-multiselect.css'}" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/js/bootstrap-multiselect.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var hoursByCategory = /*[[${hoursByCategory}]]*/;
+        var subcategoriesByCategory = /*[[${subcategoriesByCategory}]]*/;
+
+        var customTemplate = {
+            button: '<button type="button" style="color: #555; border: 1px solid #c2cad8; height: calc(1.8125rem + 2px); font-size: .875rem; padding-top: 5px;" ' +
+                'class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text pull-left"></span> ' +
+                '<b class="caret pull-right" style="margin-top: 6px;"></b></button>',
+            ul: '<ul class="multiselect-container dropdown-menu" style="font-size: 12px; color: #555; width: 100%;"></ul>'
+        };
+
+        var customOptionsMultiselect = {
+            buttonWidth: '100%',
+            nonSelectedText: 'Todos',
+            numberDisplayed: 1,
+            nSelectedText: ' seleccionados',
+            includeSelectAllOption: true,
+            selectAllText: ' Seleccionar todos',
+            selectAllValue: 0,
+            allSelectedText: 'Todos seleccionados',
+            templates: customTemplate
+        };
+
+        var selectedCategory = 'Commercial';
+        var dropDownSubcategories;
+        var dropDownHoursOfDay;
+
+        function fillSubcategoriesDropDown() {
+            var subCategories = Array();
+            dropDownSubcategories = Array();
+
+            if (selectedCategory == 'Commercial')
+                subCategories = subcategoriesByCategory.Commercial;
+            else
+                subCategories = subcategoriesByCategory.Collection;
+
+            for (var i = 0; i < subCategories.length; i++) {
+                dropDownSubcategories.push({
+                    'label': subCategories[i].content,
+                    'value': subCategories[i].id
+                });
+            }
+
+            jQuery($('#subCategory')).multiselect('dataprovider', dropDownSubcategories);
+        }
+
+        function fillHoursOfDayDropDown() {
+            var hoursOfDay = Array();
+            dropDownHoursOfDay = Array();
+
+            if (selectedCategory == 'Commercial')
+                hoursOfDay = hoursByCategory.Commercial;
+            else
+                hoursOfDay = hoursByCategory.Collection;
+
+            var options = '<option value="">Todos</option>';
+            for (var i = 0; i < hoursOfDay.length; i++) {
+                options += '<option value="' + hoursOfDay[i] + '">' + hoursOfDay[i] +'</option>';
+            }
+
+            $('#schedule').html(options);
+        }
+
+        $(function () {
+            $('#category').change(function () {
+                selectedCategory = $(this).val();
+                fillSubcategoriesDropDown();
+                fillHoursOfDayDropDown();
+            });
+
+            $('#category').change();
+
+            $('#processReport').click(function () {
+
+                var from = $('#fromDate').val();
+                var to = $('#toDate').val();
+
+                if (from == '' || to == '') {
+                    showErrorModal("Ingresar Fecha de Registro: Desde - Hasta");
+                    return;
+                }
+
+                var filters = $('#filter .form-control');
+                var jsonParams = {};
+                for (var i = 0; i < filters.length; i++) {
+                    if (jsonParams[filters[i].name] == undefined) {
+                        jsonParams[filters[i].name] = [];
+                    }
+                    jsonParams[filters[i].name][jsonParams[filters[i].name].length] = $(filters[i]).val();
+                }
+
+                defaultAjax({
+                    url: /*[[@{/followUpReport}]]*/null,
+                    type: 'POST',
+                    data: jsonParams,
+                    success: function (data) {
+                        if (data !== null && data.trim() !== '') {
+                            $('#resultTable').html(data);
+                        }
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+    <style>
+        @media (min-width: 576px) {
+            .btn-process {
+                position: absolute !important;
+                bottom: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Follow Up Report</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Follow Up Report</span>
+                                </div>
+                            </div>
+                            <div id="filter">
+                                <form role="form" >
+                                    <div class="form-row">
+                                        <!-- Fecha de registro -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><br/>Categor&iacute;a</label>
+                                                <select id="category" name="category"
+                                                    class="form-control form-control-sm" tabindex="1">
+                                                    <option value="Collection">Cobranza</option>
+                                                    <option value="Commercial">Comercial</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><br/>Sub Categor&iacute;a</label>
+                                                <select id="subCategory" name="interactionContentIds[]"
+                                                        class="form-control input-sm form-control-sm control-filter"
+                                                        multiple="multiple">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><br/>Horario</label>
+                                                <select id="schedule" name="schedule"
+                                                    class="form-control form-control-sm" tabindex="1">
+                                                    <option value="">Todos</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Fecha de registro</b><br />Desde</label>
+                                                <input id="fromDate" name="fromDate" type="text"
+                                                    class="form-control input-sm form-control-sm"
+                                                    placeholder="Desde" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br />Hasta</label>
+                                                <input id="toDate" name="toDate" type="text"
+                                                    class="form-control input-sm form-control-sm"
+                                                    placeholder="Hasta" />
+                                            </div>
+                                        </div>
+                                        <script th:inline="javascript">
+                                            /*<![CDATA[*/
+
+                                            $('#subCategory').multiselect(customOptionsMultiselect);
+
+                                            var creationFromFilter = $('#fromDate');
+                                            var creationToFilter = $('#toDate');
+                                            datepicker(creationFromFilter);
+                                            datepicker(creationToFilter);
+
+                                            function datepicker(obj) {
+                                                obj.datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                            }
+                                            creationFromFilter.on('change', function () {
+                                                creationToFilter.datepicker('setStartDate',
+                                                    creationFromFilter.val());
+                                            });
+                                            /*]]>*/
+                                        </script>
+                                        <div class="col-md-2 col-sm-3">
+                                            <button id="processReport" type="button" class="btn blue btn-outline btn-process">Procesar</button>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="portlet portlet-followup transparent">
+                                        <div class="portlet-title">
+                                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                                <span
+                                                    th:class="${@frontEndService.getDefaultCaptionSubjectClass()}" >Reportes</span>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="table-responsive" id="resultTable">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+<th:block th:fragment="results-table">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <th:block th:if="${event.event != 'total'}">
+                    <td th:text="${event.event}"></td>
+                    <td th:text="${@utilService.percentFormat(event.percentage, 'PE')}"></td>
+                    <td th:if="${event.uniqueHits == event.totalHits}"  th:text="${event.uniqueHits}"></td>
+                    <td th:if="${event.uniqueHits != event.totalHits}"  th:text="${event.uniqueHits + ' únicos / ' + event.totalHits + ' en total'}"></td>
+                    <td><a href="#" target="_blank" th:href="@{/followUpReport/download(event=${event.event}, personInteractionIds=${event.getPersonInteractionsAsString()})}">Descargar</a></td>
+                </th:block>
+                <th:block th:if="${event.event == 'total'}">
+                    <td><strong>Total</strong></td>
+                    <td><strong>100%</strong></td>
+                    <td><strong th:text="${event.uniqueHits}"></strong></td>
+                    <td><a href="#" target="_blank" th:href="@{/followUpReport/download(event=${event.event}, personInteractionIds=${event.getPersonInteractionsAsString()})}">Descargar</a></td>
+                </th:block>
+            </tr>
+        </tbody>
+    </table>
+</th:block>
+</body>
+
+</html>

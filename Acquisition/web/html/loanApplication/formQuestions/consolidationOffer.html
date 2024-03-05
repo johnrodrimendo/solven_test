@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>Consolidaci&oacute;n de deudas.</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function () {
+            $('#helpSign').on('click', function (event) {
+                event.preventDefault();
+                $('#hlp-modal').modal({backdrop: 'static', keyboard: false, show: true});
+            });
+            $("select").each(function () {
+                $(this).select2({
+                    minimumResultsForSearch: -1,
+                    placeholder: $(this).data('placeholder'),
+                    width: $(this).data('width') + 'px'
+                });
+            });
+            $('.details').on('click', function (e) {
+
+                if ($(this).attr('data-target') != 'open') {
+                    $(this).closest('tr').find('.image').addClass('block-hidden');
+                    $(this).closest('tr').find('.description').removeClass('block-hidden');
+                    $(this).attr('data-target', 'open');
+                } else {
+                    $(this).closest('tr').find('.image').removeClass('block-hidden');
+                    $(this).closest('tr').find('.description').addClass('block-hidden');
+                    $(this).attr('data-target', 'close');
+                }
+            });
+            var i = 0;
+            $('.see-more').on('click', function(e){
+                e.preventDefault();
+                if (i == 0) {
+                    $(this).closest('.offers-list').find('.block-toggle').addClass('open');
+                    $(this).closest('.offers-list').find('.bottom .icon').removeClass('icon-bullet-down');
+                    $(this).closest('.offers-list').find('.bottom .icon').addClass('icon-bullet-up');
+                    i = 1;
+                } else {
+                    $(this).closest('.offers-list').find('.block-toggle').removeClass('open');
+                    $(this).closest('.offers-list').find('.bottom .icon').removeClass('icon-bullet-up');
+                    $(this).closest('.offers-list').find('.bottom .icon').addClass('icon-bullet-down');
+                    i = 0;
+                }
+            });
+        });
+
+        function updateConsolidableDebt(entityCode, consolidationAccountType, balance, rate, installments, consolidable,  creditCardNumber, creditCardBrand, creditCardDepartment, successFunc){
+            var dataJson = {};
+            if(balance != null)
+                dataJson.balance = balance;
+            if(rate != null)
+                dataJson.rate = rate;
+            if(installments != null)
+                dataJson.installments = installments;
+            if(consolidable != null)
+                dataJson.consolidable = consolidable;
+            if(creditCardNumber != null)
+                dataJson.creditCardNumber = creditCardNumber;
+            if(creditCardBrand != null)
+                dataJson.creditCardBrand = creditCardBrand;
+            if(creditCardDepartment != null)
+                dataJson.creditCardDepartment = creditCardDepartment;
+
+            $('#loading-full').loadingContent();
+            $('#offerContainer').defaultLoad(/*[[@{/__${evaluationType}__/question/__${loanApplication.currentQuestionId}__/updateConsolidableDebt}]]*/, null,
+                    function(){
+                        if(successFunc != null) {
+                            successFunc();
+                        }
+                        $('#loading-full').unloadingContent();
+                    }, 'POST', $.extend(dataJson, {
+                        token: /*[[${token}]]*/,
+                        entityCode: entityCode,
+                        consolidationAccountType: consolidationAccountType
+                    }), function(){
+                        $('#loading-full').unloadingContent();
+                    }
+            );
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<th:block layout:fragment="content">
+    <div id="loading-full" class="fullscreen-loading"></div>
+    <div class="comparator">
+        <div class="container">
+            <div class="comparator-wrap">
+                <div class="panel-top">
+                    <div class="head">
+                        <h3><i class="icon icon-credit-billiant"></i> <span class="text-lightblue" th:text="${personName}">Martin</span>, consolida tus deudas</h3>
+                    </div>
+                    <div id="offerContainer" class="filters">
+                        <th:block th:replace="this :: offerContainer"></th:block>
+                    </div>
+                </div>
+                <div class="comparision-details" id="results-container">
+                    <th:block th:replace="this :: resultsContent"></th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="hlp-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+        <div class="modal-dialog" role="help">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Preg&uacute;ntanos algo</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div class="contact-form">
+                            <form th:object="${processContactForm}" id="contactForm">
+                                <div id="response-block"></div>
+                                <div class="field">
+                                    <input type="text" th:field="*{contactFullName}" class="input-outline"
+                                           placeholder="Nombre completo"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <input autocorrect="off" autocapitalize="none" type="text"
+                                           th:field="*{contactEmail}" class="input-outline"
+                                           placeholder="Correo electr&oacute;nico"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <textarea th:field="*{contactMessage}" class="input-outline" rows="5"
+                                              placeholder="Mensaje..."></textarea>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field text-center">
+                                    <div class="g-recaptcha"
+                                         th:attr="data-sitekey=${@configuration.invisibleCaptchaPublicKey()}"
+                                         data-callback="submit" data-size="invisible"></div>
+                                    <button class=" button bg-red" id="sendMessage">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+</th:block>
+<th:block th:fragment="offerContainer">
+    <th:block th:if="${!hasConsolidableDebts}">
+        <div class="row">
+            <div class="empty-offer">
+                <p>A&uacute;n no seleccionaste deudas para consolidar.</p>
+            </div>
+        </div>
+    </th:block>
+    <th:block th:if="${hasConsolidableDebts}">
+        <div class="row">
+            <div class="col-lg-3 cl-md-3 col-sm-3 cl">
+                <ul class="cb-lists">
+                    <li>
+                        <p class="text-small"><i class="icon icon-bullet-fill-right text-lightblue"></i> Monto Total:
+                            <strong><span id="totalAmount" class="big" th:text="${@utilService.integerMoneyFormat(offer.ammount)}">S/ 250 000</span></strong></p>
+                        <input type="hidden" id="totalAmountValue"/>
+                    </li>
+                    <li>
+                        <div class="text-small">
+                            <i class="icon icon-bullet-fill-right text-lightblue"></i> Plazo:
+                            <strong><span id="installmentsText" class="big" th:text="${offer.installments}"></span> meses</strong>
+                            <div class="actions">
+                                <button class="rounded" id="decrement"><i class="icon icon-minus"></i></button>
+                                <button class="rounded" id="increment"><i class="icon icon-plus"></i></button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="installments"/>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-3 cl-md-3 col-sm-3 cl">
+                <ul class="cb-lists">
+                    <li>
+                        <p class="text-small"><i class="icon icon-bullet-fill-right text-lightblue"></i> Cuota promedio:
+                            <strong><span th:text="${@utilService.integerMoneyFormat(offer.installmentAmountAvg)}"></span></strong></p>
+                    </li>
+                    <li>
+                        <p class="text-small"><i class="icon icon-bullet-fill-right text-lightblue"></i> Ahorro:
+                            <strong><span th:text="${@utilService.integerMoneyFormat(consolidationSavings)}"></span></strong></p>
+                    </li>
+                    <li>
+                        <p class="text-small"><i class="icon icon-bullet-fill-right text-lightblue"></i> Comisi&oacute;n Solven:
+                            <strong><span th:text="${@utilService.doubleMoneyFormat(offer.loanCommission)}"></span></strong></p>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-3 cl-md-3 col-sm-3 cl">
+                <ul class="cb-lists">
+                    <li>
+                        <p class="text-small"><i class="icon icon-bullet-fill-right text-lightblue"></i> TEA:
+                            <strong><span th:text="${@utilService.percentFormat(offer.effectiveAnualRate)}"></span></strong></p>
+                    </li>
+                    <li>
+                        <p class="text-small"><i class="icon icon-bullet-fill-right text-lightblue"></i> TCEA:
+                            <strong><span th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate)}"></span></strong></p>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-3 cl-md-3 col-sm-3 cl" style="text-align: center">
+                <button id="applyButton" class="button bg-red" style="margin-bottom: .35em;">Sol&iacute;citalo aqu&iacute;</button>
+                <a id="viewScheduleButton" class="text-lightblue text-small" href="javascript:;">Ver cronograma</a>
+            </div>
+        </div>
+        <div id="offerScheduleModal" class="modal fade" tabindex='-1'>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal">Cronograma de pagos preliminar</h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+
+                    <div class="modal-middle">
+                        <th:block th:replace="fragments/modalScheduleFragment :: modalSchedule(laoanApplication=${loanApplication}, offer=${offer}, person=${person})"></th:block>
+                    </div>
+                    <div class="actions text-center" style="padding: 0 0 1.5em 0">
+                        <button type="button" class="button black-button"
+                                data-dismiss="modal">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var minInstallments = [[${minInstallments}]], maxInstallments = [[${offer.maxInstallments}]];
+            $(function(){
+                //$('#spinner-down').find('.icon-bullet-down').addClass('disabled-control');
+                $('#increment').on('click', function(e){
+                    e.preventDefault();
+                    var newInstallment = Number($('#installmentsText').text()) + 1;
+                    if (newInstallment > maxInstallments) {
+                        return;
+                    } else {
+                        $('#installmentsText').text(newInstallment);
+                        $('#installments').val(newInstallment);
+                        updateOfferInstallments(newInstallment);
+                    }
+                });
+
+                $('#decrement').on('click', function(e){
+                    e.preventDefault();
+                    var newInstallment = Number($('#installmentsText').text()) - 1;
+                    if (newInstallment < minInstallments) {
+                        return;
+                    } else {
+                        $('#installmentsText').text(newInstallment);
+                        $('#installments').val(newInstallment);
+                        updateOfferInstallments(newInstallment);
+                    }
+                });
+
+                $('#applyButton').click(function(){
+                    defaultAjax({
+                        url: /*[[@{/__${evaluationType}__/question/__${loanApplication.currentQuestionId}__/}]]*/,
+                        type: 'POST',
+                        data:{
+                            token: /*[[${token}]]*/
+                        }
+                    })
+                });
+            });
+
+            var installmentTimeout;
+            function updateOfferInstallments(newInstallment){
+                if(installmentTimeout != null) {
+                    clearTimeout(installmentTimeout);
+                    installmentTimeout = null;
+                }
+
+                installmentTimeout = setTimeout(function(){
+                    $('#loading-full').loadingContent();
+                    $('#offerContainer').defaultLoad(/*[[@{/__${evaluationType}__/question/__${loanApplication.currentQuestionId}__/updateInstallments}]]*/, null,
+                            function(){
+                                $('#loading-full').unloadingContent();
+                            }, 'POST', {
+                                token: /*[[${token}]]*/,
+                                installemnts: newInstallment,
+                            }, function(){
+                                $('#loading-full').unloadingContent();
+                            }
+                    );
+                }, 1000);
+            }
+
+            $('#viewScheduleButton').click(function(){
+                $('#offerScheduleModal').modal('show');
+            });
+            /*]]>*/
+        </script>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="resultsContent">
+    <br/>
+    <div class="infoMessage text-black">
+        <p th:utext="#{comparator.msg.content}"></p>
+    </div>
+    <ul>
+        <li th:each="debt : ${debts}" class="offers-list consolidation" th:classappend="${debt.selected ? 'enabled':''}"
+            th:attr="data-debt-account-type=${debt.consolidationAccounttype},data-debt-entity-code=${debt.entity.code}">
+            <div class="top-bar">
+                <div class="bar"></div>
+            </div>
+            <div class="block">
+                <div class="row">
+                    <form class="forms">
+                        <div class="col-lg-2 col-md-2 col-sm-2 column">
+                            <img th:if="${debt?.entity?.bank != null}" th:src="${debt?.entity?.bank?.logoUrl}"/>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 column">
+                            <div class="desc-wrap">
+                                <div class="desc">
+                                    <h3 th:text="${debt?.entity?.shortName}"></h3>
+                                    <small th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).CREDITO_CONSUMO}"
+                                           class="text-lightblue">(Cr&eacute;dito personal)</small>
+                                    <small th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}"
+                                           class="text-lightblue">(Tarjeta de cr&eacute;dito)</small>
+                                </div>
+                                <div class="field field-amount-small inline">
+                                    <div class="wrap-field">
+                                        <small class="input-help">Saldo Pdte.</small>
+                                        <div class="box-icon prefix-box tiny-input">
+                                            <span class="prefix">S/</span>
+                                        </div>
+                                        <input type="text" id="balance" name="balance" class="input-outline-small amount-input" th:value="${debt.balance}" th:attr="data-previous=${debt.balance}"/>
+                                    </div>
+                                </div>
+                                <div class="field field-percentage-small inline">
+                                    <div class="wrap-field">
+                                        <small class="input-help">TEA </small>
+                                        <input type="text" id="rate" name="rate" class="input-outline-small tiny-input" th:value="${debt.rate}" th:attr="data-previous=${debt.rate}"/>
+                                        <div class="box-icon box-right prefix-box tiny-input">
+                                            <span class="subfix"><i class="icon icon-percent"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field field-amount inline" th:if="${debt.consolidationAccounttype != T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}">
+                                    <small class="input-help">Cuotas Pendientes</small>
+                                    <input type="text" id="installments" name="installments" class="input-outline-small tiny-input" th:value="${debt.installments}" th:attr="data-previous=${debt.rate}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 column">
+                            <div class="ask-wrap">
+                                <p id="askConsolidate" class="text-small" th:text="${debt.selected ? 'Consolidado':'¿Consolidar?'}" th:classappend="${debt.selected ? 'active-consolidate':''}"></p>
+                                <button type="button" class="btn-action button-small bg-red-3 tiny no-consolidate-button" th:classappend="${debt.selected ? 'btn-enabled':'btn-disabled'}" data-action="not"><i class="icon icon-close"></i></button>
+                                <button type="button" class="btn-action button-small bg-lightblue tiny consolidate-button" th:classappend="${debt.selected ? 'btn-disabled':''}" data-action="yes"><i class="icon icon-check"></i></button>
+                            </div>
+                            <div class="last-info hidden" th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}">
+                                <button class="close close-button"><i class="icon icon-close"></i></button>
+                                <div class="field">
+                                    <input id="creditCardNumber" name="creditCardNumber" type="text" class="input-outline-small" placeholder="Nro. Tarjeta"
+                                           th:value="${debt.accountCardNumber}"/>
+                                </div>
+                                <div class="field select2-small">
+                                    <select id="creditCardBrand" name="creditCardBrand" data-width="200" data-placeholder="Marca">
+                                        <option value="" disabled="disabled" selected="selected"></option>
+                                        <option th:each="brand : ${@catalogService.getBrands()}"
+                                                th:value="${brand.id}" th:text="${brand.name}" th:selected="${debt.brandId == brand.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="field select2-small">
+                                    <select id="creditCardDepartment" name="creditCardDepartment" data-width="200" data-placeholder="Lugar de emisi&oacute;n">
+                                        <option value="" disabled="disabled" selected="selected"></option>
+                                        <option th:each="department : ${@catalogService.getDepartments()}"
+                                                th:value="${department.id}" th:text="${department.name}" th:selected="${debt.departmentUbigeo == department.id}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="display-block">
+        <div class="sponsored-by">
+            <hr class="divisor-thin"/>
+            <div class="box-sponsor text-center">
+                <small class="text-black">Financiado por</small>
+                <br/>
+                <img th:src="${offer?.entity?.logoUrl}" width="150"/>
+            </div>
+        </div>
+    </div>
+    <div class="empty-offer">
+        <p th:if="${debts == null or debts.isEmpty()}">No encontramos ofertas para consolidar.</p>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        scanDisableButtons();
+        $('.close-button').on('click', function(e){
+            e.preventDefault();
+            $(this).closest('.last-info').addClass('hidden');
+            $(this).closest('.column').find('.ask-wrap').removeClass('hidden');
+        });
+
+        $('.apply-result-button').click(function(){
+            $('#offerContainer').loadingContent();
+            defaultAjax({
+                url: /*[[@{/__${T(com.affirm.acquisition.controller.ComparisonController).URL}__/applyForResult}]]*/,
+                type: 'POST',
+                data:{
+                    token: [[${token}]],
+                    bankId: $(this).data('bank'),
+                    comparisonCategoryId: $(this).data('comparison-category')
+                }
+            })
+        });
+
+        $('li.consolidation').each(function(){
+            var validator = /*[[${form.validator.toJson(#locale)}]]*/;
+            $(this).find('form').validateForm(createFormValidationJson(JSON.parse(validator), $(this).find('form')));
+
+            $(this).find('input[name=balance]').blur(function(){
+                if ($(this).data('previous') != null) {
+                    if ($(this).data('previous') != $(this).val()) {
+                        updateConsolidableDebt(
+                                $(this).closest('li').data('debt-entity-code'),
+                                $(this).closest('li').data('debt-account-type'),
+                                $(this).val());
+                        $(this).data('previous', $(this).val());
+                    }
+                } else {
+                    updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            $(this).val());
+                    $(this).data('previous', $(this).val());
+                }
+            });
+
+            $(this).find('input[name=rate]').blur(function(){
+                if ($(this).data('previous') != null) {
+                    if ($(this).data('previous') != $(this).val()) {
+                        updateConsolidableDebt(
+                                $(this).closest('li').data('debt-entity-code'),
+                                $(this).closest('li').data('debt-account-type'),
+                                null, $(this).val());
+                        $(this).data('previous', $(this).val());
+                    }
+                } else {
+                    updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, $(this).val());
+                    $(this).data('previous', $(this).val());
+                }
+
+            });
+            $(this).find('input[name=installments]').blur(function(){
+                if ($(this).data('previous') != null) {
+                    if ($(this).data('previous') != $(this).val()) {
+                        updateConsolidableDebt(
+                                $(this).closest('li').data('debt-entity-code'),
+                                $(this).closest('li').data('debt-account-type'),
+                                null, null, $(this).val());
+                        $(this).data('previous', $(this).val());
+                    }
+                } else {
+                    updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, null, $(this).val());
+                    $(this).data('previous', $(this).val());
+                }
+            });
+
+            $(this).find('.no-consolidate-button').click(function(){
+                var buttonClicked = $(this);
+                if(buttonClicked.hasClass('btn-disabled')) {
+                }else{
+                    updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, null, null, false, null, null, null, function(){
+                                buttonClicked.addClass('btn-disabled');
+                                buttonClicked.closest('li').find('.no-consolidate-button').removeClass('btn-enabled');
+                                buttonClicked.closest('li').find('.consolidate-button').removeClass('btn-disabled');
+                                buttonClicked.closest('li').find('#askConsolidate').text('¿Consolidar?').removeClass('active-consolidate');
+                                if (buttonClicked.closest('.enabled').length > 0) {
+                                    buttonClicked.closest('.offers-list').removeClass('enabled');
+                                }
+                            });
+                }
+
+            });
+            $(this).find('.consolidate-button').click(function(){
+                var buttonClicked = $(this);
+                if(buttonClicked.hasClass('btn-disabled')) {
+                }
+                else{
+                    if ($(this).closest('.column').find('.last-info').length) {
+                        $(this).closest('.ask-wrap').addClass('hidden');
+                        $(this).closest('.column').find('.last-info').removeClass('hidden');
+                        updateCreditCardDebtIfOk($(this).closest('li'));
+                    }else {
+                        var thisSelf = $(this);
+                        updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, null, null, true, null, null, null, function(){
+                                thisSelf.closest('.offers-list').addClass('enabled');
+                            });
+                    }
+                }
+            });
+
+            $(this).find('input[name=creditCardNumber]').blur(function(){
+                updateCreditCardDebtIfOk($(this).closest('li'));
+
+            });
+            $(this).find('select[name=creditCardBrand]').change(function(){
+                updateCreditCardDebtIfOk($(this).closest('li'));
+            });
+            $(this).find('select[name=creditCardDepartment]').change(function(){
+                updateCreditCardDebtIfOk($(this).closest('li'));
+            });
+
+
+
+        });
+
+        function updateCreditCardDebtIfOk(element){
+            var cardNum = element.find('input[name=creditCardNumber]').val();
+            var cardBrand = element.find('select[name=creditCardBrand]').val();
+            var cardDept = element.find('select[name=creditCardDepartment]').val();
+            if(cardNum != '' && cardBrand != null && cardDept != null) {
+                updateConsolidableDebt(
+                        element.data('debt-entity-code'),
+                        element.data('debt-account-type'),
+                        null, null, null, true, cardNum, cardBrand, cardDept, function(){
+                            element.addClass('enabled');
+                            element.find('.no-consolidate-button').removeClass('btn-disabled').addClass('btn-enabled');
+                            element.find('.consolidate-button').addClass('btn-disabled');
+                            element.find('#askConsolidate').text('Consolidado').addClass('active-consolidate');
+                        });
+            }
+
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

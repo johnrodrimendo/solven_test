@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <style>
+        .input-radio .option-wrapper .iconic-option-inner h5 {
+            margin-left: .5em;
+            margin-top: .5em;
+            font-size: .65em;
+            min-height: initial;
+        }
+        .input-radio .option-wrapper .iconic-option-inner .radio {
+            display: inline-block;
+        }
+    </style>
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" th:object="${form}" class="forms q120" autocomplete="off">
+            <p>¿Con qué frecuencia cobrás tu sueldo y hacia que fechas?</p>
+            <div class="forms">
+                <div class="centrado">
+                    <div>
+                        <div class="c1">
+                            <div class="field inline">
+                                <label class="h-input-radio">
+                                    <input type="radio" name="frequencyType" value="S"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner">
+                                            <div class="radio inline"></div>
+                                            <h5 class="inline">Semanal</h5>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="field inline">
+                                <label class="h-input-radio">
+                                    <input type="radio" name="frequencyType" value="Q"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner">
+                                            <div class="radio inline"></div>
+                                            <h5 class="inline">Quincenal</h5>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="field inline">
+                                <label class="h-input-radio">
+                                    <input type="radio" name="frequencyType" value="M"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner">
+                                            <div class="radio inline"></div>
+                                            <h5 class="inline">Mensual</h5>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="c2">
+                            <div class="field" id="monthlyFrequencyContainer" style="display: none;">
+                                <div class="field inline">
+                                    <input type="text" class="input-outline" th:field="*{monthlyPaymentDay}" maxlength="2"/>
+                                    <span>de cada mes</span>
+                                </div>
+                            </div>
+                            <div class="field" id="biweeklyFrequencyContainer" style="display: none;">
+                                <div class="field inline">
+                                    <input type="text" class="input-outline" th:field="*{firstBiweeklyPaymentDay}"
+                                           maxlength="2"/>
+                                    <span>y</span>
+                                    <input type="text" class="input-outline" th:field="*{secondBiweeklyPaymentDay}"
+                                           maxlength="2"/>
+                                    <span>de cada mes</span>
+                                </div>
+                            </div>
+                            <div class="field" id="weeklyFrequencyContainer" style="display: none;">
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="1"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Lunes</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="2"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Martes</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="3"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Miercoles</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="4"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Jueves</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="5"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Viernes</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="6"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Sabado</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="field inline">
+                                    <label class="input-radio">
+                                        <input type="radio" name="weeklyPaymentDay" value="7"/>
+                                        <div class="option-wrapper">
+                                            <div class="iconic-option-inner">
+                                                <div class="radio inline"></div>
+                                                <h5 class="inline">Domingo</h5>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+            </div>
+
+            <div class="field inline r-field">
+                <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var monthlyFrequencyContainer = $('#monthlyFrequencyContainer');
+        var biweeklyFrequencyContainer = $('#biweeklyFrequencyContainer');
+        var weeklyFrequencyContainer = $('#weeklyFrequencyContainer');
+
+        $('[name="frequencyType"]').change(function () {
+            var val = $(this).val();
+
+            switch (val) {
+                case 'M':
+                    biweeklyFrequencyContainer.hide();
+                    weeklyFrequencyContainer.hide();
+                    monthlyFrequencyContainer.show();
+                    break;
+                case 'Q':
+                    monthlyFrequencyContainer.hide();
+                    weeklyFrequencyContainer.hide();
+                    biweeklyFrequencyContainer.show();
+                    break;
+                case 'S':
+                    monthlyFrequencyContainer.hide();
+                    biweeklyFrequencyContainer.hide();
+                    weeklyFrequencyContainer.show();
+                    break;
+            }
+        });
+        $('#sendButton').click(function () {
+            var isValid = $('#questionForm').valid();
+            var customValid = true;
+
+            if (isValid && customValid) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        $('input[value=Q]').on('change', function () {
+            $('#firstBiweeklyPaymentDay').focus();
+        });
+        $('input[value=M]').on('change', function () {
+            $('#monthlyPaymentDay').focus();
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

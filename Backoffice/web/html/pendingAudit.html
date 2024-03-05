@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>S. pendientes de Auditoría</title>
+
+    <!-- TableFilter -->
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var atLeastOneInApproval = /*[[${atLeastOneInApproval}]]*/;
+        var refreshActive = false;
+        var loanApplicationIdsInApproval = /*[[${loanApplicationIdsInApproval}]]*/;
+        var loanApplicationIdsInError = [];
+        var loanApplicationIdsSuccess = [];
+        var errorMessages = [];
+
+        setTimeout(refreshInApproval, 5000);
+
+        if (atLeastOneInApproval) {
+            refreshActive = true;
+        }
+
+        function validateRefresh() {
+            if (!atLeastOneInApproval) {
+                refreshActive = false;
+            }
+        }
+
+        function refreshInApproval() {
+            console.log('refreshActive -> ' + refreshActive);
+            if (refreshActive) {
+                defaultAjax({
+                    url: /*[[@{/loanApplication/pendingaudit}]]*/null,
+                    type: 'POST',
+                    data: {
+                        loanApplicationIdsInApproval: loanApplicationIdsInApproval
+                    },
+                    showLoading: false,
+                    success: function (response) {
+                        console.log(response);
+
+                        loanApplicationIdsInApproval = response.loanApplicationIdsInApproval;
+                        loanApplicationIdsInError = response.loanApplicationIdsInError;
+                        loanApplicationIdsSuccess = response.loanApplicationIdsSuccess;
+                        atLeastOneInApproval = response.atLeastOneInApproval;
+                        errorMessages = response.errorMessages;
+
+                        for (var i = 0; i < loanApplicationIdsInError.length; i++) {
+                            var loanId = loanApplicationIdsInError[i];
+                            $('#spaApproval' + loanId).hide();
+                            $('#iconErrorMessage' + loanId)
+                                .attr("style", "color: red; cursor: pointer; display: inline !important")
+                                .attr('title', errorMessages[i]);
+                            $('#btnAudit' + loanId).show();
+                        }
+
+                        for (var i = 0; i < loanApplicationIdsSuccess.length; i++) {
+                            var loanId = loanApplicationIdsSuccess[i];
+                            $('#row' + loanId).fadeOut(500, function () {
+                                $(this).remove();
+                            });
+                        }
+
+                        validateRefresh();
+                    }
+                });
+            }
+            setTimeout(refreshInApproval, 5000);
+        }
+
+        /*REGISTRAR DESEMBOLSO*/
+
+        function showRegisterAuditModal(loanId,userFileSpeechId,userFileWelcomeId,selectedEntityId) {
+            $('#registerAuditModal').modal('show');
+
+            var baseUrl = /*[[@{/loanApplication/pendingaudit/modal}]]*/;
+            var url = baseUrl+"?loanApplicationId="+loanId;
+            if(userFileSpeechId) {
+                url += '&userFileSpeechId='+userFileSpeechId;
+            }
+            if(userFileWelcomeId) {
+                url += "&userFileWelcomeId="+userFileWelcomeId
+            }
+            $('#registerAuditModal .content').defaultLoad(url, null, function(){
+                $('#registerAuditModal .loading').hide();
+                $('#registerAuditModal .content').show();
+
+                function submitForm() {
+                    $form = $("#auditForm");
+                    var approved = $form[0].approved.value;
+
+                    defaultAjax({
+                        url: $form.attr('action'),
+                        type: $form.attr('method'),
+                        data: $form.serialize(),
+                        success: function (data) {
+
+                            if (approved === "true" && selectedEntityId === /*[[${T(com.affirm.common.model.catalog.Entity).ACCESO}]]*/) {
+                                refreshActive = true;
+                                $('#registerAuditModal').modal('hide');
+                                $('#btnAudit' + loanId).hide();
+                                $('#iconErrorMessage' + loanId).attr("style", "display: none !important");
+                                $('#spaApproval' + loanId).show();
+
+                                atLeastOneInApproval = true;
+                                loanApplicationIdsInApproval.push(loanId);
+
+                                validateRefresh();
+                            } else {
+                                location.reload();
+                            }
+                        },
+                        error: function (data) {
+                            console.log(data);
+                        }
+                    });
+                }
+
+                $('#registerAuditModal .auditModalApproveButton').click(function(){
+                    submitForm();
+                });
+
+                $('#registerAuditModal .auditModalRejectButton').click(function(){
+                    $(this).closest('.panel-body').find('.auditRejectionDiv').show();
+                });
+
+                $('#registerAuditModal .auditModalRejectionConfirmationButton').click(function(){
+                    $("#approved").val(false);
+                    submitForm();
+                });
+            });
+        }
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Desembolsos</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Para auditar</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Para Auditar</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(list)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: listBlock"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN MODAL -->
+    <div id="registerAuditModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content" style="display: none">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL -->
+
+</th:block>
+
+<th:block th:fragment="registerAuditModal">
+    <div class="modal-body">
+        <th:block th:each="typeId : ${params.loanApplicationAuditTypes}">
+            <div class="panel panel-default" th:with="auditType=${@catalogService.getLoanApplicationAuditType(typeId)}">
+                <div class="panel-heading" th:text="${auditType.type}"/>
+                <div class="panel-body">
+                    <div align="center">
+                        <button type="button" class="btn btn-default auditModalRejectButton">Rechazar</button>
+                        <button type="button" class="btn btn-info auditModalApproveButton">Aprobar</button>
+                    </div>
+                    <div class="auditRejectionDiv" style="display: none">
+                        <form th:action="@{/loanApplication/pendingaudit/modal}" method="POST" id="auditForm">
+                            <input type="hidden" th:value="${auditType.id}" name="auditTypeId"/>
+                            <input type="hidden" th:value="${loanApplication.id}" name="loanApplicationId"/>
+                            <input type="hidden" th:value="${userFileWelcomeId} == null ? ${userFileSpeechId} : ${userFileWelcomeId}" name="userFileId"/>
+                            <input type="hidden" value="true" name="approved" id="approved"/>
+                            <div class="form-group">
+                                <label class="control-label">Razón de rechazo</label>
+                                <select name="rejectReasonId" class="form-control">
+                                    <option th:each="reason : ${@catalogService.getLoanApplicationAuditRejectionReasonsByAuditType(auditType.id)}" th:value="${reason.id}" th:text="${reason.reason}"></option>
+                                </select>
+                                <label class="control-label">Comentario</label>
+                                <textarea class="form-control" name="rejectionReasonComment" id="rejectionReasonComment" maxlength="200"></textarea>
+                                <button type="button" class="btn btn-info auditModalRejectionConfirmationButton">Enviar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </div>
+</th:block>
+
+
+<th:block th:fragment="listBlock">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>País</th>
+            <th>Fecha</th>
+            <th>Analista</th>
+            <th>Solicitud</th>
+            <th>Tipo doc.</th>
+            <th>Numero doc.</th>
+            <th>Nombre completo</th>
+            <th>Producto</th>
+            <th>Monto aprobado</th>
+            <th>Financiador</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="loan : ${list}" th:id="'row' + ${loan?.id}">
+                <td>
+                    <div class="choose-country">
+                        <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+                    </div>
+                </td>
+                <td th:text="${@utilService.datetimeShortFormat(loan?.updatedTime)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.updatedTime)}"></td>
+                <td th:text="${loan?.analystPersonName + ' ' + loan?.analystFirstSurname + ' ' + (loan?.analystLastSurname != null ? loan?.analystLastSurname : '')}"></td>
+                <td>
+                    <a th:href="@{/person(personId=${loan?.personId}, tab='applications', applicationId=${loan?.id})}"
+                       th:text="${loan?.code}"></a>
+                </td>
+                <td th:text="${loan?.documentType?.name}"></td>
+                <td th:text="${loan?.documentNumber}"></td>
+                <td th:text="${loan.getFullName()}"></td>
+                <td th:text="${loan?.productCategory?.category}"></td>
+                <td class="numeric" th:text="${loan?.getLoanApplicationApprovedAmount(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+                <td th:text="${loan?.selectedEntity?.fullName}"></td>
+                <td align="center" th:id="'tdAudit' + ${loan?.id}">
+                    <a href="javascript:;" th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}" th:id="'btnAudit' + ${loan?.id}"
+                       th:onclick="'showRegisterAuditModal('+${loan?.id}+ ','+${loan?.userFileSpeechId}+','+${loan?.userFileWelcomeId}+','+${loan?.selectedEntity?.id}+')'"
+                       th:style="'display: ' + (${T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE != loan?.lastApprovalBotStatusId and
+                                    T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING != loan?.lastApprovalBotStatusId} ? 'block-inline;' : 'none;')">
+                        Auditar
+                    </a>
+
+                    <i th:id="'iconErrorMessage' + ${loan?.id}" class="fa fa-exclamation-circle" data-toggle="tooltip" data-placement="left" th:title="${loan?.lastErrorMessageApprovalBot}"
+                       th:style="'color: red; cursor: pointer; display: ' + (${T(com.affirm.common.model.transactional.QueryBot).STATUS_FAIL == loan?.lastApprovalBotStatusId} ?  'inline !important;' : 'none !important;')">&nbsp;</i>
+
+                    <span th:style="'border-radius: 4px !important; display: ' + (${T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE == loan?.lastApprovalBotStatusId or
+                                    T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING == loan?.lastApprovalBotStatusId} ? 'block-inline' : 'none')"
+                          th:id="'spaApproval' + ${loan?.id}" class="badge badge-warning">
+                        <i class="fa fa-clock-o" style="display: inline !important;"></i><span>&nbsp;Aprobando</span>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</th:block>
+</body>
+
+</html>

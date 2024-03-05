@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Para evaluar</title>
+    <script>window.datetimepickerFilters = true;</script>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker/bootstrap-datetimepicker.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        <!--TODO GENERALIZAR FUNCTION-->
+        function reloadLoanApplicationRow(loanApplicationId) {
+            var rowindex = $('tr[data-loan-aplication=' + loanApplicationId + ']').find('td:first-child').text()
+            var baseUrl = /*[[@{/loanApplication/offerv2/row}]]*/;
+            var tab = $('#tableResults').data('tab');
+            defaultAjax({
+                url: baseUrl,
+                type: 'GET',
+                data: {
+                    loanApplicationId: loanApplicationId
+                },
+                success: function (data) {
+                    $('#tableResults').DataTable().destroy();
+                    $('tr[data-loan-aplication=' + loanApplicationId + ']').replaceWith(data);
+                    $('tr[data-loan-aplication=' + loanApplicationId + ']').find('td:first-child').html(rowindex);
+                    getDatatable($('#tableResults'));
+                }
+            });
+        }
+
+        function updateOffer(action, loanId, personId) {
+            switch (action) {
+                case 'approve':
+                    approveLoanApplication(loanId, personId);
+                    break;
+                case 'reject':
+                    showRegisterRejectionModal(loanId);
+                    break;
+                case 'reassign':
+                    openReassignOfferModal(loanId);
+                    break;
+            }
+        }
+
+        function openReassignOfferModal(loanId) {
+            $('#reassignOfferModal').modal('show');
+            $('#reassignOfferModal #reassignOfferBtn').off("click");
+            $('#reassignOfferModal #reassignOfferBtn').click(function() {
+                if($('#reassignOfferModal #reassignOfferObs').val().trim() === '') {
+                    swal({
+                        title: "",
+                        text: "Debes ingresar una observación",
+                        type: "warning"
+                    });
+                } else {
+                    var url = /*[[@{/loanApplication/reassign}]]*/;
+                    defaultAjax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            loanApplicationId: loanId,
+                            comment: $('#reassignOfferModal #reassignOfferObs').val().trim()
+                        },
+                        success: function (data) {
+                            reloadLoanApplicationRow(loanId);
+                            $('#reassignOfferModal').modal('hide');
+                        }
+                    })
+                }
+            });
+        }
+
+        function approveLoanApplication(loanApplicationId, personId) {
+            defaultAjax({
+                url: /*[[@{/loanApplication/approve}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationId: loanApplicationId,
+                    personId: personId
+                },
+                success: function (data) {
+                    var response = JSON.parse(data);
+                    if(response.ok){
+                        reloadLoanApplicationRow(loanApplicationId);
+                        swal("Aprobada", "La solicitud fue aprobada.", "success");
+                    }else if(response.canSkip){
+                        swal({
+                                title: "",
+                                text: response.message + "<br/><br/>¿Deseas aprobarlo de todas maneras?",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "Sí, aprobar!",
+                                closeOnConfirm: false,
+                                html: true
+                            },
+                            function(){
+                                swal.close();
+                                defaultAjax({
+                                    url: /*[[@{/loanApplication/approve}]]*/null,
+                                    type: 'POST',
+                                    showLoading: true,
+                                    data: {
+                                        loanApplicationId: loanApplicationId,
+                                        personId: personId,
+                                        approveAnyway: true,
+                                    },
+                                    success: function (data) {
+                                        reloadLoanApplicationRow(loanApplicationId);
+                                        swal("Aprobada", "La solicitud fue aprobada.", "success");
+                                    }
+                                });
+                            });
+                    }else{
+                        swal({
+                            title: "",
+                            text: data.message,
+                            type: "warning"
+                        });
+                    }
+
+
+                }
+            });
+        }
+        function showRegisterRejectionModal(loanId) {
+            $('#registerApplicationRejectionModal').modal();
+            $('#registerApplicationRejectionModal .loading').hide();
+            $('#registerApplicationRejectionModal .content').show();
+            $('#registerApplicationRejectionButton').click(function () {
+                rejectLoanApplication(loanId, $('#applicationRejectionReason').val(), $('#applicationRejectionComment').val());
+            });
+        }
+
+        function rejectLoanApplication(loanId, applicationRejectionReason, applicationRejectionComment) {
+            defaultAjax({
+                url: /*[[@{/loanApplication/reject}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationId: loanId,
+                    applicationRejectionReasonId: applicationRejectionReason,
+                    applicationRejectionComment: applicationRejectionComment
+                },
+                success: function (data) {
+                    $('#registerApplicationRejectionModal').modal('hide');
+                    reloadLoanApplicationRow(loanId);
+                },
+                complete: function() {
+                    $('#frmRegisterApplicationRejectionModal').trigger('reset')
+                }
+            })
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <input type="hidden" name="offset" id="offset"/>
+        <!--Modals-->
+        <div id="registerApplicationRejectionModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form role="form" action="#" id="frmRegisterApplicationRejectionModal" method="post">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="applicationRejectionReason">Razón de
+                                            rechazo</label>
+                                        <select class="form-control" name="applicationRejectionReason"
+                                                id="applicationRejectionReason">
+                                            <option th:each="reason : ${@catalogService.getApplicationRejectionReasons()}"
+                                                    th:value="${reason.id}" th:text="${reason.reason}"></option>
+                                        </select>
+                                        <label class="control-label"
+                                               for="applicationRejectionComment">Comentarios</label>
+                                        <textarea class="form-control" name="applicationRejectionComment"
+                                                  id="applicationRejectionComment" maxlength="200"></textarea>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        <button id="registerApplicationRejectionButton" type="button" class="btn btn-info">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Solicitudes</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Para evaluar</span>
+                </li>
+            </ul>
+
+            <!--MODALES-->
+            <div id="reassignOfferModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="reassignOfferObs" class="control-label">Observación</label>
+                                            <textarea id="reassignOfferObs" class="form-control" cols="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                <button id="reassignOfferBtn" type="button" class="btn btn-info">Reasignar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Para evaluar</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'"
+                                       href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button-clean'"
+                                       href="javascript:;">
+                                        <i class="fa fa-filter"></i> Limpiar Filtros</a>
+                                    <div class="table-paginator-info"
+                                         style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/loanApplication/offerv2/list}">
+                                    <div class="form-row">
+                                        <!-- Fecha de registro -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Fecha registro</b><br/>Desde</label>
+                                                <input id="creationFromFilter" name="creationFrom" type="text"
+                                                       class="form-control form-control-sm" placeholder="Desde"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationToFilter" name="creationTo" type="text"
+                                                       class="form-control form-control-sm" placeholder="Hasta"/>
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var creationFromFilter = $('#creationFromFilter');
+                                                var creationToFilter = $('#creationToFilter');
+                                                datepicker(creationFromFilter);
+                                                datepicker(creationToFilter);
+
+                                                function datepicker(obj) {
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+
+                                                creationFromFilter.on('change', function () {
+                                                    creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <!-- Monto solicitado -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Monto solicitado</b><br/>Desde</label>
+                                                <input id="amountFromFilter" name="amountFrom" type="text"
+                                                       class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="amountToFilter" name="amountTo" type="text"
+                                                       class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                        <!-- DNI -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>DNI</label>
+                                                <input name="document_number" type="text"
+                                                       class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                        <!-- Analista -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Analista</label>
+                                                <input name="analyst" type="text" class="form-control form-control-sm" />
+                                            </div>
+                                        </div>
+                                        <!-- Empleador -->
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Empleador</label>
+                                                <select name="reason" class="form-control form-control-sm">
+                                                    <option value="" hidden="">Selecciona Empleador</option>
+                                                    <option th:each="employer : ${@catalogService.getEmployers()}"
+                                                            th:value="${employer.id}" th:text="${employer.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- Financiador -->
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Financiador</label>
+                                                <select name="entity" class="form-control form-control-sm">
+                                                    <option value="" hidden="">Selecciona financiador</option>
+                                                    <option th:each="entity : ${@catalogService.getEntities()}"
+                                                            th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(wrapper?.results)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: list(wrapper=${wrapper})"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <table id="tableResults" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>País</th>
+            <th>Fecha de registro</th>
+            <th>Fecha de última acción</th>
+            <th>Código de Solicitud/Crédito</th>
+            <th>Tipo / Nro Doc</th>
+            <th>Nombre</th>
+            <th>Producto</th>
+            <th>Financiador</th>
+            <th>Oferta</th>
+            <th>Analista</th>
+            <th>Marketplace/ Brandeada</th>
+            <th></th>
+            <th class="all">Acciones</th>
+        </tr>
+        </thead>
+        <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+        <th:block th:each="loan,iterStat : ${wrapper?.results}">
+            <th:block th:replace="this :: row"></th:block>
+        </th:block>
+        </tbody>
+    </table>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block th:fragment="row">
+    <tr th:if="${loan == null}"></tr>
+    <tr th:if="${loan != null}" th:style="'background-color:'+${loan?.lineColor}" th:attr="data-loan-aplication=${loan?.id}">
+        <td th:text="${iterStat.count + offset}"></td>
+        <td>
+            <div class="choose-country">
+                <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+            </div>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.laRegisterDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.laRegisterDate)}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.lastClientActionDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.lastClientActionDate)}"></td>
+        <td>
+            <a th:if="${loan?.credit == null}" th:href="@{/person(personId=${loan?.personId}, tab='applications', applicationId=${loan?.id})}"
+               th:text="${loan?.code}"></a>
+            <a th:if="${loan?.credit != null}" th:href="@{/person(personId=${loan?.personId}, tab='credits', creditCode=${loan?.credit?.code}, creditId=${loan?.credit?.id})}"
+               th:text="${loan?.credit?.code}"></a>
+        </td>
+        <td th:text="${loan?.documentType?.name + ' ' + loan?.documentNumber}"></td>
+        <td th:text="${loan.getFullName()}"></td>
+        <td th:utext="${loan?.productCategory?.category+'&lt;br/&gt;'+loan?.entityProductParams?.entityProduct}"></td>
+        <td th:text="${loan?.entity?.getFullName()}"></td>
+        <td>
+            <block th:if="${loan?.offers != null}">
+                <div th:each="offer : ${loan.offers}">
+                    <div class="nowrap"
+                         th:style="${offer.selected} ? 'font-weight: bold'"
+                         th:text="${offer?.getLoanOfferDescription(@utilService, loan?.country?.id)}"></div>
+                </div>
+            </block>
+        </td>
+        <td th:id="'analyst' + ${loan?.id}" th:text="${loan?.managementAnalyst}"></td>
+        <td th:text="${loan.isBranded()}"></td>
+        <td>
+            <span th:if="${loan?.observed}" th:title="${loan?.observedComment}" style="cursor: pointer" class="label label-sm label-info">Reasignado</span><br/>
+        </td>
+        <td th:id="'action' + ${loan?.id}" align="center">
+            <div class="aactions">
+                <div class="btn-group">
+                    <a th:class="${@frontEndService.defaultDropdownActionButtonClass}"
+                       href="javascript:;"
+                       data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                       aria-expanded="false">
+                        Acciones <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1" class="font-grey-gallery sbold"
+                               th:onclick="'updateOffer(\'approve\','+${loan?.id}+','+${loan?.personId}+')'">Aprobar</a>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1" class="font-grey-gallery sbold"
+                               th:onclick="'updateOffer(\'reject\','+${loan?.id}+', null)'">Rechazar</a>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1" class="font-grey-gallery sbold"
+                               th:onclick="'updateOffer(\'reassign\','+${loan?.id}+', null)'">Reasignar</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+</th:block>
+
+</body>
+</html>

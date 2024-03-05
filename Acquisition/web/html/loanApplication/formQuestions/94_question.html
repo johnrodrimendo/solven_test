@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight wrap-consolidation">
+        <div class="forms">
+            <p th:utext="#{static.question.title.94}"></p>
+            <a id="noDebtsButton" href="#" class="btn-next">No tengo deudas</a>
+            <ul class="list-consolidation-detail">
+                <li class="item-consolidation-detail" th:each="debt : ${debts}"
+                    th:classappend="${debt.selected ? 'active':''}"
+                    th:attr="data-debt-account-type=${debt.consolidationAccounttype},data-debt-entity-code=${debt.entity.code}">
+                    <form autocomplete="off">
+                        <div class="w-logo">
+                            <img th:if="${debt?.entity?.bank != null}" th:src="${debt?.entity?.bank?.logoUrl}"/>
+                        </div>
+                        <div class="w-amount">
+                            <div class="w-title">
+                                <strong th:text="${debt?.entity?.shortName}"></strong>
+                                <small th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).CREDITO_CONSUMO}"
+                                       class="text-lightblue">(Cr&eacute;dito personal)
+                                </small>
+                                <small th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}"
+                                       class="text-lightblue">(Tarjeta de cr&eacute;dito)
+                                </small>
+                            </div>
+                            <div class="field field-amount inline">
+                                <small class="input-help">Saldo Pdte.</small>
+                                <div class="wrap-field">
+                                    <div class="box-icon prefix-box tiny-input">
+                                        <span class="prefix" th:text="#{static.queston.currency}"></span>
+                                    </div>
+                                    <input type="text" class="input-outline amount-input" id="balance" name="balance"
+                                           th:value="${debt.balance}" th:attr="data-previous=${debt.balance}"/>
+                                </div>
+                            </div>
+                            <div class="field field-amount inline">
+                                <small class="input-help" th:text="#{form.field.tea}"></small>
+                                <input type="text" class="input-outline tiny-input" id="rate" name="rate"
+                                       th:value="${debt.rate}" th:attr="data-previous=${debt.rate}"/>
+                            </div>
+                            <div class="field field-amount inline"
+                                 th:if="${debt.consolidationAccounttype != T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}">
+                                <small class="input-help">Cuotas Pendientes</small>
+                                <input type="text" class="input-outline tiny-input" id="installments"
+                                       name="installments" th:value="${debt.installments}"
+                                       th:attr="data-previous=${debt.installments}"/>
+                            </div>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="w-buttons ask-wrap">
+                            <div class="ask-wrap">
+                                <small id="askConsolidate" class="text-small"
+                                       th:text="${debt.selected ? 'Consolidado':'¿Consolidar?'}"
+                                       th:classappend="${debt.selected ? 'active-consolidate':''}"></small>
+                                <button type="button"
+                                        class="btn-action button-small bg-red-3 tiny no-consolidate-button"
+                                        th:classappend="${debt.selected ? 'btn-enabled':'btn-disabled'}"
+                                        data-action="not"><i class="icon icon-close"></i></button>
+                                <button type="button"
+                                        class="btn-action button-small bg-lightblue tiny consolidate-button"
+                                        th:classappend="${debt.selected ? 'btn-disabled':''}" data-action="yes"><i
+                                        class="icon icon-check"></i></button>
+                            </div>
+                            <div class="last-info hidden"
+                                 th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}">
+                                <button class="close close-last-info close-button" type="button"><i
+                                        class="icon icon-close"></i></button>
+                                <div class="field">
+                                    <input id="creditCardNumber" name="creditCardNumber" type="text"
+                                           class="input-outline-small" placeholder="Nro. Tarjeta"
+                                           th:value="${debt.accountCardNumber}"/>
+                                </div>
+                                <div class="field select2-small">
+                                    <select id="creditCardBrand" name="creditCardBrand" data-width="200"
+                                            data-placeholder="Marca">
+                                        <option value="" disabled="disabled" selected="selected"></option>
+                                        <option th:each="brand : ${@catalogService.getBrands()}"
+                                                th:value="${brand.id}" th:text="${brand.name}"
+                                                th:selected="${debt.brandId == brand.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="field select2-small">
+                                    <select id="creditCardDepartment" name="creditCardDepartment" data-width="200"
+                                            data-placeholder="Lugar de emisi&oacute;n">
+                                        <option value="" disabled="disabled" selected="selected"></option>
+                                        <option th:each="department : ${@catalogService.getDepartments()}"
+                                                th:value="${department.id}" th:text="${department.name}"
+                                                th:selected="${debt.departmentUbigeo == department.id}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="last-info hidden"
+                                 th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).CREDITO_CONSUMO}">
+                                <button class="close close-last-info close-button" type="button"><i
+                                        class="icon icon-close"></i></button>
+                                <div class="field">
+                                    <input id="loanNumber" name="loanNumber" type="text" class="input-outline-small"
+                                           placeholder="Nro. de Préstamo"
+                                           th:value="${debt.accountCardNumber}"/>
+                                </div>
+                                <button type="button" id="loanNumberButton" class="button">Consolidar</button>
+                            </div>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <div class="field inline confirm_button">
+            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $('li.item-consolidation-detail').each(function () {
+            var validator = /*[[${form.validator.toJson(#locale)}]]*/;
+            $(this).find('form').validateForm(createFormValidationJson(JSON.parse(validator), $(this).find('form')));
+
+            $(this).find('input[name=balance]').blur(function () {
+                if ($(this).data('previous') != null) {
+                    if ($(this).data('previous') != $(this).val()) {
+                        updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            $(this).val());
+                        $(this).data('previous', $(this).val());
+                    }
+                } else {
+                    updateConsolidableDebt(
+                        $(this).closest('li').data('debt-entity-code'),
+                        $(this).closest('li').data('debt-account-type'),
+                        $(this).val());
+                    $(this).data('previous', $(this).val());
+                }
+
+            });
+
+            $(this).find('input[name=rate]').blur(function () {
+                if ($(this).data('previous') != null) {
+                    if ($(this).data('previous') != $(this).val()) {
+                        updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, $(this).val());
+                        $(this).data('previous', $(this).val());
+                    }
+                } else {
+                    updateConsolidableDebt(
+                        $(this).closest('li').data('debt-entity-code'),
+                        $(this).closest('li').data('debt-account-type'),
+                        null, $(this).val());
+                    $(this).data('previous', $(this).val());
+                }
+
+            });
+            $(this).find('input[name=installments]').blur(function () {
+                if ($(this).data('previous') != null) {
+                    if ($(this).data('previous') != $(this).val()) {
+                        updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, null, $(this).val());
+                        $(this).data('previous', $(this).val());
+                    }
+                } else {
+                    updateConsolidableDebt(
+                        $(this).closest('li').data('debt-entity-code'),
+                        $(this).closest('li').data('debt-account-type'),
+                        null, null, $(this).val());
+                    $(this).data('previous', $(this).val());
+                }
+            });
+
+            $(this).find('.no-consolidate-button').click(function () {
+                var buttonClicked = $(this);
+                if (!buttonClicked.hasClass('btn-disabled')) {
+                    var thisSelf = $(this);
+                    updateConsolidableDebt(
+                        $(this).closest('li').data('debt-entity-code'),
+                        $(this).closest('li').data('debt-account-type'),
+                        null, null, null, false, null, null, null, null, function () {
+                            paintSelectedDebt($(thisSelf).closest('li'), false)
+                        });
+                }
+
+            });
+
+            $(this).find('.consolidate-button').click(function () {
+                var buttonClicked = $(this);
+                if (!buttonClicked.hasClass('btn-disabled')) {
+                    if ($(this).closest('.w-buttons').find('.last-info').length) {
+                        $(this).closest('.ask-wrap').addClass('hidden');
+                        $(this).closest('.w-buttons').find('.last-info').removeClass('hidden');
+                        updateCreditCardDebtIfOk($(this).closest('li'));
+                    } else {
+                        var thisSelf = $(this);
+                        updateConsolidableDebt(
+                            $(this).closest('li').data('debt-entity-code'),
+                            $(this).closest('li').data('debt-account-type'),
+                            null, null, null, true, null, null, null, null, function () {
+                                paintSelectedDebt($(thisSelf).closest('li'), true)
+                            });
+
+                    }
+                }
+            });
+
+            $(this).find('input[name=creditCardNumber]').blur(function () {
+                updateCreditCardDebtIfOk($(this).closest('li'));
+            });
+            $(this).find('select[name=creditCardBrand]').change(function () {
+                updateCreditCardDebtIfOk($(this).closest('li'));
+            });
+            $(this).find('select[name=creditCardDepartment]').change(function () {
+                updateCreditCardDebtIfOk($(this).closest('li'));
+            });
+            /*$(this).find('input[name=loanNumber]').blur(function(){
+                updateLoanNumberIfOk($(this).closest('li'));
+            });*/
+
+            $(this).find('.close-last-info').on('click', function (e) {
+                $(this).closest('.last-info').addClass('hidden');
+                $(this).closest('.w-buttons').find('.ask-wrap').removeClass('hidden');
+            });
+
+        });
+
+        $('#sendButton').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                button: $(this)
+            }, "");
+        });
+
+        $('#noDebtsButton').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                button: $(this)
+            }, "nodebts");
+        });
+
+        $('#loanNumberButton').click(function () {
+            updateLoanNumberIfOk($(this).closest('li'));
+        });
+
+        function updateConsolidableDebt(entityCode, consolidationAccountType, balance, rate, installments, consolidable, creditCardNumber, creditCardBrand, creditCardDepartment, loanNumber, successFunc) {
+            var dataJson = {};
+            if (balance != null)
+                dataJson.balance = balance;
+            if (rate != null)
+                dataJson.rate = rate;
+            if (installments != null)
+                dataJson.installments = installments;
+            if (consolidable != null)
+                dataJson.consolidable = consolidable;
+            if (creditCardNumber != null)
+                dataJson.creditCardNumber = creditCardNumber;
+            if (creditCardBrand != null)
+                dataJson.creditCardBrand = creditCardBrand;
+            if (creditCardDepartment != null)
+                dataJson.creditCardDepartment = creditCardDepartment;
+
+            dataJson.loanNumber = loanNumber;
+
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: $.extend(dataJson, {
+                    entityCode: entityCode,
+                    consolidationAccountType: consolidationAccountType
+                }),
+                success: function () {
+                    if (successFunc != null) {
+                        successFunc();
+                    }
+                }
+            }, "updateConsolidableDebt");
+        }
+
+        function updateCreditCardDebtIfOk(element) {
+            var cardNum = element.find('input[name=creditCardNumber]').val();
+            var cardBrand = element.find('select[name=creditCardBrand]').val();
+            var cardDept = element.find('select[name=creditCardDepartment]').val();
+            if (cardNum != '' && cardBrand != null && cardDept != null) {
+                updateConsolidableDebt(
+                    element.data('debt-entity-code'),
+                    element.data('debt-account-type'),
+                    null, null, null, true, cardNum, cardBrand, cardDept, null, function () {
+                        paintSelectedDebt(element, true)
+                        element.find('.last-info').addClass('hidden');
+                        element.find('.ask-wrap').removeClass('hidden');
+                    });
+            }
+        }
+
+        function updateLoanNumberIfOk(element) {
+            var loanNum = element.find('input[name=loanNumber]').val();
+            updateConsolidableDebt(
+                element.data('debt-entity-code'),
+                element.data('debt-account-type'),
+                null, null, null, true, null, null, null, loanNum, function () {
+                    paintSelectedDebt(element, true)
+                    element.find('.last-info').addClass('hidden');
+                    element.find('.ask-wrap').removeClass('hidden');
+                });
+        }
+
+        function paintSelectedDebt(liElement, selected) {
+
+            if (selected) {
+                liElement.addClass('active');
+                liElement.find('.no-consolidate-button').removeClass('btn-disabled').addClass('btn-enabled').prop('disabled', false);
+                liElement.find('.consolidate-button').removeClass('btn-enabled').addClass('btn-disabled').prop('disabled', true);
+                liElement.find('#askConsolidate').text('Consolidado').addClass('active-consolidate');
+            } else {
+                liElement.removeClass('active');
+                liElement.find('.no-consolidate-button').removeClass('btn-enabled').addClass('btn-disabled').prop('disabled', true);
+                liElement.find('.consolidate-button').removeClass('btn-enabled').removeClass('btn-disabled').prop('disabled', false);
+                liElement.find('#askConsolidate').text('¿Consolidar?').removeClass('active-consolidate');
+            }
+        }
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

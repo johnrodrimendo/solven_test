@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Flag de Fraudes</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <script th:src="@{/js/bo_tablepaginator.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            var baseUrl = /*[[ @{/loanApplication/offer/list} ]]*/null;
+            $('.portlet').portletTablePaginator(baseUrl, 100);
+            var $form = $('.tablefilter-filters').find('form');
+            function getFilters() {
+                var settedFilters = [];
+                $form.find('select,input').each(function () {
+                    if ($(this).val() != '') {
+                        var filter = {};
+                        if ($(this).prop("tagName").toLowerCase() == 'select') {
+                            filter.label = $(this).find('option:selected').text();
+                            filter.value = $(this).val();
+                            filter.name = $(this).attr("name");
+                            $(this).find('option:selected').prop('disabled', true);
+                        } else if ($(this).prop("tagName").toLowerCase() == 'input') {
+                            filter.label = $(this).val();
+                            filter.value = $(this).val();
+                            filter.name = $(this).attr("name");
+                        }
+                        settedFilters [settedFilters.length] = filter;
+                    }
+                });
+                return settedFilters;
+            }
+            function  applyFilters() {
+                var filters = getFilters();
+                var jsonParams = {};
+                $('.nav.nav-tabs.pull-left').find('a').each(function(index, value){
+                    if($(this).attr('aria-expanded') == undefined ) jsonParams['collectionManagement'] = 'true';
+                    if($(this).attr('aria-expanded') == 'true'){
+                        jsonParams['collectionManagement'] = $(this).attr('data-management');
+                    }
+                });
+                for (var i = 0; i < filters.length; i++) {
+                    if (jsonParams[filters[i].name] == undefined) {
+                        jsonParams[filters[i].name] = [];
+                    }
+                    jsonParams[filters[i].name][jsonParams[filters[i].name].length] = filters[i].value;
+                }
+                jsonParams["offset"] = parseInt($("#offset").val());
+                jsonParams["limit"] = parseInt($("#limit").val());
+                console.log(jsonParams);
+                console.log("Se va a mandar: " + $form.serialize());
+                defaultAjax({
+                    url: $form.attr('action'),
+                    type: $form.attr('method'),
+                    data: jsonParams,
+                    success: function (data) {
+                        $('#tableResults tbody').html(data);
+                    }
+                });
+            }
+            /*
+
+
+            tablePaginatorDiv.find('.page-next > a').click(function () {
+                var newOffset;
+                var offset = parseInt($("#offset").val());
+                var limit = parseInt($("#limit").val());
+                var total = parseInt($("#total").val());
+                if (offset + limit > total) {
+                    console.log('No next is available');
+                    return;
+                } else {
+                    newOffset = offset + limit;
+                }
+                $("#offset").val(newOffset);
+                applyFilters();
+            });
+            tablePaginatorDiv.find('.page-pre > a').click(function () {
+                var newOffset;
+                var offset = parseInt($("#offset").val());
+                var limit = parseInt($("#limit").val());
+                var total = parseInt($("#total").val());
+                if (offset == 0) {
+                    console.log('No pre is available');
+                    return;
+                }
+                else {
+                    if (limit > offset) {
+                        newOffset = 0;
+                    } else {
+                        newOffset = offset - limit;
+                    }
+                }
+                $("#offset").val(newOffset);
+                applyFilters();
+            });
+            */
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Reportes</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Flag de Fraudes</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div th:with="showActions=true, title='Para evaluar'">
+                    <div th:replace="fraudAlertsReview :: loan-application-fraud-flags"></div>
+                </div>
+                <div th:with="fraudAlerts = ${fraudAlertsLogs}, showActions=false, title='Log'">
+                    <div th:replace="fraudAlertsReview :: loan-application-fraud-flags"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:fragment="loan-application-fraud-flags">
+    <div>
+        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+            <div class="portlet-title">
+                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}" th:text="${title}"></span>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form role="form" method="post" th:action="@{/loanApplication/offer/list}">
+                    <div class="form-row">
+                        <div class="form-row col-md-4">
+                            <div class="form-group col-md-6">
+                                <label class="control-label"><b>Fecha registro</b><br />Desde</label>
+                                <input id="creationFromFilter" name="creationFrom" type="text" class="form-control form-control-sm" placeholder="Desde" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="control-label"><b></b><br/>Hasta</label>
+                                <input id="creationToFilter" name="creationTo" type="text" class="form-control form-control-sm" placeholder="Hasta" />
+                            </div>
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+                                var creationFromFilter = $('#creationFromFilter');
+                                var creationToFilter = $('#creationToFilter');
+                                datepicker(creationFromFilter);
+                                datepicker(creationToFilter);
+                                function datepicker( obj ){
+                                    obj.datepicker({
+                                        autoclose: true,
+                                        format: "dd/mm/yyyy",
+                                        focusOnShow: true,
+                                        endDate: "today"
+                                    });
+                                }
+                                /*]]>*/
+                            </script>
+                        </div>
+                        <!-- Monto solicitado -->
+                        <div class="form-row col-md-3">
+                            <div class="form-group col-md-6">
+                                <label class="control-label"><b>Monto solicitado</b><br />Desde</label>
+                                <input id="amountFromFilter" name="amountFrom" type="text" class="form-control form-control-sm"/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="control-label"><b></b><br/>Hasta</label>
+                                <input id="amountToFilter" name="amountTo" type="text" class="form-control form-control-sm"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DNI -->
+                    <div class="form-group col-md-2">
+                        <label class="control-label"><b></b><br/>DNI</label>
+                        <input name="document_number" type="text" class="form-control form-control-sm"/>
+                    </div>
+
+                    <!-- Empleador -->
+                    <div class="form-group col-md-2">
+                        <label class="control-label"><b></b><br/>Empleador</label>
+                        <select name="reason" class="form-control form-control-sm">
+                            <option value="" hidden="">Selecciona Empleador</option>
+                            <option th:each="employer : ${@catalogService.getEmployers()}" th:value="${employer.id}" th:text="${employer.name}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Financiador -->
+                    <div class="form-group col-md-2">
+                        <label class="control-label"><b></b><br/>Financiador</label>
+                        <select name="entity" class="form-control form-control-sm">
+                            <option value="" hidden="">Selecciona financiador</option>
+                            <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+            <div class="portlet-body" th:switch="${#lists.isEmpty(fraudAlerts)}">
+                <div th:case="true">
+                    <p>No hay resultados</p>
+                </div>
+                <div th:case="false" class="table-responsive" style="overflow: hidden;">
+                    <table id="tableResults" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Solicitud</th>
+                            <th>Solicitante</th>
+                            <th>Flag de Fraude</th>
+                            <th>Detalle / Comentarios</th>
+                            <th:block th:if="${showActions}">
+                                <th></th>
+                                <th></th>
+                            </th:block>
+                            <th th:if="${!showActions}">Estado</th>
+                            <th th:if="${!showActions}">Revisado por</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:replace="this :: list"></th:block>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${showActions}">
+        <div th:replace="fraudAlertsReview :: actions"></div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <tr th:each="fraudAlert : ${fraudAlerts}">
+        <td th:text="${@utilService.datetimeShortFormat(fraudAlert?.registeredDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(fraudAlert?.registeredDate)}"></td>
+        <td><a th:href="@{/person(personId=${fraudAlert?.loanApplication?.personId}, tab='applications', applicationId=${fraudAlert?.loanApplication?.id})} + ${'#' + fraudAlert?.loanApplication?.code}"
+        th:text="${fraudAlert?.loanApplication?.code}"></a></td>
+        <td th:text="${fraudAlert?.firstName != null ? fraudAlert?.firstName : ''} + ' ' + ${fraudAlert?.lastName != null ? fraudAlert?.lastName : ''}"></td>
+        <td th:text="${@catalogService.getFraudFlag(fraudAlert?.flagId).flag}"></td>
+        <td th:text="${fraudAlert?.commentary}"></td>
+        <td>
+            <a th:if="${showActions}" class="btn red btn-outline btn-xs" th:onclick="'reviewFraudFlagPost('+ ${fraudAlert?.id} + ',false)'">Rechazar</a>
+            <div th:if="${!showActions}" th:text="${@catalogService.getFraudFlagStatus(fraudAlert?.fraudFlagStatusId)?.status}"></div>
+        </td>
+        <td>
+            <a th:if="${showActions}" class="btn green btn-outline btn-xs" th:onclick="'reviewFraudFlagPost('+ ${fraudAlert?.id} + ',true)'">Aprobar</a>
+            <div th:if="${!showActions}" th:text="${fraudAlert?.reviewer}"></div>
+        </td>
+    </tr>
+</th:block>
+
+<th:block th:fragment="actions">
+    <div id="registerModalLoanApplicationFraudAlert" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-footer">
+                    <input type="hidden" id="loanApplicationFraudAlertId"/>
+                    <a class="btn btn-info"
+                       th:onclick="'reviewFraudFlag(false)'">Rechazar</a>
+                    <a class="btn btn-info"
+                       th:onclick="'reviewFraudFlag(true)'">Aprobar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function reviewFraudFlagPost(loanApplicationFraudAlertId, approve) {
+            defaultAjax({
+                url: /*[[@{/person/review/loanApplicationFraudAlert}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationFraudAlertId: loanApplicationFraudAlertId,
+                    approve: approve
+                },
+                success: function (data) {
+                    refresh();
+                }
+            })
+        }
+        function reviewFraudFlagModal(loanApplicationFraudAlertId) {
+            $("#loanApplicationFraudAlertId").val(loanApplicationFraudAlertId);
+            $('#registerModalLoanApplicationFraudAlert').modal();
+        }
+        function reviewFraudFlag(approve) {
+            $('#registerModalLoanApplicationFraudAlert').modal('hide');
+            reviewFraudFlagPost($("#loanApplicationFraudAlertId").val(), approve);
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

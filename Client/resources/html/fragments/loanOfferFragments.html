@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<th:block th:fragment="upadteLoanApplicationModal">
+    <div class="modal-body">
+        <form action="#" autocomplete="off">
+            <div id="slides-section">
+                <div class="loan-details without-mt">
+                    <div class="row">
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                            <div class="slider-section">
+                                <label for="loanApplicationHowMany-input">¿Cu&aacute;nto dinero necesitas?</label>
+                                <div id="loanApplicationHowMany"></div>
+                                <div class="values">
+                                    <div class="min-value normal-number"
+                                         th:text="${@utilService.integerMoneyFormat(loanOfferForm.validator.ammount.minValue)}"></div>
+                                    <div class="max-value normal-number"
+                                         th:text="${@utilService.integerMoneyFormat(loanOfferForm.validator.ammount.maxValue)}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                            <div class="square-found editable">
+                                <h4 id="loanApplicationHowMany-label"></h4>
+                                <a href="#" class="icon edit-icon edit-amount" rel="nofollow" title="Editar"></a>
+                                <input type="text" id="loanApplicationHowMany-input" class="editAmount-home"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- days -->
+                <div class="loan-details"
+                     th:if="${loanApplication?.product?.id == T(com.affirm.common.model.catalog.Product).SHORT_TERM}">
+                    <div class="row">
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                            <div class="slider-section">
+                                <label for="loanApplicationShorTermDays-input" th:style="${loanOfferForm.validator.installments.maxValue == loanOfferForm.validator.installments.minValue ? 'margin-top: 2em;' : ''}">¿En que
+                                    per&iacute;odo?</label>
+                                <th:block th:if="${loanOfferForm.validator.installments.maxValue != loanOfferForm.validator.installments.minValue}">
+                                    <div id="loanApplicationShorTermDays"></div>
+                                    <div class="values">
+                                        <div class="min-value norma-number"
+                                             th:text="${loanOfferForm.validator.installments.minValue}+' '+${loanOfferForm.validator.installments.minValue > 1 ? loanApplication?.product.paymentType.pluralName : loanApplication?.product.paymentType.singularName}"></div>
+                                        <div class="max-value norma-number"
+                                             th:text="${loanOfferForm.validator.installments.maxValue}+' '+${loanOfferForm.validator.installments.maxValue > 1 ? loanApplication?.product.paymentType.pluralName : loanApplication?.product.paymentType.singularName}"></div>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                            <div class="square-found editable">
+                                <div class="two-rows-middle">
+                                    <h4 id="loanApplicationShorTermDays-label" class="bold-number"></h4>
+                                    <span id="loanApplicationShorTermDays-finish"></span>
+                                </div>
+                            </div>
+                            <input type="text" id="loanApplicationShorTermDays-input"
+                                   name="loanApplicationInstallemnts" class="slider"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- months -->
+                <div class="loan-details"
+                     th:if="${loanApplication?.product?.id != T(com.affirm.common.model.catalog.Product).SHORT_TERM}">
+                    <div class="row">
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                            <div class="slider-section">
+                                <label for="loanApplicationPeriodMonths-input" th:style="${loanOfferForm.validator.installments.maxValue == 1 ? 'margin-top: 2em;' : ''}">¿En que periodo?</label>
+                                <div id="loanApplicationPeriodMonths"></div>
+                                <th:block th:if="${loanOfferForm.validator.installments.maxValue != loanOfferForm.validator.installments.minValue}">
+                                    <div id="loanApplicationShorTermDays"></div>
+                                    <div class="values">
+                                        <div class="min-value norma-number"
+                                             th:text="${loanOfferForm.validator.installments.minValue}+' '+${loanOfferForm.validator.installments.minValue > 1 ? loanApplication?.product.paymentType.pluralName : loanApplication?.product.paymentType.singularName}"></div>
+                                        <div class="max-value norma-number"
+                                             th:text="${loanOfferForm.validator.installments.maxValue}+' '+${loanOfferForm.validator.installments.maxValue > 1 ? loanApplication?.product.paymentType.pluralName : loanApplication?.product.paymentType.singularName}"></div>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                            <div class="square-found editable">
+                                <h4 id="loanApplicationPeriodMonths-label" class="bold-number"></h4>
+                                <span id="loanApplicationPeriodEndDate-finish"></span>
+                            </div>
+                            <input type="text" id="loanApplicationPeriodMonths-input"
+                                   name="loanApplicationInstallemnts" class="slider"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loan-details">
+                    <!-- Due Date -->
+                    <div class="firstDueDate"
+                         th:if="${loanApplication?.product?.id == T(com.affirm.common.model.catalog.Product).TRADITIONAL}">
+                        <p><span id="loanApplicationfirstDueDate-edit" class="anchorText"
+                                 th:text="${@utilService.humanDateFormat(loanApplication.firstDueDate, #locale)}"></span>
+                            (Primer vencimiento)</p>
+                    </div>
+                </div>
+
+                <div class="loan-details actions">
+                    <button type="button" class="button red-button" id="udtModal" onclick="recalculate()">
+                        <span>Guardar</span>
+                    </button>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        //        var offerValidator = /*[[${loanOfferForm.validator.toJson(#locale)}]]*/null;
+        //        var jsonValidator = JSON.parse(offerValidator);
+        //        var jsonFormValidation = createFormValidationJson(jsonValidator, $('#frmOffer'));;
+        //        $('#frmOffer').validateForm(jsonFormValidation);
+
+
+        // Ammount Tradicional
+        var tradAmountSlider = document.getElementById('loanApplicationHowMany'),
+                tradAmountLabel = document.getElementById('loanApplicationHowMany-label'),
+                tradAmountInput = document.getElementById('loanApplicationHowMany-input');
+        var steps;
+        if (/*[[${loanApplication?.product?.id == T(com.affirm.common.model.catalog.Product).TRADITIONAL}]]*/ false) {
+            steps = 100;
+        } else {
+            steps = 10;
+        }
+
+
+        var minAmountValue = /*[[ ${loanOfferForm.validator.ammount.minValue} ]]*/;
+        var maxAmountValue = /*[[ ${loanOfferForm.validator.ammount.maxValue} ]]*/;
+        if (minAmountValue == maxAmountValue) {
+            tradAmountInput.value = toNumberString(minAmountValue);
+            tradAmountLabel.innerHTML = minAmountValue;
+        } else {
+            noUiSlider.create(tradAmountSlider, {
+                start: /*[[ ${loanApplication.amount} ]]*/,
+                step: steps,
+                connect: 'lower',
+                range: {
+                    'min': /*[[ ${loanOfferForm.validator.ammount.minValue} ]]*/,
+                    'max': /*[[ ${loanOfferForm.validator.ammount.maxValue} ]]*/
+                },
+                format: wNumb({
+                    decimals: 0,
+                    thousand: ' ',
+                    prefix: 'S/. '
+                })
+            });
+
+            tradAmountSlider.noUiSlider.on('update', function (values, handle) {
+                tradAmountInput.value = toNumberString(values[handle]);
+                tradAmountLabel.innerHTML = values[handle];
+            });
+
+            tradAmountInput.addEventListener('change', function () {
+                tradAmountSlider.noUiSlider.set([null, this.value]);
+            });
+        }
+
+        // Period Months
+        if (/*[[${loanApplication?.product?.id != T(com.affirm.common.model.catalog.Product).SHORT_TERM}]]*/ false) {
+            var preiodMonthsSlider = document.getElementById('loanApplicationPeriodMonths'),
+                    preiodMonthsLabel = document.getElementById('loanApplicationPeriodMonths-label'),
+                    preiodMonthsInput = document.getElementById('loanApplicationPeriodMonths-input'),
+                    periodMonthsEndDate = document.getElementById('loanApplicationPeriodEndDate-finish'),
+                    periodFinish;
+
+
+            try {
+                noUiSlider.create(preiodMonthsSlider, {
+                    start: /*[[ ${loanApplication.installments} ]]*/,
+                    step: 1,
+                    connect: 'lower',
+                    range: {
+                        'min': /*[[ ${loanOfferForm.validator.installments.minValue} ]]*/,
+                        'max': /*[[ ${loanOfferForm.validator.installments.maxValue} ]]*/
+                    },
+                    format: wNumb({
+                        decimals: 0,
+                        thousand: ' ',
+                        postfix: ' meses'
+                    })
+                });
+
+                preiodMonthsSlider.noUiSlider.on('update', function (values, handle) {
+                    preiodMonthsInput.value = toNumberString(values[handle]);
+                    preiodMonthsLabel.innerHTML = values[handle];
+                    periodFinish = getFinishDate(toNumberString(values[handle]), 'month');
+                    periodMonthsEndDate.innerHTML = 'Finaliza (' + periodFinish + ')';
+                });
+
+                preiodMonthsInput.addEventListener('change', function () {
+                    preiodMonthsSlider.noUiSlider.set([null, this.value]);
+                });
+            }catch(e){}
+        }
+
+        if (/*[[${loanApplication?.product?.id == T(com.affirm.common.model.catalog.Product).SHORT_TERM}]]*/ false) {
+            // Prediod Days
+            var shortTermDaysSlider = document.getElementById('loanApplicationShorTermDays'),
+                    shortTermDaysLabel = document.getElementById('loanApplicationShorTermDays-label'),
+                    shortTemDaysInput = document.getElementById('loanApplicationShorTermDays-input'),
+                    shortTemDaysFInish = document.getElementById('loanApplicationShorTermDays-finish'),
+                    finishDate;
+
+            var minDaysValue = /*[[ ${loanOfferForm.validator.installments.minValue} ]]*/;
+            var maxDaysValue = /*[[ ${loanOfferForm.validator.installments.maxValue} ]]*/;
+
+            if (minDaysValue == maxDaysValue) {
+                shortTemDaysInput.value = minDaysValue;
+                shortTermDaysLabel.innerHTML = minDaysValue+ ' '+/*[[${loanApplication?.product.paymentType.pluralName}]]*/;
+                finishDate = getFinishDate(minDaysValue * 2, 'week');
+                shortTemDaysFInish.innerHTML = 'Finaliza (' + finishDate + ')';
+            } else {
+                noUiSlider.create(shortTermDaysSlider, {
+                    start: /*[[ ${loanApplication.installments} ]]*/,
+                    step: 1,
+                    connect: 'lower',
+                    range: {
+                        'min': minDaysValue,
+                        'max': maxDaysValue
+                    },
+                    format: wNumb({
+                        decimals: 0,
+                        postfix: ' '+/*[[${loanApplication?.product.paymentType.pluralName}]]*/
+                    })
+                });
+
+                shortTermDaysSlider.noUiSlider.on('update', function (values, handle) {
+                    shortTemDaysInput.value = toNumberString(values[handle]);
+                    shortTermDaysLabel.innerHTML = values[handle];
+                    finishDate = getFinishDate(toNumberString(values[handle]) * 2, 'week');
+                    shortTemDaysFInish.innerHTML = 'Finaliza (' + finishDate + ')';
+                });
+
+                shortTemDaysInput.addEventListener('change', function () {
+                    shortTermDaysSlider.noUiSlider.set([null, this.value]);
+                });
+            }
+
+        }
+
+        //=== Edit amount from modal === //
+
+        var updatableMonths = $('#loanApplicationHowMany-input'),
+                updatableDays = $('#loanApplicationHowMany-input'),
+                labelMonths = $('#loanApplicationHowMany-label'),
+                labelDays = $('#loanApplicationHowMany-label');
+
+        permitOnlyNumbers(updatableMonths);
+        permitOnlyNumbers(updatableDays);
+
+        $('.edit-amount').on('click', function (event) {
+            event.preventDefault();
+
+            labelMonths.hide(0);
+            updatableMonths.attr('maxlength', 5);
+            updatableMonths.css({'display': 'block'});
+            updatableMonths.focus();
+            updatableMonths.standOut();
+            $('.edit-amount').css({'display': 'none'});
+        });
+
+        updatableMonths.on('blur', function (e) {
+            e.preventDefault();
+            updatableMonths.standOff();
+            labelMonths.show(0);
+            labelMonths.html('S/. ' + thousandWithSpace(updatableMonths.val()));
+            tradAmountSlider.noUiSlider.set(updatableMonths.val());
+            updatableMonths.css({'display': 'none'});
+            $('.edit-amount').css({'display': 'block'});
+        });
+
+        updatableMonths.on('keyup', function (e) {
+            e.preventDefault();
+            if (e.keyCode == 13) {
+                updatableMonths.standOff();
+                labelMonths.show(0);
+                labelMonths.html('S/. ' + thousandWithSpace(updatableMonths.val()));
+                tradAmountSlider.noUiSlider.set(updatableMonths.val());
+                updatableMonths.css({'display': 'none'});
+                $('.edit-amount').css({'display': 'block'});
+            }
+        });
+        /*]]>*/
+    </script>
+    <script th:if="${loanApplication?.product?.id == T(com.affirm.common.model.catalog.Product).TRADITIONAL}">
+        $('#loanApplicationfirstDueDate-edit').on('click', function (event) {
+            event.preventDefault();
+            $('#dateSelect').addClass("buttonDisabled");
+            $('#endDatePicker').modal({backdrop: 'static', keyboard: false, show: true});
+            $('.closeRoundButton').fadeIn();
+            $('#updateLoanApplicationModal').modal('hide');
+        });
+    </script>
+
+</th:block>
+
+
+<th:block th:fragment="documentationContainer">
+    <form role="form" enctype="multipart/form-data" action="#"
+          th:object="${loanApplicationDocumentsForm}"
+          id="frmDocuments" style="max-width: 730px;" autocomplete="off">
+        <input type="hidden" name="loanOfferId" id="loanOfferId"/>
+        <div id="documentationDiv">
+            <div class="nrow" id="docSection"
+                 th:style="${icarValidation == null ? 'display: none' : ''}">
+                <div class="panel panel-default">
+                    <div class="panel-heading dynamicColor" style="background:#26CAD3;color: white;padding: 1em;">
+                        <h3 class="panel-title">Otros documentos</h3>
+                        <div class="skipThis">
+                            <a href="#" class="button" id="skipProcess">M&aacute;s
+                                adelante &raquo;</a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <!--<div>-->
+                        <div th:each="userFileType : ${@catalogService.getUserFileTypes()}"
+                             th:remove="tag">
+                            <div th:with="userFiles = ${@userService.getUserFileByType(files, userFileType.id)}"
+                                 th:remove="tag">
+                                <div class="image-box"
+                                     th:if="${principalOcupation?.requiredDocuments != null
+                                     and #lists.contains(principalOcupation?.requiredDocuments, userFileType.id)
+                                     and userFileType.id != userFileType.DNI
+                                     and userFileType.id != userFileType.SELFIE}">
+                                    <div class="form-group">
+                                        <div class="upload-box">
+                                            <div class="title-bar">
+                                                <label th:text="${userFileType.type}"></label>
+                                                <div th:if="${userFileType.id == userFileType.COMPROBANTE_DIRECCION}">
+                                                    <small>Se aceptan recibos de servicios</small>
+                                                </div>
+                                                <div th:unless="${userFileType.id == userFileType.COMPROBANTE_DIRECCION}">
+                                                    <br/>
+                                                </div>
+                                            </div>
+                                            <div class="tile-thumbs-images">
+                                                <ul class="tiles-container">
+                                                    <li th:each="file : ${userFiles}"
+                                                        class="fileImage"
+                                                        data-gallery="multiimages"
+                                                        data-parent=".tile-thumbs-images"
+                                                        th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                                        th:href="@{/__${productUrl}__/__${loanAplicationToken}__/userFile/__${@fileService.generateUserFileEncrypt(file.userId, file.fileName, file.id)}__/image.jpg(thumbnail=false)}"
+                                                        th:style="'background: url(' + @{/__${productUrl}__/__${loanAplicationToken}__/userFile/__${@fileService.generateUserFileEncrypt(file.userId, file.fileName, file.id)}__/image.jpg(thumbnail=true)} +');background-size: 100%;'"></li>
+                                                    <li th:onclick="'openUploadUserFileModal('+${userFileType.id}+')'">
+                                                        <a href="javascript:;"><i
+                                                                class="icon control-add"></i></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="nrow animated" id="refSection">
+                <div class="panel panel-default">
+                    <div class="panel-heading dynamicColor" style="background:#26CAD3;color: white;padding: 1em;">
+                        <h3 class="panel-title"
+                            th:text="#{loanApplicationDocuments.phones.subtittle}"></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="PhoneDiv" class="row" style="padding: 1em">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="inputs-wrapper">
+                                    <div class="cl wp">
+                                        <div class="fields">
+                                            <div class="form-group label-floating">
+                                                <label class="control-label" for="relative1"
+                                                       th:text="#{form.field.relationship}"></label>
+                                                <select th:field="*{relative1}"
+                                                        class="form-control">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="status : ${@catalogService.getRelationships(#locale)}"
+                                                            th:value="${status.id}"
+                                                            th:text="${status.relationship}"></option>
+                                                </select>
+                                                <small class="help-block muted">Ej: Padre</small>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="cl" style="margin-left: 0;margin-right: 0;">
+                                        <div class="fields">
+                                            <span class="prefix">(</span>
+                                            <div class="form-group">
+                                                <input type="text" th:field="*{contactCityCode1}"
+                                                       class="form-control city-code"
+                                                       style="text-align: center"/>
+                                                <small class="help-block muted">Ej: (01)</small>
+
+                                            </div>
+                                            <span class="postfix" style="margin-left: 0">)</span>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cl" style="margin-left: .3em">
+                                        <div class="fields">
+                                            <div class="form-group label-floating">
+                                                <label class="control-label">Tel/Cel</label>
+                                                <input type="text" th:field="*{contactPhone1}"
+                                                       class="form-control medium-number-input"/>
+                                                <div class="errorContainer">
+                                                                <span class="help-block form-field-error-message"
+                                                                      th:if="*{validator.contactPhone1.hasErrors}"
+                                                                      th:text="*{validator.contactPhone1.errors}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="inputs-wrapper">
+                                    <div class="cl wp">
+                                        <div class="fields">
+                                            <div class="form-group label-floating">
+                                                <label class="control-label" for="relative2"
+                                                       th:text="#{form.field.relationship}"></label>
+                                                <select disabled="disabled" th:field="*{relative2}"
+                                                        class="form-control relative2">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="status : ${@catalogService.getRelationships(#locale)}"
+                                                            th:value="${status.id}"
+                                                            th:text="${status.relationship}"></option>
+                                                </select>
+                                                <small class="help-block muted">Ej: Padre
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="cl" style="margin-left: 0;margin-right: 0;">
+                                        <div class="fields">
+                                            <span class="prefix">(</span>
+                                            <div class="form-group">
+                                                <input disabled="disabled" type="text" th:field="*{contactCityCode2}"
+                                                       class="form-control city-code relative2"
+                                                       style="text-align: center"/>
+                                                <small class="help-block muted">Ej: (01)</small>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <span class="postfix" style="margin-left: 0">)</span>
+                                        </div>
+                                    </div>
+                                    <div class="cl" style="margin-left: .3em">
+                                        <div class="fields">
+                                            <div class="form-group label-floating">
+                                                <label class="control-label">Tel/Cel</label>
+                                                <input disabled="disabled" type="text" th:field="*{contactPhone2}"
+                                                       class="form-control medium-number-input relative2"/>
+                                                <div class="errorContainer">
+                                                                <span class="help-block form-field-error-message"
+                                                                      th:if="*{validator.contactPhone2.hasErrors}"
+                                                                      th:text="*{validator.contactPhone2.errors}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <button id="btnSubmit" type="submit" class="button red-button" style="display:none;">
+                <span th:text="#{loanOffer.applyForLoan}"></span>
+            </button>
+        </div>
+    </form>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+
+            // Set the validator for the documents and referents
+            var documentsValidator = /*[[${loanApplicationDocumentsForm.validator.toJson(#locale)}]]*/null;
+            if (documentsValidator != null) {
+                console.log(documentsValidator);
+                var jsonValidator = JSON.parse(documentsValidator);
+                var jsonFormValidation = createFormValidationJson(jsonValidator, $('#frmDocuments'));
+                console.log(jsonFormValidation);
+                $('#frmDocuments').validateForm(jsonFormValidation);
+            }
+
+            //Initialize the FileUploads
+            var jsonConfigUpload = {
+                showCaption: false,
+                maxFileCount: 10,
+                allowedFileExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'bmp', 'tiff'],
+                maxFileSize: 2048,
+                showUpload: false,
+                language: "es"
+            };
+            $("#dni").fileinput(jsonConfigUpload);
+            $("#comprobanteDireccion").fileinput(jsonConfigUpload);
+            $("#boletaPago").fileinput(jsonConfigUpload);
+            $("#declaracionJuradaAnual").fileinput(jsonConfigUpload);
+            $("#reciboHonorarios").fileinput(jsonConfigUpload);
+            $("#facturaInteres").fileinput(jsonConfigUpload);
+            $("#pagoCuentaArrendamiento").fileinput(jsonConfigUpload);
+            $("#fichaRegistralVigente").fileinput(jsonConfigUpload);
+            $("#declaracionAnual").fileinput(jsonConfigUpload);
+            $("#pdt").fileinput(jsonConfigUpload);
+
+
+            //  Set dependentPhoneNumberCode behavior
+            $('#contactCityCode1').keyup(function (event) {
+                if ($(this).val().length == 2) {
+                    $('#contactPhone1').focus();
+                }
+            });
+            $('#contactCityCode2').keyup(function (event) {
+                if ($(this).val().length == 2) {
+                    $('#contactPhone2').focus();
+                }
+            });
+
+            initializeUserFileSection();
+        });
+
+        function initializeUserFileSection() {
+            $('#docSection').find('.fileImage').click(function () {
+                $(this).ekkoLightbox();
+            });
+
+            $('#skipProcess').on('click', function (event) {
+                event.preventDefault();
+                showRefSection();
+            });
+
+            var sizeDocuments = $('.image-box').length;
+
+            switch (sizeDocuments) {
+                case 1:
+                    $('.image-box').addClass('col-lg-12');
+                    break;
+                case 2:
+                    $('.image-box').addClass('col-lg-6 col-md-6 col-sm-12');
+                    break;
+                case 3:
+                    $('.image-box').addClass('col-lg-4 col-md-4 col-sm-12');
+                    break;
+                default:
+                    $('.image-box').addClass('col-lg-4 col-md-4 col-sm-12');
+                    break;
+            }
+        }
+        function showRefSection() {
+            $('#refSection').css({'display': 'block'});
+            $('#refSection').addClass('fadeIn');
+            $('#btnSubmit').css({'display': 'inline-block'});
+            $('#independentPhoneHomeContact').focus();
+
+            $("html, body").animate({scrollTop: $("#refSection").offset().top}, 1000);
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block th:fragment="documentationUploadModal">
+    <div id="uploadUserFileModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="smaller">Se aceptan todos los formatos de imagen y documentos PDF.</div>
+                    <div class="smaller">Tama&ntilde;o m&aacute;ximo <span th:text="${@configuration.MAX_UPLOAD_FILE_SIZE_MB() + 'mb' }"></span></div>
+                </div>
+                <div class="modal-body">
+                    <div id="uploadUserFile" class="dropzone"></div>
+                    <br/>
+                    <div class="actions">
+                        <button type="button" class="button black-button" onclick="closeUploadUserFileModal()">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var uploadedSuccess = false;
+        function openUploadUserFileModal(userFileType) {
+            uploadedSuccess = false;
+            var url = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/userFile} ]]*/;
+            $("#uploadUserFile").dropzone({
+                url: url,
+                params: {userFileType: userFileType},
+                paramName: 'file',
+                maxFilesize: /*[[ ${@configuration.MAX_UPLOAD_FILE_SIZE_MB()} ]]*/, // MB
+                maxFiles: 5,
+                dictDefaultMessage: 'Arrastra una imagen aqu&iacute; para subirla, o haz click para seleccionar una.',
+                acceptedFiles: 'image/*,application/pdf',
+                headers: addCsrfToJsonHeaders({
+                    'x-request-sender-type': 'ajax'
+                }),
+                init: function () {
+                    this.on("success", function () {
+                        debugger;
+                        uploadedSuccess = true;
+                        closeUploadUserFileModal();
+
+                        $("html, body").animate({scrollTop: $("#refSection").offset().top}, 1000);
+                    });
+                }
+            });
+
+            $('#uploadUserFileModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+
+        function closeUploadUserFileModal() {
+            $('#uploadUserFileModal').modal('hide');
+            Dropzone.forElement("div#uploadUserFile").destroy();
+            if (uploadedSuccess) {
+                showRefSection();
+                var baseUrl = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/offer/documentation/panel} ]]*/;
+                $('#docSection').load(baseUrl + ' #docSection > *', function () {
+                    initializeUserFileSection();
+                });
+            }
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      layout:decorator="templates/defaultTemplate" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="https://s3.amazonaws.com/solven-public/external/fullcalendar-3.9.0/fullcalendar.min.css"></link>
+    <script src="https://s3.amazonaws.com/solven-public/external/fullcalendar-3.9.0/lib/moment.min.js"></script>
+    <script src="https://s3.amazonaws.com/solven-public/external/fullcalendar-3.9.0/fullcalendar.min.js"></script>
+    <script src="https://s3.amazonaws.com/solven-public/external/fullcalendar-3.9.0/gcal.min.js"></script>
+    <script src="https://s3.amazonaws.com/solven-public/external/fullcalendar-3.9.0/locale/es.js"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker/bootstrap-datetimepicker.js'}"></script>
+    <title>Match Transaccional</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+            this.getColorByStatus = function(i){
+                switch(i) {
+                    case 1:
+                        return 'gray' // Cola
+                        break;
+                    case 2:
+                        return 'yellow' // Ejecucion
+                        break;
+                    case 3:
+                        return '#3CB371' // Success
+                        break;
+                    case 4:
+                        return '#FF6666' // Fallido
+                        break;
+                    case 6:
+                        return '#ADD8E6' // Programado
+                        break;
+                }
+            }
+            this.parseQueryBots = function(queryBotsParam){
+                var listEvents = []
+                for(var i=0 ; i < queryBotsParam.length;i++){
+                    if(queryBotsParam[i].statusId !== 5){
+                        var newObj = {};
+                        var tmpObj = templates.filter(function (tmp) {
+                            if(queryBotsParam[i].parameters === undefined ||
+                                queryBotsParam[i].parameters.map === undefined ||
+                                queryBotsParam[i].parameters.map.interactionContentId === undefined)
+                                return null;
+                            else
+                                return tmp.interactionContent.id === parseInt(queryBotsParam[i].parameters.map.interactionContentId);
+                        });
+                        if(tmpObj != null && tmpObj.length > 0){
+                            newObj.title = tmpObj[0].name;
+                        }
+                        newObj.backgroundColor = this.getColorByStatus(queryBotsParam[i].statusId);
+                        if(queryBotsParam[i].statusId === 6)
+                            newObj.start = queryBotsParam[i].scheduledDate;
+                        else
+                            newObj.start = queryBotsParam[i].startTime;
+                        newObj.end = queryBotsParam[i].finishTime;
+                        newObj.color = 'black';
+                        newObj.queryBot = queryBotsParam[i];
+                        listEvents.push(newObj);
+                    }
+                }
+                return listEvents;
+            }
+
+
+            var currentDate =  new Date();
+            var templates = JSON.parse([[${@utilService.toJson(templates)}]]);
+            var canBotBeRun = [[${canBotBeRun}]];
+            var parsedEvents = this.parseQueryBots(JSON.parse([[${@utilService.toJson(queryBots)}]]));
+            var template = null;
+            var self = this;
+            var buttonAction;
+            var selectedEvent;
+            if(canBotBeRun === true)
+                $('#onDemandButton').show();
+            else
+                $('#infoMessage').show();
+
+            $("#templates").change(function () {
+                var selectedId = this.value;
+                template = templates.filter(function (tmp) {
+                    return tmp.interactionContent.id === parseInt(selectedId);
+                });
+                $('#previewTemplate').html(template[0].interactionContent.body.replace("background:url(%AGENT_IMAGE_URL%);","\'"));
+            });
+
+            $('#calendar').fullCalendar({
+                locale: 'es',
+                events: parsedEvents,
+                eventClick: function(event) {
+                    self.openExistingEvent(event);
+                }
+            })
+
+            this.submitOnDemandMailing = function(){
+                if(template != null){
+                    defaultAjax({
+                        url: /*[[@{/system/transactionalmatch}]]*/,
+                        type: 'POST',
+                        data: {templateId:template[0].id,
+                            canBotBeRun:canBotBeRun,
+                            interactionContentId: template[0].interactionContent.id
+                        },
+                        success: function (data,textStatus,jqXHR) {
+                            $('#onDemandButton').hide();
+                            swal({
+                                title: 'Operacion Realizada ',
+                                type: 'success',
+                                text: 'Mailing bot en ejecucion',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            canBotBeRun = false;
+                            setTimeout(function(){
+                                $('#infoMessage').show();
+                                self.fetchQueryBotsByDate(moment().add(monthIndex, 'months').format('YYYY-MM'));
+                            }, 2000);
+                        }
+                    })
+                }else{
+                    swal({
+                        title: 'Operacion Cancelada ',
+                        type: 'warning',
+                        text: 'Seleccione una plantilla',
+                        showConfirmButton: false,
+                        timer: 3000
+                    })
+
+                }
+            }
+            this.fetchQueryBotsByDate = function(yearAndMonth){
+                    defaultAjax({
+                        url: /*[[@{/system/transactionalmatch/querybots}]]*/,
+                        type: 'POST',
+                        data: {yearAndMonth:yearAndMonth},
+                        success: function (data,textStatus,jqXHR) {
+                            var eventsResponse = self.parseQueryBots(JSON.parse(data));
+                            $('#calendar').fullCalendar('removeEvents');
+                            $('#calendar').fullCalendar('addEventSource', eventsResponse);
+                            $('#calendar').fullCalendar('rerenderEvents');
+                        }
+                    })
+            }
+
+            this.openExistingEvent = function(ev){
+
+                if(ev.queryBot.statusId === 6  && moment(ev.start).isAfter(moment()) ) {
+                    buttonAction = 'DELETE';
+                    selectedEvent = ev;
+                }else{
+                    buttonAction = 'SHOW';
+                }
+                self.renderModal(buttonAction,ev)
+            }
+            this.addNewEvent = function(){
+                buttonAction = 'NEW';
+                self.renderModal(buttonAction,null)
+            }
+
+            this.renderModal = function(action,ev){
+                    if(action === 'NEW'){
+                        $('#new').show();
+                        $('#show').hide();
+                        $('#processEvent').show();
+                        $('#processEvent').text('GUARDAR')
+
+                    }else if(action === 'SHOW'){
+                        $('#processEvent').hide();
+                        $('#show').show();
+                        $('#new').hide();
+                        $('#showName').text(ev.title);
+                        $('#showDate').text( moment(ev.start).format("DD-MM-YYYY HH:mm"));
+
+
+                    }else if(action === 'DELETE'){
+                        $('#processEvent').show();
+                        $('#processEvent').text('BORRAR');
+                        $('#show').show();
+                        $('#new').hide();
+                        $('#showName').text(ev.title);
+                        $('#showDate').text( moment(ev.start).format("DD-MM-YYYY HH:mm"));
+
+                    }
+                $('#calendarTaskModal').modal();
+
+            }
+            $('body').on('click', 'button.fc-prev-button', function() {
+
+                var prevMonth = currentDate.getMonth()-1;
+                currentDate.setMonth(prevMonth);
+                self.renderByDate(currentDate);
+
+            });
+
+            $('body').on('click', 'button.fc-next-button', function() {
+
+                var nextMonth = currentDate.getMonth()+1;
+                currentDate.setMonth(nextMonth);
+                self.renderByDate(currentDate);
+
+            });
+
+            $('#newdatetimepicker').datetimepicker({
+                format: 'YYYY-MM-DD HH:mm',
+                viewDate : 'viewDate: moment(new Date())'
+            });
+            this.processEvent = function(){
+                if(buttonAction === 'NEW'){
+                    templateId = $('#templatesModal').find(":selected").val();
+                    selectedTime = $('input#newdatetimepicker').data('DateTimePicker').date() != null ? moment($('input#newdatetimepicker').data('DateTimePicker').date()._d).format("YYYY-MM-DD HH:mm:ss"):null;
+                    if(templateId != null && selectedTime!= null && templateId.length > 0 && selectedTime.length > 0 && moment(selectedTime).isAfter(moment())){
+                        $('#calendarTaskModal').modal('hide');
+                        var localTemplate = templates.filter(function (tmp) {
+                            return tmp.interactionContent.id === parseInt(templateId);
+                        });
+                        self.newQueryBot(selectedTime, localTemplate[0].interactionContent.id);
+                    }
+
+                }else if(buttonAction === 'DELETE'){
+                    $('#calendarTaskModal').modal('hide');
+                    self.removeQueryBot(selectedEvent.queryBot.id);
+
+                }
+            }
+            this.removeQueryBot = function(queryBotId){
+                defaultAjax({
+                    url: /*[[@{/system/transactionalmatch/remove}]]*/,
+                    type: 'POST',
+                    data: {queryBotId:queryBotId},
+                    success: function (data,textStatus,jqXHR) {
+                        if(textStatus === 'success'){
+                            swal({
+                                title: 'Operacion Realizada ',
+                                type: 'success',
+                                text: 'Mailing bot fue cancelado',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            self.renderByDate(currentDate);                       }
+                    }
+                })
+            }
+            this.newQueryBot = function(date, interactionContentId){
+                defaultAjax({
+                    url: /*[[@{/system/transactionalmatch/add}]]*/,
+                    type: 'POST',
+                    data: {date:date,interactionContentId:interactionContentId},
+                    success: function (data,textStatus,jqXHR) {
+
+                        if(textStatus === 'success'){
+                            swal({
+                                title: 'Operacion Realizada ',
+                                type: 'success',
+                                text: 'Mailing bot fue creado',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            self.renderByDate(currentDate);
+                        }
+                    }
+                })
+            }
+            this.renderByDate = function (date){
+                var tmpMonth = (date.getMonth()+1);
+                var parsedMonth = tmpMonth < 10 ?'0' + tmpMonth:tmpMonth;
+                self.fetchQueryBotsByDate(date.getFullYear()+"-"+parsedMonth)
+            }
+        });
+       /*]]>*/
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <!-- Home, Cola de Procesos.-->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Match Transaccional</span>
+                </li>
+            </ul>
+            <div class="row page-content-inner">
+                <div class="col-md-6" shiro:hasPermission="transactionalMatch:onDemand:read">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">A demanda</span>
+                            </div>
+                        </div>
+                        <div class="row portlet-body">
+                            <!-- Entidad -->
+                            <div class="form-group col-md-6">
+                                <label class="control-label"><b>Plantilla</b></label>
+                                <select  id="templates" name="templates" class="form-control form-control-sm" style="max-width: 320px">
+                                    <option value="" hidden="hidden">Selecciona la Plantilla</option>
+                                    <option th:each="template : ${templates}" th:value="${template.interactionContent.id}" th:text="${template.name}"></option>
+                                </select>
+
+                            </div>
+                            <div class="form-group col-md-6" style="padding-top:28px">
+                                <a style="display:none" id="onDemandButton" href="javascript:;" onclick="submitOnDemandMailing()" class="btn blue btn-outline pull-right">Ejecutar</a>
+                                <span id="infoMessage" style="display:none"><b>Ya existe una tarea programada para hoy</b></span>
+                            </div>
+                            <div class="form-group" style="width:100%;margin:10px;margin-top:25px;">
+                                <label class="control-label"><b>Previsualizacion</b></label>
+                                <div id="previewTemplate" name="previewTemplate" style="pointer-events:none;overflow-y: auto;overflow-x: auto;;border:1px #D3D3D3 solid;min-height:450px;padding:5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6" shiro:hasPermission="transactionalMatch:scheduled:read">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Programadas</span>
+                            </div>
+                        </div>
+                        <div class="row portlet-body">
+                            <div class="form-group col-md-6" style="margin-top: 0px">
+                                <label class="control-label"><b>Tareas</b></label>
+                                <a id="addNewEventButton" href="javascript:;" onclick="addNewEvent()" class="btn blue btn-outline">Nueva</a>
+                            </div>
+                            <div class="form-group col-md-10" id="calendar"></div>
+                        </div>
+                        <div class="row portlet-body">
+                            <div style="padding-left:15px"><h4><b>LEYENDA &nbsp;:&nbsp;&nbsp;</b></h4>
+                             <span style="color:#FF6666"><b>FALLIDO</b>&nbsp;&nbsp;</span>
+                             <span style="color:gray"><b>COLA</b>&nbsp;&nbsp;</span>
+                             <span style="color:#3CB371"><b>OK</b>&nbsp;&nbsp;</span>
+                             <span style="color:#ADD8E6"><b>PROGRAMADO&nbsp;&nbsp;</b></span>
+                             <span style="color:yellow"><b>EJECUCION</b></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="calendarTaskModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="content">
+                        <div class="modal-body">
+                            <div class="row">
+
+                                <div class="col-md-8" >
+                                    <div class="form-group">
+                                        <h3><b>Evento[QueryBot]</b></h3>
+                                        <div id="new">
+                                            <label class="control-label"><b>Plantilla</b></label>
+                                            <select  id="templatesModal" name="templates" class="form-control form-control-sm" style="max-width: 180px">
+                                                <option value="" hidden="hidden">Selecciona la Plantilla</option>
+                                                <option th:each="templatesModal : ${templates}" th:value="${templatesModal.interactionContent.id}" th:text="${templatesModal.name}"></option>
+                                            </select>
+                                            <label class="control-label"><b>Fecha</b></label>
+                                            <input type="text" id ="newdatetimepicker"/>
+                                        </div>
+                                        <div id="show">
+                                            <label class="control-label"><b>Plantilla</b></label>
+                                            <div id ="showName"></div>
+                                            <label class="control-label"><b>Fecha</b></label>
+                                            <div id ="showDate"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                            <button id="processEvent" onclick="processEvent()" type="button" class="btn btn-info"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

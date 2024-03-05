@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q27">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <th:block th:if="${tittle == null}">
+                    <p th:utext="#{questions.block.companyRUC}"></p>
+                </th:block>
+                <th:block th:unless="${tittle == null}">
+                    <p th:utext="${tittle}"></p>
+                </th:block>
+                <div class="centrado">
+                    <div>
+                        <div class="field inline">
+                            <input type="text" class="input-outline document-input-ruc" th:field="*{ruc}"/>
+                            <small class="input-help" th:text="#{questions.block.companyRUC.small1}"></small>
+                            <!-- <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                                <small class="input-help">Nro. RUC</small>
+                            </th:block>
+                            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                                <small class="input-help">Nro. CUIT</small>
+                            </th:block>
+                            <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                <small class="input-help">NIT</small> -->
+                            <!-- </th:block> -->
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                        <div>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <small class="display-block text-black" th:utext="#{questions.block.companyRUC.small2}"></small>
+                        <!-- <small th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}"
+                               class="display-block text-black">&iquest;No lo encuentras? B&uacute;scalo <a
+                                href="http://www.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaMovil.jsp"
+                                class="text-lightblue" target="_blank" rel="no-referer">aqu&iacute;</a></small></small></small>
+                        <small th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                               class="display-block text-black">&iquest;No lo encontr&aacute;s? Buscalo en tu recibo de sueldo o <a
+                                href="https://www.cuitonline.com/" class="text-lightblue" target="_blank" rel="no-referer">aqu&iacute;</a>
+                        </small>
+                        <small th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}"
+                               class="display-block text-black">¿No lo encuentras? Búsquelo en su recibo de sueldo o <a
+                                href="http://www.rues.org.co/RM" class="text-lightblue" target="_blank" rel="no-referer">aqu&iacute;</a>
+                        </small> -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var $documentinputruc = $('.document-input-ruc');
+        setTimeout(function () {
+            $documentinputruc.focus();
+        }, 300);
+        $documentinputruc.bind('paste', function (e) {
+            setTimeout(() => {
+                $(this).val($(this).val().replace(/-|\s/g, ''));
+            }, 100);
+        });
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Log de acciones</title>
+
+    <!-- TableFilterPaginator -->
+    <script th:src="@{/js/ext_tablefilter.js}"></script>
+
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+</head>
+
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='activityLog')"/>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper" >
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+                        <div class="portlet light tablefilter">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <span class="caption-subject font-green bold uppercase">Log de actividades de los usuarios</span>
+                                </div>
+
+                                <div class="actions">
+                                    <!--<a class="btn btn-circle btn-default tablefilter-action-button"-->
+                                       <!--href="javascript:;">-->
+                                        <!--<i class="fa fa-filter"></i> Filtros-->
+                                    <!--</a>-->
+                                    <!--<a class="btn btn-circle btn-default tablefilter-action-button-clean" href="javascript:;">-->
+                                        <!--<i class="fa fa-filter"></i> Limpiar Filtros-->
+                                    <!--</a>-->
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+
+
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <div id="listSize" th:attr="paginator-total=${listSize}"></div>
+
+                                <form role="form" method="post" th:action="@{/activityLog/list}">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <dl class="dl-horizontal dl-user-data">
+                                                <dt>Fec. registro</dt>
+                                                <dd>
+                                                    Desde
+                                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                                           style="display: inline"
+                                                           class="form-control input-sm input-small"/>
+                                                    Hasta
+                                                    <input id="creationToFilter" name="creationTo" type="text"
+                                                           style="display: inline"
+                                                           class="form-control input-sm input-small"/>
+                                                    <script>
+                                                        $('#creationFromFilter').datepicker({
+                                                            autoclose: true,
+                                                            format: "dd/mm/yyyy",
+                                                            focusOnShow: true,
+                                                            endDate: "today"
+                                                        });
+                                                        $('#creationToFilter').datepicker({
+                                                            autoclose: true,
+                                                            format: "dd/mm/yyyy",
+                                                            focusOnShow: true,
+                                                            endDate: "today"
+                                                        });
+                                                    </script>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <dl class="dl-horizontal dl-user-data">
+                                                <dt>Usuario</dt>
+                                                <dd>
+                                                    <select name="reason" class="form-control input-sm input-small">
+                                                        <option value=""></option>
+                                                        <option th:each="user : ${userActionsList}"
+                                                                th:value="${user.entityUserId}"
+                                                                th:text="texto"></option>
+                                                    </select>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <dl class="dl-horizontal dl-user-data">
+                                                <dt>Accion</dt>
+                                                <dd>
+                                                    <select name="entity" class="form-control input-sm input-small">
+                                                        <option value=""></option>
+                                                        <option th:each="action : ${userActionsList}"
+                                                                th:value="${action.entityUserId}"
+                                                                th:text="texto"></option>
+                                                    </select>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(userActionsList)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: list(userActionsList=${userActionsList})"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- / Top summary -->
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+<th:block th:fragment="list">
+    <th:block shiro:hasPermission="menu:user:logs:view">
+        <table id="tableResults" class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Accion </th>
+                <th>Fecha</th>
+            </tr>
+            </thead>
+            <tbody th:attr="data-table-paginator-total=${listSize}">
+            <tr th:each="userActivity: ${userActionsList}">
+                <td th:text="${userActivity?.entityUserName}"></td>
+                <td th:text="${userActivity?.permission}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(userActivity?.actionDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(userActivity?.actionDate)}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <script>
+            /*<![CDATA[*/
+                $(function() {
+                    var $table = $('.table');
+                    dataTable( $table, false, false, true, false );
+                });
+            /*]]>*/
+        </script>
+    </th:block>
+</th:block>
+
+</body>
+
+</html>

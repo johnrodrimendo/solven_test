@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/companyTemplate">
+<head>
+
+    <title>Adelantos</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <th:block th:replace="fragments/headers :: companyDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block
+            th:replace="fragments/extranetSidebarFragments :: extranetCompanySidebar(currentPage='salaryAdvance')"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <span class="active">Adelantos</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <i class="icon-settings font-dark"></i>
+                        <span class="caption-subject bold uppercase"> Adelantos</span>
+                    </div>
+                    <div class="actions">
+                        <div class="btn-group" th:if="${credits != null and !credits.isEmpty()}">
+                            <a class="btn green btn-circle" href="javascript:;" data-toggle="dropdown" aria-expanded="true">
+                                <i class="fa fa-cog"></i> Acciones
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a th:href="@{/salarayAdvances/excel}">
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar">
+                    </div>
+                    <div id="sample_1_2_wrapper" class="dataTables_wrapper" th:if="${credits != null}">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover table-checkable order-column dataTable"
+                                   id="sample_1_2" role="grid" aria-describedby="sample_1_2_info">
+                                <thead>
+                                <tr role="row">
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending" style="text-align:center;width: 200px;">
+                                        Tipo documento
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending" style="text-align:center;width: 200px;">
+                                        N&uacute;mero documento
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Nombre Completo
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending" style="text-align:center;width: 110px;">
+                                        Cantidad cr&eacute;ditos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending" style="text-align:center;width: 196px;">
+                                        Monto cr&eacute;ditos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending" style="background:#32c5d2;color: white;text-align:center;width: 187px;">
+                                        Monto a pagar
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending" style="background:#f7323f;color:white;text-align:center;width: 187px;">
+                                        Monto pendiente
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr role="row" th:each="credit : ${credits}">
+                                    <td style="padding:1em;text-align:left;">
+                                        <span th:text="${credit.docType.name}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${credit.docNumber}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${credit.getFullName()}"></span>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span th:text="${credit.credits}"></span>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span th:text="${@utilService.doubleMoneyFormat(credit.totalCreditAmount)}"></span>
+                                    </td>
+                                    <td style="background:#c3eef1;text-align:center;">
+                                       <span th:text="${@utilService.doubleMoneyFormat(credit.totalCreditAmountToPay)}"></span>
+                                    </td>
+                                    <td  style="background:#ffc3cb;text-align:center;">
+                                        <span th:text="${@utilService.doubleMoneyFormat(credit.totalPendingAmount)}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"></td>
+                                    <td style="text-align: right"><b>Total</b></td>
+                                    <td style="text-align: center">
+                                        <b th:text="${totals.credits}"></b>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <b th:text="${@utilService.doubleMoneyFormat(totals.totalCreditAmount)}"></b>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <b th:text="${@utilService.doubleMoneyFormat(totals.totalCreditAmountToPay)}"></b>
+                                    </td>
+                                    <td  style="text-align:center;">
+                                        <b th:text="${@utilService.doubleMoneyFormat(totals.totalPendingAmount)}"></b>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

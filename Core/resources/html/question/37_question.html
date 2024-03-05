@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_client_grouped">
+    <style>
+        select[name=hopeGrow] + span.select2 { margin: 0.25em }
+    </style>
+    <div class="inner-question" th:attr="data-question=${q}">
+        <div class="questions-section animated fadeInRight">
+            <div class="forms q37">
+                <p>¿Cu&aacute;l fue el ingreso mensual promedio que puedas demostrar? (Ult. 6 meses)</p>
+                <form class="inner-question-form" autocomplete="off">
+                    <div class="field field-amount inline">
+                        <div class="wrap-field">
+                            <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                            </div>
+                            <input type="text" class="input-outline amount-input" name="monthlyIncome"/>
+                        </div>
+                    </div>
+                    <select name="hopeGrow">
+                        <option value="despite">Espero que disminuyan</option>
+                        <option value="keeping">Espero que se mantengan</option>
+                        <option value="grow">Espero crecer en más del 15%</option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </form>
+            </div>
+        </div>
+        <hr class="divisor-bottom"/>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+
+                var $monthlyIncome = innerQuestion.find('#monthlyIncome');
+                setTimeout(function () {
+                    $monthlyIncome.focus();
+                }, 300);
+                innerQuestion.find('input[name=monthlyIncome]').on("keyup", function (event) {
+                    if (event.keyCode === 13) {
+                        return false;
+                    }
+                });
+            })();
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.provableIncome}"></p>
+            <div class="form-group">
+                <small>Ingreso U6M</small>
+                <div class="input-group">
+                    <span class="input-group-addon" th:text="${loanApplication.country.currency.symbol}"></span>
+                    <input class="form-control" type="text" th:field="*{monthlyIncome}"/>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group">
+                <select class="form-control" th:field="*{hopeGrow}">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option value="despite">Espero que disminuyan.</option>
+                    <option value="keeping">Espero que se mantengan.</option>
+                    <option value="grow">Espero crecer en m&aacute;s del 15%.</option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

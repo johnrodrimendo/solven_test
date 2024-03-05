@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<!-- CREDIT -->
+<!-- Be careful with this and use the variable onlyView because is rendered also by an external user-->
+<div th:fragment="credit" th:class="${@frontEndService.getDefaultPortletClass()}"
+     th:id="${credit?.code != null ? credit?.code : ''}">
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+
+            $("#jquery_jplayer_2").jPlayer({
+                ready: function () {
+                    $(this).jPlayer("setMedia", {
+                        wav: /*[[${credit?.welcomeCall}]]*/null
+                    });
+                },
+                swfPath: '/js',
+                solution: 'html, flash',
+                supplied: "mp3, oga, wav",
+                preload: 'metadata',
+                volume: 0.8,
+                muted: false,
+                backgroundColor: '#000000',
+                cssSelectorAncestor: '#jp_container_2',
+                cssSelector: {
+                    videoPlay: '.jp-video-play',
+                    play: '.jp-play',
+                    pause: '.jp-pause',
+                    stop: '.jp-stop',
+                    seekBar: '.jp-seek-bar',
+                    playBar: '.jp-play-bar',
+                    mute: '.jp-mute',
+                    unmute: '.jp-unmute',
+                    volumeBar: '.jp-volume-bar',
+                    volumeBarValue: '.jp-volume-bar-value',
+                    volumeMax: '.jp-volume-max',
+                    playbackRateBar: '.jp-playback-rate-bar',
+                    playbackRateBarValue: '.jp-playback-rate-bar-value',
+                    currentTime: '.jp-current-time',
+                    duration: '.jp-duration',
+                    title: '.jp-title',
+                    fullScreen: '.jp-full-screen',
+                    restoreScreen: '.jp-restore-screen',
+                    repeat: '.jp-repeat',
+                    repeatOff: '.jp-repeat-off',
+                    gui: '.jp-gui',
+                    noSolution: '.jp-no-solution'
+                },
+                errorAlerts: false,
+                warningAlerts: false
+            });
+
+            $('#welcomeCallUploader').on('change', function (event) {
+                event.preventDefault();
+                if ($(this).val().replace(/C:\\fakepath\\/i, '') != '') {
+                    var data = new FormData();
+                    data.append("welcomeCall", $('#welcomeCallUploader')[0].files[0]);
+                    data.append("creditId", /*[[${credit?.id}]]*/null);
+
+                    console.log(data);
+                    defaultAjax({
+                        url: /*[[ @{/credit/uploadWelcomeCall} ]]*/,
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            system.unloadAlert = false;
+                            location.reload();
+                        },
+                        error: function () {
+
+                        }
+                    });
+                }
+
+            });
+        });
+    </script>
+
+    <script th:inline="javascript">
+        /*$(document).ready(function () {
+         var hashcode = window.location.hash;
+         if (hashcode.length > 0) {
+         $('html,body').animate({scrollTop: $('div' + hashcode).offset().top - 60}, 'slow');
+         }
+         });*/
+    </script>
+    <div class="portlet-title tabbable-line">
+        <div th:class="${@frontEndService.getDefaultCaptionClass()}" style="width: 95%">
+                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"
+                      th:text="${credit?.code}"></span>
+            <span th:if="${credit?.status?.status} != null"
+                  th:classappend="${credit.status.id != credit.status.REJECTED ? 'label-success' : 'label-danger'}"
+                  class="label label-sm"
+                  th:text="${credit?.status?.status}"></span>
+            <span th:if="${!onlyView}">
+                    <a target="_blank" class="label label-sm label-info"
+                       th:href="@{/loanApplication/viewasclient(loanApplicationId=${credit?.loanApplicationId},userId=${credit?.userId},personId=${credit?.personId})}">Ver
+                        como cliente</a>
+                </span>
+            <span th:if="${credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).AFFIRM and !onlyView}">
+                    <a target="_blank" class="label label-sm label-info"
+                       th:href="@{/person/viewextranet(userId=${credit?.userId})}">Ver extranet
+                    </a>
+                </span>
+            <span th:if="${!onlyView}">
+                    <!--<a target="_blank" class="label label-sm label-warning"-->
+                <!--th:href="${'https://insights.hotjar.com/sites/' + @configuration.HOTJAR_ACCOUNT_ID + '/playbacks/list?tag_names=' + credit?.loanApplication?.code}">Ver Filmación</a>-->
+                </span>
+            <!--<span class="label label-sm label-success"-->
+            <!--th:text="${credit?.loanApplication?.getApplicantType()}"></span>-->
+            <span th:if="${!onlyView and credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).EFL}">
+                    <a target="_blank" class="label label-sm label-info"
+                       th:onclick="'showWelcomeSpeechModal()'">Welcome Speech</a>
+                    <script th:inline="javascript">
+                        function showWelcomeSpeechModal() {
+                            var win = window.open("", "Speech", "toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=800, height=780");
+                            win.document.body.innerHTML = /*[[${credit?.welcomeSpeech}]]*/'';
+                        }
+                    </script>
+                </span>
+            <!--<span class="label label-sm label-danger"-->
+            <!--th:if="${(credit?.htAmount != null and credit?.htAmount != credit?.amount) or (credit?.htInstallments != null and credit?.htInstallments != credit?.installments) or (credit?.htEffectiveAnnualRate != null and credit?.htEffectiveAnnualRate != credit?.effectiveAnnualRate)}">Condiciones actualizadas-->
+            <!--</span>-->
+            <span th:if="${!onlyView and credit?.returningReasons != null and credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).COMPARTAMOS}">
+                    <a target="_blank" class="label label-sm label-info"
+                       th:onclick="'regenerateCredit(' +${credit?.id}+ ')'">Regenerar Crédito</a>
+                    <script th:inline="javascript">
+                        function regenerateCredit(creditId) {
+                            defaultAjax({
+                                url: /*[[@{/credit/regenerateOnEntity}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    creditId: creditId
+                                },
+                                success: function (data) {
+                                    swal(
+                                        'Enhorabuena',
+                                        '¡Se regeneró el crédito en el financiador!',
+                                        'success'
+                                    );
+                                },
+                                error: function (data) {
+                                    swal(
+                                        '',
+                                        'Ocurrió un error de comunicación con el financiador',
+                                        'error'
+                                    );
+                                }
+                            });
+                        }
+                    </script>
+                </span>
+            <span th:if="${onlyView}" class="label label-sm label-success">Validado SBS</span>
+            <span th:if="${onlyView}" class="label label-sm label-success">Validado Equifax</span>
+        </div>
+        <!--TODO-->
+        <!--<ul class="nav nav-tabs" th:if="${!onlyView}">-->
+        <!--<li class="active">-->
+        <!--<a href="#portlet_tab_credit" data-toggle="tab" aria-expanded="true"> Crédito </a>-->
+        <!--</li>-->
+        <!--<li>-->
+        <!--<a th:if="${credit?.status?.id >= T(com.affirm.common.model.catalog.CreditStatus).ACTIVE}" href="#portlet_tab_cancellation" data-toggle="tab" aria-expanded="true"> Cancelación Anticipada </a>-->
+        <!--</li>-->
+        <!--<li class="">-->
+        <!--<a th:if="${credit?.status?.id >= T(com.affirm.common.model.catalog.CreditStatus).ACTIVE}" href="#portlet_tab_refinancement" data-toggle="tab" aria-expanded="false">Refinanciamiento </a>-->
+        <!--</li>-->
+        <!--</ul>-->
+        <div class="tools" style="width: 5%">
+            <a href="javascript:;" class="reload"
+               th:attr="data-personId=${credit.personId}, data-userId=${credit.userId}, data-creditId=${credit.id}, data-personId=${credit.personId}"></a>
+            <a href="javascript:;" th:classappend="${iter?.size eq 1 ? 'collapse' : 'expand'}"
+               th:attr="data-personId=${credit.personId}, data-userId=${credit.userId}, data-creditId=${credit.id}, data-personId=${credit.personId}, data-isDisabled=${iter?.index == 0 and iter?.size eq 1}"></a>
+        </div>
+    </div>
+    <div class="portlet-body" style="display:none" th:style="${onlyView OR iter?.size gt 1} ? 'display:none'">
+        <ul class="fa-ul" th:if="${onlyView OR iter?.size gt 1}">
+            <li>
+                <i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de Solicitud
+            </li>
+        </ul>
+        <th:block th:if="${onlyView OR iter?.size eq 1}">
+            <div th:replace="fragments/personFragmentsCredit :: credit-body"></div>
+        </th:block>
+    </div>
+</div>
+
+<div th:fragment="credit-body">
+    <div class="tab_pane active" id="portlet_tab_credit">
+        <div style="margin-bottom: 1rem;">
+            <span th:if="${!onlyView}">
+                <a target="_blank" class="label label-sm label-warning"
+                   th:href="${'https://insights.hotjar.com/sites/' + @configuration.HOTJAR_ACCOUNT_ID + '/playbacks/list?tag_names=' + credit?.loanApplication?.code}">Ver Filmación</a>
+            </span>
+            <span class="label label-sm label-success" th:text="${credit?.loanApplication?.getApplicantType()}"></span>
+            <span class="label label-sm label-danger"
+                  th:if="${(credit?.htAmount != null and credit?.htAmount != credit?.amount) or (credit?.htInstallments != null and credit?.htInstallments != credit?.installments) or (credit?.htEffectiveAnnualRate != null and credit?.htEffectiveAnnualRate != credit?.effectiveAnnualRate)}">Condiciones actualizadas
+            </span>
+        </div>
+
+        <th:block th:if="${credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).REJECTED}">
+            <div class="list-group-item list-group-item-danger"
+                 style="border-radius: 5px;display:inline-block;margin-bottom:1.5em;">Motivo de rechazo: <span
+                    th:text="${#strings.toLowerCase(credit?.rejectionReason?.reason) + '. ' + #strings.toLowerCase(credit?.rejectionComment != null ? credit?.rejectionComment : '')}"></span></div>
+        </th:block>
+
+        <div class="row align-items-baseline">
+            <dl class="dl-horizontal dl-loan-application col-md-6">
+                <th:block th:if="${credit?.status?.id != T(com.affirm.common.model.catalog.CreditStatus).REJECTED}">
+                    <dt>Estado</dt>
+                    <dd th:text="${credit?.status?.status + ' ' + credit?.rejectionLocal}"></dd>
+                </th:block>
+                <th:block th:if="${credit?.employer != null}">
+                    <dt>Empleador</dt>
+                    <dd th:text="${credit?.employer.name}"></dd>
+                </th:block>
+                <dt>Entidad Financiadora</dt>
+                <dd th:text="${credit?.entity?.shortName}"></dd>
+                <dt>Capital del Crédito</dt>
+                <dd th:text="${@utilService.doubleMoneyFormat(credit?.loanCapital, credit?.country?.currency)}"></dd>
+                <th:block
+                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                    <dt>Monto Solicitado</dt>
+                    <dd>
+                        <span th:text="${@utilService.doubleMoneyFormat(credit?.amount, credit?.country?.currency)}"></span>
+                        <a class="editable-click"
+                           th:if="${credit?.htAmount != null and credit?.htAmount != credit?.amount}">
+                            <span th:text="${'/ ' + @utilService.doubleMoneyFormat(credit?.htAmount, credit?.country?.currency)}"></span>
+                            <span class="label label-sm label-danger">Modificado</span>
+                        </a>
+                    </dd>
+                </th:block>
+                <th:block
+                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                    <dt>Monto del Credito</dt>
+                    <dd th:text="${@utilService.integerMoneyFormat(credit?.getCreditAmount().intValue(), credit?.country?.currency)}"></dd>
+                    <dt>Monto a Desembolsar</dt>
+                    <dd th:text="${@utilService.integerMoneyFormat(credit?.amount.intValue(), credit?.country?.currency)}"></dd>
+                </th:block>
+                <th:block th:if="${credit?.product?.id == T(com.affirm.common.model.catalog.Product).GUARANTEED}">
+                    <dt>Loan to Value</dt>
+                    <dd th:text="${@utilService.percentFormat(credit?.loanToValue)}"></dd>
+                </th:block>
+                <dt>Total a Pagar</dt>
+                <dd th:text="${@utilService.integerMoneyFormat(credit?.pendingCreditAmount, credit?.country?.currency)}"></dd>
+                <th:block
+                        th:if="${credit?.product?.id == T(com.affirm.common.model.catalog.Product).DEBT_CONSOLIDATION}">
+                    <dt>Remanente de Consolidacion</dt>
+                    <dd th:text="${@utilService.doubleMoneyFormat(credit?.consolidationRemnants, credit?.country?.currency?.symbol, credit?.country?.separator)}"></dd>
+                </th:block>
+                <dt>Producto</dt>
+                <dd th:text="${credit?.entityProductParams?.entityProduct}"></dd>
+                <dt>Cuotas</dt>
+                <dd>
+                    <span th:text="${credit?.installments}"></span>
+                    <a class="editable-click"
+                       th:if="${credit?.htInstallments != null and credit?.htInstallments != credit?.installments}">
+                        <span th:text="${'/ ' + credit?.htInstallments}"></span>
+                        <span class="label label-sm label-danger">Modificado</span>
+                    </a>
+                </dd>
+                <dt>Monto x Cuota</dt>
+                <dd th:text="${@utilService.doubleMoneyFormat(credit?.installmentAmountAvg, credit?.country?.currency)}"></dd>
+                <dt>TEA</dt>
+                <dd>
+                    <span th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate, credit?.currency)}"></span>
+                    <a class="editable-click"
+                       th:if="${credit?.htEffectiveAnnualRate != null and credit?.htEffectiveAnnualRate != credit?.effectiveAnnualRate}">
+                        <span th:text="${'/ ' + @utilService.percentFormat(credit?.htEffectiveAnnualRate, credit?.currency)}"></span>
+                        <span class="label label-sm label-danger">Modificado</span>
+                    </a>
+                </dd>
+                <dt>TEM</dt>
+                <dd th:text="${@utilService.percentFormat(credit?.effectiveMonthlyRate, credit?.currency)}"></dd>
+                <dt>TCEA</dt>
+                <dd th:text="${@utilService.percentFormat(credit?.effectiveAnnualCostRate, credit?.currency)}"></dd>
+                <th:block
+                        th:if="${person?.documentType?.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                    <dt>TNA</dt>
+                    <dd th:text="${credit?.getNominalAnualRate()!=null?@utilService.percentFormat(credit?.getNominalAnualRate(), credit?.currency):'Valor no encontrado'}"></dd>
+                </th:block>
+                <th:block
+                        th:if="${person?.documentType?.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                    <dt>TED</dt>
+                    <dd th:text="${@utilService.threeDigitPercentFormat(credit?.effectiveDailyRate, credit?.currency)}"></dd>
+                    <dt>Cluster</dt>
+                    <dd th:text="${credit?.clusterSubcluster}"></dd>
+                    <th:block th:with="resultEfl=${@creditDAO.getResultEFL(credit)}">
+                        <dt th:if="${resultEfl != null}">Resultado EFL</dt>
+                        <dt th:if="${resultEfl != null}" th:text="${resultEfl}"></dt>
+                    </th:block>
+                    <dt>Tipo de proceso</dt>
+                    <dd th:text="${credit?.entityProductParams?.getSignatureTypeName()}"></dd>
+                    <th:block th:if="${credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).COMPARTAMOS
+                                    and credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).APPLICATION_PAYMENT_TYPE.getKey()) != null}">
+                        <dt>Aplicación de Pago</dt>
+                        <th:block
+                                th:if="${credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).APPLICATION_PAYMENT_TYPE.getKey()) == 'A'}">
+                            <dd>Reducción número de cuotas</dd>
+                        </th:block>
+                        <th:block
+                                th:unless="${credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).APPLICATION_PAYMENT_TYPE.getKey()) == 'A'}">
+                            <dd>Reducción de monto</dd>
+                        </th:block>
+                    </th:block>
+                </th:block>
+                <dt>Código de Solicitud en Entidad</dt>
+                <dd th:text="${credit?.loanApplication?.entityApplicationCode}"></dd>
+                <dt>Código de Credito en Entidad</dt>
+                <dd th:text="${credit?.entityCreditCode}"></dd>
+            </dl>
+            <dl class="dl-horizontal dl-loan-application col-md-6">
+                <th:block
+                        th:if="${person?.documentType?.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+
+                    <th:block th:if="${credit?.commissionType}=='P'">
+                        <dt>Porcentaje Comisión</dt>
+                        <dd th:text="${@utilService.percentFormat(credit?.commission)}"></dd>
+                        <dt>Porcentaje IGV Comisión</dt>
+                        <dd th:text="${@utilService.percentFormat(credit?.commissionIgv)}"></dd>
+                        <dt>Porcentaje Comisión Total</dt>
+                        <dd th:text="${@utilService.percentFormat(credit?.totalCommission)}"></dd>
+                    </th:block>
+                    <th:block th:if="${credit?.commissionType}=='V'">
+                        <dt>Comisión</dt>
+                        <dd th:text="${@utilService.doubleMoneyFormat(credit?.commission, credit?.country?.currency)}"></dd>
+                        <dt>IGV Comisión</dt>
+                        <dd th:text="${@utilService.doubleMoneyFormat(credit?.commissionIgv, credit?.country?.currency)}"></dd>
+                    </th:block>
+                    <dt>Valor Comisión</dt>
+                    <dd th:text="${@utilService.doubleMoneyFormat(credit?.loanCommission, credit?.country?.currency)}"></dd>
+                    <dt>Código de Depositante</dt>
+                    <dd th:text="${credit?.depositorCode}"></dd>
+                    <th:block th:if="${credit?.loanApplication?.getGuaranteedVehicleDescription() != null}">
+                        <dt>Vehiculo Garantizado</dt>
+                        <dd th:text="${credit?.loanApplication.getGuaranteedVehicleDescription()}"></dd>
+                        <dt>kilometraje</dt>
+                        <dd th:text="${credit?.loanApplication.guaranteedVehicleMileage}"></dd>
+                        <dt>Placa</dt>
+                        <dd th:text="${credit?.loanApplication.guaranteedVehiclePlate}"></dd>
+                    </th:block>
+                </th:block>
+            </dl>
+        </div>
+        <br/>
+
+        <th:block th:if="${credit?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_LIBRE_DISPONIBILIDAD}">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="portlet transparent">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Nombres de los padres</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <dl class="dl-horizontal dl-loan-application">
+                                <th:block th:each="referral : ${referrals}" th:switch="${referral?.relationship?.id}">
+                                    <dt th:case="${T(com.affirm.common.model.catalog.Relationship).FATHER}">Nombres del padre</dt>
+                                    <dt th:case="${T(com.affirm.common.model.catalog.Relationship).MOTHER}">Nombres de la madre</dt>
+                                    <dd th:text="${referral?.fullName}"></dd>
+                                </th:block>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+        <th:block th:if="${credit?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_CREDIGOB_PROOVEDOR_ESTADO}">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="portlet transparent">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Credigob</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <dl class="dl-horizontal dl-loan-application">
+                                    <dt>Código SIAF</dt>
+                                    <dd th:text="${credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).CREDIGOB_NUMERO_OS.getKey())}"></dd>
+                                    <dt>Rango ingreso personal</dt>
+                                    <dd th:text="${credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).CREDIGOB_RANGO_INGRESOS.getKey())}"></dd>
+                                    <dt>Rango ingreso empresa</dt>
+                                    <dd th:text="${credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).CREDIGOB_RANGO_INGRESOS_EMPRESA.getKey())}"></dd>
+                                    <dt>% paricipaci&oacute;n empresa</dt>
+                                    <dd th:text="${credit?.loanApplication?.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).CREDIGOB_PRCT_PARTICIPACION.getKey())}"></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+        <div class="row" th:if="${credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).EFL}">
+            <div class="col-md-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Welcome Call</span>
+                        </div>
+                    </div>
+                    <div th:if="${credit?.welcomeCall == null}">
+                        <form action="#" enctype="multipart/form-data" id="welcomeCallForm">
+                            <label href="javascript:;" class="btn btn-lg red" for="welcomeCallUploader"> Subir
+                                Archivo
+                                <i class="fa fa-edit"></i>
+                                <input type="file" style="display: none" name="welcomeCall"
+                                       id="welcomeCallUploader"/>
+                            </label>
+                        </form>
+                    </div>
+                    <div th:unless="${credit?.welcomeCall == null}">
+                        <div id="jquery_jplayer_2" class="jp-jplayer"></div>
+                        <div id="jp_container_2" class="jp-audio" role="application" aria-label="media player">
+                            <div class="jp-type-single">
+                                <div class="jp-gui jp-interface">
+                                    <div class="jp-controls">
+                                        <button class="jp-pause" role="button" tabindex="0">pause</button>
+                                        <button class="jp-play" role="button" tabindex="0">play</button>
+                                        <button class="jp-stop" role="button" tabindex="0">stop</button>
+                                    </div>
+                                    <div class="jp-progress">
+                                        <div class="jp-seek-bar">
+                                            <div class="jp-play-bar"></div>
+                                        </div>
+                                    </div>
+                                    <div class="jp-volume-controls">
+                                        <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                        <button class="jp-volume-max" role="button" tabindex="0">max volume
+                                        </button>
+                                        <div class="jp-volume-bar">
+                                            <div class="jp-volume-bar-value"></div>
+                                        </div>
+                                    </div>
+                                    <div class="jp-time-holder">
+                                        <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                                        <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                                        <div class="jp-toggles">
+                                            <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="jp-details">
+                                    <div class="jp-title" aria-label="title">
+                                        <div>
+                                            <a target="_blank" th:href="${credit?.welcomeCall}"> Descargar
+                                                llamada </a>
+                                        </div>
+
+                                        <div>
+                                            <a href="javascript:;"
+                                               th:onclick="'deleteWelcomeCall(' + ${credit?.id} + ')'">
+                                                Eliminar </a>
+                                        </div>
+                                        <script th:inline="javascript">
+                                            function deleteWelcomeCall(creditId) {
+                                                var data = new FormData();
+                                                data.append("creditId", creditId);
+
+                                                swal({
+                                                        title: "",
+                                                        text: "<br/><br/>¿Deseas eliminar el welcome call de todas maneras?",
+                                                        type: "warning",
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: "#DD6B55",
+                                                        confirmButtonText: "¡Sí, eliminar!",
+                                                        closeOnConfirm: false,
+                                                        html: true
+                                                    },
+                                                    function () {
+                                                        defaultAjax({
+                                                            url: /*[[ @{/credit/deleteWelcomeCall} ]]*/,
+                                                            type: 'POST',
+                                                            data: data,
+                                                            cache: false,
+                                                            processData: false,
+                                                            contentType: false,
+                                                            success: function (data) {
+                                                                refreshTabAjax('credits');
+                                                                swal("Eliminada", "El welcome call  ha sido eliminada correctamente.", "success");
+                                                            }
+                                                        });
+                                                    });
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="jp-no-solution">
+                                    <span>Update Required</span>
+                                    To play the media you will need to either update your browser to a recent
+                                    version or update your <a href="http://get.adobe.com/flashplayer/"
+                                                              target="_blank">Flash plugin</a>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <br/>
+
+        <div class="row" th:if="${credit?.returningReasons != null}">
+            <div class="col-md-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Motivos de Rechazo de la Entidad</span>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="tab-content">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Motivo de Rechazo</th>
+                                        <th>Flujo Correctivo</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="returningReason : ${credit?.returningReasons}">
+                                        <td th:text="${returningReason?.id}"></td>
+                                        <td th:text="${returningReason?.reason}"></td>
+                                        <td th:text="${returningReason?.correctionFlow?.flow}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" th:if="${credit?.consolidatedDebts != null}">
+            <div class="col-md-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Deudas Consolidables</span>
+                        </div>
+
+                    </div>
+                    <div class="portlet-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Banco</th>
+                                    <th>Nro Tarjeta</th>
+                                    <th>Marca</th>
+                                    <th>Ubigeo</th>
+                                    <th>Monto (S/)</th>
+                                    <th>Tasa</th>
+                                    <th>Cuotas</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="consolidatedDebt : ${credit?.consolidatedDebts}">
+                                    <td th:text="${consolidatedDebt?.entity?.shortName}"></td>
+                                    <td th:text="${consolidatedDebt?.accountCardNumber}"></td>
+                                    <td th:text="${consolidatedDebt?.creditCardBrand?.name}"></td>
+                                    <td th:text="${consolidatedDebt?.department?.name}"></td>
+                                    <td class="numeric" th:text="${consolidatedDebt?.balanceDouble}"></td>
+                                    <td class="numeric"
+                                        th:text="${@utilService.percentFormat(consolidatedDebt?.rate)}"></td>
+                                    <td class="numeric" th:text="${consolidatedDebt?.installments}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" th:if="${credit.vehicle != null}">
+            <div class="col-md-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Datos del Vehículo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <dl class="dl-horizontal dl-loan-application">
+                            <dt>Marca</dt>
+                            <dd th:text="${credit?.vehicle?.brand?.brand}"></dd>
+                            <dt>Modelo</dt>
+                            <dd th:text="${credit?.vehicle?.model}"></dd>
+                            <dt>Transmisión</dt>
+                            <th:block
+                                    th:switch="${credit?.vehicle?.transmission}">
+                                <dd th:case="${T(com.affirm.common.model.catalog.Vehicle).MECANICO}">
+                                    Mecánico
+                                </dd>
+                                <dd th:case="${T(com.affirm.common.model.catalog.Vehicle).AUTOMATICO}">
+                                    Automático
+                                </dd>
+                            </th:block>
+                            <dt>Precio Online</dt>
+                            <dd th:text="${@utilService.doubleMoneyFormat(credit?.vehicle?.price, T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"></dd>
+                            <dt>Precio de Lista</dt>
+                            <dd th:text="${@utilService.doubleMoneyFormat(credit?.vehicle?.listPrice, T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"></dd>
+                            <dt>Versión</dt>
+                            <dd th:text="${credit?.vehicle?.version}"></dd>
+                            <dt>Combustible</dt>
+                            <dd th:text="${credit?.vehicle?.gasType?.type}"></dd>
+                            <dt>Año de Producción</dt>
+                            <dd th:text="${credit?.vehicle?.yearOfProduction}"></dd>
+                            <dt>Color</dt>
+                            <dd th:text="${credit?.vehicle?.vehicleDetails[0]?.color}"></dd>
+                            <dt>Concesionario</dt>
+                            <dd th:text="${credit?.vehicle?.vehicleDealership?.name}"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row"
+             th:if="${credit.vehicle != null and credit?.loanApplication?.status?.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).APPROVED_SIGNED}">
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Cuota Inicial</span>
+                            <th:block th:if="${credit?.isDownPaymentPaid}">
+                                <span class="label label-sm label-success">Pagada</span>
+                            </th:block>
+                            <th:block th:unless="${credit?.isDownPaymentPaid}">
+                                        <span th:id="'spanPendiente_' + ${credit.id}"
+                                              class="label label-sm label-danger">Pendiente</span>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <dl class="dl-horizontal dl-loan-application">
+                            <dt>Cuota inicial Total</dt>
+                            <dd th:id="'downPayment_' + ${credit?.id}"
+                                th:text="${@utilService.doubleMoneyFormat(credit?.downPayment, credit?.downPaymentCurrency?.symbol, credit?.downPaymentCurrency?.separator)}"></dd>
+                            <dt>Cuota Inicial Pendiente</dt>
+                            <dd th:id="'downPaymentDiff_' + ${credit?.id}"
+                                th:text="${credit?.downPayment - credit?.paidDownPayment > 0} ? ${@utilService.doubleMoneyFormat(credit?.downPayment - credit?.paidDownPayment, credit?.downPaymentCurrency?.symbol, credit?.downPaymentCurrency?.separator)} : ${@utilService.doubleMoneyFormat(0, credit?.downPaymentCurrency?.symbol, credit?.downPaymentCurrency?.separator)}"></dd>
+                            <dt>Cuota Inicial Pagada</dt>
+                            <dd th:id="'downPaymentPaid_' + ${credit?.id}"
+                                th:text="${@utilService.doubleMoneyFormat(credit?.paidDownPayment, credit?.downPaymentCurrency?.symbol, credit?.downPaymentCurrency?.separator)}"></dd>
+                            <dt>Excedente</dt>
+                            <dd th:id="'downPaymentPaidPlus_' + ${credit?.id}"
+                                th:text="${credit?.paidDownPayment - credit?.downPayment > 0} ? ${@utilService.doubleMoneyFormat(credit?.paidDownPayment - credit?.downPayment, credit?.downPaymentCurrency?.symbol, credit?.downPaymentCurrency?.separator)} : ${@utilService.doubleMoneyFormat(0, credit?.downPaymentCurrency?.symbol, credit?.downPaymentCurrency?.separator)}"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Detalle de Operaciones</span>
+                        </div>
+                    </div>
+                    <div th:id="'downPaymentDetails' + ${credit?.id}" class="portlet-body">
+                        <th:block th:replace="this :: downPayments"></th:block>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Registro</span>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="col-md-5 input-inline input-medium">
+                            <select class="form-control m-input custom-select"
+                                    th:id="'downPaymentBank_' + ${credit.id}">
+                                <option th:each="bank : ${@catalogService.getBanksByVehicle(credit?.vehicle?.groupId, #locale)}"
+                                        th:value="${bank.id}" th:text="${bank.name}"></option>
+                            </select>
+                            <input type="text" th:id="'downPaymentAmount_' + ${credit.id}"
+                                   placeholder="Cuota inicial"/>
+                            <input type="text" th:id="'downPaymentOps_' + ${credit.id}"
+                                   placeholder="Nro. Operación"/>
+                        </div>
+                        <button th:id="'downPaymentButton_' + ${credit.id}" class="btn btn-default"
+                                type="button">Registrar
+                        </button>
+                        <script th:inline="javascript">
+                            /*<![CDATA[*/
+                            $("#downPaymentAmount_" + /*[[${credit?.id}]]*/).forceDoubleOnly(true, 0, 99999);
+                            $("#downPaymentOps_" + /*[[${credit?.id}]]*/).forceLettersOnly('^[a-zA-Z0-9. ()]+$', true, 4, 10);
+
+                            $("#downPaymentButton_" + /*[[${credit?.id}]]*/).click(function () {
+                                var downPaymentBank = $('#downPaymentBank_' + /*[[${credit?.id}]]*/).val();
+                                var downPayment = $('#downPaymentAmount_' + /*[[${credit?.id}]]*/).val();
+                                var downPaymentOps = $('#downPaymentOps_' + /*[[${credit?.id}]]*/).val();
+                                if (downPayment == null || downPayment == '' || downPaymentOps == null || downPaymentOps == '') {
+                                    swal(
+                                        '',
+                                        'Debes ingresar todos los datos del depósito de la cuota inicial',
+                                        'error'
+                                    );
+                                } else {
+                                    defaultAjax({
+                                        url: /*[[@{/credit/downPayment}]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            creditId: /*[[${credit?.id}]]*/null,
+                                            downPaymentBank: downPaymentBank,
+                                            downPayment: downPayment,
+                                            downPaymentOps: downPaymentOps
+                                        },
+                                        success: function (data) {
+                                            var obj = JSON.parse(data);
+                                            $('#downPayment_' + /*[[${credit?.id}]]*/).text(formatCurrency(obj.credit_down_payment, [[${T(com.affirm.common.model.catalog.Currency).USD_SYMBOL}]]));
+                                            var dif = obj.credit_down_payment - obj.down_payment_ammount_paid;
+                                            if (dif < 0) {
+                                                $('#downPaymentDiff_' + /*[[${credit?.id}]]*/).text(formatCurrency(0, [[${T(com.affirm.common.model.catalog.Currency).USD_SYMBOL}]]));
+                                                $('#downPaymentPaidPlus_' + /*[[${credit?.id}]]*/).text(formatCurrency(-1 * dif, [[${T(com.affirm.common.model.catalog.Currency).USD_SYMBOL}]]));
+                                            } else $('#downPaymentDiff_' + /*[[${credit?.id}]]*/).text(formatCurrency(dif, [[${T(com.affirm.common.model.catalog.Currency).USD_SYMBOL}]]));
+                                            $('#downPaymentPaid_' + /*[[${credit?.id}]]*/).text(formatCurrency(obj.down_payment_ammount_paid, [[${T(com.affirm.common.model.catalog.Currency).USD_SYMBOL}]]));
+
+                                            if (obj.credit_down_payment - obj.down_payment_ammount_paid <= 0) {
+                                                $('#spanPendiente_' + /*[[${credit?.id}]]*/).replaceWith("<span class='label label-sm label-success'>Pagada</span>");
+                                                $('#registerDownPayment_' + /*[[${credit?.id}]]*/).remove();
+                                            }
+
+
+                                            defaultAjax({
+                                                url: /*[[@{/credit/downPaymentDetails}]]*/null,
+                                                type: 'POST',
+                                                data: {
+                                                    creditId: /*[[${credit?.id}]]*/null
+                                                },
+                                                success: function (data) {
+                                                    $('#downPaymentDetails' + /*[[${credit?.id}]]*/).html(data);
+                                                    $('#downPaymentAmount_' + /*[[${credit?.id}]]*/).val('');
+                                                    $('#downPaymentOps_' + /*[[${credit?.id}]]*/).val('');
+                                                    swal(
+                                                        'Enhorabuena',
+                                                        '¡Se registro el abono de inicial correctamente!',
+                                                        'success'
+                                                    )
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                            /*]]>*/
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="creditObservation" class="row" th:if="${credit?.observationReason?.id} and ${!onlyView}">
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Observaciones</span>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <dl class="dl-horizontal dl-loan-application">
+                            <dt th:text="${credit?.observationReason?.reason}"></dt>
+                            <button id="dismissObservation" type="button" class="btn btn-default"
+                                    data-dismiss="modal" th:onclick="'dismissObservation('+${credit?.id}+')'">
+                                SUBSANAR
+                            </button>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function dismissObservation(creditId) {
+                swal({
+                        title: "&iquest;Est&aacute;s seguro de subsanar el cr&eacute;dito?",
+                        text: "No podr&aacute;s revertir el cambio.",
+                        html: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#36c6d3",
+                        confirmButtonText: "¡Si, Subsanar!",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        defaultAjax({
+                            url: /*[[@{/person/dismissObservation/}]]*/null,
+                            type: 'POST',
+                            data: {
+                                creditId: creditId,
+                                observationReasonId: null
+                            },
+                            success: function (data) {
+                                swal("Subsanado", "El crédito ha sido subsanado correctamente.", "success");
+                                $('#creditObservation').remove();
+                            }
+                        })
+                    });
+            }
+
+            /*]]>*/
+
+        </script>
+
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Desembolso</span>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <dl class="dl-horizontal dl-loan-application">
+                            <dt>F. Desembolso</dt>
+                            <dd th:text="${@utilService.dateFormat(credit?.disbursementDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.disbursementDate)}"></dd>
+                            <dt>F. Confirmación</dt>
+                            <dd th:text="${@utilService.dateFormat(credit?.disbursementConfirmationDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.disbursementConfirmationDate)}"></dd>
+                            <dt>Tipo</dt>
+                            <dd th:text="${credit?.getDisbursementTypeDescription()}"></dd>
+                            <dt>Número Cheque</dt>
+                            <dd th:text="${credit?.disbursementCheckNumber}"></dd>
+                            <dt>Firmante</dt>
+                            <dd th:text="${credit?.disbursementSignatureSysuser}"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Estados</span>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <dl class="dl-horizontal dl-loan-application">
+                            <dt>Inact. sin Cronograma</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.inactiveWOScheduleDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></dd>
+                            <dt>Inact. con Cronograma</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.inactiveWScheduleDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWScheduleDate)}"></dd>
+                            <dt>Activo</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.activeDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.activeDate)}"></dd>
+                            <dt>Finalizado</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.cancelledDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.cancelledDate)}"></dd>
+                            <dt>Rechazado</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.rejectedDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.rejectedDate)}"></dd>
+                            <dt>Originado</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.originatedDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.originatedDate)}"></dd>
+                            <dt>Desembolsado</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(credit?.originatedDisbursementDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.originatedDisbursementDate)}"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="portlet transparent">
+                    <div class="portlet-title">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> RCI</span>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <dl class="dl-horizontal dl-loan-application">
+                            <dt>Cuota Promedio</dt>
+                            <dd th:text="${@utilService.doubleMoneyFormat(credit?.installmentAmountAvg, credit?.country?.currency)}"></dd>
+
+                            <th:block
+                                    th:if="${person?.documentType?.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                <dt>Cuota SBS</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(credit?.sbsMonthlyInstallment, credit?.country?.currency)}"></dd>
+                                <dt>Cuota SBS Hipotecario</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(credit?.sbsMonthlyInstallmentMotgage, credit?.country?.currency)}"></dd>
+                                <dt>Ingreso Total Admisión</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(credit?.admissionTotalIncome, credit?.country?.currency)}"></dd>
+                                <dt>RCI</dt>
+                                <dd th:text="${@utilService.percentFormat(credit?.rci, credit?.currency)}"></dd>
+                                <dt>RCI Interno</dt>
+                                <dd th:text="${@utilService.percentFormat(credit?.internalRci, credit?.currency)}"></dd>
+                            </th:block>
+
+                            <th:block
+                                    th:if="${person?.documentType?.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                <dt>Compromiso Nosis</dt>
+                                <dd th:text="${credit.getNosisCommitment()!=null?@utilService.doubleMoneyFormat(credit.getNosisCommitment(), credit?.country?.currency):'No se pudo obtener el valor'}"></dd>
+                                <dt>Endeudamiento BCRA</dt>
+                                <dd th:text="${credit.getBcraIndebtedness()!=null?@utilService.doubleMoneyFormat(credit.getBcraIndebtedness(), credit?.country?.currency):'No se encontro información'}"></dd>
+                                <dt>Ingreso estimado</dt>
+                                <dd th:text="${credit.getEstimateIncome()!=null?@utilService.doubleMoneyFormat(credit.getEstimateIncome(), credit?.country?.currency):'No se pudo calcular el valor'}"></dd>
+                                <dt>RCI</dt>
+                                <dd th:text="${credit.getEstimateIncome()!=null and credit.getEstimateIncome()!=0?@utilService.percentValueFormat(credit.getInstallmentAmountAvg()/credit.getEstimateIncome(), credit?.country?.currency):'No se pudo calcular el ingreso estimado'}"></dd>
+                                <dt>DTI</dt>
+                                <dd th:text="${credit.getDti()!=null?@utilService.percentValueFormat(credit?.dti, credit?.country?.currency):'No se pudo calular'}"></dd>
+                            </th:block>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Cronograma de pagos</span>
+                    </div>
+                    <div class="actions" th:if="${credit?.status?.id} != 4 and ${!onlyView}">
+                        <div class="btn-group">
+                            <a th:class="${@frontEndService.defaultDropdownActionButtonClass}" href="javascript:;"
+                               data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                               aria-expanded="false">
+                                Acciones de cobranza <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-submenu pull-left" style="width: 100%">
+                                    <a href="javascript:;" tabindex="-1"
+                                       class="font-grey-gallery sbold">Contacto</a>
+                                    <ul class="dropdown-menu">
+                                        <li th:each="contact : ${@catalogService.getContactResultsByType('Contacto')}">
+                                            <a href="javascript:;"
+                                               th:onclick="'saveContactResult('+${contact.id}+','+${credit?.id}+')'"
+                                               th:text="${contact.result}"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu pull-left" style="width: 100%">
+                                    <a href="javascript:;" class="font-grey-gallery sbold">No contacto
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li th:each="contact : ${@catalogService.getContactResultsByType('No Contacto')}">
+                                            <a href="javascript:;"
+                                               th:onclick="'saveContactResult('+${contact.id}+','+${credit?.id}+')'"
+                                               th:text="${contact.result}"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-responsive">
+                        <table th:if="${credit?.getManagementSchedule() != null}"
+                               class="table table-bordered table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>Cuota</th>
+                                <th>Vencimiento</th>
+                                <th>Saldo de deuda</th>
+                                <th>Capital</th>
+                                <th>Interés<br/>(Inc.
+                                    <th:block
+                                            th:text="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>
+                                    )
+                                </th>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <th>Gasto<br/>de Recaudo<br/>(Inc.
+                                        <th:block
+                                                th:text="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>
+                                        )
+                                    </th>
+                                    <th>Interés<br/>Moratorio</th>
+                                    <th>Cargos<br/>por Mora</th>
+                                </th:block>
+                                <th th:if="${credit?.vehicle !=null}">Seguro Vehicular</th>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <th>Desgravamen</th>
+                                </th:block>
+                                <th>Cuota<br/>total</th>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <th>Estado</th>
+                                </th:block>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="managementSchedule : ${credit?.managementSchedule}">
+                                <td class="text-center" th:text="${managementSchedule?.installmentId}"></td>
+                                <td class="text-center">
+                                    <span th:text="${@utilService.dateFormat(managementSchedule?.getDueDate())}"
+                                          th:attr="data-order=${@utilService.datetimeYearFirstFormat(managementSchedule?.getDueDate())}"></span>
+                                    <small th:if="${managementSchedule?.getDaysInArrears()} > 0" class="font-red-mint"
+                                           th:text="'(' + ${managementSchedule?.getDaysInArrears()} + ')' "></small>
+                                </td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getRemainingCapital(), credit?.country?.currency)}"></td>
+                                <td class="numeric">
+                                    <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getInstallmentCapital(), credit?.country?.currency)}"></span>
+                                    <small class="font-green-sharp"
+                                           th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getPendingInstallmentCapital(), credit?.country?.currency)}"></small>
+                                </td>
+                                <td class="numeric">
+                                    <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalInterest(), credit?.country?.currency)}"></span>
+                                    <small class="font-green-sharp"
+                                           th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingInterest(), credit?.country?.currency)}"></small>
+                                </td>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <td class="numeric">
+                                        <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalCollectionCommission(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></span>
+                                        <small class="font-green-sharp"
+                                               th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingCollectionCommission(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></small>
+                                    </td>
+                                    <td class="numeric">
+                                        <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalMoratoriumInterest(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></span>
+                                        <small class="font-green-sharp"
+                                               th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingMoratoriumInterest(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></small>
+                                    </td>
+                                    <td class="numeric">
+                                        <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalMoratoriumCharge(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></span>
+                                        <small class="font-green-sharp"
+                                               th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingMoratoriumCharge(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></small>
+                                    </td>
+                                </th:block>
+                                <td th:if="${credit?.vehicle !=null}" class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getCarInsurance(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <td class="numeric"
+                                        th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getInsurance(), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                </th:block>
+                                <td class="numeric">
+                                    <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getInstallmentAmount(), credit?.country?.currency)}"></span>
+                                    <small class="font-green-sharp"
+                                           th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getPendingInstallmentAmount(), credit?.country?.currency)}"></small>
+                                </td>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <td class="text-center"
+                                        th:if="${credit?.status?.id != T(com.affirm.common.model.catalog.CreditStatus).REJECTED}">
+                                                <span th:if="${credit?.getNeverManageCollection()}"
+                                                      class="label label-xs label-default">N/A</span>
+                                        <span th:if="${managementSchedule?.getInstallmentStatusId() == 1 and credit?.getNeverManageCollection() != true}"
+                                              class="label label-xs label-info">Pendiente</span>
+                                        <span th:if="${managementSchedule?.getInstallmentStatusId() == 2 and credit?.getNeverManageCollection() != true}"
+                                              class="label label-xs label-warning">Vencida</span>
+                                        <span th:if="${managementSchedule?.getInstallmentStatusId() == 3 and credit?.getNeverManageCollection() != true}"
+                                              class="label label-xs label-danger">En Mora</span>
+                                        <span th:if="${managementSchedule?.getInstallmentStatusId() == 4 and credit?.getNeverManageCollection() != true}"
+                                              class="label label-xs label-success">Pagada</span>
+                                    </td>
+                                    <td class="text-center"
+                                        th:if="${credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).REJECTED}">
+                                        <span class="label label-xs label-danger">No aplica</span>
+                                    </td>
+                                </th:block>
+                                <!--<td th:text="${managementSchedule?.getDaysAhead()}"></td>-->
+                            </tr>
+                            <tr></tr>
+                            <tr>
+                                <td colspan="3" align="right"><b>Totales:</b></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('installmentCapital', 'M'), credit?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalInterest', 'M'), credit?.country?.currency)}"></td>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <td class="numeric"
+                                        th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalCollectionCommission', 'M'), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                    <td class="numeric"
+                                        th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalMoratoriumInterest', 'M'), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                    <td class="numeric"
+                                        th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalMoratoriumCharge', 'M'), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                </th:block>
+                                <td th:if="${credit?.vehicle !=null}" class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('carInsurance', 'M'), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                <th:block
+                                        th:if="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                    <td class="numeric"
+                                        th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('insurance', 'M'), credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                                </th:block>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('installmentAmount', 'M'), credit?.country?.currency)}"></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tabData" data-accordion="application" th:if="${showLoanApplicationTab == null or showLoanApplicationTab}"
+         th:with="loanApplication = ${credit?.loanApplication}">
+        <div class="portlet box green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <!--<div th:remove="tag">Solicitud</div>-->
+                    <div th:remove="tag" th:text="'Solicitud ' + ${loanApplication?.code} "></div>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="expand" data-original-title="" title=""> </a>
+                </div>
+            </div>
+            <div class="portlet-body" style="display:none">
+                <ul class="fa-ul">
+                    <li>
+                        <i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de Documentación
+                    </li>
+                </ul>
+                <!--<div th:replace="fragments/personFragmentsLoanApplication :: loan-application"></div>-->
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${showDocumentationTab == null or showDocumentationTab}"
+         th:with="userFilesObject = ${credit.userFilesObjectList}" th:remove="tag">
+        <div th:replace="fragments/personFragmentsDocumentation :: tab-documentation(loanApplication=${credit?.loanApplication})"/>
+    </div>
+
+    <div th:if="${showRekognitionTab == null or showRekognitionTab}" th:with="result = ${credit.recognition}"
+         th:remove="tag">
+        <div th:replace="fragments/personFragmentsRekognition :: tab-rekognition"/>
+    </div>
+
+    <div th:if="${showInteractionsTab == null or showInteractionsTab}"
+         th:with="interaction = ${credit.interactions}" th:remove="tag">
+        <div th:replace="fragments/personFragmentsInteraction :: tab-interactions-know"/>
+    </div>
+
+    <div th:if="${showNotes == null or showNotes}" class="row"
+         th:with="loanApplication=${credit?.loanApplication}" th:remove="tag">
+        <div th:replace="fragments/personFragmentsNote :: tab-notes-log"></div>
+    </div>
+
+    <div th:if="${showPepOfacTab == null or showPepOfacTab}"
+         th:with="loanApplication = ${credit?.loanApplication} , onlyView = true" th:remove="tag">
+        <div th:replace="fragments/personFragmentDisqualifier :: tab-disqualifier"/>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            var uri = /*[[ @{/person} ]]*/null;
+            var personId = /*[[ ${credit.personId} ]]*/null;
+            var creditId = /*[[ ${credit.id} ]]*/null;
+            var baseURL = uri + '/' + personId + '/credit/' + creditId;
+
+            var creditCode = /*[[ ${credit.code} ]]*/null;
+            var accordions = $('#' + creditCode + ' #tabData');
+
+            // console.log(accordions);
+
+            accordions.each(function (accordion) {
+                var eachAccordion = $(this).data('accordion');
+                var oneTimeLoadAccordion = $(this).find('.tools a.expand');
+                // console.log(oneTimeLoadAccordion);
+                var reloadAccordion = $(this).find('.tools a.reload');
+                // console.log(reloadAccordion);
+
+                oneTimeLoadAccordion.one('click', function () {
+                    loadAccordionOnDemand(eachAccordion, false);
+                });
+                reloadAccordion.click(function () {
+                    loadAccordionOnDemand(eachAccordion, true);
+                });
+            });
+
+            function loadAccordionOnDemand(accordion, isReload) {
+                var url = baseURL + '/' + accordion;
+                var container = $('#' + creditCode + ' #tabData[data-accordion=' + accordion + '] .portlet-body');
+                // console.log(url);
+
+                if (accordion == null) {
+                    container.html('<ul class="fa-ul"><li>Acordeon no implementado correctamente</ul>');
+                    return;
+                }
+
+                if (isReload) {
+                    container.html('<ul class="fa-ul"><li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información ...</li></ul>');
+                }
+
+                defaultAjax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        // console.log(data);
+                        if (data !== null && data.trim() !== '') {
+                            // Sucede que al refrescar, el nuevo html ya no ejecuta el script que tiene internamente cuando se usa $.html().
+                            // Como workaround y hack de alguna libreria de $. Doy click al refresh -> renderiza una animacion de carga (son alrededor de 3 divs) -> tomo el primer div y uso $.replaceWith()
+                            // $.replaceWith() a diferencia $.html() si vuelve a cargar el JS
+                            container.children().first().replaceWith(data);
+                        }
+                        // else {
+                        //     container.html('No se obtuvieron resultados');
+                        // }
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    }
+                });
+            }
+        })();
+        /*]]>*/
+    </script>
+
+</div>
+
+</body>
+</html>

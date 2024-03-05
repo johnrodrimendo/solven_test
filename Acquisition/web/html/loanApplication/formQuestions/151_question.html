@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div id="formPhone" class="forms arg q151">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <p th:text="#{questions.151.title}"></p>
+                <div class="wrap-phones">
+                    <div class="field inline" style="padding-right: 0;">
+                        <input type="text" class="input-outline company" placeholder="Nombre de la empresa" th:field="*{name}" />
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field inline filed2" style="padding-right: 0;display:flex;">
+                        <div class="field inline cbofield">
+                            <select data-placeholder="Tipo de Teléfono" data-width="100" th:field="*{typePhone}">
+                                <option value="" disabled="disabled" selected="selected"></option>
+                                <option th:value="${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}">Fijo</option>
+                                <option th:value="${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}">Celular
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="field inline phoneCodeField" style="margin: 0 !important;">
+                            <input type="text" class="input-outline small-input codeInput" th:field="*{phoneNumber}" placeholder="Número"/>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                    <div class="field inline">
+                        <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*
+        var phonecode = $('#phoneCode');
+        setTimeout(function() {
+            phonecode.focus();
+        }, 320);
+        */
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        /*<![CDATA[*/
+        $('#phoneNumber').mask('000-#');
+        var staticPhoneNumberMaxlength = $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength;
+        var status = false;
+        $('#typePhone').on('change select2:select', function () {
+            if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}]]*/) {
+                console.log(/*[[${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}]]*/);
+                $('#questionForm').data('validatorJson').rules.phoneCode.required = true;
+                $('#phoneCode').val('');
+                $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $('#phoneCode').val().length;
+                $('#phoneCode').keyup();
+                $('.phoneCodeField').show();
+                setTimeout(function () {
+                    $('#phoneCode').focus();
+                }, 300);
+                status = false;
+
+            } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}]]*/) {
+                console.log(/*[[${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}]]*/);
+                $('#questionForm').data('validatorJson').rules.phoneCode.required = false;
+                $('#phoneCode').val('');
+                $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $('#phoneCode').val().length;
+                $('.phoneCodeField').hide();
+                $('#phoneNumber').mask('0000-#');
+                $('#phoneCode').keyup();
+                setTimeout(function () {
+                    $('#phoneNumber').focus();
+                }, 300);
+                status = true;
+            }
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+
+        });
+        $('#typePhone').change();
+
+
+        $('body').on('keyup', '#phoneCode', function (event) {
+            $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+
+            if (status == false) {
+                if (event.keyCode == 13) {
+                    $(this).closest('.questions-section').find('.button').click();
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+
+        $('body').on('keyup', '#phoneNumber', function (event) {
+            if (status != false) {
+                if (event.keyCode == 13) {
+                    $(this).closest('.questions-section').find('.button').click();
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        /*<![CDATA[*/
+        var staticPhoneNumberMaxlength = $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength;
+        $('body').on('keyup', '#phoneCode', function () {
+            $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').data('validatorJson').rules.phoneNumber.minlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+
+        $('#phoneNumber').mask('000-#');
+        $('body').on('keyup', '.codeInput', function () {
+            var actualCodeLength = $(this).val().length;
+            if (actualCodeLength == 2) {
+                $('#phoneNumber').mask('0000-#');
+            } else if (actualCodeLength > 2) {
+                $('#phoneNumber').mask('000-#');
+            }
+        });
+
+
+        $('body').on('keyup', '#phoneNumber', function () {
+            if (event.keyCode == 13) {
+                $(this).closest('.questions-section').find('.button').click();
+                event.preventDefault();
+                return false;
+            }
+        });
+        var change = function() {
+            $('#phoneCode').focus();
+        };
+
+
+        $("#phoneCode").on("keydown", function(e) {
+            var code = e.which;
+            if ( code == 13 || code == 9 ) {
+                e.preventDefault();
+                $('#phoneNumber').focus();
+            }
+        });
+
+
+
+        $('#typePhone').on('select2:select change', change);
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var phoneCodeVal = /*[[${phonePrefix}]]*/ null;
+        if (phoneCodeVal != null && phoneCodeVal != '') {
+            $('#phoneCode').val(phoneCodeVal);
+            setTimeout(function () {
+                $('#phoneNumber').focus();
+            }, 400);
+            $('#phoneCode').keyup();
+        }
+        else {
+            setTimeout(function () {
+                $('#phoneCode').focus();
+            }, 400);
+        }
+        /*]]>*/
+
+    </script>
+</th:block>
+</html>

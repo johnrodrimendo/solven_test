@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title th:utext="#{contract.title}"></title>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/pdfJs/text_layer_builder.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-ui/jquery-ui.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery.touch-punch/jquery.ui.touch-punch.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var bankRequired= /*[[${bankRequired}]]*/;
+        var paymentApplicationTypeRequired= /*[[${paymentApplicationTypeRequired}]]*/;
+        var currentProductId = /*[[ ${credit.product.id} ]]*/;
+        var agreementId = /*[[ ${credit.product.AGREEMENT} ]]*/;
+        $(function(){
+            $('#bankId, #bankAccountType, #bankAccountDepartment').select2({
+                minimumResultsForSearch: -1,
+                width: 100+'%'
+            });
+            $('label.custom-check').on('change', '.real-check', function () {
+                $(this).checked();
+            });
+            // Set the validations
+            var validator = /*[[${loanApplicationBankForm.validator.toJson(#locale)}]]*/null;
+            $('#loanApplicationBankForm').validateForm(createFormValidationJson(JSON.parse(validator), $('#loanApplicationBankForm')));
+            var validatorSign = /*[[${loanApplicationSignatureForm.validator.toJson(#locale)}]]*/null;
+            $('#formSignatureModal').validateForm(createFormValidationJson(JSON.parse(validatorSign), $('#formSignatureModal')));
+            var helpSign = $('#helpSign'),
+                helpModal = $('#helpModal'),
+                signText = $('#signatureOpenModal'),
+                signModal = $('#signatureModal'),
+                liveBox = $('#loanApplicationSign'),
+                signButton = $('#signButton'),
+                signtureBlock = $('#formSignatureModal'),
+                bankAccountBlock = $('#loanApplicationBankForm'),
+                paymentApplicationTypeBlock = $('#paymentApplicationTypeForm');
+
+            helpSign.on('click', function(event){
+                event.preventDefault();
+                helpModal.modal({backdrop: 'static', keyboard: false, show: true});
+            });
+
+            signText.on('click', function(e){
+                signModal.modal({backdrop: 'static', keyboard: false, show: true});
+
+                signModal.on('shown.bs.modal', function() {
+                    liveBox.focus();
+                });
+            });
+
+            liveBox.keypress(function(event) {
+                if (event.which == 13) {
+                    debugger;
+                    signButton.click();
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            //AJax
+            signButton.on('click', function(e){
+                e.preventDefault();
+                if (paymentApplicationTypeRequired) {
+                    if($('#formSignatureModal').valid()) {
+                        signButton.loading('', 2);
+                        defaultAjax({
+                            url: /*[[@{/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__/__${token}__/validateSignature}]]*/null,
+                            type: 'POST',
+                            data: $('#formSignatureModal').serializeObject(),
+                            success: function (data) {
+                                signButton.unloading();
+                                signtureBlock.addClass('block-hidden');
+                                paymentApplicationTypeBlock.removeClass('block-hidden');
+                            }, error: function (xhr, errorJson) {
+                                signButton.unloading();
+                                if(errorJson != null && errorJson.constructor == {}.constructor && errorJson.type == "message"){
+                                    $('#formSignatureModal').data('validator').showErrors({loanApplicationSign: errorJson.message})
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                }else if (bankRequired) {
+                    if($('#formSignatureModal').valid()) {
+                        signButton.loading('', 2);
+                        defaultAjax({
+                            url: /*[[@{/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__/__${token}__/validateSignature}]]*/null,
+                            type: 'POST',
+                            data: $('#formSignatureModal').serializeObject(),
+                            success: function (data) {
+                                signButton.unloading();
+                                signtureBlock.addClass('block-hidden');
+                                bankAccountBlock.removeClass('block-hidden');
+                            }, error: function (xhr, errorJson) {
+                                signButton.unloading();
+                                if(errorJson != null && errorJson.constructor == {}.constructor && errorJson.type == "message"){
+                                    $('#formSignatureModal').data('validator').showErrors({loanApplicationSign: errorJson.message})
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    var terms1 = $('#terms1').prop('checked'),
+                        terms2 = $('#terms2').prop('checked');
+                    if (terms1 == false){
+                        $('#error-response').html('Debe aceptar los t&eacute;rminos '+/*[[#{contract.read2}]]*/null+'.');
+                    } else if (terms2 == false) {
+                        $('#error-response').html('Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.');
+                    } else {
+                        if($('#formSignatureModal').valid()) {
+                            signButton.loading('', 2);
+                            defaultAjax({
+                                url: /*[[@{/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__/__${token}__/validateSignature}]]*/null,
+                                type: 'POST',
+                                data: $('#formSignatureModal').serializeObject(),
+                                success: function (data) {
+                                    signButton.unloading();
+                                    signtureBlock.addClass('block-hidden');
+                                }, error: function (xhr, errorJson) {
+                                    signButton.unloading();
+                                    if(errorJson != null && errorJson.constructor == {}.constructor && errorJson.type == "message"){
+                                        $('#formSignatureModal').data('validator').showErrors({loanApplicationSign: errorJson.message})
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+            });
+            var sendButton = $('#sendButton');
+            sendButton.on('click', function(e){
+                e.preventDefault();
+                var terms1 = $('#terms1').prop('checked'),
+                    terms2 = $('#terms2').prop('checked');
+                if (terms1 == false){
+                    $('#error-response').html('Debe aceptar los t&eacute;rminos '+/*[[#{contract.read2}]]*/null+'.');
+                } else if (terms2 == false) {
+                    $('#error-response').html('Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.');
+                } else {
+                    if ($('#loanApplicationBankForm').valid()) {
+                        $('#error-response').html('');
+                        sendButton.loading('', 2);
+                        defaultAjax({
+                            url: /*[[@{/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__/__${token}__/signature}]]*/null,
+                            type: 'POST',
+                            form: $('#formSignatureModal'),
+                            data: $.extend({}, $('#formSignatureModal').serializeObject(), $('#loanApplicationBankForm').serializeObject()),
+                            success: function (data) {
+                                sendButton.unloading();
+                            }, error: function (xhr, errorJson) {
+                                sendButton.unloading();
+                            }
+                        });
+                    }
+                }
+            });
+
+            var sendButtonPaymentType = $('#sendButtonPaymentType');
+            sendButtonPaymentType.on('click', function(e){
+                e.preventDefault();
+                if(!bankRequired){
+                    var terms1 = $('#terms1').prop('checked'),
+                        terms2 = $('#terms2').prop('checked');
+                    if (terms1 == false){
+                        var text='Debe aceptar los t&eacute;rminos '+/*[[#{contract.read2}]]*/null+'.';
+                        $('#error-response-type-application').html(text);
+                        return;
+                    } else if (terms2 == false) {
+                        $('#error-response-type-application').html('Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.');
+                        return;
+                    }
+                }
+
+                if ($('input[name=type]:checked').val() != null) {
+                    $('#error-response-type-application').html('');
+                    sendButtonPaymentType.loading('', 2);
+                    defaultAjax({
+                        url: /*[[@{/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__/__${token}__/paymentTypeSignature}]]*/null,
+                        type: 'POST',
+                        data: $.extend({
+                            type: $('input[name=type]:checked').val()
+                        }, $('#formSignatureModal').serializeObject()),
+                        success: function (data) {
+                            sendButtonPaymentType.unloading();
+                            paymentApplicationTypeBlock.addClass('block-hidden');
+                            if(bankRequired)
+                                bankAccountBlock.removeClass('block-hidden');
+                        }, error: function (xhr, errorJson) {
+                            sendButtonPaymentType.unloading();
+                        }
+                    });
+                }else{
+                    $('#error-response-type-application').html('Debes seleccionar un tipo de aplicaci&oacute;n de pago');
+                }
+            });
+        });
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        /*]]>*/
+    </script>
+</head>
+<body th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: pdfHeader"></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="pdfViewer">
+        <div class="pdf-bar">
+            <div class="container">
+                <button class="button bg-white" id="signatureOpenModal" th:utext="#{contract.sign}"> <i class="icon icon-feather"></i></button>
+            </div>
+        </div>
+        <div class="actions-pdf">
+            <ul>
+                <li>
+                    <a href="#" id="resetZoom" class="circle"><i class="icon icon-fit-to-page" aria-hidden="true"></i></a>
+                </li>
+                <li>
+                    <a href="#" id="zoomIn" class="circle"><i class="icon icon-plus" aria-hidden="true"></i></a>
+                </li>
+                <li>
+                    <a href="#" id="zoomOut" class="circle"><i class="icon icon-minus" aria-hidden="true"></i></a>
+                </li>
+            </ul>
+        </div>
+        <div class="pdf-container">
+            <div id="page">
+                <div id="container"></div>
+                <div id="loading-ajax" class="loading-ajax-invisible loading-content">
+                    <div class="sk-circle">
+                        <div class="sk-circle1 sk-child"></div>
+                        <div class="sk-circle2 sk-child"></div>
+                        <div class="sk-circle3 sk-child"></div>
+                        <div class="sk-circle4 sk-child"></div>
+                        <div class="sk-circle5 sk-child"></div>
+                        <div class="sk-circle6 sk-child"></div>
+                        <div class="sk-circle7 sk-child"></div>
+                        <div class="sk-circle8 sk-child"></div>
+                    </div>
+                    <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Signature modal -->
+
+    <div class="modal fade" id="signatureModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Hoja de Firma</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <form class="form" role="form" id="formSignatureModal" th:object="${loanApplicationSignatureForm}" autocomplete="off">
+                            <div id="signature-block" class="signature-block">
+                                <div class="field">
+                                    <i class="icon icon-feather"></i>
+                                </div>
+                                <div class="field">
+                                    <input type="text" th:field="*{loanApplicationSign}" class="signature-input"/>
+                                    <small class="input-help text-center" style="font-size: 16px">
+                                        <span>Para firmar, escribe: </span>
+                                        <strong th:text="${person.getName().substring(0,1).concat('. ').concat(person.getFirstSurname()) }" style="background-color: yellow;"></strong>
+                                    </small>
+                                </div>
+                                <div class="display-block text-center">
+                                    <div class="errorContainer"></div>
+                                </div>
+                                <div class="terms-block text-left" th:if="${!bankRequired and !paymentApplicationTypeRequired}">
+                                    <label for="terms1" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                        <span class="check-label" th:utext="#{contract.conditions}"> </span>
+                                        <input type="checkbox" class="real-check" id="terms1"/>
+                                    </label>
+                                    <label for="terms2" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                        <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento expreso con los <a
+                                                th:href="@{/terminos-y-condiciones}" rel="noopener noreferrer" target="_blank">T&eacute;rminos y Condiciones</a> y con la <a th:href="@{/politica-de-privacidad}" rel="noopener noreferrer" target="_blank">Pol&iacute;tica de Privacidad</a>. <th:block th:utext="#{contract.valid}"> </th:block> </span>
+                                        <input type="checkbox" class="real-check" id="terms2"/>
+                                    </label>
+                                    <small id="error-response" class="error-text"></small>
+                                </div>
+
+                                <div class="actions">
+                                    <button class="button bg-red" id="signButton" type="button">Firmar</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <form th:if="${bankRequired}" id="loanApplicationBankForm" class="form block-hidden" role="form" action="#" th:object="${loanApplicationBankForm}" autocomplete="off">
+                            <h3>&iquest;A qu&eacute; cuenta te enviamos tu dinero?</h3>
+                            <span class="subtitle">(Recuerda que debes ser titular de la misma, caso contrario no podremos realizar la transferencia)</span>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 column">
+                                    <div class="field">
+                                        <small th:text="#{form.field.bank}" class="input-help"></small>
+                                        <select th:value="*{bankId}" name="bankId" id="bankId" data-placeholder="Selecciona el banco">
+                                            <option value="" hidden="hidden"></option>
+                                            <th:block th:each="bank : ${@catalogService.getBanks(false)}">
+                                                <option value="" disabled="disabled" selected="selected"></option>
+                                                <option  th:value="${bank.id}" th:text="${bank.name}"></option>
+                                            </th:block>
+
+                                        </select>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+
+                                    <div class="field">
+                                        <small th:text="#{form.field.bankAccountType}" class="input-help"></small>
+                                        <select th:value="*{bankAccountType}" name="bankAccountType" id="bankAccountType" data-placeholder="Seleccione el tipo de cuenta">
+                                            <option value="" hidden="hidden" selected="selected" disabled="disabled"></option>
+                                            <option value="S" th:text="#{form.field.bankAccountType.saving}"></option>
+                                            <option value="C" th:text="#{form.field.bankAccountType.current}"></option>
+                                        </select>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 column">
+                                    <div class="field">
+                                        <small th:text="#{form.field.bankAccountNumber}" class="input-help"></small>
+                                        <input type="text" th:value="*{bankAccountNumber}" name="bankAccountNumber" id="bankAccountNumber" class="input-outline" />
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+
+                                    <div class="field">
+                                        <small th:text="#{loanApplicationSignature.bankAccountDepartment}" class="input-help"></small>
+                                        <select th:value="*{bankAccountDepartment}" id="bankAccountDepartment" name="bankAccountDepartment" data-placeholder="Seleccione el lugar">
+                                            <th:block th:each="department : ${@catalogService.getDepartments()}">
+                                                <option value="" hidden="hidden" disabled="disabled" selected="selected"></option>
+                                                <option th:value="${department.id}" th:text="${department.name}"></option>
+                                            </th:block>
+                                        </select>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="terms-block text-left">
+                                <label for="terms1" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                    <span class="check-label" th:utext="#{contract.conditions}"> </span>
+                                    <input type="checkbox" class="real-check" id="terms1"/>
+                                </label>
+                                <label for="terms2" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                    <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento expreso con los <a
+                                            th:href="@{/terminos-y-condiciones}" rel="noopener noreferrer" target="_blank">T&eacute;rminos y Condiciones</a> y con la <a th:href="@{/politica-de-privacidad}" rel="noopener noreferrer" target="_blank">Pol&iacute;tica de Privacidad</a>. Dichos consentimientos tienen la validez y eficacia que le confiere el art&iacute;culo 141 del C&oacute;digo Civil peruano.</span>
+                                    <input type="checkbox" class="real-check" id="terms2"/>
+                                </label>
+                                <small id="error-response" class="error-text"></small>
+                            </div>
+                            <div class="actions text-center">
+                                <button id="sendButton" class="button bg-red" type="button">Aceptar</button>
+                            </div>
+                        </form>
+
+
+                        <form th:if="${paymentApplicationTypeRequired}" id="paymentApplicationTypeForm" class="form block-hidden" role="form" action="#" autocomplete="off">
+                            <h3>Elige un tipo de aplicaci&oacute;n de pago</h3>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 column" id="modalFormInputRadio">
+                                    <div class="field">
+                                        <label class="h-input-radio">
+                                            <input type="radio" name="type" value="A"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Reducción de número de cuotas</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="h-input-radio">
+                                            <input type="radio" name="type" value="D"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Reducción de monto</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="terms-block text-left" th:if="${!bankRequired}">
+                                <label for="terms1" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                    <span class="check-label" th:utext="#{contract.conditions}"></span>
+                                    <input type="checkbox" class="real-check" id="terms1"/>
+                                </label>
+                                <label for="terms2" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                    <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento expreso con los <a
+                                            th:href="@{/terminos-y-condiciones}" rel="noopener noreferrer" target="_blank">T&eacute;rminos y Condiciones</a> y con la <a th:href="@{/politica-de-privacidad}" rel="noopener noreferrer" target="_blank">Pol&iacute;tica de Privacidad</a>. Dichos consentimientos tienen la validez y eficacia que le confiere el art&iacute;culo 141 del C&oacute;digo Civil peruano.</span>
+                                    <input type="checkbox" class="real-check" id="terms2"/>
+                                </label>
+                                <small id="error-response-type-application" class="error-text"></small>
+                            </div>
+                            <div class="terms-block text-left" th:if="${bankRequired}">
+                                <small id="error-response-type-application" class="error-text"></small>
+                            </div>
+                            <div class="actions text-center">
+                                <button id="sendButtonPaymentType" class="button bg-red" type="button">Aceptar</button>
+                            </div>
+
+
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+
+                                $('.h-input-radio').radio();
+                                /*]]>*/
+                            </script>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal" th:utext="#{contract.about}"> </h4>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <ul style="text-align: left">
+                        <li style="margin: 1em 0;">
+                            <p ><b>1.-</b><th:block th:utext="#{contract.read}"> </th:block></p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>2.-</b> Podr&aacute;s dar tu consentimiento de manera electr&oacute;nica, indicando tu nombre completo al final del mismo (dicho consentimiento tienen la validez y eficacia que le confiere el art&iacute;culo 141 del C&oacute;digo Civil peruano - es equivalente a tu firma en un documento f&iacute;sico).</p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>3.-</b> Ingresa los datos de la cuenta bancaria donde te depositaremos el dinero (al momento de realizar la transferencia validaremos que se encuentre a tu nombre, caso contrario detendremos el proceso). *</p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>4.-</b> Recibir&aacute;s un correo electr&oacute;nico con la copia <th:block th:utext="#{contract.read2}"> </th:block> y el cronograma preliminar. El cronograma final te lo enviaremos una vez que hayamos validado la acreditaci&oacute;n del dinero en tu cuenta bancaria.</p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>5.-</b> El dinero se acreditar&aacute; en tu cuenta de acuerdo al tiempo que pueda tomar una transferencia interbancaria (habitualmente hasta 24hs h&aacute;biles como m&aacute;ximo).
+                            </p>
+                        </li>
+                    </ul>
+                    <small>* No aplica para consolidaci&oacute;n de deudas.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- This snippet is used in production (included from viewer.html) -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/pdfJs2/pdf.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var pdfViewer;
+        var currentScale = 0,
+            initialScale;
+        var newScale;
+        var url = /*[[@{/__${categoryUrl}__/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__/__${token}__/contract}]]*/;
+
+        $(window).scroll( function(){
+            setTimeout(function(){
+                $('.actions-pdf').removeClass('actions-pdf-active');
+            }, 4000);
+            $('.actions-pdf').addClass('actions-pdf-active');
+
+        });
+        $(function(){
+
+            $('#zoomIn').on('click', function(e){
+                e.preventDefault();
+                zoomIn();
+//                $("#container").draggable({disabled: false, scroll: false });
+            });
+
+            $('#zoomOut').on('click', function(e){
+                e.preventDefault();
+                zoomOut();
+            });
+
+            var initialScale = currentScale;
+
+            $('#resetZoom').on('click', function(e){
+                e.preventDefault();
+                resetZoom();
+            });
+        });
+        pdfjsLib.getDocument(url).promise
+                .then(function(pdf) {
+                    pdfViewer = pdf;
+                    // Get div#container and cache it for later use
+                    rendering(pdfViewer)
+                });
+
+        function resetZoom() {
+            newScale = initialScale;
+            rendering(pdfViewer)
+        }
+        function zoomIn() {
+            newScale = (newScale) ? newScale + 1 : currentScale + 1;
+            console.log('new ' + currentScale);
+            rendering(pdfViewer)
+        }
+
+        function zoomOut() {
+            if (newScale> currentScale) {
+                newScale = newScale - 1;
+            }
+            rendering(pdfViewer)
+        }
+
+        function rendering(pdf){
+            var container = document.getElementById("container");
+            container.innerHTML = "";
+
+            // Loop from 1 to total_number_of_pages in PDF document
+            for (var i = 1; i <= pdf.numPages; i++) {
+
+                // Get desired page
+                pdf.getPage(i).then(function(page) {
+
+                    var div = document.createElement("div");
+
+                    // Set id attribute with page-#{pdf_page_number} format
+                    div.setAttribute("id", "page-" + (page.pageIndex + 1));
+
+                    // This will keep positions of child elements as per our needs
+                    div.setAttribute("style", "position: relative");
+
+                    // Append div within div#container
+                    container.appendChild(div);
+
+                    // Create a new Canvas element
+                    var canvas = document.createElement("canvas");
+
+                    // Append Canvas within div#page-#{pdf_page_number}
+                    div.appendChild(canvas);
+
+                    var context = canvas.getContext('2d');
+
+
+                    var viewport = page.getViewport(1);
+                    currentScale = container.clientWidth / viewport.width;
+                    initialScale = container.clientWidth / viewport.width;
+
+                    var scale = (newScale) ? newScale : currentScale;
+                    console.log('scale ' + scale);
+                    viewport = page.getViewport(scale);
+
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    // Render PDF page
+                    var x=page.render(renderContext);
+                    $('.loading-content').hide();
+                    $('.pdf-bar').fadeIn();
+                });
+            }
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

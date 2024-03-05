@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q137" autocomplete="off">
+            <p>Por favor confirm&aacute; que los datos sean correctos y completa los que falten.</p>
+            <div class="field_content">
+                <div class="field inline">
+                    <input id="name" name="name" type="text" class="input-outline" disabled="disabled" th:value="${formDefaults?.name}"/>
+                    <small class="input-help">Nombre</small>
+                </div>
+                <div class="field inline">
+                    <input id="surname" name="surname" type="text" class="input-outline" disabled="disabled" th:value="${formDefaults?.surname}"/>
+                    <small class="input-help">Apellidos</small>
+                </div>
+            </div>
+            <div class="field_content">
+                <div class="field inline">
+                    <input id="documentNumber" name="documentNumber" type="text" class="input-outline" disabled="disabled" th:value="${formDefaults?.documentNumber}"/>
+                    <small class="input-help">Cuit/Cuil</small>
+                </div>
+                <div class="field  c-i">
+                    <div class="field-birthdate">
+                            <span>
+                                <svg x="0px" y="0px" viewBox="0 0 512 512">
+                                    <path d="M400,160H272v-32h-32v32H112c-26.496,0-48,21.504-48,48v48h384v-48C448,181.504,426.496,160,400,160z"></path> <path d="M480,288H32c-17.664,0-32,14.336-32,32v32c0,35.36,28.64,64,64,64s64-28.64,64-64c0,35.36,28.64,64,64,64s64-28.64,64-64 c0,35.36,28.64,64,64,64s64-28.64,64-64c0,35.36,28.64,64,64,64s64-28.64,64-64v-32C512,302.336,497.664,288,480,288z"></path> <path d="M448,448c-24.576,0-47.008-9.28-64-24.512C367.008,438.72,344.576,448,320,448s-47.008-9.28-64-24.512 C239.008,438.72,216.576,448,192,448s-47.008-9.28-64-24.512C111.008,438.72,88.576,448,64,448c-24.672,0-46.976-9.632-64-24.96 V480c0,17.664,14.336,32,32,32h448c17.664,0,32-14.336,32-32v-56.96C494.976,438.4,472.672,448,448,448z"></path> <path d="M256,0c0,0-32,46.336-32,64s14.336,32,32,32s32-14.336,32-32S256,0,256,0z"></path>
+                                </svg>
+                            </span>
+                        <input type="text" name="dayOfBirth" id="dayOfBirth" class="input-outline tiny-input" placeholder="dd" pattern="[0-9]*" disabled="disabled" />
+                        <input type="text" name="monthOfBirth" id="monthOfBirth" class="input-outline tiny-input" placeholder="mm" pattern="[0-9]*" disabled="disabled" />
+                        <input type="text" name="yearOfBirth" id="yearOfBirth" class="input-outline small-input" placeholder="aaaa" pattern="[0-9]*" disabled="disabled" />
+                    </div>
+                    <small class="input-help">Fecha de Nacimiento</small>
+                </div>
+            </div>
+            <div class="field_content">
+                <div class="field inline">
+                    <input id="reason" name="reason" type="text" class="input-outline" disabled="disabled" th:value="${formDefaults?.reason}"/>
+                    <small class="input-help">Motivo</small>
+                </div>
+                <div class="field inline">
+                    <input id="amount" name="amount" type="text" class="input-outline" disabled="disabled" th:value="${formDefaults?.amount}"/>
+                    <small class="input-help">Monto</small>
+                </div>
+                <script>
+
+                    $("#select2-products-disabled").prop("disabled", true);
+                    $(".select_disabled").closest("select2-selection").css("cursor","default")
+
+                </script>
+            </div>
+            <div class="field_content">
+                <div class="field inline">
+                    <input id="email" name="email" type="text" class="input-outline form-control" th:value="${formDefaults?.email}"/>
+                    <small class="input-help">Email</small>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field-flex">
+                    <div class="field inline">
+                        <div class="field-flex-content">
+                            <input id="mobileAreaCode" name="mobileAreaCode" type="text" class="input-outline form-control" th:value="${formDefaults?.mobileAreaCode}" maxlength="4" />
+                            <small class="input-help">Cod. Area</small>
+                        </div>
+                        <div class="field-flex-content">
+                            <input id="mobile" name="mobile" type="text" class="input-outline form-control" th:value="${formDefaults?.mobile}" maxlength="8" />
+                            <small class="input-help">Celular</small>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="field_content">
+                <div class="field-flex">
+                    <div class="field inline">
+                        <div class="field-flex-content">
+                            <input  id="landlineAreaCode" name="landlineAreaCode" type="text" class="input-outline" th:value="${formDefaults?.landlineAreaCode}" maxlength="4" />
+                            <small class="input-help">Cod. Area</small>
+                        </div>
+                        <div class="field-flex-content">
+                            <input id="landline" name="landline" type="text" class="input-outline" th:value="${formDefaults?.landline}" maxlength="8" />
+                            <small class="input-help">Tel personal/laboral</small>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="field inline">
+                    <select name="maritalStatus" id="maritalStatus" class="form-control" data-placeholder="Seleccionar Estado Civi">
+                        <option value="" hidden="hidden" selected="selected">Seleccionar Estado Civil</option>
+                        <option th:each="maritalStatus : ${maritalStatus}"
+                                th:value="${maritalStatus.id}" th:text="${maritalStatus.status}"></option>
+                    </select>
+                    <small class="input-help">Estado Civil</small>
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+
+            <div class="field_content">
+                <div class="field inline">
+                    <select id="afipActivity" name="afipActivity" class="form-control" data-placeholder="Seleccione Actividad">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="afip : ${@catalogDao.getAfipActivities()}" th:value="${afip.id}" th:text="${afip.description}"></option>
+                    </select>
+                    <small class="input-help">Actividad</small>
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+            <div class="field_content">
+                <p>&#191;Reside en el Exterior?</p>
+                <div class="wrap-radios">
+                    <div class="field inline">
+                        <div class="field_facta">
+                            <label id="labelFactaTrue" class="input-radio input-outline form-control" th:classappend="${factaTrue != null?'radio-border':''}">
+                                <input id="factaTrue" name="factaTrue" type="radio" th:checked="${factaTrue != null}"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>Si</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label id="labelFactaFalse" class="input-radio input-outline form-control" th:classappend="${factaFalse != null?'radio-border':''}">
+                                <input id="factaFalse" name="factaFalse" type="radio" th:checked="${factaFalse != null}"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>No</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="field_content">
+                <p>&#191;Es persona pol&iacute;ticamente expuesta? </p>
+                <div class="wrap-radios">
+                    <div class="field inline ">
+                        <div class="field_pep">
+                            <label id="labelPepTrue" class="input-radio input-outline form-control" th:classappend="${pepTrue != null?'radio-border':''}">
+                                <input id="pepTrue" name="pepTrue" type="radio" th:checked="${pepTrue != null}"  />
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>Si</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label id="labelPepFalse" class="input-radio input-outline form-control" th:classappend="${pepFalse != null?'radio-border':''}">
+                                <input id="pepFalse" name="pepFalse" type="radio" th:checked="${pepFalse != null}"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>No</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="field_content pep_motive" id="pep_motive" th:style="${pepTrue != null?'display:block':'display:none'}">
+                <div class="field inline">
+                    <input id="pepReason" name="pepReason" type="text" class="input-outline amount-input form-control" style="min-width:470px;max-width: 470px;" th:value="${pepDetail != null?pepDetail:''}" />
+                    <small class="input-help">Motivo de Pep</small>
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+            <div class="field inline r-field">
+                <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+        </form>
+    </div>
+
+    <div id="pep-facta" class="modal fade on">
+        <div class="modal-dialog modal-lg">
+            <div id="modal-facta" class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">FATCA - Foreign Account Tax Compliance Act</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close" style="background: rgb(0, 56, 118);"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="gray-block">
+                        <div class="on-modal">
+                            <p class="on-modal">
+                                <span class="col-md-7 col-sm-12 col-xs-12" style="padding-bottom: 29px;width: 100%;">La Ley FATCA (Ley de Fiscalización de Cuentas Extranjeras) exige a las entidades financieras identificar para fines tributarios a los residentes fiscales de los E.E.U.U. , conforme a lo señalado en dicha norma. En caso de ser residente en E.E.U.U. se deberá completar una DDJJ Anexa, la cual deberá ser suscripta por el cliente.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-pep" class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">PEP - Personas Expuestas Políticamente</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close" style="background: rgb(0, 56, 118);"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="gray-block">
+                        <div class="on-modal">
+                            <p class="on-modal">
+                                <span class="col-md-7 col-sm-12 col-xs-12" style="padding-bottom: 29px;width: 100%;">Las Personas Expuestas Políticamente (por sus siglas, PEP) extranjeras o nacionales son individuos que cumplen o a quienes se les han confiado funciones públicas prominentes en otro país o a nivel nacional, como por ejemplo los Jefes de Estado o de Gobierno, políticos de alto nivel, funcionarios gubernamentales o judiciales de alto nivel o militares de alto rango, ejecutivos de alto nivel de corporaciones estatales, funcionarios de partidos políticos importantes. Para mayor información favor de referirse a la Resolución UIF N° 134/2018.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var jsonObj = JSON.parse(/*[[${jsonFormData}]]*/null);
+
+        if(!jQuery.isEmptyObject(jsonObj)) {
+            $('#maritalStatus option[value="' + jsonObj.maritalStatusValue + '"]').prop('selected', true);
+            $('#maritalStatus').trigger('change.select2');
+
+            $('#afipActivity option[value="' + jsonObj.activityId + '"]').prop('selected', true);
+            $('#afipActivity').trigger('change.select2');
+
+        }
+
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${formDefaults.validator.toJson(#locale)}]]*/));
+        var validator = $('#questionForm').data('validatorJson')
+        $('#questionForm').validateForm(validator);
+
+        var dob = (/*[[${formDefaults?.dateOfBirth}]]*/null);
+        if(dob != null){
+            var dobArr = dob.split('/');
+            $('#dayOfBirth').val(dobArr[0]);
+            $('#monthOfBirth').val(dobArr[1]);
+            $('#yearOfBirth').val(dobArr[2]);
+        }
+
+        $("#questionForm").data('validatorJson').rules.pepReason.required = false;
+        $("#questionForm").validateForm($("#questionForm").data('validatorJson'));
+        $("#questionForm").data('validator').resetForm();
+
+        $('#sendButton').click(function () {
+
+            if($("#pepTrue").is(":checked")){
+                $("#questionForm").data('validatorJson').rules.pepFalse.required = false;
+                $("#questionForm").data('validatorJson').rules.pepReason.required = true;
+            }
+
+            if($("#pepFalse").is(":checked")){
+                $("#questionForm").data('validatorJson').rules.pepTrue.required = false;
+                $("#questionForm").data('validatorJson').rules.pepReason.required = false;
+            }
+
+            if($("#factaTrue").is(":checked"))
+                $("#questionForm").data('validatorJson').rules.factaFalse.required = false;
+            if($("#factaFalse").is(":checked"))
+                $("#questionForm").data('validatorJson').rules.factaTrue.required = false;
+
+            $("#questionForm").validateForm($("#questionForm").data('validatorJson'));
+            $("#questionForm").data('validator').resetForm();
+
+            if($('#questionForm').valid()){
+                $("#questionForm :disabled").removeAttr('disabled');
+                questionFw.ajaxToCurrentQuestionController({
+
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {})
+                }, "");
+            }
+        });
+
+
+        function dynamicValidation(){
+            if($("#pepTrue").is(":checked")){
+                $("#questionForm").data('validatorJson').rules.pepReason.required = true;
+            }else if($("#pepFalse").is(":checked")) {
+                $("#questionForm").data('validatorJson').rules.pepReason.required = false;
+            }
+
+            $("#questionForm").validateForm($("#questionForm").data('validatorJson'));
+            $("#questionForm").data('validator').resetForm();
+        }
+
+        $("#pepTrue").click(function(){
+            $(".pep_motive").show();
+            $("#questionForm").data('validatorJson').rules.pepFalse.required = false;
+            dynamicValidation();
+
+        });
+
+        $("#pepFalse").click(function(){
+            $(".pep_motive").hide();
+            $("#questionForm").data('validatorJson').rules.pepTrue.required = false;
+            dynamicValidation();
+
+        });
+        $(".field_pep").one("click",function(){
+
+            $('#modal-facta').hide();
+            $('#modal-pep').show();
+            $('#pep-facta').modal({backdrop: 'static', keyboard: false});
+            $(".icon-close").click(function(){
+                dynamicValidation();
+            })
+
+        });
+
+        $(".field_pep").children('.input-radio').on("click",function(){
+            $(".field_pep .input-radio").removeClass("radio-border");
+            $(this).toggleClass("radio-border");
+            if($("#labelPepTrue").hasClass("radio-border")){
+                $("#labelPepFalse").removeClass("radio-border");
+                $("#labelPepFalse").addClass("radio-border_desactive");
+
+            }
+            else if($("#labelPepFalse").hasClass("radio-border")){
+                $("#labelPepTrue").removeClass("radio-border");
+                $("#labelPepTrue").addClass("radio-border_desactive");
+            }
+
+
+        });
+        $(".field_facta").one("click",function(){
+            $('#modal-pep').hide();
+            $('#modal-facta').show();
+            $('#pep-facta').modal({backdrop: 'static', keyboard: false, show: true});
+        });
+        $(".field_facta").children('.input-radio').on("click",function(){
+            $(".field_facta .input-radio").removeClass("radio-border");
+            $(this).toggleClass("radio-border");
+            if($("#labelFactaTrue").hasClass("radio-border")){
+                $("#labelFactaFalse").removeClass("radio-border");
+                $("#labelFactaFalse").addClass("radio-border_desactive");
+
+            }
+            else if($("#labelFactaFalse").hasClass("radio-border")){
+                $("#labelFactaTrue").removeClass("radio-border");
+                $("#labelFactaTrue").addClass("radio-border_desactive");
+            }
+
+        });
+
+        $("#factaTrue").click(function(){
+            $('#questionForm').data('validatorJson').rules.factaFalse.required = false;
+            dynamicValidation();
+
+        });
+        $("#factaFalse").click(function(){
+            $('#questionForm').data('validatorJson').rules.factaTrue.required = false;
+            dynamicValidation();
+        });
+
+        /*]]>*/
+    </script>
+
+</th:block>
+</html>

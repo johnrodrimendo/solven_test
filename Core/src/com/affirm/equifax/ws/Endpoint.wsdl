@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://impl.endpoint.creditreport.ws.equifax.com.pe/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:ns1="http://ws.creditreport.equifax.com.pe/endpoint" name="CreditReportPortService"
+                  targetNamespace="http://impl.endpoint.creditreport.ws.equifax.com.pe/">
+  <wsdl:import location="http://ws.equifax.com.pe/CreditReportService/Endpoint?wsdl=Endpoint.wsdl" namespace="http://ws.creditreport.equifax.com.pe/endpoint">
+    </wsdl:import>
+  <wsdl:binding name="CreditReportPortServiceSoapBinding" type="ns1:Endpoint">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetReporteHistorico">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetReporteHistorico">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetReporteHistoricoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EquifaxInterfaceException">
+        <soap:fault name="EquifaxInterfaceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetReporteOnline">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetReporteOnline">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetReporteOnlineResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EquifaxInterfaceException">
+        <soap:fault name="EquifaxInterfaceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CreditReportPortService">
+    <wsdl:port binding="tns:CreditReportPortServiceSoapBinding" name="CreditReportPort">
+      <soap:address location="http://ws.equifax.com.pe/CreditReportService/Endpoint"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

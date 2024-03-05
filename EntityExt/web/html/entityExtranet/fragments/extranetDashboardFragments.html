@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="bdsBranding">
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <th:block th:replace="fragments/headers :: entityContentHeader(title='Ingresar nueva Solicitud')"></th:block>
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+<!--                        <div class="portlet-title">-->
+<!--                            <div class="caption">-->
+<!--                                <span class="caption-subject font-green bold uppercase"></span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                        <div class="portlet-body">
+                            <form id="createLoanForm" class="section-functionary" role="form" autocomplete="off" style="align-items: flex-start;">
+                                <div class="section-content">
+                                    <div class="section-search">
+                                            <div class="section-functionary_content">
+                                                <div class="form-group functionary-block">
+                                                    <label>CUIT/CUIL</label>
+                                                    <input name="docNumber" id="docNumber"
+                                                            class="form-control" placeholder="Número"/>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                            </div>
+                                            <div class="section-functionary_content">
+                                                <div class="form-group functionary-block">
+                                                    <label>Destino</label>
+                                                    <select name="destination" id="destination"
+                                                            class="form-control">
+                                                        <option hidden="hidden"></option>
+                                                        <option>Ocio</option>
+                                                        <option>Arreglo de vehículo</option>
+                                                        <option>Arreglo de hogar</option>
+                                                        <option>Cambio de vehículo</option>
+                                                        <option>Otros</option>
+                                                    </select>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                                <div class="form-group functionary-block">
+                                                    <label>Motivo de contacto</label>
+                                                    <select name="reason" id="reason"
+                                                            class="form-control">
+                                                        <option hidden="hidden"></option>
+                                                        <option>Renovación de Póliza</option>
+                                                        <option>Consulta comercial seguros</option>
+                                                        <option>Servicio SANCOR</option>
+                                                        <option>Siniestro Vehículo</option>
+                                                        <option>Siniestro Hogar</option>
+                                                        <option>Otros</option>
+                                                    </select>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                            </div>
+                                            <div class="section-functionary_content">
+                                                <div class="form-group functionary-block">
+                                                    <div class="funcitonary-tootltip">
+                                                        <label>Tipo Cliente</label>
+                                                        <span class="icon-tootltip">ⓘ</span>
+                                                        <div class="modal-tootltip">
+                                                            <span>Indicar si la persona tiene o no un producto Sancor</span>
+                                                        </div>   
+                                                    </div>
+                                                    <select name="clientType" id="clientType" class="form-control">
+                                                        <option hidden="hidden"></option>
+                                                        <option th:each="type : ${T(com.affirm.bancodelsol.service.impl.BancoDelSolServiceImpl).CLIENT_TYPES}" th:text="${type}" th:value="${type}"></option>
+                                                    </select>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                            </div>
+                                            <div class="section-functionary_content">
+                                                <div class="form-group functionary-block">
+                                                    <div class="form-actions">
+                                                        <button id="searchButton" type="button" class="btn red principal-button-color">Buscar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="section-dialog">
+                                        <div class="sub-section-dialog">
+                                            <table class="dialog-table">
+                                                <tr>
+                                                    <th colspan="3">Caracter&iacute;sticas del Pr&eacute;stamo</th>
+                                                </tr>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>M&iacute;nimo</th>
+                                                    <th>M&aacute;ximo</th>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3"><strong>Cliente Sancor</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Montos</strong></td>
+                                                    <td th:text="${@utilService.integerMoneyFormat(sancorMinAmount, currency)}"></td>
+                                                    <td th:text="${@utilService.integerMoneyFormat(sancorMaxAmount, currency)}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Plazos</strong></td>
+                                                    <td th:text="${sancorMinInstallments}"></td>
+                                                    <td th:text="${sancorMaxInstallments}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Tasas</strong></td>
+                                                    <td th:text="${@utilService.percentFormat(sancorMinRateCommission)}"></td>
+                                                    <td th:text="${@utilService.percentFormat(sancorMaxRateCommission)}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3"><strong>No Cliente Sancor</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Montos</strong></td>
+                                                    <td th:text="${@utilService.integerMoneyFormat(noSancorMinAmount, currency)}"></td>
+                                                    <td th:text="${@utilService.integerMoneyFormat(noSancorMaxAmount, currency)}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Plazos</strong></td>
+                                                    <td th:text="${noSancorMinInstallments}"></td>
+                                                    <td th:text="${noSancorMaxInstallments}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Tasas</strong></td>
+                                                    <td th:text="${@utilService.percentFormat(noSancorMinRateCommission)}"></td>
+                                                    <td th:text="${@utilService.percentFormat(noSancorMaxRateCommission)}"></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!---->
+                                <div class="section-functionary_disabled">
+                                    <div class="form-group functionary-block">
+                                        <label>CUIT/CUIL</label>
+                                        <input name="docNumber" class="form-control" disabled="disabled"/>
+                                    </div>
+                                    <div class="section-functionary_content">
+                                        <div class="form-group functionary-block" style="width:100%">
+                                            <label>Apellido y Nombres</label>
+                                            <input name="name" id="name" class="form-control" style="min-width:100%" disabled="disabled"/>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                    <div class="section-functionary_content">
+                                        <div class="form-group functionary-block">
+                                            <label>Fecha de Nacimiento</label>
+                                            <input name="birthdate" id="birthdate" type="text"
+                                                   class="form-control"
+                                                   placeholder="DD/MM/AAAA"/>
+                                            <div class="errorContainer"></div>
+                                            <script>
+                                                var minus18Year = moment().subtract('year', 18).format('DD/MM/YYYY') ;
+                                                $('#birthdate').datepicker({
+                                                    autoclose:true,
+                                                    format: "dd/mm/yyyy",
+                                                    startView : 3,
+                                                    minView : 2,
+                                                    endDate: minus18Year,
+                                                    language: 'es'
+                                                });
+                                            </script>
+                                        </div>
+                                        <div class="form-group functionary-block">
+                                            <label>Email</label>
+                                            <input name="email" id="email" type="email"
+                                                   class="form-control"/>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                    <div class="section-functionary_content" style="margin-left:15px">
+                                        <div class="functionary-block">
+                                            <label>Celular (sin 0, ni 15)</label>
+                                            <div class="funcitonary-flx">
+                                                <div class="form-group functionary-code">
+                                                    <input name="code" id="code" class="form-control" minlength="2"/>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                                <div class="form-group functionary-telephone" style="max-width:120px;">
+                                                    <input name="phone" id="phone" class="form-control" minlength="6"/>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group functionary-block">
+                                            <label>Provincia de residencia</label>
+                                            <select name="province" id="province" class="form-control">
+                                                <option value="" hidden="hidden"></option>
+                                                <option th:each="province : ${@catalogService.getGeneralProvince(54)}"
+                                                        th:value="${province.provinceId}"
+                                                        th:text="${province.name}"></option>
+                                            </select>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                    <div class="section-functionary_content">
+                                        <div class="functionary-block">
+                                            <div class="form-group funcitonary-actions">
+                                                <div class="form-actions">
+                                                    <button id="createLoanButtonBancoDelSol" type="button" class="btn red principal-button-color" style="padding: 6px">Solicitar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#docNumber').bind('paste', function (e) {
+            setTimeout(() => {
+                $(this).val($(this).val().replace(/-/g, ''));
+            }, 100);
+        });
+
+        $("#searchButton").click(function () {
+            defaultAjax({
+                url: /*[[@{/createLoanApplication/documentNumber}]]*/null,
+                type: 'POST',
+                data: {
+                    docType: 4,
+                    docNumber: $('#docNumber').val()
+                },
+                beforeSend: function () {
+                    $('#searchButton').loading();
+                },
+                success: function (data) {
+                    //SHOW FORM
+                    $('.section-functionary_disabled').css('visibility', 'visible');
+
+                    if(data != null && data.length > 0) {
+                        var json = JSON.parse(data);
+                        console.log(data);
+                        $('#createLoanForm [name=name]').val(json.name != null ? json.name.trim() : json.name);
+                        $('#createLoanForm [name=docNumber]').val(json.documentNumber);
+                        $('#createLoanForm [name=birthdate]').datepicker('setDate', moment(json.birthdate, 'DD/MM/YYYY').toDate());
+                        $('#createLoanForm [name=email]').val(json.email);
+                        $('#createLoanForm [name=code]').val(json.phone ? Number(json.phone.substring(1, json.phone.indexOf(' ') - 1)) : '');
+                        $('#createLoanForm [name=phone]').val(json.phone ? json.phone.substring(json.phone.indexOf(' ') + 1) : '');
+                        // $('#createLoanForm [name=province]').val(json.province);
+                    }
+                },
+                error: function (err) {
+                    //HIDE FORM
+                    $('.section-functionary_disabled').css('visibility', 'hidden');
+                    $('#createLoanForm').trigger('reset');
+                },
+                complete: function () {
+                    $('#searchButton').unloading();
+                }
+            });
+        });
+
+
+        $('#createLoanButtonBancoDelSol').click(function (event) {
+            if(!$('#createLoanForm').valid()){
+                return;
+            }
+            var baseUrl = /*[[@{/}]]*/null;
+            $('#createLoanButtonBancoDelSol').loading();
+            defaultAjax({
+                url: baseUrl + 'bancoDelSol/createLoanApplication',
+                type: 'POST',
+                form : $('#createLoanForm'),
+                data: $('#createLoanForm').serializeObject(),
+                success: function (data) {
+                    $('#createLoanButtonBancoDelSol').unloading();
+                },
+                error: function (error) {
+                    console.log(error);
+                    $('#createLoanButtonBancoDelSol').unloading();
+                    if (error.status == 503 || error.status == 504) {
+                        showErrorModal('El proceso está tardando más de lo esperado. Por favor, volvé a intentarlo en 30 segundos.');
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(document).on('ready', function () {
+            $('body').on('keyup', '#code', function () {
+                $('#createLoanForm').data('validatorJson').rules.phone.maxlength = 11 - $("#code").val().length;
+                $('#createLoanForm').data('validatorJson').rules.phone.minlength = 11 - $("#code").val().length;
+                $('#createLoanForm').validateForm($('#createLoanForm').data('validatorJson'));
+            });
+
+            $('#phone').mask('000-#');
+            $('body').on('keyup', '#code', function () {
+                var actualCodeLength = $(this).val().length;
+                if (actualCodeLength == 2) {
+                    $('#phone').mask('0000-#');
+                } else if (actualCodeLength > 2) {
+                    $('#phone').mask('000-#');
+                }
+            });
+            $('#birthdate').keyup(function(){
+                if($(this).val().length == 10){
+                    $('#birthdate').datepicker('update', $(this).val());
+                }
+            })
+        });
+
+        /*]]>*/
+    </script>
+
+</th:block>
+
+<th:block th:fragment="peBranding">
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold uppercase">Creación de solicitud del cliente</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <form id="createLoanForm" role="form">
+                                        <!--<div class="form-body" style="padding: 1em;">-->
+                                            <div class="form-group"
+                                                 style="display:inline-block;width: 80px;vertical-align: top;">
+                                                <label>Tip. Doc</label>
+                                                <select name="docType" id="docType" class="form-control">
+                                                    <option th:value="${T(com.affirm.common.model.catalog.IdentityDocumentType).DNI}">
+                                                        DNI
+                                                    </option>
+                                                    <option th:value="${T(com.affirm.common.model.catalog.IdentityDocumentType).CE}">
+                                                        CE
+                                                    </option>
+                                                </select>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <div class="form-group"
+                                                 style="display:inline-block; margin-left: 15px; width: 190px; vertical-align: top;">
+                                                <label>Nro. Documento</label>
+                                                <input name="docNumber" id="docNumber" type="text" class="form-control"
+                                                       placeholder=""/>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Seleccione el producto</label>
+                                                <select id="category" name="category" class="form-control">
+                                                    <option th:each="category : ${categories}"
+                                                            th:value="${category.id}"
+                                                            th:text="${category.category}"></option>
+                                                </select>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                        <!--</div>-->
+                                        <div class="form-actions" style="padding: 1em">
+                                            <button id="createLoanButton" type="button" class="btn red">Crear</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</html>

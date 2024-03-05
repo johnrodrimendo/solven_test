@@ -1,0 +1,3247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+
+<!-- BLOCK PREEVALUATION RESPONSE -->
+<div th:fragment="block0" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="false">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div class="questionContainer" id="b0s1question1">
+            <p class="question"><span th:utext="#{preEvaluationResponse.state.fail.tittle}"/></p>
+        </div>
+        <br/>
+        <div class="note" id="b0s1errormsg" style="display: none">
+        </div>
+        <br/>
+        <div class="note" id="b0s1final2" style="display: none"
+             th:utext="#{preEvaluationResponse.state.fail.final.message1(${@configuration.APP_NAME})}"></div>
+        <br/>
+        <div class="note" id="b0s1final2" style="display: none"
+             th:utext="#{preEvaluationResponse.state.fail.final.message2}"></div>
+        <br/>
+        <div th:if="false" class="note wtmt" id="b0s1final3"
+             th:utext="#{preEvaluationResponse.state.final.phrase1}" style="display: none"></div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function (section) {
+                var statusString = /*[[${status}]]*/null;
+                var status = JSON.parse(statusString);
+                section.params.status = status;
+
+                // Barra desktop
+                $('.humanProgress-container').css({'display': 'none'});
+
+                // Barra Mobile
+                $('.humanProgress-container-mobile').css({'display': 'none'});
+
+                if (status.status == 'S' && !status.approved) {
+                    $('#b0s1question1 .question').write(function () {
+                        $('#b0s1errormsg').html(status.message);
+                        $('#b0s1errormsg').show();
+                        $('#b0s1errormsg').write(function () {
+                            if (section.params.status.helpMessage != null) {
+                                block.showNextSection();
+                            } else {
+                                $('#b0s1final2').fadeIn();
+                                setTimeout(function () {
+                                    $('#b0s1final3').fadeIn();
+//                                    $('#b0s1final4').fadeIn();
+                                }, 2000);
+                            }
+                        }, 4000);
+                    }, writeOnFinishDelay);
+                }
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+        <div class="description-text" id="b0s2helpHow" th:text="#{preEvaluationResponse.state.fail.message}"></div>
+        <br/>
+        <div class="description-text" id="b0s2helpMessageTittle" style="display: none;"></div>
+        <div class="note" id="b0s2helpMessageBody" style="display: none;"></div>
+
+        <div class="note" id="b0s2final1" style="display: none;"
+             th:text="#{preEvaluationResponse.state.fail.final.message1(${@configuration.APP_NAME})}"></div>
+        <div class="note" id="b0s2final2" style="display: none;"
+             th:utext="#{preEvaluationResponse.state.fail.final.message2}"></div>
+        <div th:if="false" class="note wtmt" id="b0s3final3"
+             th:utext="#{preEvaluationResponse.state.final.phrase1}"
+             style="display: none"></div>
+        <p class="note toblog wtmt" id="b0s3final4" style="display: none;">Aprende m&aacute;s en nuestro <a
+                href="https://www.solven.pe/blog" class="human-buttons text-white" target="_blank" rel="noopener noreferrer">Blog.</a></p>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function (section) {
+                $('#b0s2helpMessageTittle').html(section.params.status.helpMessage.tittle);
+                $('#b0s2helpMessageBody').html(section.params.status.helpMessage.body);
+
+                // If 1 or 2, dont show the help how message
+                if (section.params.status.helpMessage.id == 1 || section.params.status.helpMessage.id == 2) {
+                    $('#b0s2helpHow').hide();
+                    showb0s2HelpMessage();
+                } else {
+                    $('#b0s2helpHow').write(function () {
+                        showb0s2HelpMessage();
+                    }, 1000);
+                }
+            };
+
+            function showb0s2HelpMessage() {
+                $('#b0s2helpMessageTittle').show();
+                $('#b0s2helpMessageTittle').write(function () {
+                    $('#b0s2helpMessageBody').fadeIn();
+                    setTimeout(function () {
+                        $('#b0s2final1').fadeIn();
+                        $('#b0s2final2').fadeIn();
+                    }, 5000);
+                }, writeOnFinishDelay);
+            }
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK HOW ARE YOU -->
+<div th:fragment="block1" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+    <div class="blockSection" data-section-id="0" data-section-back="false">
+        <div class="questionContainer">
+            <p id="b1s0message" class="question" th:utext="#{preEvaluationResponse.state.running.message}"></p>
+        </div>
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 1;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b1s0message').write(function () {
+                    $('#loadingContainer').initLoading();
+                    setTimeout(function () {
+                        $('#loadingContainer').stopLoading();
+                        block.showNextSection();
+                    }, 10000)
+                }, writeOnFinishDelay);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div class="questionContainer">
+            <p id="b1Success" class="question" th:utext="#{preEvaluationResponse.state.success.tittle}"></p>
+        </div>
+
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 3;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b1Success').write(function () {
+                    block.showNextSection();
+                }, 1300);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="3" data-section-back="false">
+        <div class="questionContainer">
+            <p id="b1Hi" class="question">Ahora si... ¡Hola <span th:text="${name}"></span>!</p>
+        </div>
+
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b1Hi').write(function () {
+                    block.showNextSection();
+                }, 1300);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+
+        <div class="questionContainer">
+            <p class="question" id="b1HowAreYou">&iquest;C&oacute;mo est&aacute;s hoy?</p>
+        </div>
+
+        <div class="answerContainer">
+            <div id="b1HowAreYouAnswers" class="answers" style="display: none;">
+                <a href="#" class="faces" id="depressed" data-value="1" title="Mal"><i
+                        class="icon depressed-icon"></i></a>
+                <a href="#" class="faces" id="bad" data-value="2" title="Maso"><i class="icon bad-icon"></i></a>
+                <a href="#" class="faces" id="good" data-value="3" title="Muy Bien"><i class="icon good-icon"></i></a>
+                <a href="#" class="faces" id="great" data-value="4" title="Genial"><i class="icon great-icon"></i></a>
+            </div>
+        </div>
+
+        <div class="response" id="b1HowAreYouResponse">
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+                $('#b1HowAreYou').write(function () {
+                    $('#b1HowAreYouAnswers').fadeIn();
+                }, writeOnFinishDelay)
+            };
+
+            var b1s2FinishWrite = false;
+            var b1s2FinishAjax = false;
+            function onb1s2finish(type) {
+                type == 'ajax' ? b1s2FinishAjax = true : (type == 'write' ? b1s2FinishWrite = true : null);
+                if (b1s2FinishWrite && b1s2FinishAjax) {
+                    showNextBlock();
+                }
+            }
+
+            $('#depressed,#bad,#good,#great').click(function () {
+                block.disableBlock();
+                $('.faces').removeClass('face-active');
+                $(this).addClass('face-active');
+                if (this.id == 'depressed' || this.id == 'bad') {
+                    $('#b1HowAreYouResponse').html("Lo sentimos mucho, espero que podamos animarte con nuestra fabulosa atenci&oacute;n, :)").write(function () {
+                        onb1s2finish('write')
+                    }, writeOnFinishDelay)
+                } else if (this.id == 'good' || this.id == 'great') {
+                    $('#b1HowAreYouResponse').html("&iexcl;Genial, vamos para adelante!").write(function () {
+                        onb1s2finish('write')
+                    }, writeOnFinishDelay)
+                }
+
+                defaultAjax({
+                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/1}]]*/null,
+                    type: 'POST',
+                    data: {
+                        mood: $(this).data('value')
+                    },
+                    success: function (data) {
+                        onb1s2finish('ajax');
+                    }
+                });
+            });
+
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK READY -->
+<div th:fragment="block2" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div id="b2s1tittle" class="questionContainer">
+            <p class="question">
+                Voy a ayudarte con tu cr&eacute;dito para <span th:text="${reason}"></span>.
+                A trav&eacute;s de Solven, solicitar un cr&eacute;dito es muy f&aacute;cil, no tardar&aacute;s m&aacute;s
+                de 90 segundos.</p>
+        </div>
+        <div id="b2s1note" class="note" style="display: none;">
+            Recuerda que debes tener a mano tu documento de identidad, c&aacute;mara web (o un smarthphone) y una cuenta
+            bancaria a tu nombre, para el desembolso. De acuerdo a tu perfil podr&iacute;a ser necesaria alguna documentaci&oacute;n adicional.
+        </div>
+        <div id="b2s2tittle" class="questionContainer" style="display: none">
+            <p class="question">&iquest;Estamos listos?</p>
+        </div>
+
+        <div id="b2s2answers" class="answerContainer" style="display: none;">
+            <div class="answers">
+                <a href="#" data-answer="no" class="human-button" id="readyNo" style="margin-left: 0;">Regreso luego</a>
+                <a href="#" data-answer="yes" class="human-button booleanAnswer" id="readyYes">Si</a>
+            </div>
+        </div>
+
+        <div id="b2s2note" style="display: none;"><br/>
+            <p>Perfecto, estaremos esper&aacute;ndote para cuando tengas todo listo. S&oacute;lo deber&aacute;s
+                ingresar nuevamente tu documento de identidad.</p>
+        </div>
+        <br/>
+        <div id="countdownText" style="display: none"> Te estamos redirigiendo en <span id="countdown"></span></div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b2s1tittle .question').write(function () {
+                    $('#b2s1note').fadeIn(400, function () {
+                        setTimeout(function () {
+                            $('#b2s2tittle').show();
+                            $('#b2s2tittle .question').write(function () {
+                                $('#b2s2answers').fadeIn();
+                            }, writeOnFinishDelay);
+                        }, 4500);
+                    });
+                }, writeOnFinishDelay + 3000);
+            };
+
+
+            $('#readyYes, #readyNo').on('click', function () {
+                $('#readyYes, #readyNo').removeClass('button-active');
+                $(this).addClass('button-active');
+                switch ($(this).data('answer')) {
+                    case 'no':
+                        debugger;
+                        $('#b2s2note').css({'display': 'block'});
+                        $('#b2s2note p').write(function () {
+                            $('#countdownText').fadeIn();
+                            countdown($('#countdown'), 5);
+                            block.runRedirect('/', 5000);
+                        }, writeOnFinishDelay);
+                        break;
+                    case 'yes':
+                        debugger;
+                        block.stopRedirect();
+                        block.disableBlock();
+                        $('#countdownText').css({'display': 'none'});
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/2}]]*/null,
+                            type: 'POST',
+                            data: {},
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                showNextBlock();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                        break;
+                }
+                return false;
+            });
+
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK PARTNER -->
+<div th:fragment="block3" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div id="b3s1question" class="questionContainer">
+            <p class="question">Cu&eacute;ntame acerca de ti...</p>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b3s1question .question').write(function () {
+                    block.showNextSection();
+                }, writeOnFinishDelay + 500)
+            };
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+        <div id="b3s2question" class="questionContainer">
+            <p class="question">&iquest;Est&aacute;s casado o tienes conviviente?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b3s2answers" style="display: none;">
+                <a class="human-button booleanAnswer" id="partnerNo">No</a>
+                <a class="human-button booleanAnswer" id="partnerYes">Si</a>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+                $('#b3s2question .question').write(function () {
+                    $('#b3s2answers').fadeIn();
+                }, writeOnFinishDelay)
+            };
+            humanFormSection.whereToGo = function (section) {
+                if (section.values.hasPartner) {
+                    return 3;
+                } else {
+                    return null;
+                }
+            };
+            $('#partnerYes').click(function (evt) {
+                $('#loadingContainer').initLoading();
+                var jsonData = {isCohabitantOrMarried: true};
+                defaultAjax({
+                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/3/2}]]*/null,
+                    type: 'POST',
+                    data: jsonData,
+                    success: function (data) {
+                        $('#loadingContainer').stopLoading();
+                        block.disableBlock();
+                        $('#partnerNo').removeClass('button-active');
+                        $('#partnerYes').addClass('button-active');
+                        $('#partnerYes').closest('.blockSection').data('section').values.hasPartner = true;
+                        block.showNextSection();
+                        return false;
+                    }
+                    , error: function () {
+                        $('#loadingContainer').stopLoading();
+                    }
+                });
+                return false;
+            });
+            $('#partnerNo').click(function () {//TODO JARMANDO
+                $('#loadingContainer').initLoading();
+                var jsonData = {isCohabitantOrMarried: false};
+                defaultAjax({
+                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/3/2}]]*/null,
+                    type: 'POST',
+                    data: jsonData,
+                    success: function (data) {
+                        block.disableBlock();
+                        $('#partnerYes').removeClass('button-active');
+                        $('#partnerNo').addClass('button-active');
+                        $('#partnerNo').closest('.blockSection').data('section').values.hasPartner = false;
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/3 }]]*/null,
+                            type: 'POST',
+                            data: {},
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                showNextBlock();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    , error: function () {
+                        $('#loadingContainer').stopLoading();
+                    }
+                });
+                return false;
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="3">
+        <div class="questionContainer">
+            <p id="b3s3question" class="question">&iquest;Cu&aacute;l es su n&uacute;mero y tipo de documento?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b3s3answers" style="display: none;">
+                <form role="form" th:object="${form}" autocomplete="off">
+                    <div class="inputs">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <select class="tidy-input-number text-white" th:field="*{partnerDocType}">
+                                    <option value="1" th:text="#{form.field.documentType.dni}"></option>
+                                    <option value="2" th:text="#{form.field.documentType.ce}"></option>
+                                </select>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <input type="text" th:field="*{partnerDocNumber}"
+                                       class="small-input-number text-white" pattern="[0-9]*" autocomplete="off"/>
+                                <span class="example">Ej: 10161970</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b3s3button">Continuar</a>
+                            </div>
+                        </div>
+                        <p class="generalError" id="partnerDocMessage"></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+
+                // Set the validation
+                debugger;
+                var validator = /*[[${form.validator.toJson(#locale)}]]*/null;
+                var jsonValidator = createFormValidationJson(JSON.parse(validator), $('#b3s3answers form'));
+                $('#b3s3answers form').validateForm(jsonValidator);
+
+                // Set dinamic validation
+                $('#partnerDocType').change(function () {
+                    debugger;
+                    var dniValidator = /*[[${T(com.affirm.common.util.ValidatorUtil).DOC_NUMBER_DNI.toJson(#locale).toString()}]]*/null;
+                    var ceValidator = /*[[${T(com.affirm.common.util.ValidatorUtil).DOC_NUMBER_CE.toJson(#locale).toString()}]]*/null;
+                    var dniValidatorJson = JSON.parse(dniValidator);
+                    var ceValidatorJson = JSON.parse(ceValidator);
+
+                    if ($(this).val() == '1') {
+                        jsonValidator.rules.partnerDocNumber.maxlength = dniValidatorJson.maxCharacters;
+                    } else if ($(this).val() == '2') {
+                        jsonValidator.rules.partnerDocNumber.maxlength = ceValidatorJson.maxCharacters;
+                    }
+                    $('#b3s3answers form').validateForm(jsonValidator);
+                });
+
+                // Set the writers
+                $('#b3s3question').write(function () {
+                    $('#b3s3answers').fadeIn(400, function () {
+                        $('#partnerDocNumber').focus();
+                    });
+                }, writeOnFinishDelay);
+
+                $('#partnerDocNumber').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b3s3button').trigger('click');
+                        return false;
+                    }
+                });
+
+                $('#b3s3button').click(function () {
+                    if ($('#b3s3answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        block.disableBlock();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/partnerValidation}]]*/null,
+                            type: 'GET',
+                            form: $('#b3s3answers form'),
+                            data: $('#b3s3answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                $('#partnerDocMessage').html('');
+                                block.enableBlock();
+                                if (data == null || data == "") {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/3}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            showNextBlock();
+                                        }
+                                    });
+                                } else {
+                                    var json = JSON.parse(data)
+                                    $('.currentSection > .blockSection').data('section').params = {alternatives: json.alternatives};
+                                    block.showNextSection();
+                                }
+                            }, error: function (xhr, errorJson) {
+                                $('#loadingContainer').stopLoading();
+                                block.enableBlock();
+                                if (errorJson != null && errorJson.type == 'message') {
+                                    $('#partnerDocMessage').html(errorJson.message);
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                    return false;
+                });
+            };
+            humanFormSection.whereToGo = function (section) {
+                return 4;
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="4">
+        <div id="b3s4question" class="questionContainer">
+            <p class="question">&iquest;Cu&aacute;l de estos es el nombre de tu c&oacute;nyugue o conviviente?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b3s4answers" style="display: none;">
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function (section) {
+
+                // Paint alternatives
+                for (var i = 0; i < section.params.alternatives.length; i++) {
+                    var alternative = $('<a></a>').addClass('partnerVerificationItem human-button').html(section.params.alternatives[i]);
+                    $('#b3s4answers').append(alternative);
+                }
+
+                $('#b3s4question .question').write(function () {
+                    $('#b3s4answers').fadeIn('slow');
+                }, writeOnFinishDelay);
+                $('.partnerVerificationItem').click(function () {
+                    block.disableBlock();
+                    $('.partnerVerificationItem').removeClass('button-active');
+                    $(this).addClass('button-active');
+                    $('#loadingContainer').initLoading();
+                    defaultAjax({
+                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/partnerValidation}]]*/null,
+                        type: 'POST',
+                        data: {
+                            partnerName: $(this).html()
+                        },
+                        success: function (data) {
+                            defaultAjax({
+                                url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/3}]]*/null,
+                                type: 'POST',
+                                data: {},
+                                success: function (data) {
+                                    $('#loadingContainer').stopLoading();
+                                    showNextBlock();
+                                }
+                            });
+                        }
+                        , error: function () {
+                            $('#loadingContainer').stopLoading();
+                        }
+                    });
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK EMAIL -->
+<div th:fragment="block4" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true"
+    th:with="humanFormParam=${@catalogService.getHumanFormProductParam(T(com.affirm.common.model.catalog.HumanForm).EMAIL, loanApplication.product.id)}">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div id="b4s1question" class="questionContainer">
+            <p class="question">Dime donde podr&iacute;a escribirte...</p>
+        </div>
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b4s1question .question').write(function () {
+                    block.showNextSection();
+                }, writeOnFinishDelay);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+
+        <div id="b4s2question" class="questionContainer">
+            <p class="question">&iquest;Tienes alguno de estos emails?</p>
+        </div>
+
+        <div class="answerContainer">
+            <div class="answers" id="b4s2answers" style="display: none;">
+                <a class="human-buttons iconBgWhite" id="gmail" title="Gmail" onclick="login('google')"><i
+                        class="icon gmail-icon"></i> <span>Gmail</span></a>
+                <a class="human-buttons iconBgWhite" id="hotmail" title="Hotmail" onclick="login('windows')"><i
+                        class="icon hotmail-icon"></i><span>Hotmail</span></a>
+                <a class="human-buttons iconBgWhite" id="yahoo" title="Yahoo" onclick="login('yahoo')"><i
+                        class="icon yahoo-icon"></i><span>Yahoo</span></a>
+                <a th:if="${humanFormParam?.skippable}" class="human-button" id="skip" onclick="skip();return false;" style="margin-top:.5em;">
+                    Omitir</a>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+
+                $('#b4s2question .question').write(function () {
+                    $('#b4s2answers').fadeIn();
+                }, writeOnFinishDelay);
+            };
+
+            // Setup the oauthy
+            oauthy.setupNetwork('google',
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getClientId()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getRedirectUri()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getDefaultPermission()}]]*/null);
+            oauthy.setupNetwork('windows',
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getClientId()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getRedirectUri()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getDefaultPermission()}]]*/null);
+            oauthy.setupNetwork('yahoo',
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getClientId()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getRedirectUri()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getDefaultPermission()}]]*/null);
+
+            function login(network) {
+                oauthy.login(network, function (code) {
+                    defaultAjax({
+                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/4/2}]]*/null,
+                        type: 'POST',
+                        data: {
+                            emailProvider: network == 'google' ? 'G' : network == 'windows' ? 'W' : network == 'yahoo' ? 'Y' : null,
+                            authCode: code
+                        },
+                        success: function (data) {
+                            $('#loadingContainer').initLoading();
+                            console.log('First Data: ' + data);
+                            defaultAjax({
+                                url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/4}]]*/null,
+                                type: 'POST',
+                                data: {},
+                                success: function (data) {
+                                    $('#loadingContainer').stopLoading();
+                                    console.log('Sec Data: ' + data);
+                                    showNextBlock();
+                                }
+                            });
+                        }
+                        , error: function () {
+                            $('#loadingContainer').stopLoading();
+                        }
+                    });
+                }, function () {
+                    alert('error');
+                });
+            }
+            /*]]>*/
+        </script>
+        <script th:inline="javascript" th:if="${humanFormParam?.skippable}">
+            /*<![CDATA[*/
+            function skip() {
+                $('#loadingContainer').initLoading();
+                defaultAjax({
+                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/4}]]*/null,
+                    type: 'POST',
+                    data: {},
+                    success: function (data) {
+                        $('#loadingContainer').stopLoading();
+                        showNextBlock();
+                    }
+                });
+            }
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK CELLPHONE -->
+<div th:fragment="block5" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div class="questionContainer" id="b5s1question">
+            <p class="question">Dime a que n&uacute;mero podr&iacute;a llamarte...</p>
+        </div>
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b5s1question .question').write(function () {
+                    block.showNextSection();
+                }, writeOnFinishDelay);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+        <div class="questionContainer" id="b5s2question">
+            <p class="question">Ingresa tu n&uacute;mero celular</p>
+            <p class="note" style="display: none">Te enviar&eacute; un SMS con un PIN para validar tu n&uacute;mero.</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b5s2answers" style="display: none;">
+                <div class="inputs">
+                    <form role="form" th:object="${form}" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <input type="text" th:field="*{phoneNumber}"
+                                       class="medium-number-input text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 998931909</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b5s2button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 3;
+            };
+            humanFormSection.onDisplay = function () {
+
+                // Set the validation
+                var validator = /*[[${form.validator.toJson(#locale)}]]*/null;
+                $('#b5s2answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b5s2answers form')));
+
+                // Set the writers
+                $('#b5s2question .question').write(function () {
+                    $('#b5s2question .note').fadeIn();
+                    $('#b5s2answers').fadeIn(400, function () {
+                        $('#phoneNumber').focus();
+                    });
+                }, writeOnFinishDelay)
+
+                $('#phoneNumber').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b5s2button').trigger('click');
+                        return false;
+                    }
+                });
+
+                $('#b5s2button').click(function () {
+                    if ($('#b5s2answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/5/2}]]*/null,
+                            type: 'POST',
+                            form: $('#b5s2answers form'),
+                            data: $('#b5s2answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                var smsActivated =  /*[[${T(com.affirm.system.configuration.Configuration).SMS_AUTHORIZATION_ACTIVATED()}]]*/;
+                                if (smsActivated) {
+                                    block.showNextSection();
+                                } else {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/5}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            },
+                            error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="3">
+        <div class="questionContainer" id="b5s3question">
+            <p class="question">Ingresa el PIN</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b5s3answers" style="display: none;">
+                <div class="inputs">
+                    <form role="form" th:object="${form3}" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <input type="text" th:field="*{smsToken}"
+                                       class="small-input-number text-white" style="text-align: center;"
+                                       pattern="[0-9]*"/>
+                                <span class="example">Ej: 1234</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b5s3button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+
+                // Set the validation
+                var validator = /*[[${form3.validator.toJson(#locale)}]]*/null;
+                $('#b5s3answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b5s3answers form')));
+
+                // Set the writers
+                $('#b5s3question .question').write(function () {
+                    $('#b5s3answers').fadeIn();
+                }, writeOnFinishDelay);
+
+                $('#b5s3button').click(function () {
+                    if ($('#b5s3answers form').valid()) {
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/5/3}]]*/null,
+                            type: 'POST',
+                            form: $('#b5s3answers form'),
+                            data: $('#b5s3answers form').serializeObject(),
+                            success: function (data) {
+                                debugger;
+                                json = JSON.parse(data);
+                                if (json.result) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/5}]]*/null,
+                                        type: 'POST',
+                                        form: $('#b5s3answers form'),
+                                        data: $('#b5s3answers form').serializeObject(),
+                                        data: {},
+                                        success: function (data) {
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+
+
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK ADDRESS -->
+<div th:fragment="block6" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+    <div class="blockSection" data-section-id="0" data-section-back="false">
+        <div class="questionContainer" id="b6s0question">
+            <p class="question" style="display: none">Necesitamos que actives tu geolocalizaci&oacute;n</p>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 1;
+            };
+            humanFormSection.onDisplay = function () {
+                var browserLocation = /*[[${browserLocation}]]*/;
+                if (!navigator.geolocation || browserLocation) {
+                    block.showNextSection();
+                    return;
+                }
+
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b6s0question .question').show().write(function () {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        clearTimeout(broke);
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/browserLocation/}]]*/null,
+                            type: 'POST',
+                            data: {
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude
+                            },
+                            success: function (result) {
+                            },
+                            error: function (result) {
+                                console.log('Error saving browser location')
+                            }
+                        });
+                        block.showNextSection();
+                    }, function (error) {
+                        clearTimeout(broke);
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                console.log("User denied the request for Geolocation");
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                console.log("Location information is unavailable");
+                                break;
+                            case error.TIMEOUT:
+                                console.log("The request to get user location timed out");
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                console.log("Unknow geolocation error");
+                                break;
+                        }
+                        block.showNextSection();
+                    });
+
+                    var broke = setTimeout(function(){
+                        block.showNextSection();
+                    }, 10000);
+
+                }, writeOnFinishDelay);
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div class="questionContainer" id="b6s1question">
+            <p class="question">Dime tu dirección exacta...</p>
+        </div>
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b6s1question .question').write(function () {
+                    block.showNextSection();
+                }, writeOnFinishDelay);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+        <div class="questionContainer" id="b6s2question">
+            <p class="question">&iquest;En que zona te encuentras?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b6s2answers" style="display: none;">
+                <div class="inputs">
+                    <form role="form" th:object="${form2}" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <select th:field="*{department}" class="input-cities text-white">
+                                    <option value="" th:text="#{form.field.department.placeholder}"
+                                            hidden="hidden"></option>
+                                    <!--<option value="" hidden="hidden"></option>-->
+                                    <option th:each="department : ${@catalogService.getDepartments()}"
+                                            th:value="${department.id}"
+                                            th:text="${department.name}"></option>
+                                </select>
+                                <span class="example">Ej: Lima</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem" id="provinceBlock" style="display:none;">
+                            <div class="form-group">
+                                <select th:field="*{province}" class="input-cities text-white"></select>
+                                <span class="example">Ej: Lima</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem" id="districtBlock" style="display:none;">
+                            <div class="form-group">
+                                <select th:field="*{district}" class="input-cities text-white"></select>
+                                <span class="example">Ej: Miraflores</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem" id="buttonBlock" style="display:none;">
+                            <div class="form-group">
+                                <a class="human-button" id="b6s2button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 3;
+            };
+            humanFormSection.onDisplay = function () {
+
+                // Set the validation
+                var validator = /*[[${form2.validator.toJson(#locale)}]]*/null;
+                $('#b6s2answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b6s2answers form')));
+
+                // Set the writers
+                $('#b6s2question .question').write(function () {
+                    $('#b6s2answers').fadeIn(400, function () {
+                        $('#department').focus();
+                    });
+                }, writeOnFinishDelay);
+
+                $('#department').on('change', function () {
+                    if ($(this).val() == '') {
+                        return;
+                    }
+                    $.getJSON(/*[[@{/catalog/provinces/json}]]*/, {departmentId: $(this).val()}, function (data) {
+                        var placeholder = /*[[#{form.field.province.placeholder}]]*/;
+//                        var placeholder = "";
+                        var options = '<option value="" hidden="hidden">' + placeholder + '</option>';
+                        for (var x = 0; x < data.length; x++) {
+                            options += '<option value="' + data[x]['id'] + '" ' + '>' + data[x]['name'] + '</option>';
+                        }
+                        $('#province').html(options);
+                        $('#province').change();
+                        $('#provinceBlock').show();
+                    });
+                });
+                $('#province').on('change', function () {
+                    if ($(this).val() == '') {
+                        return;
+                    }
+                    $.getJSON(/*[[@{/catalog/districts/json}]]*/, {
+                        departmentId: $('#department').val(),
+                        provinceId: $(this).val()
+                    }, function (data) {
+                        var placeholder = /*[[#{form.field.district.placeholder}]]*/;
+//                        var placeholder = "";
+                        var options = '<option value="" hidden="hidden">' + placeholder + '</option>';
+                        for (var x = 0; x < data.length; x++) {
+                            options += '<option value="' + data[x]['id'] + '">' + data[x]['name'] + '</option>';
+                        }
+                        $('#district').html(options);
+                        $('#districtBlock, #buttonBlock').show();
+                    });
+
+                });
+
+                $('#b6s2button').click(function () {
+                    if ($('#b6s2answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        block.disableBlock();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/6/2}]]*/null,
+                            type: 'POST',
+                            form: $('#b6s2answers form'),
+                            data: $('#b6s2answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="3">
+        <div class="questionContainer" id="b6s3question">
+            <p class="question">&iquest;Cu&aacute;l es tu direcci&oacute;n exacta?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b6s3answers" style="display: none;">
+                <div class="inputs">
+                    <form role="form" th:object="${form3}" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <input type="text" th:field="*{fullAddress}" class="input-full-address text-white"/>
+                                <span class="example">Ej: Av. Farol 376, dpto 202</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b6s3button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function () {
+
+                // Set the validation
+                var validator = /*[[${form3.validator.toJson(#locale)}]]*/null;
+                $('#b6s3answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b6s3answers form')));
+
+                // Set the writers
+                $('#b6s3question .question').write(function () {
+                    $('#b6s3answers').fadeIn(400, function () {
+                        $('#fullAddress').focus();
+                    });
+                }, writeOnFinishDelay);
+
+                $('#fullAddress').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b6s3button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b6s3button').click(function () {
+                    if ($('#b6s3answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        block.disableBlock();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/6/3}]]*/null,
+                            type: 'POST',
+                            form: $('#b6s3answers form'),
+                            data: $('#b6s3answers form').serializeObject(),
+                            success: function (data) {
+                                defaultAjax({
+                                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/6}]]*/null,
+                                    type: 'POST',
+                                    data: {},
+                                    success: function (data) {
+                                        $('#loadingContainer').stopLoading();
+                                        showNextBlock();
+                                    }
+                                });
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK OCUPATION -->
+<div th:fragment="block7" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div class="questionContainer" id="b7s1question">
+            <p class="question">Cu&eacute;ntame acerca de tu trabajo...</p>
+        </div>
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 2;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#b7s1question .question').write(function () {
+                    setTimeout(function () {
+                        block.showNextSection();
+                    }, 1000);
+                }, writeOnFinishDelay);
+            };
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+        <div class="questionContainer" id="b7s2question">
+            <p class="question">&iquest;Qu&eacute; tipo de actividad realizas?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b7s2answers" style="display: none;">
+                <div class="inputs">
+                    <form role="form" th:object="${form2}" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <select th:field="*{activityType}" class="text-white">
+                                    <option value="" hidden="hidden"></option>
+                                    <option th:each="activity : ${@catalogService.getActivityTypes(#locale, true)}"
+                                            th:value="${activity.id}" th:text="${activity.type}"></option>
+                                </select>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b7s2button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                var dependentType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).DEPENDENT }]]*/;
+                var independentType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT }]]*/;
+                var housekeeperType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).HOUSEKEEPER }]]*/;
+                var rentierType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).RENTIER }]]*/;
+                var stockholderType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).STOCKHOLDER }]]*/;
+                var pensionerType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).PENSIONER }]]*/;
+                var studentType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).STUDENT }]]*/;
+                var unemployedType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).UNEMPLOYED }]]*/;
+
+                switch (section.values.activityType) {
+                    case dependentType:
+                        return 3;
+                        break;
+                    case independentType:
+                        return 5;
+                        break;
+                    case rentierType:
+                        return 7;
+                        break;
+                    case stockholderType:
+                        return 9;
+                        break;
+                    case pensionerType:
+                        return 11;
+                        break;
+                    case housekeeperType:
+                        return 12;
+                        break;
+                    case studentType:
+                        simpleAjax();
+                        break;
+                    case unemployedType:
+                        simpleAjax();
+                        break;
+                    default:
+                        return 15;
+                        break;
+                }
+            };
+            $('#b7s2answers select').change(function () {
+                if ($(this).val() != '') {
+                    $(this).closest('.blockSection').data('section').values.activityType = $(this).val();
+                }
+            });
+            humanFormSection.onDisplay = function () {
+
+                // Set the validation
+                var validator = /*[[${form2.validator.toJson(#locale)}]]*/null;
+                $('#b7s2answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s2answers form')));
+
+                // Set the writers
+                $('#b7s2question .question').write(function () {
+                    $('#b7s2answers').fadeIn(400, function () {
+                        $('#activityType').focus();
+                    });
+                }, writeOnFinishDelay);
+
+                $('#b7s2button').click(function () {
+                    if ($('#b7s2answers form').valid()) {
+                        block.disableBlock();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/2}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s2answers form'),
+                            data: $('#b7s2answers form').serializeObject(),
+                            success: function (data) {
+                                block.showNextSection();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+
+            function simpleAjax() {
+                defaultAjax({
+                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                    type: 'POST',
+                    data: {},
+                    success: function (data) {
+                        showNextBlock();
+                    }
+                });
+            }
+            /*]]>*/
+        </script>
+    </div>
+
+    <!-- || PRIMARY ACTIVITY || -->
+    <th:block th:replace=":: dummy(sectionForm=${form3},sectionId=3)"/>
+    <th:block th:replace=":: dependent1(sectionForm=${form3},sectionId=3)"/>
+    <th:block th:replace=":: dependent2(sectionForm=${form4},sectionId=4)"/>
+    <th:block th:replace=":: independent1(sectionForm=${form5},sectionId=5)"/>
+    <th:block th:replace=":: independent2(sectionForm=${form6},sectionId=6)"/>
+    <th:block th:replace=":: rentier1(sectionForm=${form7},sectionId=7)"/>
+    <th:block th:replace=":: rentier2(sectionForm=${form8},sectionId=8)"/>
+    <th:block th:replace=":: shareholder1(sectionForm=${form9},sectionId=9)"/>
+    <th:block th:replace=":: shareholder2(sectionForm=${form10},sectionId=10)"/>
+    <th:block th:replace=":: pensioner1(sectionForm=${form11},sectionId=11)"/>
+    <th:block th:replace=":: housekeeper1(sectionForm=${form12},sectionId=12)"/>
+    <th:block th:replace=":: housekeeper2(sectionForm=${form13},sectionId=13)"/>
+
+    <!-- || OTHER INCOMES || -->
+    <div class="blockSection" data-section-id="15" th:with="sectionForm=${form15},sectionId=15">
+        <div class="questionContainer" id="b7s15otherquestion">
+            <p class="question">&iquest;Tienes otros ingresos?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b7s15otheranswers" style="display: none;">
+                <div class="anwsers-buttons">
+                    <a class="other-income human-button booleanAnswer" data-answer="no">No</a>
+                    <a class="other-income human-button booleanAnswer" data-answer="si">Si</a>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <div class="questionContainer" id="b7s15provequestion" style="display: none;">
+            <p class="question">&iquest;Los puedes demostrar?</p>
+        </div>
+
+        <div class="answerContainer">
+            <div class="answers" id="b7s15proveanswers" style="display: none;">
+                <div class="anwsers-buttons">
+                    <a class="can-prove human-button booleanAnswer" data-answer="no">No</a>
+                    <a class="can-prove human-button booleanAnswer" data-answer="si">Si</a>
+                </div>
+                <div class="inputs" id="b7s15OtherIncome" style="display: none;">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="otherIncome">Ingreso neto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="otherIncome" name="otherIncome"
+                                       th:value="${sectionForm.otherIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2000</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b7s15button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.values.secundary)
+                    return 19;
+                else
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'OtherIncome form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'OtherIncome form')));
+
+                // Set the writers
+                $('#b7s15otherquestion .question').write(function () {
+                    $('#b7s15otheranswers').fadeIn();
+                    $('#otherIncome').focus();
+                }, writeOnFinishDelay);
+
+                $('.other-income').click(function () {
+
+                    if ($(this).data('answer') == 'si') {
+                        $('.other-income').removeClass('button-active');
+                        $(this).addClass('button-active');
+                        $('#b7s15provequestion').show().children('.question').write(function () {
+                            $('#b7s15proveanswers').fadeIn();
+                            $('#loadingContainer').stopLoading();
+                        }, writeOnFinishDelay);
+                    } else if ($(this).data('answer') == 'no') {
+                        block.disableBlock();
+                        $('.other-income').removeClass('button-active');
+                        $(this).addClass('button-active');
+                        $('#b7s15proveanswers, #b7s15provequestion').css({'display': 'none'});
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                            type: 'POST',
+                            data: {},
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                showNextBlock();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                });
+
+                $('.can-prove').click(function () {
+                    if ($(this).data('answer') == 'si') {
+                        $('#b7s15OtherIncome').css({'display': 'none'});
+                        $('.can-prove').removeClass('button-active');
+                        $(this).addClass('button-active');
+                        section.values.secundary = true;
+                        $('#loadingContainer').stopLoading();
+                        block.showNextSection();
+                    } else if ($(this).data('answer') == 'no') {
+                        $('.can-prove').removeClass('button-active');
+                        $(this).addClass('button-active');
+                        $('#b7s15OtherIncome').fadeIn(400, function () {
+                            $('#otherIncome').focus();
+                        });
+                    }
+                    return false;
+                });
+
+                $('#b7s15button').click(function () {
+                    if ($('#b7s15OtherIncome form').valid()) {
+                        block.disableBlock();
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/15}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s15OtherIncome form'),
+                            data: $('#b7s15OtherIncome form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                defaultAjax({
+                                    url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                    type: 'POST',
+                                    data: {},
+                                    success: function (data) {
+                                        $('#loadingContainer').stopLoading();
+                                        showNextBlock();
+                                    }
+                                });
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+
+    <div class="blockSection" data-section-id="19">
+        <div class="questionContainer" id="b7s19question">
+            <p class="question">&iquest;Qu&eacute; tipo de actividad secundaria realizas?</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b7s19answers" style="display: none;">
+                <div class="inputs">
+                    <form role="form" th:object="${form19}" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <select th:field="*{activityType}" class="text-white">
+                                    <option value="" hidden="hidden"></option>
+                                    <option th:each="activity : ${@catalogService.getActivityTypes(#locale, false)}"
+                                            th:value="${activity.id}" th:text="${activity.type}"></option>
+                                </select>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" id="b7s19button">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                var dependentType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).DEPENDENT }]]*/;
+                var independentType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT }]]*/;
+                var housekeeperType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).HOUSEKEEPER }]]*/;
+                var rentierType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).RENTIER }]]*/;
+                var stockholderType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).STOCKHOLDER }]]*/;
+                var pensionerType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).PENSIONER }]]*/;
+                var studentType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).STUDENT }]]*/;
+                var unemployedType = '' +/*[[${ T(com.affirm.common.model.catalog.ActivityType).UNEMPLOYED }]]*/;
+
+                switch (section.values.activityType) {
+                    case dependentType:
+                        return 20;
+                        break;
+                    case independentType:
+                        return 22;
+                        break;
+                    case rentierType:
+                        return 24;
+                        break;
+                    case stockholderType:
+                        return 26;
+                        break;
+                    case pensionerType:
+                        return 28;
+                        break;
+                    case housekeeperType:
+                        return 29;
+                        break;
+                    default:
+                        return null;
+                        break;
+                }
+            };
+            $('#b7s19answers select').change(function () {
+                if ($(this).val() != '') {
+                    $(this).closest('.blockSection').data('section').values.activityType = $(this).val();
+                }
+            });
+            humanFormSection.onDisplay = function () {
+                // Set the validation
+                var validator = /*[[${form19.validator.toJson(#locale)}]]*/null;
+                $('#b7s19answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s19answers form')));
+
+                // Set the writers
+                $('#b7s19question .question').write(function () {
+                    $('#b7s19answers').fadeIn(400, function () {
+                        $('#b7s19answers select').focus();
+                    });
+                }, writeOnFinishDelay);
+
+                $('#b7s19button').click(function () {
+                    if ($('#b7s19answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        block.disableBlock();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/19}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s19answers form'),
+                            data: $('#b7s19answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+
+    <!-- || SECUNDARY ACTIVITY || -->
+    <th:block th:replace=":: dummy(sectionForm=${form3},sectionId=3)"/>
+    <th:block th:replace=":: dependent1(sectionForm=${form20},sectionId=20)"/>
+    <th:block th:replace=":: dependent2(sectionForm=${form21},sectionId=21)"/>
+    <th:block th:replace=":: independent1(sectionForm=${form22},sectionId=22)"/>
+    <th:block th:replace=":: independent2(sectionForm=${form23},sectionId=23)"/>
+    <th:block th:replace=":: rentier1(sectionForm=${form24},sectionId=24)"/>
+    <th:block th:replace=":: rentier2(sectionForm=${form25},sectionId=25)"/>
+    <th:block th:replace=":: shareholder1(sectionForm=${form26},sectionId=26)"/>
+    <th:block th:replace=":: shareholder2(sectionForm=${form27},sectionId=27)"/>
+    <th:block th:replace=":: pensioner1(sectionForm=${form28},sectionId=28)"/>
+    <th:block th:replace=":: housekeeper1(sectionForm=${form29},sectionId=29)"/>
+    <th:block th:replace=":: housekeeper2(sectionForm=${form30},sectionId=30)"/>
+
+</div>
+
+<!-- SECTION IOVATION-->
+<div th:fragment="sectionIovation">
+    <div class="blockSection" data-section-id="0" data-section-back="false">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            console.log('INIT i');
+            window.io_global_object_name = "IGLOO"
+            window.IGLOO = window.IGLOO || {
+                        "install_flash" : false,
+                        "bb_callback" : function (bb, complete ) {
+                            if ( complete ) {
+                                sendBB( bb );
+                            }
+                        },
+                        "loader" : {
+                            "version" : "5.0.0",
+                            "tp_host" : /*[[${@userService.tpHost()}]]*/null
+                        }
+                    };
+            var sent = false;
+            function sendBB( bb ) {
+                if (sent) return;
+                var mybb = bb;
+                if ( bb === undefined )
+                    try {
+                        mybb = window["IGLOO"].getBlackbox().blackbox;
+                    } catch(e) { }
+                sent = true;
+                console.log( "Sending something...." + mybb);
+                defaultAjax( {
+                    url: /*[[@{/i/demo}]]*/null,
+                    type: 'POST',
+                    data: {
+                        ioBlackbox: mybb
+                    },
+                    success: function (data) {
+                        console.log("I finished: " +  data );
+                        $('#loadingContainer').stopLoading();
+                        block.showNextSection();
+                    }
+                });
+            }
+            setTimeout(sendBB, 3000);
+            /*]]>*/
+        </script>
+        <script th:src="${base} + ${static}"></script>
+
+        <div class="questionContainer">
+            <p id="bios0message" class="question">Aguarda un momento</p>
+        </div>
+        <script>
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 1;
+            };
+            humanFormSection.onDisplay = function () {
+                $('.humanProgress-bar').css({'display': 'block'});
+                $('#bios0message').write(function () {
+                    $('#loadingContainer').initLoading();
+                }, writeOnFinishDelay);
+            };
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK SOCIAL NETWORKS -->
+<div th:fragment="block8" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="true">
+
+    <th:block th:if="${doIovation}">
+        <th:block th:replace=":: sectionIovation"></th:block>
+    </th:block>
+
+    <div class="blockSection" data-section-id="1">
+
+        <div class="questionContainer" id="b8s1question">
+            <p class="question">Conecta tus redes sociales (nos ayudar&aacute; a darte una mejor oferta).</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" id="b8s1answers" style="display: none;">
+                <a th:attr="data-facebook-exist=${facebookId != null}" id="facebook-button" style="background: #3b5998;position:relative;width: 145px;">
+                    <i th:style="${facebookId != null ? 'color: white;display:block;position: absolute;background: #8BC34A;width: 12px;height: 12px;text-align: center;border-radius: 50%;right: 5px;font-size: 1.5em;bottom: 0;top:0; margin:auto;': 'color:white;position: absolute;display: none;background: #8BC34A;width: 12px;height: 12px;text-align: center;border-radius: 50%;right: 5px;font-size: 1.5em;bottom: 0;top:0; margin:auto;'}"></i>
+                    <img th:src="@{/img/icons/facebook-logo.png}" width="120" alt="Facebook"/></a>
+                <div class="mobileBlock"></div>
+                <a th:attr="data-linkedin-exist=${linkedinId != null}" id="linkedin-button"
+                   style="background: #2d83b3;height: 45px;padding: .25em .5em;position:relative;width: 145px;">
+                    <i th:style="${linkedinId != null ? 'color: white;display:block;position: absolute;background: #8BC34A;width: 12px;height: 12px;text-align: center;border-radius: 50%;right: 5px;font-size: 1.5em;bottom: 0;top:0; margin:auto;': 'color:white;position: absolute;display: none;background: #8BC34A;width: 12px;height: 12px;text-align: center;border-radius: 50%;right: 5px;font-size: 1.5em;bottom: 0;top:0; margin:auto;'}"></i>
+                    <img th:src="@{/img/icons/LinkedIn-logo.png}" width="110" alt="Linkedin"/></a>
+                <div class="mobileBlock"></div>
+                <a th:attr="data-mercadolibre-exist=${mercadoLibre != null}"
+                   id="mercadolibre-button" style="background: white;height: 45px;padding: .25em;margin: 0 .5em;position:relative;width: 145px;">
+                    <i th:style="${mercadoLibre != null ? 'color: white;display:block;position: absolute;background: #8BC34A;width: 12px;height: 12px;text-align: center;border-radius: 50%;right: 5px;font-size: 1.5em;bottom: 0;top:0; margin:auto;': 'color:white;position: absolute;display: none;background: #8BC34A;width: 12px;height: 12px;text-align: center;border-radius: 50%;right: 5px;font-size: 1.5em;bottom: 0;top:0; margin:auto;'}"></i>
+                    <img th:src="@{/img/icons/mercadolibre-logo.png}" width="110" alt="Mercadolibre"/></a>
+                <br/>
+                <br/>
+                <a id="b8s1continue" class="human-button">Omitir</a>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function (section) {
+                $('.humanProgress-bar').css({'display': 'block'});
+
+                $('#b8s1question .question').write(function () {
+                    $('#b8s1answers').fadeIn();
+                }, writeOnFinishDelay);
+
+                if ($('#facebook-button').data('facebook-exist')) {
+                    facebookSuccess();
+                } else {
+                    $('#facebook-button').on('click', function () {
+                        oauthy.login('facebook', function (code) {
+                            $('#loadingContainer').initLoading();
+                            defaultAjax({
+                                url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/8/2}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    socialNetwork: 'F',
+                                    authCode: code
+                                },
+                                success: function (data) {
+                                    facebookSuccess();
+                                    $('#loadingContainer').stopLoading();
+                                },
+                                error: function () {
+                                    $('#loadingContainer').stopLoading();
+                                }
+                            });
+                        });
+                    });
+                }
+
+                if ($('#linkedin-button').data('linkedin-exist')) {
+                    linkedinSuccess();
+                } else {
+                    $('#linkedin-button').on('click', function () {
+                        oauthy.login('linkedin', function (code) {
+                            $('#loadingContainer').initLoading();
+                            defaultAjax({
+                                url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/8/2}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    socialNetwork: 'L',
+                                    authCode: code
+                                },
+                                success: function (data) {
+                                    linkedinSuccess();
+                                    $('#loadingContainer').stopLoading();
+                                },
+                                error: function () {
+                                    $('#loadingContainer').stopLoading();
+                                }
+                            });
+                        });
+                    });
+                }
+
+                if ($('#mercadolibre-button').data('mercadolibre-exist')) {
+                    mercadolibreSuccess();
+                } else {
+                    $('#mercadolibre-button').on('click', function () {
+                        oauthy.login('mercadolibre', function (code) {
+                            $('#loadingContainer').initLoading();
+                            defaultAjax({
+                                url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/8/2}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    socialNetwork: 'M',
+                                    authCode: code
+                                },
+                                success: function (data) {
+                                    mercadolibreSuccess();
+                                    $('#loadingContainer').stopLoading();
+                                },
+                                error: function () {
+                                    $('#loadingContainer').stopLoading();
+                                }
+                            });
+                        });
+                    });
+                }
+
+                $('#b8s1continue').click(function (e) {
+                    e.preventDefault();
+                    $('#loadingContainer').initLoading();
+                    system.unloadAlert = false;
+                    defaultAjax({
+                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/8}]]*/null,
+                        type: 'POST',
+                        data: {},
+                        success: function (data) {
+                            $('#loadingContainer').stopLoading();
+                            showNextBlock();
+                        }
+                        , error: function () {
+                            $('#loadingContainer').stopLoading();
+                        }
+                    });
+                });
+
+            };
+
+            oauthy.setupNetwork('facebook',
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getClientId()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getRedirectUri()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getDefaultPermission()}]]*/null);
+            oauthy.setupNetwork('linkedin',
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getClientId()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getRedirectUri()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getDefaultPermission()}]]*/null);
+            oauthy.setupNetwork('mercadolibre',
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).MERCADOLIBRE.getClientId()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).MERCADOLIBRE.getRedirectUri()}]]*/null,
+                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).MERCADOLIBRE.getDefaultPermission()}]]*/null);
+
+            function facebookSuccess() {
+                $('.humanProgress-bar').css({'display': 'none'});
+                $('#facebook-button').addClass('button-active');
+                $('.button-active i').css({'display' : 'block'});
+                $('#b8s1continue').html('Continuar');
+            }
+
+            function linkedinSuccess() {
+                $('.humanProgress-bar').css({'display': 'none'});
+                $('#linkedin-button').addClass('button-active');
+                $('.button-active i').css({'display' : 'block'});
+                $('#b8s1continue').html('Continuar');
+            }
+
+            function mercadolibreSuccess() {
+                $('.humanProgress-bar').css({'display': 'none'});
+                $('#mercadolibre-button').addClass('button-active');
+                $('.button-active i').css({'display' : 'block'});
+                $('#b8s1continue').html('Continuar');
+            }
+
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- BLOCK EVALUATION RESPONSE -->
+<div th:fragment="block9" th:attr="data-block-percentage=${blockPercentage}" data-unload-alert="false">
+    <div class="blockSection" data-section-id="1" data-section-back="false">
+        <div class="questionContainer" id="b9s1question1">
+            <p class="question" style="display:none;vetical-align:top;"><span th:text="${name}"/>, estamos haciendo
+                algunas consultas adicionales a fuentes externas, nos tomar&aacute; solamente unos pocos segundos.</p>
+        </div>
+        <div class="note" id="b9s1note" style="display: none;vetical-align:top;">Aguarda y te daremos la
+            respuesta
+        </div>
+
+        <div class="note" id="b9f2note" style="display: none;vetical-align:top;"
+             th:utext="#{preEvaluationResponse.state.final.phrase2}"></div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                debugger;
+                if (section.values.status.status == 'S' && section.values.status.approved) {
+                    return 2;
+                } else if (section.values.status.status == 'S' && !section.values.status.approved) {
+                    return 3;
+                } else if (section.values.status == 'F') {
+                    return 3;
+                }
+            };
+            humanFormSection.onDisplay = function (section) {
+                var statusString = /*[[${status}]]*/null;
+                var status = JSON.parse(statusString);
+                $('.humanProgress-bar').css({'display': 'none'});
+                section.values.status = status;
+                section.params.status = status;
+
+                // Barra desktop
+                $('.humanProgress-container').css({'display': 'none'});
+
+                // Barra Mobile
+                $('.humanProgress-container-mobile').css({'display': 'none'});
+
+                if (status.status == 'R') {
+                    $('#b9s1question1 .question').show().write(function () {
+                        $('#b9s1note').css({'display': 'inline-block'}).write(function () {
+                            setTimeout(function () {
+                                $('#b9f2note').fadeIn();
+                                $('#loadingContainer').initLoading();
+                                setRequestTimeout();
+                            }, 3000);
+                        }, writeOnFinishDelay);
+                    }, writeOnFinishDelay);
+                } else {
+                    setTimeout(function () {
+                        block.showNextSection();
+                    }, 100);
+
+                }
+
+                function setRequestTimeout() {
+                    setTimeout(function () {
+                        getStatusData();
+                    }, 2000);
+                }
+
+                function getStatusData() {
+                    defaultAjax({
+                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/evaluation/json}]]*/null,
+                        type: 'GET',
+                        success: function (result) {
+                            statusJson = JSON.parse(result);
+                            section.values.status = statusJson;
+                            section.params.status = statusJson;
+
+                            if (statusJson.status == 'R') {
+                                setRequestTimeout();
+                            } else {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                        }
+                        , error: function () {
+                            $('#loadingContainer').stopLoading();
+                        }
+                    })
+                }
+
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="2">
+        <div class="questionContainer" id="b9s2question">
+            <p class="question" th:utext="#{evaluationResponse.state.success.tittle}"></p>
+        </div>
+        <div class="note" id="b9s2note" style="display: none">Por favor selecciona la oferta que mejor se acomode a tus
+            necesidades.
+        </div>
+        <br/>
+        <div id="redirectFinish" style="display: none">Te estamos redirigiendo en <span id="countdownFinish"></span>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function (section) {
+                $('#b9s2question .question').write(function () {
+                    $('#b9s2note').show().write(function () {
+                        $('#redirectFinish').fadeIn();
+                        countdown($('#countdownFinish'), 5);
+                        var urlToRedirect = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/offer} ]]*/null;
+                        block.runRedirect(urlToRedirect, 5000);
+                    }, writeOnFinishDelay);
+                }, writeOnFinishDelay);
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="3" data-section-back="false">
+        <div class="questionContainer" id="b9s3question1">
+            <p class="question" th:utext="#{evaluationResponse.state.fail.tittle}"></p>
+        </div>
+        <div class="note" id="b9s3question2" style="display: none">
+        </div>
+        <br/>
+        <div class="note" id="b9s3final1" style="display: none"
+             th:utext="#{evaluationResponse.state.fail.final.message1(${@configuration.APP_NAME})}"></div>
+        <br/>
+        <div class="note" id="b9s3final2" style="display: none"
+             th:utext="#{evaluationResponse.state.fail.final.message2}"></div>
+        <br/>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                return 4;
+            };
+            humanFormSection.onDisplay = function (section) {
+                $('#b9s3question1 .question').write(function () {
+                    $('#b9s3question2').html(section.params.status.message);
+                    $('#b9s3question2').show();
+                    $('#b9s3question2').write(function () {
+                        if (section.params.status.helpMessage != null) {
+                            block.showNextSection();
+                        } else {
+                            $('#b9s3final1').fadeIn();
+                            setTimeout(function () {
+                                $('#b9s3final2').fadeIn();
+//                                $('#b9b1final').fadeIn();
+                            }, 2000);
+                        }
+                    }, 4000);
+                }, writeOnFinishDelay);
+            };
+            /*]]>*/
+        </script>
+    </div>
+    <div class="blockSection" data-section-id="4">
+        <div class="description-text" id="b9s4helpHow" th:text="#{evaluationResponse.state.fail.message}"></div>
+        <br/>
+        <div class="note" id="b9s4helpMessageTittle" style="display: none;"></div>
+        <div class="note" id="b9s4helpMessageBody" style="display: none;"></div>
+        <br/>
+        <div class="note" id="b9s4final1" style="display: none"
+             th:utext="#{evaluationResponse.state.fail.final.message1(${@configuration.APP_NAME})}"></div>
+        <br/>
+        <div class="note" id="b9s4final2" style="display: none"
+             th:utext="#{evaluationResponse.state.fail.final.message2}"></div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.onDisplay = function (section) {
+                $('#b9s4helpMessageTittle').html(section.params.status.helpMessage.tittle);
+                $('#b9s4helpMessageBody').html(section.params.status.helpMessage.body);
+
+                // If 1 or 2, dont show the help how message
+                if (section.params.status.helpMessage.id == 1 || section.params.status.helpMessage.id == 2) {
+                    $('#b9s4helpHow').hide();
+                    showb9s4HelpMessage();
+                } else {
+                    $('#b9s4helpHow').write(function () {
+                        showb9s4HelpMessage();
+                    }, 1000);
+                }
+            };
+
+            function showb9s4HelpMessage() {
+                $('#b9s4helpMessageTittle').show();
+                $('#b9s4helpMessageTittle').write(function () {
+                    $('#b9s4helpMessageBody').fadeIn();
+                    setTimeout(function () {
+                        $('#b9s4final1').fadeIn();
+                        $('#b9s4final2').fadeIn();
+                    }, 5000);
+                }, writeOnFinishDelay);
+            }
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<!-- Los siguientes fragments reciben los sigientes params:
+    - sectionId
+    - sectionForm
+ -->
+
+<!-- SECTION DUMMY ->
+    utilizada para evitar un problema de reeplace del fragment
+    A&uacute;n no se sabe la causa del problema
+-->
+<th:block th:fragment="dummy">
+    <div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION DEPENDENT 1 -> ID [ 3, 20 ] -->
+<th:block th:fragment="dependent1">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Br&iacute;ndame los siguientes datos de la empresa en la que trabajas...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="dependentRuc">RUC</label>
+                                <input type="text" id="dependentRuc" name="dependentRuc"
+                                       th:value="${sectionForm.dependentRuc}"
+                                       class="input-ruc text-white" pattern="[0-9]*" tabindex="1" />
+                                <span class="example">Ej: 20600606043</span>
+                                <span class="example">Busca tu RUC <a
+                                        href="http://www.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaMovil.jsp"
+                                        target="_blank"
+                                        style="text-decoration: underline;margin:0;" rel="noopener noreferrer">aqu&iacute;</a></span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="dependentPhoneNumber">Tel/Cel</label>
+                                (<input type="text" id="dependentPhoneNumberCode" name="dependentPhoneNumberCode"
+                                        style="width: 30px" class="medium-number-input text-white" pattern="[0-9]*" tabindex="2"/>)
+                                <input type="text" id="dependentPhoneNumber" name="dependentPhoneNumber"
+                                       th:value="${sectionForm.dependentPhoneNumber}"
+                                       class="medium-number-input text-white" pattern="[0-9]*" tabindex="3"/>
+                                <span class="example">Ej: (01) 2411750 / 983571444</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 3)
+                    return 4;
+                else if (section.id == 20)
+                    return 21;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#dependentRuc').focus();
+                }, writeOnFinishDelay);
+
+                $('#dependentPhoneNumber').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+
+                //  Set dependentPhoneNumberCode behavior
+                $('#b7s' + section.id + 'answers #dependentPhoneNumberCode').keyup(function (event) {
+                    if ($(this).val().length == 2) {
+                        $('#b7s' + section.id + 'answers #dependentPhoneNumber').focus();
+                    }
+                });
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION DEPENDENT 2 -> ID [ 4, 21 ] -->
+<th:block th:fragment="dependent2">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Cu&eacute;ntame sobre tu antig&uuml;edad e ingresos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="dependentTime">Tiempo en el empleo</label>
+                                <input type="text" id="dependentTime" name="dependentTime"
+                                       th:value="${sectionForm.dependentTime}"
+                                       class="tidy-input-number text-white" pattern="[0-9]*"/>
+                                <span class="postfix"> meses</span>
+                                <span class="example">Ej: 18</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="dependentGrossIncome">Ingreso bruto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="dependentGrossIncome" name="dependentGrossIncome"
+                                       th:value="${sectionForm.dependentGrossIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2500</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="dependentNetIncome">Ingreso neto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="dependentNetIncome" name="dependentNetIncome"
+                                       th:value="${sectionForm.dependentNetIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2000</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 4)
+                    return 15;
+                else if (section.id == 21)
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#dependentTime').focus();
+                }, writeOnFinishDelay);
+
+                $('#dependentNetIncome').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                if (section.id == 4)
+                                    block.showNextSection();
+                                else if (section.id == 21) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION INDEPENDENT 1 -> ID [ 5, 22 ] -->
+<th:block th:fragment="independent1">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Br&iacute;ndame los siguientes datos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="independentRuc">RUC</label>
+                                <input type="text" id="independentRuc" name="independentRuc"
+                                       th:value="${sectionForm.independentRuc}"
+                                       class="input-ruc text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 20600606043</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="independentVouchers">&iquest;Qu&eacute; comprobantes
+                                    de ingresos tienes?</label>
+                                <select id="independentVouchers" name="independentVouchers"
+                                        th:value="${sectionForm.independentVouchers}" style="padding: .45em">
+                                    <option value="" hidden="hidden"></option>
+                                    <option th:each="vou : ${@catalogService.getVoucherTypes(#locale)}"
+                                            th:value="${vou.id}"
+                                            th:text="${vou.name}"></option>
+                                </select>
+                                <span class="example">Ej: Facturas</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 5)
+                    return 6;
+                else if (section.id == 22)
+                    return 23;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#independentRuc').focus();
+                }, writeOnFinishDelay);
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            },
+                            error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION INDEPENDENT 2 -> ID [ 6, 23 ] -->
+<th:block th:fragment="independent2">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Cu&eacute;ntame sobre tu experiencia e ingresos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="independentTime">Tiempo en la actividad</label>
+                                <input type="text" id="independentTime" name="independentTime"
+                                       th:value="${sectionForm.independentTime}"
+                                       class="tidy-input-number text-white" pattern="[0-9]*"/>
+                                <span class="postfix"> meses</span>
+                                <span class="example">Ej: 18</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="independentGrossIncome">Ingreso bruto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="independentGrossIncome" name="independentGrossIncome"
+                                       th:value="${sectionForm.independentGrossIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2500</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="independentNetIncome">Ingreso neto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="independentNetIncome" name="independentNetIncome"
+                                       th:value="${sectionForm.independentNetIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2000</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 6)
+                    return 15;
+                else if (section.id == 23)
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#independentTime').focus();
+                }, writeOnFinishDelay);
+
+                $('#independentNetIncome').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                if (section.id == 6)
+                                    block.showNextSection();
+                                else if (section.id == 23) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            $('#loadingContainer').stopLoading();
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION RENTIER 1 -> ID [ 7, 24 ] -->
+<th:block th:fragment="rentier1">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Br&iacute;ndame los siguientes datos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="rentierRuc">RUC</label>
+                                <input type="text" id="rentierRuc" name="rentierRuc"
+                                       th:value="${sectionForm.rentierRuc}"
+                                       class="input-ruc text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 20600606043</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="rentierBelonging">&iquest;Sobre que tipo de bien
+                                    generas rentas?</label>
+                                <select id="rentierBelonging" name="rentierBelonging"
+                                        th:value="${sectionForm.rentierBelonging}">
+                                    <option value="" hidden="hidden"></option>
+                                    <option th:each="bel : ${@catalogService.getBelongings(#locale)}"
+                                            th:value="${bel.id}"
+                                            th:text="${bel.name}"></option>
+                                </select>
+                                <span class="example">Ej: Dinero</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 7)
+                    return 8;
+                else if (section.id == 24)
+                    return 25;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#rentierRuc').focus();
+                }, writeOnFinishDelay);
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION RENTIER 2 -> ID [ 8, 25 ] -->
+<th:block th:fragment="rentier2">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Cu&eacute;ntame sobre tu experiencia e ingresos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="rentierTime">Tiempo en la actividad</label>
+                                <input type="text" id="rentierTime" name="rentierTime"
+                                       th:value="${sectionForm.rentierTime}"
+                                       class="tidy-input-number text-white" pattern="[0-9]*"/>
+                                <span class="postfix"> meses</span>
+                                <span class="example">Ej: 18</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="rentierGrossIncome">Ingreso bruto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="rentierGrossIncome" name="rentierGrossIncome"
+                                       th:value="${sectionForm.rentierGrossIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2500</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="rentierNetIncome">Ingreso neto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="rentierNetIncome" name="rentierNetIncome"
+                                       th:value="${sectionForm.rentierNetIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2000</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 8)
+                    return 15;
+                else if (section.id == 25)
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#rentierTime').focus();
+                }, writeOnFinishDelay);
+
+                $('#rentierNetIncome').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                if (section.id == 8)
+                                    block.showNextSection();
+                                else if (section.id == 25) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            $('#loadingContainer').stopLoading();
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION SHAREHOLDER 1 -> ID [ 9, 26 ] -->
+<th:block th:fragment="shareholder1">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Br&iacute;ndame los siguientes datos de tu compa&ntilde;&iacute;a...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="shareholderRuc">RUC</label>
+                                <input type="text" id="shareholderRuc" name="shareholderRuc"
+                                       th:value="${sectionForm.shareholderRuc}"
+                                       class="input-ruc text-white" pattern="[0-9]*" tabindex="1"/>
+                                <span class="example">Ej: 20600606043</span>
+                                <span class="example">Encuentra el RUC <a
+                                        href="http://www.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaMovil.jsp"
+                                        target="_blank"
+                                        style="text-decoration: underline;margin:0;" rel="noopener noreferrer">aqu&iacute;</a></span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="shareholderShareholding">Participaci&oacute;n
+                                    accionarial</label>
+                                <input type="text" id="shareholderShareholding" name="shareholderShareholding"
+                                       th:value="${sectionForm.shareholderShareholding}"
+                                       class="tidy-input-number text-white ignore_validation" pattern="[0-9]*" tabindex="2"/>
+                                <span class="postfix"> %</span>
+                                <span class="example">Ej: 50%</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 9)
+                    return 10;
+                else if (section.id == 26)
+                    return 27;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                    var jsonValidator = createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form'));
+                debugger;
+                $('#b7s' + section.id + 'answers form').validateForm(jsonValidator);
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#shareholderRuc').focus();
+                }, writeOnFinishDelay);
+
+                $('#shareholderShareholding').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION SHAREHOLDER 2 -> ID [ 10, 27 ] -->
+<th:block th:fragment="shareholder2">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Cu&eacute;ntame sobre los ingresos de tu compa&ntilde;&iacute;a...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="shareholderResultU12M">Resultado neto de los &uacute;ltimos
+                                    12 meses</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="shareholderResultU12M" name="shareholderResultU12M"
+                                       th:value="${sectionForm.shareholderResultU12M}"
+                                       class="medium-number-input text-white"/>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label">Ingreso neto</label>
+                                <label id="mountPercent" style="margin-top:.5em;opacity: .5;"></label>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var perc = $('#shareholderShareholding').val();
+
+            $('#shareholderResultU12M').on('keyup', function () {
+
+                $('#mountPercent').html('S/. ' + ($(this).val() * perc) / 100);
+
+            });
+
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 10)
+                    return 15;
+                else if (section.id == 27)
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#shareholderResultU12M').focus();
+                }, writeOnFinishDelay);
+
+                $('#shareholderResultU12M').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                if (section.id == 10)
+                                    block.showNextSection();
+                                else if (section.id == 27) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            $('#loadingContainer').stopLoading();
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION PENSIONER 1 -> ID [ 11, 28 ] -->
+<th:block th:fragment="pensioner1">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Br&iacute;ndame los siguientes datos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="pensionerFrom">De quien recibes tus
+                                    pagos</label>
+                                <select id="pensionerFrom" name="pensionerFrom" th:value="${sectionForm.pensionerFrom}">
+                                    <option value="" hidden="hidden"></option>
+                                    <option th:each="pen : ${@catalogService.getPensionPayers(#locale)}"
+                                            th:value="${pen.id}"
+                                            th:text="${pen.name}"></option>
+                                </select>
+                                <span class="example">Ej: AFP</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="pensionerNetIncome">&iquest;Cu&aacute;l es tu ingreso
+                                    neto?</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="pensionerNetIncome" name="pensionerNetIncome"
+                                       th:value="${sectionForm.pensionerNetIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2000</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 11)
+                    return 15;
+                else if (section.id == 28)
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#pensionerFrom').focus();
+                }, writeOnFinishDelay);
+
+                $('#pensionerNetIncome').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        debugger;
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                if(section.id == 11){
+                                    block.showNextSection();
+                                } else if (section.id == 28) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            $('#loadingContainer').stopLoading();
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION HOUSEKEEPER 1 -> ID [ 12, 29 ] -->
+<th:block th:fragment="housekeeper1">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Br&iacute;ndame los siguientes datos de tu empleador...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="housekeeperEmployer">Nombre</label>
+                                <input type="text" id="housekeeperEmployer" name="housekeeperEmployer"
+                                       th:value="${sectionForm.housekeeperEmployer}"
+                                       class="text-white"/>
+                                <span class="example">Ej: Camila D&iacute;az Flores</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="housekeeperEmployerPhone">Tel/Cel</label>
+                                (<input type="text" id="housekeeperEmployerPhoneCode"
+                                        name="housekeeperEmployerPhoneCode"
+                                        style="width: 30px" class="medium-number-input text-white" pattern="[0-9]*"/>)
+                                <input type="text" id="housekeeperEmployerPhone" name="housekeeperEmployerPhone"
+                                       th:value="${sectionForm.housekeeperEmployerPhone}"
+                                       class="medium-number-input text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: (01) 2411750 / 983571444</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 12)
+                    return 13;
+                else if (section.id == 29)
+                    return 30;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#housekeeperEmployer').focus();
+                }, writeOnFinishDelay);
+
+                $('#housekeeperEmployerPhone').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                block.showNextSection();
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+
+                //  Set housekeeperEmployerPhoneCode behavior
+                $('#b7s' + section.id + 'answers #housekeeperEmployerPhoneCode').keyup(function (event) {
+                    if ($(this).val().length == 2) {
+                        $('#b7s' + section.id + 'answers #housekeeperEmployerPhone').focus();
+                    }
+                });
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<!-- SECTION HOUSEKEEPER 2 -> ID [ 13, 30 ] -->
+<th:block th:fragment="housekeeper2">
+    <div class="blockSection" th:attr="data-section-id=${sectionId}">
+        <div class="questionContainer" th:id="'b7s'+${sectionId}+'question'">
+            <p class="question">Cu&eacute;ntame sobre tu experiencia e ingresos...</p>
+        </div>
+        <div class="answerContainer">
+            <div class="answers" th:id="'b7s'+${sectionId}+'answers'" style="display: none;">
+                <div class="inputs">
+                    <form role="form" autocomplete="off">
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="housekeeperTime">Tiempo en el empleo</label>
+                                <input type="text" id="housekeeperTime" name="housekeeperTime"
+                                       th:value="${sectionForm.housekeeperTime}"
+                                       class="tidy-input-number text-white" pattern="[0-9]*"/>
+                                <span class="postfix"> meses</span>
+                                <span class="example">Ej: 18</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <label class="control-label" for="housekeeperNetIncome">Ingreso neto</label>
+                                <span class="prefix">S/. </span>
+                                <input type="text" id="housekeeperNetIncome" name="housekeeperNetIncome"
+                                       th:value="${sectionForm.housekeeperNetIncome}"
+                                       class="small-input-number text-white" pattern="[0-9]*"/>
+                                <span class="example">Ej: 2000</span>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="inputItem">
+                            <div class="form-group">
+                                <a class="human-button" th:id="'b7s'+${sectionId}+'button'">Continuar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            humanFormSection = new HumanFormSection($('.blockSection').last());
+            humanFormSection.whereToGo = function (section) {
+                if (section.id == 13)
+                    return 15;
+                else if (section.id == 30)
+                    return null;
+            };
+            humanFormSection.onDisplay = function (section) {
+
+                // Set the validation
+                var validator = /*[[${sectionForm.validator.toJson(#locale)}]]*/null;
+                $('#b7s' + section.id + 'answers form').validateForm(createFormValidationJson(JSON.parse(validator), $('#b7s' + section.id + 'answers form')));
+
+                // Set the writers
+                $('#b7s' + section.id + 'question .question').write(function () {
+                    $('#b7s' + section.id + 'answers').fadeIn();
+                    $('#housekeeperTime').focus();
+                }, writeOnFinishDelay);
+
+                $('#housekeeperNetIncome').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#b7s' + section.id + 'button').trigger('click');
+                        return false;    //<---- Add this line
+                    }
+                });
+
+                $('#b7s' + section.id + 'button').click(function () {
+                    if ($('#b7s' + section.id + 'answers form').valid()) {
+                        $('#loadingContainer').initLoading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7/__${sectionId}__}]]*/null,
+                            type: 'POST',
+                            form: $('#b7s' + section.id + 'answers form'),
+                            data: $('#b7s' + section.id + 'answers form').serializeObject(),
+                            success: function (data) {
+                                $('#loadingContainer').stopLoading();
+                                if (section.id == 13)
+                                    block.showNextSection();
+                                else if (section.id == 30) {
+                                    defaultAjax({
+                                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/form/7}]]*/null,
+                                        type: 'POST',
+                                        data: {},
+                                        success: function (data) {
+                                            $('#loadingContainer').stopLoading();
+                                            showNextBlock();
+                                        }
+                                    });
+                                }
+                            }
+                            , error: function () {
+                                $('#loadingContainer').stopLoading();
+                            }
+                        });
+                    }
+                    return false;
+                })
+            };
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+
+</body>
+</html>

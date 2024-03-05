@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<!--[if IE 8]>
+<html lang="es" class="ie8">
+<![endif]-->
+<!--[if IE 9]>
+<html lang="es" class="ie9">
+<![endif]-->
+<!--[if !IE]><!-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<!--<![endif]-->
+<head>
+
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+
+    <meta charset="UTF-8"/>
+
+    <meta name="Author" content="SOLVEN S.A.C."/>
+
+    <title layout:title-pattern="$DECORATOR_TITLE | $CONTENT_TITLE">
+        Dashboard
+    </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="description"  th:content="${T(com.affirm.system.configuration.Configuration).META_DESCRIPTION}"/>
+    <meta name="keywords" th:content="${T(com.affirm.system.configuration.Configuration).META_KEYWORDS}"/>
+    <meta name="Resource-type" content="Document"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}"/>
+
+    <style th:inline="text">
+        @font-face {
+            font-family: "Solven Icons";
+            font-style: normal;
+            font-weight: normal;
+            src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")
+        }
+    </style>
+
+    <!--[if lt IE 9]>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/plugins/respond.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/plugins/excanvas.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/plugins/ie8.fix.min.js'}"></script>
+    <![endif]-->
+
+    <!-- Jquery -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/jquery.min.js'}" type="text/javascript"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/css/bootstrap.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/js/bootstrap.min.js'}"></script>
+
+    <!--Moment-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment-with-locales.min.js'}"></script>
+
+    <!-- SweetAlert -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.min.js'}"></script>
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.css'}"/>
+
+
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/font-awesome/css/font-awesome.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/simple-line-icons/simple-line-icons.min.css'}" rel="stylesheet" type="text/css"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/js-cookie/js.cookie.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-slimscroll/jquery.slimscroll.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/blockUI/jquery.blockui.min.js'}" type="text/javascript"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-switch/css/bootstrap-switch.min.css'}" rel="stylesheet" type="text/css"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-switch/js/bootstrap-switch.min.js'}" type="text/javascript"></script>
+
+    <!-- metronic -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/global/scripts/app.min.js'}" type="text/javascript"></script>
+    <!--<link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/global/css/plugins.min.css'}" rel="stylesheet" type="text/css" />-->
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/global/css/components-rounded.min.css'}" rel="stylesheet" id="style_components" type="text/css" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout4/scripts/layout.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout4/scripts/demo.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/global/scripts/quick-sidebar.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/global/scripts/quick-nav.min.js'}" type="text/javascript"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout4/css/layout.min.css'}" rel="stylesheet" type="text/css" />
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout4/css/themes/default.min.css'}" rel="stylesheet" type="text/css" id="style_color" />
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout4/css/custom.min.css'}" rel="stylesheet" type="text/css" />
+    <!-- /metronic -->
+
+    <link th:href="@{/css/metronic_custom.min.css}" rel="stylesheet" type="text/css" />
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <!-- Detect Mobile -->
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+
+    <!--    datatable-->
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/datatables/datatables.min.css'}" rel="stylesheet" type="text/css"/>
+    <script th:src="@{/js/jquery.dataTables.js}"></script>
+    <script th:src="@{/js/dataTables.responsive.js}"></script>
+
+    <!-- Own -->
+    <script th:src="@{/js/util.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/application.css}"/>
+
+    <!-- Select2 -->
+
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/select2.4/css/select2.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/select2.4/js/select2.full.min.js'}"></script>
+
+    <!-- Bootstrap selectpicker -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
+    <!-- / Bootstrap selectpicker -->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Variable globales
+        var system = {
+            contextPath : /*[[ ${#httpServletRequest.getContextPath()} ]]*/,
+            unloadAlert: true
+        };
+
+        window.addEventListener("beforeunload", function (e) {
+            if (system.unloadAlert) {
+                var confirmationMessage = '¿Est&aacute;s seguro que deseas salir de la página?';
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var hideloading = /*[[${hideLoading}]]*/null;
+        var executeHideLoading = false;
+
+        function removeLoading(){
+            if(!executeHideLoading){
+                let result = $("#loading-screen").remove();
+                if(result.length){
+                    executeHideLoading = true;
+                }
+            }
+            if(!executeHideLoading) setTimeout(()=>{
+                removeLoading();
+            },1000);
+        }
+
+        if(hideloading) {
+            removeLoading();
+        }
+
+        $(document).on('ready', function () {
+            var jsBranding = [[${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)}]];
+            customStyleTemplateCssClass(jsBranding);
+
+            function customStyleTemplateCssClass(data){
+                if(data == null) {
+                    $("#loading-screen").hide();
+                    return;
+                }
+                var style = document.createElement('style');
+                style.type = 'text/css';
+                style.innerHTML = ``;
+                if(data.faviconUrl){
+                    if($("head > link:nth-child(9)")) $("head > link:nth-child(9)").remove()
+                    $('head').append('<link href="'+data.faviconUrl+'" rel="icon"/>');
+                }
+                if(data.headerBackgroundColor) {
+                    style.innerHTML += `.page-header.navbar, .page-header.navbar .top-menu .navbar-nav > li.dropdown-dark .dropdown-menu {background: ${data.headerBackgroundColor} !important;} \n`;
+                    style.innerHTML += `.page-header.navbar .top-menu .navbar-nav > li.dropdown-dark .dropdown-menu::after { border-bottom-color : ${data.headerBackgroundColor} !important;} \n`;
+                }
+                if(data.headerTextColor) style.innerHTML += `.page-header.navbar .top-menu .navbar-nav > li.dropdown-language > .dropdown-toggle > .langname, .page-header.navbar .top-menu .navbar-nav > li.dropdown-user > .dropdown-toggle > .username, .page-header.navbar .top-menu .navbar-nav > li.dropdown-user > .dropdown-toggle > i, #countdown, .icon-hourglass, .page-header.navbar .top-menu .navbar-nav > li.dropdown-dark .dropdown-menu .dropdown-menu-list > li a, .page-header.navbar .top-menu .navbar-nav > li.dropdown-dark .dropdown-menu.dropdown-menu-default > li a, .menu-toggler {color: ${data.headerTextColor} !important;} \n`;
+                if(data.menuTitleTextColor) style.innerHTML += `h3.uppercase { color: ${data.menuTitleTextColor} !important;} \n`
+                if(data.menuActiveTextColor) {
+                    style.innerHTML += `.page-sidebar .page-sidebar-menu > li.active > a, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active > a { border-left: 3px solid ${data.menuActiveTextColor} !important;} \n`;
+                    style.innerHTML += `.page-sidebar .page-sidebar-menu > li.active.open > a, .page-sidebar .page-sidebar-menu > li.active > a, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active.open > a, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active > a, .page-sidebar .page-sidebar-menu > li.active.open > a > i, .page-sidebar .page-sidebar-menu > li.active > a > i, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active.open > a > i, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active > a > i { color: ${data.menuActiveTextColor} !important;} \n}`
+                    style.innerHTML += `.page-sidebar .page-sidebar-menu > li > a, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li > a, .page-sidebar .page-sidebar-menu > li.active > a > i, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li > a > i { color: ${data.menuActiveTextColor} !important;} \n`;
+                }
+                if(data.menuHoverBackgroundColor){
+                    style.innerHTML += `a.nav-link:hover {background-color: ${data.menuHoverBackgroundColor} !important;} \n`;
+                    if(data.menuActiveTextColor) style.innerHTML += `a:nav-link:hover, .page-sidebar .page-sidebar-menu > li > a:hover, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li > a:hover {border-left: 3px solid ${data.menuActiveTextColor} !important;} \n`;
+                    style.innerHTML += `.page-sidebar .page-sidebar-menu > li:hover > a > i, .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li:hover > a > i { color: ${data.menuActiveTextColor || '#5b9bd1'} !important ; } \n`;
+                }
+                if(data.menuBackgroundColor){
+                    style.innerHTML += `.page-sidebar-menu { background-color : ${data.menuBackgroundColor} !important; } \n`;
+                }
+                if(data.generalBackgroundColor){
+                    style.innerHTML += `body { background : ${data.generalBackgroundColor} !important;} \n`
+                }
+                if(data.cardBackgroundColor){
+                    style.innerHTML += `.portlet { background-color: ${data.cardBackgroundColor} !important;} \n`;
+                }
+                if(data.cardBorderColor){
+                    style.innerHTML += `.portlet.light.bordered { border: 1px solid ${data.cardBorderColor} !important;} \n`;
+                }
+                if(data.cardTitleColor){
+                    style.innerHTML += `.font-green, .font-green-steel { color: ${data.cardTitleColor} !important;} \n`;
+                }
+                if(data.cardTableHeaderBackgroundColor){
+                    style.innerHTML += `#tableResults thead, table.table > thead { background: ${data.cardTableHeaderBackgroundColor} !important;} \n`;
+                }
+                if(data.cardTableHeaderTextColor){
+                    style.innerHTML += `table.table > thead { color: ${data.cardTableHeaderTextColor} !important;} \n`;
+                }
+                if(data.cardTableBodyBackgroundColor){
+                    style.innerHTML += `table-striped > tbody > tr { background-color: ${data.cardTableBodyBackgroundColor} !important;} \n`;
+                }
+                if(data.cardTableBodyBackgroundColor){
+                    style.innerHTML += `table.dataTable.order-column tbody tr > .sorting_1, table.dataTable.order-column tbody tr > .sorting_2, table.dataTable.order-column tbody tr > .sorting_3, table.dataTable.display tbody tr > .sorting_1, table.dataTable.display tbody tr > .sorting_2, table.dataTable.display tbody tr > .sorting_3, .table-striped>tbody>tr:nth-child(odd)>td, .table-striped>tbody>tr:nth-child(odd)>th { background-color: ${data.cardTableBodyBackgroundColor} !important;} \n`;
+                }
+                if(data.cardTableBodyHoverBackgroundColor){
+                    style.innerHTML += `.table-hover tbody tr:hover td, .table-hover tbody tr:hover th { background-color: ${data.cardTableBodyHoverBackgroundColor} !important;} \n`;
+                }
+                if(data.cardTableBodyTextColor){
+                    style.innerHTML += `.table-striped > tbody > tr > td {color : ${data.cardTableBodyTextColor} !important } \n`;
+                }
+                if(data.cardTableBodyLinkColor){
+                    style.innerHTML += `.table-striped > tbody > tr > td > a {color : ${data.cardTableBodyLinkColor} !important } \n`;
+                }
+                if(data.cardTablePaginatorTextColor){
+                    style.innerHTML += `#tableResults_paginate > a, #tableResults_paginate > a,.dataTables_wrapper .dataTables_paginate .paginate_button  {color : ${data.cardTablePaginatorTextColor} !important } \n`;
+                }
+                if(data.cardFilterLabelTextColor){
+                    style.innerHTML += `.control-label {color : ${data.cardFilterLabelTextColor} !important } \n`;
+                }
+                if(data.cardFilterInputTextColor){
+                    style.innerHTML += `.form-group > input, .form-group > select, select, input {color : ${data.cardFilterInputTextColor} !important } \n`;
+                }
+                if(data.cardFilterInputBackgroundColor){
+                    style.innerHTML += `.form-group > input, .form-group > select, select, input {background-color : ${data.cardFilterInputBackgroundColor} !important } \n`;
+                }
+                if(data.cardFilterInputBorderColor){
+                    style.innerHTML += `.form-group > input, .form-group > select, input, select, .bootstrap-select > button.btn-default {border-color : ${data.cardFilterInputBorderColor} !important } \n`;
+                }
+                if(data.cardFilterInputFocusBorderColor){
+                    style.innerHTML += `.form-group > input:focus, .form-group > select:focus, select:focus, input:focus, .bootstrap-select > button.btn-default:focus {border-color : ${data.cardFilterInputFocusBorderColor} !important }
+                    .bootstrap-select .dropdown-toggle:focus{
+                        outline: none !important;
+                    }
+                    \n`;
+                }
+                if(data.cardFilterButtonBackgroundColor){
+                    style.innerHTML += `#btnGenerateReport3, .filter-btn, a#cancel-filter, a#apply-filter, .tablefilter-action-button  {background-color: ${data.cardFilterButtonBackgroundColor} !important; border-color: ${data.cardFilterButtonBackgroundColor} !important;} \n`;
+                    style.innerHTML += `.download-btn{background-color: white; border-color: ${data.cardFilterButtonBackgroundColor} !important; color: ${data.cardFilterButtonBackgroundColor} !important;} \n`;
+                    style.innerHTML += `.process-loading-container .loading-content .sk-circle .sk-child::before { background-color: ${data.cardFilterButtonBackgroundColor} !important} \n`;
+                }
+                if(data.cardFilterButtonTextColor){
+                    style.innerHTML += `#btnGenerateReport3, .filter-btn, a#cancel-filter, a#apply-filter, .tablefilter-action-button  {color: ${data.cardFilterButtonTextColor} !important;}
+                     .sk-fading-circle .sk-circle.sk-circle2 {border-top-color: ${data.cardFilterButtonTextColor} !important; border-left-color: ${data.cardFilterButtonTextColor} !important;}\n`;
+                }
+                if(data.cardTableBorderColor){
+                    style.innerHTML += `table {border-color: ${data.cardTableBorderColor} !important;} \n`;
+                }
+                if(data.selectLinkArrow){
+                    style.innerHTML += `select{
+                            -moz-appearance:none;
+                            -webkit-appearance:none;
+                            appearance:none;
+                          background: transparent;
+                          background-image: url(${data.selectLinkArrow}) !important;
+                          background-repeat: no-repeat;
+                          background-position-x: 95%;
+                          background-position-y: 50%;
+                          border: 1px solid #dfdfdf;
+                          border-radius: 2px;
+                          margin-right: 2rem;
+                          padding: 0px 20px 0px 5px !important;
+                          background-size: 12px;
+                           width:100%;
+                        overflow:hidden;
+                        white-space:nowrap;
+                        text-overflow:ellipsis;
+                    }
+                    .bootstrap-select .bs-caret > span.caret {
+                            -moz-appearance: none;
+                            -webkit-appearance: none;
+                            appearance: none;
+                            background-image: url(${data.selectLinkArrow}) !important;
+                            background-repeat: no-repeat;
+                            background-position-x: 50%;
+                            background-position-y: 50%;
+                            border: 0px solid black !important;
+                            padding: 0px 20px 0px 5px !important;
+                            background-size: 12px;
+                            height: 20px;
+                            position: absolute;
+                            top: 30% !important;
+                            right: 0px !important;
+                    }
+                    \n`;
+                }
+                if(data.headerBackgroundHoverColor){
+                    style.innerHTML += `ul.dropdown-menu.dropdown-menu-default > li > a:hover, ul.dropdown-menu > li:hover, #dropdown-avatar:hover, .page-header.navbar .top-menu .navbar-nav > li.dropdown.open .dropdown-toggle {background-color : ${data.headerBackgroundHoverColor} !important;} \n`;
+                }
+                if(data.headerBackgroundTextHoverColor){
+                    style.innerHTML += `#dropdown-avatar:hover,.page-header.navbar .top-menu .navbar-nav > li.dropdown.open .dropdown-toggle {color : ${data.headerBackgroundTextHoverColor} !important;} \n`;
+                    style.innerHTML += `ul.dropdown-menu > li:hover, ul.dropdown-menu > li > a:hover, {color : ${data.headerBackgroundTextHoverColor} !important;} \n`;
+                }
+                if(data.headerLogoImg){
+                    style.innerHTML += `.extranet-logo{display : none !important;} \n`;
+                    $('.custom-logo-img-header').show();
+                    $('.custom-logo-img-header').attr("src",data.headerLogoImg);
+                }
+                if(data.cardTablePaginatorActiveBackground){
+                    style.innerHTML += `.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{ background: ${data.cardTablePaginatorActiveBackground} !important;} \n`;
+                }
+                if(data.cardTablePaginatorBackgroundHover){
+                    style.innerHTML += `.dataTables_wrapper .dataTables_paginate .paginate_button:hover{ background: ${data.cardTablePaginatorBackgroundHover} !important; } \n`;
+                }
+                if(data.cardTablePaginatorTextHoverColor){
+                    style.innerHTML += `.dataTables_wrapper .dataTables_paginate .paginate_button:hover{ color: ${data.cardTablePaginatorTextHoverColor}  !important;}`;
+                }
+                if(data.cardTablePaginatorBackground){
+                    style.innerHTML += `.dataTables_wrapper .dataTables_paginate .paginate_button, .dataTables_wrapper .dataTables_paginate .paginate_button:hover{ background: ${data.cardTablePaginatorBackground} !important; } \n`;
+                }
+                if(data.backgroundColorButtonCancelModal){
+                    style.innerHTML += `#cancelButtonSaveButton, #closeUpdateRolesModal, #closeCreditObservationReasonButton { background-color: ${data.backgroundColorButtonCancelModal} !important; border-color: ${data.backgroundColorButtonCancelModal} !important;} \n`;
+                }
+                if(data.textColorButtonCancelModal){
+                    style.innerHTML += `#cancelButtonSaveButton, #closeUpdateRolesModal, #closeCreditObservationReasonButton { color: ${data.textColorButtonCancelModal} !important;} \n`;
+                }
+                if(data.backgroundColorButtonAcceptModal){
+                    style.innerHTML += `#createUserSaveButton, #confirmUpdateRolesModal, #creditObservationReasonButton, #registerCreditDisbursementModalButton, #registerGeneratedCreditRejectionButton  { background-color: ${data.backgroundColorButtonAcceptModal} !important; border-color: ${data.backgroundColorButtonAcceptModal} !important;} \n`;
+                }
+                if(data.textColorButtonAcceptModal){
+                    style.innerHTML += `#createUserSaveButton, #confirmUpdateRolesModal, #creditObservationReasonButton, #registerCreditDisbursementModalButton, #registerGeneratedCreditRejectionButton { color: ${data.textColorButtonAcceptModal} !important;} \n`;
+                }
+                if(data.backgroundColorButtonDropdown){
+                    style.innerHTML += `.btn-group > a.btn{ background-color: ${data.backgroundColorButtonDropdown} !important; border-color: ${data.backgroundColorButtonDropdown} !important;}  \n`;
+                }
+                if(data.textColorButtonDropdown){
+                    style.innerHTML += `.btn-group > a.btn{ color: ${data.textColorButtonDropdown} !important;}  \n`;
+                }
+                if(data.backgroundColorButtonCloseModal){
+                    style.innerHTML += `.modal .modal-dialog .modal-content .modal-top .corner-close::after, .title-modal::before { background: ${data.backgroundColorButtonCloseModal} !important; } \n .modal-content .corner-close{ background: ${data.backgroundColorButtonCloseModal} !important;}\n`;
+                }
+                if(data.textColorButtonCloseModal){
+                    style.innerHTML += `.modal .modal-dialog .modal-content .modal-top .corner-close .icon-close::before { color: ${data.textColorButtonCloseModal} !important;} \n`;
+                }
+                if(data.backgroundColorButtonTableFirstAction){
+                    style.innerHTML += `.th-actions-row button:first-child {background-color: ${data.backgroundColorButtonTableFirstAction} !important;border-color: ${data.backgroundColorButtonTableFirstAction} !important;}\n`;
+                }
+                if(data.textColorButtonTableFirstAction){
+                    style.innerHTML += `.th-actions-row button:first-child {color: ${data.textColorButtonTableFirstAction} !important;}\n`;
+                }
+                if(data.backgroundColorButtonTableSecondAction){
+                    style.innerHTML += `.th-actions-row button:nth-child(2n) {background-color: ${data.backgroundColorButtonTableSecondAction} !important;border-color: ${data.backgroundColorButtonTableSecondAction} !important;}\n`;
+                }
+                if(data.textColorButtonTableSecondAction){
+                    style.innerHTML += `.th-actions-row button:nth-child(2n) {color: ${data.textColorButtonTableSecondAction} !important;}\n`;
+                }
+                if(data.menuTitle) $(".heading > h3.uppercase").text(data.menuTitle);
+                if(data.alertTextColor){
+                    style.innerHTML += `.sweet-alert h2, .sweet-alert p {color: ${data.alertTextColor} !important;}\n`;
+                }
+                if(data.alertButtonBackgroundColor){
+                    style.innerHTML += `.sweet-alert button{background-color: ${data.alertButtonBackgroundColor} !important;}\n`;
+                }
+                if(data.alertButtonTextColor){
+                    style.innerHTML += `.sweet-alert button {color: ${data.alertButtonTextColor} !important;}\n`;
+                }
+                document.getElementsByTagName('head')[0].appendChild(style);
+                setTimeout(() => {
+                    $("#loading-screen").css("display","none");
+                },1000)
+            }
+            setTimeout(() => {
+                    $("#loading-screen").css("display","none");
+                },2000)
+        });
+
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var defaultMin = /*[[ ${@configuration.getExtranetTimeoutMinutes()} ]]*/
+        var endTime;
+        function countdownTimer( elementName, minutes)
+        {
+            var element, hours, mins, msLeft, time, timeLeft, dateDefault;
+
+            function twoDigits( n )
+            {
+                return (n <= 9 ? "0" + n : n);
+            }
+
+            function updateTimer()
+            {
+                msLeft = endTime - (+new Date);
+
+                if ( msLeft <= 0 ) {
+                    system.unloadAlert = false;
+                    location.reload();
+                } else {
+                    time = new Date( msLeft );
+                    hours = time.getUTCHours();
+                    mins = time.getUTCMinutes();
+
+                    if (hours == 0 && mins == 0 && time.getUTCSeconds() == 30){
+                        showModalSession();
+                    }
+
+                    element.innerHTML = (hours ? hours + ':' + twoDigits( mins ) : mins) + ':' + twoDigits( time.getUTCSeconds() );
+                    timeLeft = setTimeout( updateTimer, time.getUTCMilliseconds() + 500 );
+                }
+             }
+
+            element = document.getElementById( elementName );
+
+            endTime = (+new Date) + 1000 * (60*minutes) + 500;
+
+            updateTimer();
+
+        };
+
+
+        function resetTimer() {
+            endTime = (+new Date) + 1000 * (60*defaultMin) + 500;
+        }
+
+        function showModalSession() {
+
+            swal({
+                title: '',
+                text: "Tu sesi&oacute;n finalizar&aacute; en <div id='countdownModal'></div> <br> &iquest;Deseas extenderla?",
+                html: true,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                closeOnConfirm: true // change this for close when click Si
+            },
+            function(){
+
+                var baseUrl = /*[[ @{/client/refreshSession} ]]*/
+
+                defaultAjax({
+                    url: baseUrl,
+                    type: 'POST',
+                    success: function (data) {
+                        resetTimer();
+                    }
+                });
+
+
+
+
+
+
+            });
+        }
+
+
+
+
+        $(document).on('ready', function(){
+
+            $('.selectCompany').on('click', function(event){
+                event.preventDefault();
+
+                var employerId = $(this).data('id');
+
+                defaultAjax({
+                    url: /*[[ @{/active} ]]*/null,
+                    type: 'POST',
+                    data: {
+                        employerId: employerId
+                    },
+                    success: function (data) {
+                        window.location.reload();
+                    }
+                });
+
+            });
+
+
+            if ($('#countdown').length > 0 ) {
+                if($('#countdown').data('extranet-type') != null && $('#countdown').data('extranet-type') == 'entity'){
+                    defaultMin = /*[[ ${@configuration.getEntityExtranetTimeoutMinutes()} ]]*/;
+                }else{
+                    defaultMin = /*[[ ${@configuration.getExtranetTimeoutMinutes()} ]]*/;
+                }
+                countdownTimer( "countdown", defaultMin);
+            }
+
+        });
+
+        /*]]>*/
+    </script>
+
+    <style>
+
+        #tableResults_processing {
+            margin-left: 10px;
+        }
+
+        #tableResults_filter > label{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .control-label{
+            font-weight: bold;
+        }
+
+        #tableResults_filter > label > input{
+            margin-left: 0px !important;
+            height: 40px !important;
+            padding: 0px 20px !important;
+            border-radius: 6px !important;
+            border: 1px solid #c2cad8;
+        }
+        #tableResults_length > label > select{
+            margin-left: 2rem;
+        }
+        .custom-logo-img-header{
+            max-height: 35px;
+            margin-top: 20px;
+            width: auto;
+        }
+
+        .input-sm, .input-group-sm > .form-control, .input-group-sm > .input-group-addon, .input-group-sm > .input-group-btn > .btn {
+            height: 40px !important;
+            padding: 0px 5px;
+            border-radius: 6px !important;
+        }
+
+        #btnGenerateReport3, .filter-btn, .download-btn{
+            border-radius: 8px !important;
+        }
+
+        .filter-btn, .download-btn{
+            padding: 1rem 2rem;
+        }
+
+        tr > td{
+            border-left: 0px solid white !important;
+            border-right: 0px solid white !important;
+        }
+    </style>
+
+</head>
+<body class="page-container-bg-solid page-header-fixed " th:classappend="${sidebarClosed != null and sidebarClosed ? 'page-sidebar-closed' : ''}">
+
+<div id="loading-screen">
+    <div class="process-loading-container circle-progress-question" style="position: initial !important;">
+        <div class="loading-content">
+            <div class="sk-circle">
+                <div class="sk-circle1 sk-child"></div>
+                <div class="sk-circle2 sk-child"></div>
+                <div class="sk-circle3 sk-child"></div>
+                <div class="sk-circle4 sk-child"></div>
+                <div class="sk-circle5 sk-child"></div>
+                <div class="sk-circle6 sk-child"></div>
+                <div class="sk-circle7 sk-child"></div>
+                <div class="sk-circle8 sk-child"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- header -->
+<th:block layout:fragment="header"/>
+<!-- /header -->
+
+<!-- content -->
+<div class="page-container">
+    <th:block layout:fragment="content"/>
+</div>
+<!-- /content -->
+
+<script>
+    if (encodeURI(location.hash)) {
+        var tabid = encodeURI(location.hash.substr(1));
+        $('a[href="#' + tabid + '"]').parents('.tab-pane:hidden').each(function() {
+            var tabid = $(this).attr("id");
+            $('a[href="#' + tabid + '"]').click();
+        });
+        $('a[href="#' + tabid + '"]').click();
+    }
+
+    $(function () {
+        $("a,button").click(function () {
+            system.unloadAlert = false;
+        });
+    });
+
+</script>
+</body>
+</html>

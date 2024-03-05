@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--Google maps-->
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q174">
+        <div class="form q174">
+            <p class="question-option-title">¿Dónde deseas recibir el desembolso?</p>
+            <p class="question-subtitle">Recuerda que debes ser el titular de la misma, caso contrario Alfin Banco no podrá realizar la transferencia</p>
+
+            <form id="questionForm" th:object="${form}" autocomplete="off" style="display: flex; justify-content: center">
+
+                <div class="firstOption">
+                    <button type="button" class="button  rounded-button-fill-question option-btn-question" th:onclick="'selectQuestionOption(1)'">Cuenta de ahorro <br/> nueva de Alfin Banco</button>
+<!--                    <p style="text-align: center;">
+                        Necesitas contar con tu DNI <br/>
+                        y cuenta del banco a mano. <br/>
+                        Te tomará entre 5-6 minutos.
+                    </p>-->
+                </div>
+
+                <div class="secondOption">
+                    <button type="button" class="button rounded-button-question option-btn-question" th:onclick="'selectQuestionOption(2)'">Cuenta propia <br/> en otro banco</button>
+<!--                    <p style="text-align: center;">
+                        Te tomará 1-2 minutos <br/>
+                        en línea y finalizar el <br/>
+                        trámite en la agencia.
+                    </p>-->
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function selectQuestionOption(option){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    disbursementOption: option
+                }
+            }, "");
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</html>

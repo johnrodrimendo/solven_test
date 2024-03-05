@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="chooseCredit">
+            <p th:text="#{form.sending.type}"></p>
+            <form id="questionForm" th:object="${form}" class="q107" autocomplete="off"><!--MISMO ESTILO DE PREGUNTA-->
+                <!--FORMATO DIGITAL-->
+                <div class="field inline">
+                    <label class="input-radio">
+                        <input type="radio" class="digitalFormat" value="false" name="bankAccountStatement"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <figure>
+                                    <img src="https://s3.amazonaws.com/solven-public/img/icons/correo.svg"
+                                         alt="Formato Digital"/>
+                                </figure>
+                                <h5>Correo Electrónico</h5>
+                                <div class="radio"></div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <!--FORMATO FISICO-->
+                <div class="field inline">
+                    <label class="input-radio">
+                        <input type="radio" class="physicalFormat" value="true" name="bankAccountStatement"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <figure>
+                                    <img src="https://s3.amazonaws.com/solven-public/img/icons/fisico.svg"
+                                         alt="Formato Físico"/>
+                                </figure>
+                                <h5>Envío Físico</h5>
+                                <div class="radio"></div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </form>
+            <hr class="divisor-bottom"/>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=bankAccountStatement]:radio').change(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {bankAccountStatement: $(this).val()}
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+</html>

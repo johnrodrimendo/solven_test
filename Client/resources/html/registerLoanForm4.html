@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationWizardTemplate" th:with="step = 4">
+<head>
+
+</head>
+<body>
+
+<th:block layout:fragment="head">
+    <!--Range slider-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/js/ion.rangeSlider.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.skinNice.css'}"/>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!-- LInkedIn -->
+    <script type="text/javascript" src="https://platform.linkedin.com/in.js">
+        // @formatter:off
+        api_key:75zux0mbxk43qc
+        authorize:true
+        scope:r_basicprofile r_emailaddress
+        // @formatter:on
+    </script>
+
+    <!--Own-->
+    <script th:src="@{/js/facebookIntegration.js}"></script>
+    <script th:inline="javascript" charset="ISO-8859-1">
+        /*<![CDATA[*/
+        var errorMessage = /*[[${errorMessage}]]*/null;
+        var jsonUpdModalFormValidation;
+        var jsonProductTraditional = {
+            maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).TRADITIONAL).getMaxAmount()} ]]*/,
+            minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).TRADITIONAL).getMinAmount()} ]]*/
+        };
+        var jsonProductShortTerms = {
+            maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMaxAmount()} ]]*/,
+            minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMinAmount()} ]]*/
+        };
+        var facebookPersonId = /*[[ ${loanApplicationStep4Form.facebookId} ]]*/;
+        var linkedinPersonId = /*[[ ${loanApplicationStep4Form.linkedinId} ]]*/;
+
+        $(document).ready(function () {
+
+            if (errorMessage != null) {
+                $('#errorModal').find('p').html(errorMessage);
+                $('#errorModal').modal('show');
+            }
+
+//            $('#continueButton').click(function () {
+//                document.getElementById('frmRegister').submit();
+//            });
+
+            $('#facebookSwitch').change(function () {
+                if ($(this).is(":checked")) {
+                    callFacebook();
+                }
+            });
+            $('#linkedinSwitch').change(function () {
+                if ($(this).is(":checked")) {
+                    launchLinkedinAuth();
+                }
+            });
+
+            if (facebookPersonId != null) {
+                facebookSuccess();
+            }
+            if (linkedinPersonId != null) {
+                linkedinSuccess();
+            }
+
+
+            $('#continueButton').click(function (e) {
+                e.preventDefault();
+                if ($('#frmRegister').valid()) {
+                    defaultAjax({
+                        url: /*[[@{/loanapplication/socialNetworksInformation/__${loanAplicationToken}__}]]*/null,
+                        type: 'POST',
+                        form: $('#frmRegister'),
+                        data: $('#frmRegister').serializeObject()
+                    });
+                }
+            });
+        });
+
+        // FACEBOOK
+        function callFacebook() {
+            facebookLoading();
+            launchFacebookLogin(onFacebookResponse, facebookError);
+        }
+
+        function onFacebookResponse(response) {
+            // Create a form for the result
+            var form = document.createElement("form");
+
+            // Put the result in a form and send it to the server
+            addFacebookFieldsToForm(form, response);
+            $.ajax({
+                url: /*[[@{/loanapplication/socialNetworksInformation/network/__${loanAplicationToken}__}]]*/null,
+                type: 'POST',
+                data: $(form).serialize(),
+                success: function (result) {
+                    facebookSuccess();
+                },
+                error: function (result) {
+                    console.log('Error guardando facebook: ' + JSON.stringify(result))
+                    facebookError();
+                }
+            });
+        }
+
+        function facebookLoading() {
+            $('#facebookSwitch').prop('checked', false);
+            setTimeout(function () {
+                $('#facebookSwitch').prop('disabled', true);
+            }, 0);
+            $('#facebookLoading').show();
+            $('#facebookError').hide();
+        }
+
+        function facebookError() {
+            $('#facebookSwitch').prop('checked', false);
+            setTimeout(function () {
+                $('#facebookSwitch').prop('disabled', false);
+            }, 0);
+            $('#facebookLoading').hide();
+            $('#facebookError').show();
+        }
+
+        function facebookSuccess() {
+            $('#facebookSwitch').prop('checked', true);
+            setTimeout(function () {
+                $('#facebookSwitch').prop('disabled', true);
+            }, 0);
+            $('#facebookLoading').hide();
+            $('#facebookError').hide();
+        }
+
+        // LINKEDIN
+        function launchLinkedinAuth() {
+            linkedinLoading();
+            IN.User.authorize(function () {
+                getProfileData();
+            });
+        }
+
+        function connectLinkedIN() {
+            console.log('conexcatnto linkedin');
+            IN.Event.on(IN, "auth", getProfileData);
+        }
+
+        // Use the API call wrapper to request the member's basic profile data
+        function getProfileData() {
+            console.log('Obteniendo user data linkedin');
+            IN.API.Raw("/people/~:(id,first-name,last-name,maiden-name,formatted-name,phonetic-first-name,"
+                    + "phonetic-last-name,formatted-phonetic-name,headline,location,industry,current-share,"
+                    + "num-connections,,num-connections-capped,summary,specialties,positions,picture-url,picture-urls,"
+                    + "site-standard-profile-request,api-standard-profile-request,public-profile-url,email-address)").result(onSuccess).error(linkedinError);
+        }
+
+        // Handle the successful return from the API call
+        function onSuccess(data) {
+            console.log("Success: " + JSON.stringify(data));
+
+            // Create a form for the result
+            var form = document.createElement("form");
+
+            // Put the result in a form and send it to the server
+            addLinkedinResponseToForm(form, data);
+            $.ajax({
+                url: /*[[@{/loanapplication/socialNetworksInformation/network/__${loanAplicationToken}__}]]*/null,
+                type: 'POST',
+                data: $(form).serialize(),
+                success: function (result) {
+                    linkedinSuccess();
+                },
+                error: function (result) {
+                    console.log('Error guardando linkedin: ' + JSON.stringify(result))
+                    linkedinError();
+                }
+            });
+        }
+
+        function addLinkedinResponseToForm(form, linkedinResponse) {
+            if (linkedinResponse != undefined) {
+                addHiddenToForm(form, 'linkedinId', linkedinResponse.id);
+                addHiddenToForm(form, 'linkedinFirstName', linkedinResponse.firstName);
+                addHiddenToForm(form, 'linkedinLastName', linkedinResponse.lastName);
+                addHiddenToForm(form, 'linkedinMaidenName', linkedinResponse.maidenName);
+                addHiddenToForm(form, 'linkedinFormattedName', linkedinResponse.formattedName);
+                addHiddenToForm(form, 'linkedinPhoneticFirstName', linkedinResponse.phoneticFirstName);
+                addHiddenToForm(form, 'linkedinPhoneticLastName', linkedinResponse.phoneticLastName);
+                addHiddenToForm(form, 'linkedinFormattedPhoneticName', linkedinResponse.formattedPhoneticName);
+                addHiddenToForm(form, 'linkedinHeadline', linkedinResponse.headline);
+                addHiddenToForm(form, 'linkedinLocation', linkedinResponse.location);
+                addHiddenToForm(form, 'linkedinIndustry', linkedinResponse.industry);
+                addHiddenToForm(form, 'linkedinNumConnections', linkedinResponse.numConnections);
+                addHiddenToForm(form, 'linkedinNumConnectionsCapped', linkedinResponse.numConnectionsCapped);
+                addHiddenToForm(form, 'linkedinSummary', linkedinResponse.summary);
+                addHiddenToForm(form, 'linkedinSpecialties', linkedinResponse.specialties);
+                addHiddenToForm(form, 'linkedinPositions', linkedinResponse.positions);
+                addHiddenToForm(form, 'linkedinPictureUrl', linkedinResponse.pictureUrl);
+                addHiddenToForm(form, 'linkedinPictureUrlsOriginal', linkedinResponse.pictureUrls);
+                addHiddenToForm(form, 'linkedinPublicProfileUrl', linkedinResponse.publicProfileUrl);
+                addHiddenToForm(form, 'linkedinEmailAddress', linkedinResponse.emailAddress);
+            }
+        }
+
+        function linkedinLoading() {
+            $('#linkedinSwitch').prop('checked', false);
+            setTimeout(function () {
+                $('#linkedinSwitch').prop('disabled', true);
+            }, 0);
+            $('#linkedinLoading').show();
+            $('#linkedinError').hide();
+        }
+
+        function linkedinError() {
+            $('#linkedinSwitch').prop('checked', false);
+            setTimeout(function () {
+                $('#linkedinSwitch').prop('disabled', false);
+            }, 0);
+            $('#linkedinLoading').hide();
+            $('#linkedinError').show();
+        }
+
+        function linkedinSuccess() {
+            $('#linkedinSwitch').prop('checked', true);
+            setTimeout(function () {
+                $('#linkedinSwitch').prop('disabled', true);
+            }, 0);
+            $('#linkedinLoading').hide();
+            $('#linkedinError').hide();
+        }
+
+        function preventBack() {
+            window.history.forward();
+        }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () {
+            null
+        };
+
+        /*]]>*/
+    </script>
+
+</th:block>
+
+<th:block layout:fragment="contentTab4">
+    <!--/* <nav class="navbar navbar-default navbar-fixed-top" style="padding-right: 20px" onload="loadLoanApplication();">-->
+    <!--<div class="navbar-right  navbar-text container-fluid"-->
+    <!--th:with="initialForm=${@loanApplicationDAO.getUserLoanInitialForm(@loanApplicationService.getLoanApplicationIdFromLoanAplicationToken(loanAplicationToken))}">-->
+    <!--<div>-->
+    <!--<label>Monto: </label>-->
+    <!--<span id="navBarLoanAmmount" th:text="${initialForm.loanApplicationAmmount}"></span>-->
+    <!--</div>-->
+    <!--<div style="display: inline;">-->
+    <!--<label>Plazos: </label>-->
+    <!--<span id="navBarLoanInstallments"-->
+    <!--th:text="${initialForm.loanApplicationInstallemnts != null?initialForm.loanApplicationInstallemnts:'Adelanto'}"></span>-->
+    <!--</div>-->
+    <!--<span style="visibility: hidden" id="navBarShorTermDays"-->
+    <!--th:text="${initialForm.loanApplicationShorTermDays}"></span>-->
+    <!--<button class="btn btn-info btn-sm" style="display: inline;" onclick="openUpdateoanApplicationModal()">-->
+    <!--Editar-->
+    <!--</button>-->
+    <!--</div>-->
+    <!--</nav> */-->
+
+    <div id="registerLoanForm4">
+
+        <form role="form" action="#" th:object="${loanApplicationStep4Form}" id="frmRegister" autocomplete="off"
+              class="containerbuttonssocial">
+            <div class="box-inner panel">
+                <p th:text="#{registerLoanForm4.tittle}"></p>
+
+                <div class="row">
+                    <div id="aff-row-container-social">
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <div class="square-socials">
+                                <div class="social-icon-wrap">
+                                    <i class="icon facebook-icon" aria-hidden="true"></i>
+                                </div>
+                                <div class="switch-button-wrap">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" class="onoffswitch-checkbox" id="facebookSwitch"/>
+                                        <label class="onoffswitch-label" for="facebookSwitch">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="loading-text" id="facebookLoading" style="display: none; text-align: center">Cargando ...</div>
+                                <div class="error-text" id="facebookError" style="display: none; text-align: center">Hubo un error</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <div class="square-socials">
+                                <div class="social-icon-wrap">
+                                    <i class="icon linkedin-icon" aria-hidden="true"></i>
+                                </div>
+                                <div class="switch-button-wrap">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" class="onoffswitch-checkbox" id="linkedinSwitch"/>
+                                        <label class="onoffswitch-label" for="linkedinSwitch">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="loading-text" id="linkedinLoading" style="display: none; text-align: center">Cargando ...</div>
+                                <div class="error-text" id="linkedinError" style="display: none; text-align: center">Hubo un error</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="continueButton" type="submit" class="button red-button"><span>Continuar</span></button>
+            </div>
+        </form>
+    </div>
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!-- Burger Menu -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/hamburger/hamburgers.min.css'}"/>
+    <!-- / Burger Menu -->
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.js'}"></script>
+    <!-- / Owl. Carousel -->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var loanApplicationToken;
+
+        function letMeKnow() {
+            var baseUrl = /*[[@{/early/6/}]]*/;
+            if (!isEmail($('#earlyEmail').val())) {
+                $('#landingResponse').css({'display' : 'inline-block'});
+                $('#landingResponse').html('Ingresa un email v&aacute;lido.');
+            } else {
+                $('#landingResponse').html('').hide();
+                $('#landingSubmit').loading();
+                defaultAjax({
+                    url: baseUrl,
+                    type: 'POST',
+                    data: $('#frmEarlyAccess').serializeObject(),
+                    success: function (data) {
+                        $('#landingSubmit').unloading();
+                        $('.hideAjax').css({'display' : 'none'});
+                        $('#earlyResponse').fadeIn().html('Te avisaremos apenas estemos listos.');
+                    },
+                    error: function(msg) {
+                        $('#landingSubmit').unloading();
+                        $('#landingResponse').html('Lo sentimos hubo un error!');
+                    }
+                });
+            }
+        }
+
+        $(document).on('ready', function () {
+
+            <!-- Cookies Notification -->
+            /*if (getCookie('acceptCookies') != 'true') {
+                $('.cookiesBar').fadeIn();
+                $('#acceptCookies').on('click', function (event) {
+                    event.preventDefault();
+                    $('.cookiesBar').fadeOut();
+                    createCookie('acceptCookies', 'true', 360);
+                });
+            }*/
+            <!-- / Cookies Notification -->
+
+        });
+
+        <!-- Cookies Bar -->
+        /*$(window).on('resize', function () {
+            if ($(window).width() > 480) {
+                $('.cookiesBar').removeClass('slideInDown');
+                $('.cookiesBar').removeClass('slideInUp');
+                $('.cookiesBar').css({'bottom': '70px'}).addClass('slideInDown');
+            } else {
+                $('.cookiesBar').removeClass('slideInDown');
+                $('.cookiesBar').removeClass('slideInUp');
+                $('.cookiesBar').css({'bottom': 0}).addClass('slideInUp');
+            }
+        });*/
+        <!-- / Cookies Bar -->
+
+        <!-- Header Sticky -->
+        $(window).on('scroll', function () {
+            var scrollTop = $(window).scrollTop(),
+                    header = $('.home-header');
+
+            if (scrollTop > 1) {
+
+                /*if ($(window).width() > 480) {
+                    $('.cookiesBar').removeClass('slideInDown');
+                    $('.cookiesBar').removeClass('slideInUp');
+                    $('.cookiesBar').css({'bottom': 0}).addClass('slideInDown');
+                }*/
+
+                sticky(header);
+            } else {
+
+                /*if ($(window).width() > 480) {
+                    $('.cookiesBar').removeClass('slideInDown');
+                    $('.cookiesBar').removeClass('slideInUp');
+                    $('.cookiesBar').css({'bottom': '70px'}).addClass('slideInUp');
+                }*/
+
+                unSticky(header);
+            }
+
+        });
+        <!-- / Header Sticky -->
+
+        /*]]>*/
+    </script>
+
+    <!--TOKY-->
+    <script th:if="${@configuration.TOKY_ACTIVE()}">
+
+        function detectmob() {
+            if( navigator.userAgent.match(/Android/i)
+                    || navigator.userAgent.match(/webOS/i)
+                    || navigator.userAgent.match(/iPhone/i)
+                    || navigator.userAgent.match(/iPad/i)
+                    || navigator.userAgent.match(/iPod/i)
+                    || navigator.userAgent.match(/BlackBerry/i)
+                    || navigator.userAgent.match(/Windows Phone/i)
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        $(document).on('ready', function(){
+
+            var text = "";
+            console.log(detectmob());
+            if (detectmob() == false) {
+                text = "Llámanos Gratis";
+            }
+            initToky(text);
+
+        });
+
+        function initToky(t) {
+
+            if(t != "") {
+                (function (v, p) {
+                    var s = document.createElement('script');
+                    s.src = 'https://app.toky.co/resources/widgets/toky-widget.js?v=' + v;
+                    s.onload = function () {
+                        Toky.load(p);
+                    };
+                    document.head.appendChild(s);
+                })('6800f1c', {
+                    "$lang": "es",
+                    "$username": "Solven",
+                    "$bubble": false,
+                    "$text": t,
+                    "$color": "#00aabb,#f7323f,#ffffff"
+                });
+            } else {
+
+                (function(v,p){
+                    var s=document.createElement('script');
+                    s.src='https://app.toky.co/resources/widgets/toky-widget.js?v='+v;
+                    s.onload=function(){Toky.load(p);};
+                    document.head.appendChild(s);
+                })('6800f1c', {"$username":"Solven","$bubble":false,"$color": "#00aabb,#f7323f,#ffffff"});
+            }
+
+        }
+
+    </script>
+
+</head>
+<body>
+
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: headerLanding(landingType='insurance')"></th:block>
+</th:block>
+<!-- /Header -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+    <!-- Cookies -->
+    <!--<div class="cookiesBar animated">
+        <div class="container">
+            <p>Las cookies nos ayudan a mejorar tu experiencia en Solven. Se utilizan tambi&eacute;n en estad&iacute;sticas,
+                redes sociales, controles de calidad y junto con nuestros aliados, en marketing. Al continuar navegando
+                en nuestro sitio web, aceptas el uso. <a href="#" id="acceptCookies">Ocultar</a>.</p>
+        </div>
+    </div>-->
+    <!-- / -->
+
+    <!-- Landing -->
+    <div class="landing insurance-bg">
+        <div class="overlay"></div>
+        <div class="hero-title">
+            <h2 class="red-text">Olvídate todo lo que sabes acerca de Seguros.</h2>
+            <p>Precios en el instante, con las tasas m&aacute;s bajas del mercado y en tus propios t&eacute;rminos. Muy pronto, s&oacute;lo a trav&eacute;s de Solven.</p>
+            <div class="hero-rate">
+                <form role="form" id="frmEarlyAccess" action="#" th:if="${product.active == false and session.countryUnlocked}" autocomplete="off">
+                    <div class="onlyEmail">
+                        <div class="field hideAjax">
+                            <input type="hidden" value="null"/>
+                            <input type="hidden" value=""/>
+                            <input type="text" class="input-landing"
+                                   placeholder="Correo Electr&oacute;nico" name="email" id="earlyEmail" autocomplete="off"/>
+                        </div>
+                        <div class="field hideAjax">
+                            <button class="button red-button" id="landingSubmit" onclick="letMeKnow();return false;">
+                                ¡Avísenme!
+                            </button>
+                        </div>
+                        <div class="block"></div>
+                    </div>
+
+                </form>
+
+                <div class="small-text successMessage" id="countryLocked" th:if="${session.countryUnlocked == false}">Lo sentimos mucho, pero en este momento s&oacute;lo es posible solicitar productos desde Per&uacute;.</div>
+
+            </div>
+        </div>
+        <div class="bottom-info bottom-info-landing">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>M&aacute;s cobertura</p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Menores costos</p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Solic&iacute;talo en 90 segundos</p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Gestiona tu p&oacute;liza en línea</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Landing -->
+
+</th:block>
+<!-- /Content -->
+
+
+</body>
+</html>

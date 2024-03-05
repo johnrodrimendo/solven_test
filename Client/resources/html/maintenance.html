@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <title>En mantenimiento</title>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}"/>
+    <!-- Jquery -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/jquery.min.js'}" type="text/javascript"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/css/bootstrap.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/js/bootstrap.min.js'}"></script>
+
+    <!-- Own -->
+    <link rel="stylesheet" th:href="@{/css/application.css}"/>
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="main-content maintenance">
+        <div class="container">
+            <div class="wrap">
+                <div class="page-505">
+                    <h2>En mantenimiento</h2>
+                    <p>Estamos construyendo nuevas funcionalidades.</p>
+                    <div class="go-to">
+                        <a class="button red-button" th:href="@{/}">Ir al inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

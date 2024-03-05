@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+  <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+  <div id="modal_msg_question20" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="offerModal">
+    <div class="modal-dialog" role="help">
+      <div class="modal-content">
+        <div class="modal-middle">
+          <div class="corner-close">
+            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="block-content">
+            <form action="" class="wrap-form" autocomplete="off">
+              <p>Déjanos tu correo para enviarte novedades.</p>
+              <div class="wrap-field">
+                <div class="wsi">
+                  <svg version="1.1" id="icon-email" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                       width="22px" height="22px" viewBox="0 0 511.626 511.626" style="enable-background:new 0 0 511.626 511.626;"
+                       xml:space="preserve">
+                                    <g>
+                                        <g>
+                                            <path d="M49.106,178.729c6.472,4.567,25.981,18.131,58.528,40.685c32.548,22.554,57.482,39.92,74.803,52.099
+                                                c1.903,1.335,5.946,4.237,12.131,8.71c6.186,4.476,11.326,8.093,15.416,10.852c4.093,2.758,9.041,5.852,14.849,9.277
+                                                c5.806,3.422,11.279,5.996,16.418,7.7c5.14,1.718,9.898,2.569,14.275,2.569h0.287h0.288c4.377,0,9.137-0.852,14.277-2.569
+                                                c5.137-1.704,10.615-4.281,16.416-7.7c5.804-3.429,10.752-6.52,14.845-9.277c4.093-2.759,9.229-6.376,15.417-10.852
+                                                c6.184-4.477,10.232-7.375,12.135-8.71c17.508-12.179,62.051-43.11,133.615-92.79c13.894-9.703,25.502-21.411,34.827-35.116
+                                                c9.332-13.699,13.993-28.07,13.993-43.105c0-12.564-4.523-23.319-13.565-32.264c-9.041-8.947-19.749-13.418-32.117-13.418H45.679
+                                                c-14.655,0-25.933,4.948-33.832,14.844C3.949,79.562,0,91.934,0,106.779c0,11.991,5.236,24.985,15.703,38.974
+                                                C26.169,159.743,37.307,170.736,49.106,178.729z"/>
+                                          <path d="M483.072,209.275c-62.424,42.251-109.824,75.087-142.177,98.501c-10.849,7.991-19.65,14.229-26.409,18.699
+                                                c-6.759,4.473-15.748,9.041-26.98,13.702c-11.228,4.668-21.692,6.995-31.401,6.995h-0.291h-0.287
+                                                c-9.707,0-20.177-2.327-31.405-6.995c-11.228-4.661-20.223-9.229-26.98-13.702c-6.755-4.47-15.559-10.708-26.407-18.699
+                                                c-25.697-18.842-72.995-51.68-141.896-98.501C17.987,202.047,8.375,193.762,0,184.437v226.685c0,12.57,4.471,23.319,13.418,32.265
+                                                c8.945,8.949,19.701,13.422,32.264,13.422h420.266c12.56,0,23.315-4.473,32.261-13.422c8.949-8.949,13.418-19.694,13.418-32.265
+                                                V184.437C503.441,193.569,493.927,201.854,483.072,209.275z"/>
+                                        </g>
+                                    </g>
+                                    </svg>
+                </div>
+                <input type="text" class="input-outline" autocorrect="off" autocapitalize="none"
+                       id="email" name="email" value="" aria-required="true"/>
+              </div>
+              <button type="button" class="button bg-red" id="sendEmailButton">Enviar</button>
+              <a th:href="@{/}" class="button bg-transparent icon-home">Salir</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="questions-section animated fadeInRight">
+    <div class="wrap-info-page"
+         th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).ACCESO) ? 'wrap-requeriments-acceso' : 'wrap-info-page' }">
+      <th:block th:switch="${category}">
+        <p th:case="${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO}"
+           th:utext="#{questions.block.areYouReadyQuestion3(${agent.name},'tu',${vehicle})}"></p>
+        <p th:case="*" th:utext="#{questions.block.areYouReadyQuestion2(${agent.name})}"></p>
+      </th:block>
+      <div class="note" th:utext="#{questions.block.areYouReadyNote}" style="display:none"></div>
+      <th:block th:if="${category != T(com.affirm.common.model.catalog.ProductCategory).VEHICULO}">
+        <span class="span-requeriment"><b th:utext="#{questions.starting.required}"></b></span>
+      </th:block>
+      <th:block th:unless="${category != T(com.affirm.common.model.catalog.ProductCategory).VEHICULO}">
+                <span class="span-requeriment span-requeriment-cars"><b
+                        th:utext="#{questions.starting.required}"></b></span>
+      </th:block>
+
+      <th:block th:if="${category != T(com.affirm.common.model.catalog.ProductCategory).VEHICULO}">
+        <ul class="note list-requeriments"
+            th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'isListBranding' : ''}">
+          <li>
+            <div class="wsi">
+              <svg version="1.1" id="dni" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                   viewBox="0 100 400 200" width="90px" xml:space="preserve">
+                                <g>
+                                    <path d="M85.3,275.5h230.2c3.4,0,6.1-2.7,6.1-6.1v-12.6H79.2v12.6C79.2,272.8,82,275.5,85.3,275.5z"/>
+                                </g>
+                <g>
+                                    <path d="M103.9,177.8c0-8.3,6.8-15.1,15.1-15.1s15.1,6.8,15.1,15.1c0,6.3-3.9,11.7-9.4,14c6.7,1.2,12.6,4.4,17.2,9v-48.5
+                                        c0-1-0.8-1.9-1.9-1.9H98c-1,0-1.9,0.8-1.9,1.9v48.5c4.6-4.6,10.5-7.8,17.2-9C107.8,189.5,103.9,184.1,103.9,177.8z"/>
+                                </g>
+                <g>
+                                    <path d="M315.5,132.1H85.3c-3.4,0-6.1,2.7-6.1,6.1v105.3h242.3V138.1C321.6,134.8,318.8,132.1,315.5,132.1z M237.9,151.7h-79.3
+                                        c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,151.7,237.9,151.7z M145.2,204.5v4.5
+                                        c0,2.8-2.3,5.1-5.1,5.1H98c-2.8,0-5.1-2.3-5.1-5.1v-4.5v-52.3c0-2.8,2.3-5.1,5.1-5.1h42.1c2.8,0,5.1,2.3,5.1,5.1V204.5z
+                                         M237.9,214.2h-79.3c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,214.2,237.9,214.2z M237.9,192.9
+                                        h-79.3c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,192.9,237.9,192.9z M237.9,171.6h-79.3
+                                        c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,171.6,237.9,171.6z"/>
+                                </g>
+                            </svg>
+            </div>
+            <span>Documento<br/>de identidad</span>
+          </li>
+          <li>
+            <th:block
+                    th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CAJASULLANA)}">
+              <figure>
+                <img class="sullana-doc" src="/img/icons/documentacion.jpg" alt=""/>
+              </figure>
+              <span>Sustento de ingresos<br/>y recibo de servicios</span>
+            </th:block>
+            <th:block
+                    th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CAJASULLANA)}">
+              <div class="wsi">
+                <svg version="1.1" id="cuenta" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                     viewBox="0 100 400 200" width="90px" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+                                    <g>
+                                        <path class="st4" d="M106.4,262.2c0,8.7,7,15.7,15.7,15.7h161.5c8.7,0,15.7-7,15.7-15.7v-60.4H106.4V262.2z M243.1,217.4
+                                            c3.9,0,7.6,1.1,10.7,3c3.1-1.9,6.8-3,10.7-3c11.4,0,20.6,9.3,20.6,20.6c0,11.4-9.3,20.6-20.6,20.6c-3.9,0-7.6-1.1-10.7-3
+                                            c-3.1,1.9-6.8,3-10.7,3c-11.4,0-20.6-9.3-20.6-20.6C222.5,226.6,231.7,217.4,243.1,217.4z M119.7,224.9h42.9c1.9,0,3.5,1.6,3.5,3.5
+                                            s-1.6,3.5-3.5,3.5h-42.9c-1.9,0-3.5-1.6-3.5-3.5S117.8,224.9,119.7,224.9z M119.7,245.9h68.6c1.9,0,3.5,1.6,3.5,3.5
+                                            c0,1.9-1.6,3.5-3.5,3.5h-68.6c-1.9,0-3.5-1.6-3.5-3.5C116.2,247.5,117.8,245.9,119.7,245.9z"/>
+                                      <path class="st4" d="M258.7,251.5c1.8,0.8,3.8,1.2,5.8,1.2c8.1,0,14.7-6.6,14.7-14.7c0-8.1-6.6-14.7-14.7-14.7
+                                            c-2.1,0-4,0.4-5.8,1.2c-1.9,0.8-3.5,2-4.9,3.5c-2.4,2.6-3.9,6.1-3.9,9.9c0,3.8,1.5,7.3,3.9,9.9
+                                            C255.2,249.4,256.8,250.6,258.7,251.5z"/>
+                                      <path class="st4" d="M283.6,152.8H122.1c-8.7,0-15.7,7-15.7,15.7v5h192.9v-5C299.3,159.8,292.3,152.8,283.6,152.8z"/>
+                                      <rect x="106.4" y="178.1" class="st4" width="192.9" height="19.2"/>
+                                      <path class="st4" d="M243.1,252.7c2.1,0,4-0.4,5.8-1.2c-3.1-3.6-5-8.3-5-13.4c0-5.1,1.9-9.8,5-13.4c-1.8-0.8-3.8-1.2-5.8-1.2
+                                            c-8.1,0-14.7,6.6-14.7,14.7C228.4,246.1,235,252.7,243.1,252.7z"/>
+                                      <path class="st4" d="M318.8,129.7c-4.6-4.5-5.8-10.7-8.8-16.3c-2.8,5.5-4.1,11.7-8.6,16.2c-4.5,4.6-10.8,5.7-16.3,8.7
+                                            c5.6,2.8,11.8,4.1,16.3,8.7c4.5,4.5,5.7,10.7,8.6,16.2c2.9-5.6,4.2-11.7,8.7-16.2c4.5-4.6,10.8-5.7,16.2-8.7
+                                            C329.4,135.4,323.3,134.1,318.8,129.7z"/>
+                                      <path class="st4" d="M79.5,187.3c-1.7,3.2-2.4,6.8-5,9.5c-2.6,2.7-6.3,3.3-9.5,5.1c3.3,1.6,6.9,2.4,9.5,5.1c2.6,2.6,3.3,6.2,5,9.4
+                                            c1.7-3.3,2.4-6.8,5.1-9.5c2.6-2.7,6.3-3.3,9.5-5.1c-3.2-1.6-6.8-2.4-9.4-5C82,194.2,81.2,190.6,79.5,187.3z"/>
+                                    </g>
+                                </svg>
+              </div>
+              <span th:utext="#{questions.1.account}"></span>
+            </th:block>
+          </li>
+
+          <li>
+            <figure>
+              <img src="/img/icons/camara.jpg" alt=""/>
+            </figure>
+            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+              <span>Cámara web <br/>o smartphone</span>
+            </th:block>
+            <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+              <span>Cámara web <br/>o smartphone</span>
+            </th:block>
+
+          </li>
+
+          <th:block th:if="${@brandingService.showMinRequirements(#httpServletRequest)}">
+            <li class="isbranding">
+              <ul>
+                <th:block
+                        th:if="${@brandingService.getEntityBrandingMinRequirements(#httpServletRequest) != null}">
+                  <li th:each="requirement : ${@brandingService.getEntityBrandingMinRequirements(#httpServletRequest)}">
+                    <i class="icon icon-check"></i>
+                    <span th:utext="${requirement}"></span>
+                  </li>
+                </th:block>
+
+                <th:block
+                        th:if="${@brandingService.getEntityBrandingMinRequirements(#httpServletRequest) == null}">
+                  <li>
+                    <i class="icon icon-check"></i>
+                    <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                                            <span>Edad <strong>
+                                            <span th:text="${@brandingService.getRangeAge(#httpServletRequest, 74, 18)?.minAge}"></span></strong> a <strong><span
+                                                    th:text="${@brandingService.getRangeAge(#httpServletRequest, 74, 18)?.maxAge}"></span> años</strong></span>
+                    </th:block>
+                    <th:block th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                      <span>Edad <strong>18</strong> a <strong>69 años</strong></span>
+                    </th:block>
+                  </li>
+                  <li>
+                    <i class="icon icon-check"></i>
+                    <span><strong>6 meses</strong> de experiencia crediticia.</span>
+                  </li>
+                  <li>
+                    <i class="icon icon-check"></i>
+                    <span>Buen <strong>comportamiento de pago.</strong></span>
+                  </li>
+                  _
+                </th:block>
+              </ul>
+            </li>
+          </th:block>
+          <th:block
+                  th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).ACCESO)}">
+            <li class="isbrandingAcceso">
+              <ul>
+                <li>
+                  <i class="icon icon-check"></i>
+                  <span>Edad <strong>21</strong> a <strong>67</strong> años</span>
+                </li>
+                <li>
+                  <i class="icon icon-check"></i>
+                  <span>Tener un auto del <strong>2012</strong> en adelante.</span>
+                </li>
+                <li>
+                  <i class="icon icon-check"></i>
+                  <span>No tener multas vigentes.</span>
+                </li>
+              </ul>
+            </li>
+          </th:block>
+        </ul>
+      </th:block>
+      <th:block th:unless="${category != T(com.affirm.common.model.catalog.ProductCategory).VEHICULO}">
+        <ul class="note list-requeriments list-requeriments-cars">
+          <li>
+
+            <div class="wsi">
+              <svg version="1.1" id="dni" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                   viewBox="0 100 400 200" width="90px" xml:space="preserve">
+                                <g>
+                                    <path d="M85.3,275.5h230.2c3.4,0,6.1-2.7,6.1-6.1v-12.6H79.2v12.6C79.2,272.8,82,275.5,85.3,275.5z"/>
+                                </g>
+                <g>
+                                    <path d="M103.9,177.8c0-8.3,6.8-15.1,15.1-15.1s15.1,6.8,15.1,15.1c0,6.3-3.9,11.7-9.4,14c6.7,1.2,12.6,4.4,17.2,9v-48.5
+                                        c0-1-0.8-1.9-1.9-1.9H98c-1,0-1.9,0.8-1.9,1.9v48.5c4.6-4.6,10.5-7.8,17.2-9C107.8,189.5,103.9,184.1,103.9,177.8z"/>
+                                </g>
+                <g>
+                                    <path d="M315.5,132.1H85.3c-3.4,0-6.1,2.7-6.1,6.1v105.3h242.3V138.1C321.6,134.8,318.8,132.1,315.5,132.1z M237.9,151.7h-79.3
+                                        c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,151.7,237.9,151.7z M145.2,204.5v4.5
+                                        c0,2.8-2.3,5.1-5.1,5.1H98c-2.8,0-5.1-2.3-5.1-5.1v-4.5v-52.3c0-2.8,2.3-5.1,5.1-5.1h42.1c2.8,0,5.1,2.3,5.1,5.1V204.5z
+                                         M237.9,214.2h-79.3c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,214.2,237.9,214.2z M237.9,192.9
+                                        h-79.3c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,192.9,237.9,192.9z M237.9,171.6h-79.3
+                                        c-0.9,0-1.6-0.7-1.6-1.6s0.7-1.6,1.6-1.6h79.3c0.9,0,1.6,0.7,1.6,1.6S238.8,171.6,237.9,171.6z"/>
+                                </g>
+                            </svg>
+            </div>
+            <span>Documento<br/><strong>de identidad</strong></span>
+          </li>
+          <li>
+            <ul>
+              <li>
+                <i class="icon icon-check"></i>
+                <span>Edad <strong>21</strong> a <strong>68 años</strong></span>
+              </li>
+              <li>
+                <i class="icon icon-check"></i>
+                <span>Flexibilidad con tu historial crediticio</span>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <figure>
+              <img src="/img/icons/camara.jpg" alt=""/>
+            </figure>
+            <span>Computadora con cámara<br/><strong>web</strong> o <strong>smartphone</strong></span>
+          </li>
+        </ul>
+      </th:block>
+      <small class="important" th:if="${showSolvenMessage}">
+        <th:block th:if="${solvenMessage != null}" th:text="${solvenMessage}"></th:block>
+        <th:block th:if="${solvenMessage == null}">
+                    <span th:if="${@brandingService.isBranded(#httpServletRequest)}">
+
+                    </span>
+          <span th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                        <strong>Importante:</strong> Solven no te cobra por gestionar el crédito.
+                    </span>
+        </th:block>
+      </small>
+
+      <div th:if="${!isInCorrectCountry and redirectUrl != null}" id="response-block">
+                <span class="small-text alert successMessage">
+                    <small>Estas en otro país, haz click <a th:href="${redirectUrl}" class="successMessage text-bold"
+                                                            style="text-decoration: underline">aqui</a> para ir al tuyo.</small>
+                </span>
+      </div>
+      <div class="actions collection-buttons">
+        <a href="#" id="open_modal_20" type="button" class="button bg-black">&iexcl;Regreso luego!</a>
+        <button id="sendButton" type="button" class="button bg-red">&iexcl;Estoy listo!</button>
+      </div>
+    </div>
+  </div>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var homeUrl = /*[[ @{/} ]]*/;
+    var emailVehicleDiscovery = /*[[ ${session.emailVehicleDiscovery} ]]*/;
+
+    $('#open_modal_20').on('click', function (event) {
+      event.preventDefault();
+      if (emailVehicleDiscovery != null) {
+        window.location.href = homeUrl;
+      } else {
+        self.openMsg1Modal();
+        $("#modal_msg_question20").modal('show');
+        console.log('lanzó el modal');
+      }
+    });
+
+    this.openMsg1Modal = function () {
+      $("#modal_msg_question20").modal('show');
+    };
+
+    $('#sendButton').click(function () {
+      questionFw.ajaxToCurrentQuestionController({
+        button: $('#sendButton'),
+        data: {
+          category: /*[[${category}]]*/
+        },
+        type: "POST"
+      }, "");
+    });
+
+
+    $('#sendEmailButton').on('click', function (event) {
+      sendMail();
+    });
+
+    function sendMail() {
+      var email = $('#email').val();
+      if (!email) {
+        swal({
+          title: "",
+          text: "Debes ingresar tu correo electrónico",
+          type: "error"
+        });
+      } else {
+        questionFw.ajaxToCurrentQuestionController({
+          button: $('#sendEmailButton'),
+          data: {
+            email: email
+          },
+          type: "POST",
+          success: function (data) {
+            swal({
+                      title: "",
+                      text: "Gracias por suscribirte, te enviaremos novedades.",
+                      type: "success"
+                    },
+                    function () {
+                      window.location.href = '/';
+                    });
+          }
+        }, "illbeback");
+      }
+    }
+
+    /*]]>*/
+
+  </script>
+
+
+</th:block>
+</html>

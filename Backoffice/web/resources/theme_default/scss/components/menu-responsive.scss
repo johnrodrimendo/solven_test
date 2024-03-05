@@ -1,0 +1,86 @@
+.menu-responsive{
+    position: fixed;
+    top: 0;
+    left: -300px;
+    background-color: #f3f3f3;
+    width: 250px;
+    transition: all .32s ease;
+    height: 100vh;
+    overflow: auto;
+    padding-bottom: 4rem;
+    >li{
+        >a{
+            font-weight: 700;
+            outline: 1px solid #eaeaea;
+            display: block;
+            padding: .5rem 1rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-right: 1rem;
+            >*{
+                flex-grow: 1;
+            }
+            &:before{
+                @include icon();
+                content: "\e914";
+                position: absolute;
+                top: 50%;
+                right: 1rem;
+                transform: translateY(-50%);
+                color: $colorred;
+            }
+        }
+
+        &.item-menu{
+            display: flex;
+            flex-wrap: wrap;
+
+            position: static;
+            >*{
+                flex-grow: 1;
+            }
+            >a{
+                width: 80%;
+            }
+            .btn-submenu{
+                font-size: 0;
+                order: -1;
+                background-color: $colorred;
+                color: #FFF;
+                &:before{
+                    font-size: 12px;
+                }
+                &.active{
+                    &:before{
+                        content: "\e90e";
+                    }
+                }
+            }
+            .sub-menu{
+                width: 100%;
+                display: none;
+                a{
+                    display: block;
+                    padding: .5rem 2.5rem;
+                    line-height: 1.5;
+                    width: 100%;
+                    border-bottom: 1px solid #fdfdfd;
+                }
+                &.active-sub-menu{
+
+                }
+            }
+        }
+    }
+
+    &.open-menu{
+        left: 0;
+    }
+}
+
+@media screen and (min-width: 769px){
+    .menu-responsive{
+        display: none;
+    }
+}

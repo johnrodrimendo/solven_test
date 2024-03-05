@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q60">
+        <div id="documents" class="branding_credigob"></div>
+        <div class="tk-small">
+            <small>Los formatos de archivo permitidos son : jpg, jpeg, png, pdf y word</small>
+            <br/>
+            <small>El tama&ncaron;o m&aacute;ximo de las im&aacute;genes es : 10Mb</small>
+        </div>
+        <div class="actions main-buttons">
+            <a href="#" id="uploadButton" class="anchor-button bg-gris tpAction" data-target="upload"
+               th:utext="#{questions.block.uploadPhoto}"></a>
+            <a href="#" id="takeButton" class="anchor-button bg-red tpAction" data-target="take"
+               th:utext="#{questions.block.takePhoto}"></a>
+
+            <button id="skipButton" class="button bg-red block-hidden bg-t" type="button" th:text="Omitir"></button>
+            <button id="nextButton" class="button bg-red block-hidden" type="button" th:text="#{button.next}"></button>
+            <button id="sendButton" class="button bg-red block-hidden" type="button" th:text="#{button.next}"></button>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var files = JSON.parse(/*[[${jsonTakePictureConfig}]]*/);
+        var messages = JSON.parse(/*[[${jsonMessages}]]*/);
+        var tp = new Tp({
+            container: '#documents',
+            userFileConfig: files,
+            messages: messages
+        });
+
+        tp.init();
+
+        files.forEach((item, index) => { $('.q60-files').length ? $('.q60-files').append(`<li class="">
+            ${(index + 1)+")"} ${item.name}</li>`) : null; });
+
+        $('#sendButton').click(function () {
+            $('#sendButton').loading('', 2);
+            tp.uploadPictures(function () {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST"
+                }, "");
+            });
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        var d = $('#documents');
+        d.closest('.loan-process').find('.adviser-section').addClass('show-img').removeAttr('style');
+
+        function triggerCallback(e, callback) {
+            if(!callback || typeof callback !== 'function') {
+                return;
+            }
+            var files;
+            if(e.dataTransfer) {
+                files = e.dataTransfer.files;
+            } else if(e.target) {
+                files = e.target.files;
+            }
+            callback.call(null, files);
+        }
+
+        function makeDroppable(ele, callback) {
+            if (ele === null)
+                return;
+
+            ele.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                ele.classList.add('dragover');
+            });
+
+            ele.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                ele.classList.remove('dragover');
+            });
+
+            ele.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                ele.classList.remove('dragover');
+                triggerCallback(e, callback);
+            });
+        }
+
+        function reloadDroppableFunction() {
+            setTimeout(function() {
+                makeDroppable(window.document.querySelector('.upload-box'), function(files) {
+                    document.getElementById('upload').files = files;
+
+                    for (var i = 0; i < files.length; i++) {
+                        var fileName = files[i].name;
+                        var extension = fileName.substr(fileName.lastIndexOf('.')).toLowerCase();
+                        var allowedExtensions = document.getElementById('upload').accept.replace(/ /g, '').split(',');
+                        console.log(extension);
+
+                        if ((extension !== '.jpg' && extension !== '.jpeg' && extension !== '.png') && !allowedExtensions.includes(extension)) {
+                            showErrorModal('No se permiten archivos de este formato');
+                            return;
+                        }
+                        if (files[i].size > 10485760) { // More than 10 MB
+                            showErrorModal('El tamaño máximo de las imágenes es de 10 MB');
+                            return;
+                        }
+                    }
+
+                    $('#upload').change();
+                });
+            }, 500);
+        }
+
+        $('#uploadButton').click(function () {
+            reloadDroppableFunction();
+        });
+
+        (function() {
+            reloadDroppableFunction();
+        })(this);
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

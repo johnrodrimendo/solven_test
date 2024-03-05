@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q144">
+            <div th:if="${loan?.status?.id != T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED}">
+                <p th:utext="#{questions.block.accountOpening}"></p>
+                <div class="field inline field-button">
+                    <div class="note paragraphs">
+                        <div>
+                            <span>Como parte del proceso del desembolso se requiere la apertura de una cuenta de "ahorro conveniente".</span><br/>
+                            <span>Esta cuenta de ahorro:</span>
+                        </div>
+                        <div class="list-features-account">
+                            <li>No tiene costo por mantenimiento sin importar el saldo de su cuenta.</li>
+                            <li>Si mantiene saldos menores a S/1,500 US$500, puede gratuitamente depositar 3 veces por ventanilla, retirar 2 veces por ventanilla y realizar 4 retiros en cajeros automáticos, a mayor saldo tendrá más operaciones libres.</li>
+                            <li>Acceso a los cajeros de la red Global net.</li>
+                            <li>La TREA del producto para un ejemplo de S/1,000 es de 0.50%</li>
+                            <li>LA TREA del producto para un ejemplo de US$1,00 es de 0.25%</li>
+                            <li>Saldo mínimo de equilibrio será cualquier saldo que se mantenga en la cuenta.</li>
+                        </div>
+                        <div>
+                            <span>¿Acepta que le abramos una cuenta "ahorro conveniente" a su nombre?</span>
+                        </div>
+                    </div>
+                    <div class="text-center animated fadeInRight" style="margin-bottom: 40px; margin-top: 30px;">
+                        <button id="sendButton" type="button" class="button bg-red" th:text="#{button.yes.i.accept}" style="margin-bottom: 10px;"></button><br/>
+                        <a id="cancelButton" href="javascript:void(0)" class="text-lightblue" th:text="#{button.no.accept}"></a>
+                    </div>
+                    <div class="note offer-container">
+                        <div class="sponsored-by">
+                            <small>
+                                *Mayor información sobre la cuenta será enviada a <span th:text="${user?.email}"></span>, en el cual también ponemos a su disposición el contrato y la cartilla de información de esta cuenta de ahorro. Por ello, lo invitamos a que usted revise esta información antes de ir a una oficina BanBif para habilitar su cuenta y recibir su tarjeta de débito. Esta información también la puede ubicar en nuestra página web <a href="www.banbif.pe" class="text-lightblue">www.banbif.pe</a><br/>
+                                Asimismo, le informamos que la cuenta por el momento solo podrá recibir depósitos (con un límite de US$9.999 o su equivalente en soles) y a fin de que pueda realizar otro tipo de transacción como retiros, deberá acercarse a cualquiera de nuestras oficinas con su DNI para la habilitación de la cuenta. De no acercarse en el transcurso de 60 días se cancelará la cuenta de manera automática siempre y cuando no mantenga saldos esta cuenta. En caso no estuviera de acuerdo con alguna de las condiciones de la cuenta de ahorro, usted podrá solicitar la resolución del contrato y/o la cancelación de la cuenta sin costo alguno a través de nuestra banca telefónica, llamando al teléfono 6319000, o en cualquier de nuestras oficinas BanBif.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p th:if="${loan?.status?.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED}">¡Muchas gracias por tu respuesta!<br/>
+                Seguiremos trabajando, comprometidos en ofrecerte un servicio cada vez mejor.
+            </p>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#sendButton').on('click', function(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+        $('#cancelButton').on('click', function () {
+            swal({
+                    title: "",
+                    text: "<span>Es necesaria la apertura de una nueva cuenta para continuar con el proceso.</span><br/><br/>" +
+                        "<span>¿Desea desestimar la solicitud?</span>",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#F7323F",
+                    cancelButtonColor: "#C1C1C1",
+                    cancelButtonText: "Sí, desestimar",
+                    confirmButtonText: "Volver",
+                    closeOnConfirm: true,
+                    closeOnCancel:true,
+                    allowEscapeKey: false,
+                    html: true
+                },
+                function (isConfirm) {
+                    if (!isConfirm) {
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "POST",
+                            data: {}
+                        }, "reject");
+                    }
+                });
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

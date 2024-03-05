@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+
+<th:block th:fragment="footerLandings">
+    <footer class="landing-footer bg-black">
+        <div class="container">
+            <div class="row">
+                <div class="colum-4 col-md-4 col-xs-4 column">
+                    <ul>
+                        <li>
+                            <a th:href="@{/nosotros}" th:class="${itemSelected != null and itemSelected =='aboutUs' ? 'menu-selected' : ''}">Nosotros</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/centro-de-ayuda}" th:class="${itemSelected != null and itemSelected =='faqs' ? 'menu-selected' : ''}">Centro de Ayuda</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/blog}" th:class="${itemSelected != null and itemSelected =='blog' ? 'menu-selected' : ''}">Blog</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="colum-4 col-md-4 col-xs-4 column">
+                    <ul>
+                        <li>
+                            <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/terminos-y-condiciones}">T&eacute;rminos y Condiciones</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="colum-4 col-md-4 col-xs-4 column">
+                    <div class="address">
+                        <p th:text="#{static.landing.company.info}"></p>
+                        <p th:text="#{static.landing.company.ruc}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="copy">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 clumn">
+                        <div class="contact">
+                            <button class="button bg-red" id="contact-button">Cont&aacute;ctanos</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 clumn only-em">
+                        <div class="socials">
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).FACEBOOK_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-facebook"></i></a>
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).INSTAGRAM_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-instagram"></i></a>
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).TWITTER_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-twitter"></i></a>
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).LINKEDIN_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 clumn">
+                        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span> Solven Funding S.A.C. Todos los derechos reservados.</p>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 clumn not-em">
+                        <div class="socials">
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).FACEBOOK_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-facebook"></i></a>
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).INSTAGRAM_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-instagram"></i></a>
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).TWITTER_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-twitter"></i></a>
+                            <a th:href="${T(com.affirm.system.configuration.Configuration).LINKEDIN_URL}" class="square" target="_blank" rel="nofollow noreferrer noopener"><i class="icon icon-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Confirmation modal -->
+    <div class="modal fade " id="confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+        <div class="modal-dialog" role="confirmation">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal" th:text="#{modal.confirmationCode.title}"></h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <p th:text="#{modal.confirmationCode.subTitle}"></p>
+                        <form action="">
+                            <div class="field inline">
+                                <small class="input-help">C&oacute;digo de confirmaci&oacute;n</small>
+                                <input type="text" class="input-outline" id="cofirmCodePromo" />
+                            </div>
+                            <div class="field inline">
+                                <small class="input-help">&nbsp;</small>
+                                <button type="button" class="button bg-red" th:text="#{button.confirm}"></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+
+        /*<![CDATA[*/
+        $('#cofirmCodePromo').forceLettersOnly('', true, 10, 10);
+        var confimationButtonModal = $('#confirmation-button'),
+            confirmationModal = $('#confirmation-modal');
+        confimationButtonModal.doOnce(function(){
+            confimationButtonModal.on('click', function(e){
+                e.preventDefault();
+                confirmationModal.modal({backdrop: 'static', keyboard: false, show: true});
+            });
+        });
+        /*]]>*/
+
+    </script>
+
+
+    <div class="modal fade " id="information-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+        <div class="modal-dialog" role="confirmation">
+            <div class="modal-content">
+                <div class="modal-middle">
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="block-content">
+                        <p><strong>Acceso Crediticio</strong>, compañía financiera líder en la financiación de vehículos y <strong>Mitsui Automotriz</strong>, concesionario oficial de Toyota en Perú, se unieron a Solven para que puedas comprar tu auto al crédito, completamente en línea.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="contact-modal" tabindex="-1" role="dialog" aria-labelledby="contactModal"
+        th:with="contactForm=${T(com.affirm.client.model.form.ContactForm).newInstance()}">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal" th:text="#{static.landing.modal.title}"></h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div class="contact-form">
+                            <form id="contactForm">
+                                <div id="response-block"></div>
+                                <div class="field">
+                                    <input type="text" name="contactFullName" id="contactFullName" class="input-outline"
+                                           placeholder="Nombre completo"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field mobile-hidden">
+                                    <input type="text" name="contactTelephone" id="contactTelephone" class="input-outline"
+                                           placeholder="Tel&eacute;fono"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <input type="text" name="contactEmail" id="contactEmail" class="input-outline"
+                                           placeholder="Correo electr&oacute;nico"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <input type="text" name="contactSubject" id="contactSubject" class="input-outline"
+                                           placeholder="Asunto"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <textarea name="contactMessage" id="contactMessage" class="input-outline" rows="5"
+                                              placeholder="Mensaje..."></textarea>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="g-recaptcha" th:attr="data-sitekey=${@configuration.invisibleCaptchaPublicKey()}" data-callback="submit" data-size="invisible"></div>
+                                <div class="field text-center">
+                                    <button type="button" id="sendMessage" class="button bg-red">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            $(document).ready(function () {
+                var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+                if (validator != null) {
+                    var jsonValidator = JSON.parse(validator);
+                    $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+                }
+
+                $('#sendMessage').on('click', function(event){
+                    event.preventDefault();
+                    validate();
+                });
+
+                $('#contact-button').on('click', function (event) {
+                    event.preventDefault();
+                    $('#contact-modal').modal({backdrop: 'static', keyboard: false, show: true});
+                });
+
+
+                $('.helpSign').on('click', function (event) {
+                    event.preventDefault();
+                    $('#information-modal').modal({backdrop: 'static', keyboard: false, show: true});
+                });
+
+            });
+
+            function validate() {
+                if ($('#contactForm').valid()) {
+                    grecaptcha.reset();
+                    grecaptcha.execute();
+                }
+            }
+
+            function submit(){
+                $('#sendMessage').loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/contact}]]*/,
+                    type: 'POST',
+                    formValidation: $('#contactForm').data('validator'),
+                    data: $('#contactForm').serializeObject(),
+                    success: function (data) {
+                        $('#sendMessage').unloading();
+                        $('#contactForm').data('validator').resetForm();
+                        $('#contactForm')[0].reset();
+                        $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                    },
+                    error: function () {
+                        $('#sendMessage').unloading();
+                    }
+                });
+            }
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<th:block th:fragment="processFooter">
+    <div class="bottom-footer" th:classappend="${@brandingService.isNinja(#httpServletRequest) ? 'ninja' : (@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF) ? 'banbif-footer' : '')}"  >
+        <img th:if="${@brandingService.isNinja(#httpServletRequest)}" th:src="${@brandingService.getEntityBrandingFooterLogoUrl(#httpServletRequest, null)}" alt=""/>
+        <a th:unless="${@brandingService.isBranded(#httpServletRequest)}" href="#" id="anchor-back"><svg x="0px" y="0px" viewBox="0 0 512 512"><path d="M491.318,235.318H20.682C9.26,235.318,0,244.578,0,256c0,11.423,9.26,20.682,20.682,20.682h470.636c11.423,0,20.682-9.259,20.682-20.682C512,244.578,502.741,235.318,491.318,235.318z"/><path d="M49.932,256L211.795,94.136c8.077-8.077,8.077-21.172,0-29.249c-8.077-8.076-21.172-8.076-29.249,0L6.058,241.375c-8.077,8.077-8.077,21.172,0,29.249l176.488,176.488c4.038,4.039,9.332,6.058,14.625,6.058c5.293,0,10.587-2.019,14.625-6.058c8.077-8.077,8.077-21.172,0-29.249L49.932,256z"/></svg><span>Volver</span></a>
+        <div class="bar"></div>
+    </div>
+    <th:block th:replace="fragments/modalContactFragment :: modalContactFragment"></th:block>
+</th:block>
+
+<th:block th:fragment="processFooterChooseAgent">
+    <div class="bottom-footer brand-footer"
+         th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CAJASULLANA) ? 'bottom-footer brand-footer sullana-footer':'bottom-footer brand-footer' }">
+        <div class="footer-logo"><img  th:src="${@brandingService.getEntityBrandingFooterLogoUrl(#httpServletRequest, null)}" alt=""/></div>
+        <ul>
+            <li><span>Operado por Solven</span></li>
+            <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER)}">
+                <li><a th:href="@{/documents/BB-CAR-173_Terminos_y_condiciones_credito_digital.pdf}" target="_blank">Términos y Condiciones</a><span class="underline"></span></li>
+                <li><a href="https://www.fundaciondelamujer.com/Tratamiento_Datos_Personales/POLITICA_INSTITUCIONAL_DE_TRATAMIENTO_DE_INFORMACION_Y_PROTECCION_DE_DATOS_PERSONALES.pdf" target="_blank">Políticas de Privacidad</a><span class="underline"></span></li>
+            </th:block>
+            <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <li><a href="https://alfinbanco.pe/terminosycondiciones" target="_blank">Términos y Condiciones</a><span class="underline"></span></li>
+                <li><a href="https://alfinbanco.pe/politicasdeprivacidad" target="_blank">Políticas de Privacidad</a><span class="underline"></span></li>
+            </th:block>
+            <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER) or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <li><a th:href="@{/terminos-y-condiciones}" target="_blank">Términos y Condiciones</a><span class="underline"></span></li>
+                <li><a th:href="@{/politica-de-privacidad}" target="_blank">Políticas de Privacidad</a><span class="underline"></span></li>
+            </th:block>
+        </ul>
+        <div class="wchat"></div>
+    </div>
+</th:block>
+
+<th:block th:fragment="processFooterChooseAgentInner">
+    <div id="brand-footer" class="bottom-footer brand-footer process-footer" th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CAJASULLANA) ? 'bottom-footer brand-footer process-footer sullana-footer':'bottom-footer brand-footer process-footer' }">
+        <div class="footer-logo">
+            <img  th:src="${@brandingService.getEntityBrandingProcessLogo(#httpServletRequest, null)}" alt=""/>
+        </div>
+        <a th:if="${@brandingService.isBranded(#httpServletRequest)}" href="#" id="anchor-back"><svg x="0px" y="0px" viewBox="0 0 512 512"><path d="M491.318,235.318H20.682C9.26,235.318,0,244.578,0,256c0,11.423,9.26,20.682,20.682,20.682h470.636c11.423,0,20.682-9.259,20.682-20.682C512,244.578,502.741,235.318,491.318,235.318z"/><path d="M49.932,256L211.795,94.136c8.077-8.077,8.077-21.172,0-29.249c-8.077-8.076-21.172-8.076-29.249,0L6.058,241.375c-8.077,8.077-8.077,21.172,0,29.249l176.488,176.488c4.038,4.039,9.332,6.058,14.625,6.058c5.293,0,10.587-2.019,14.625-6.058c8.077-8.077,8.077-21.172,0-29.249L49.932,256z"/></svg><span>Volver</span></a>
+        <ul th:if="${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+            <li><span>Operado por Solven</span></li>
+            <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER)}">
+                <li><a th:href="@{/documents/BB-CAR-173_Terminos_y_condiciones_credito_digital.pdf}" target="_blank">Términos y Condiciones</a><span class="underline"></span></li>
+                <li><a href="https://www.fundaciondelamujer.com/Tratamiento_Datos_Personales/POLITICA_INSTITUCIONAL_DE_TRATAMIENTO_DE_INFORMACION_Y_PROTECCION_DE_DATOS_PERSONALES.pdf" target="_blank">Políticas de Privacidad</a><span class="underline"></span></li>
+            </th:block>
+            <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <li><a href="https://alfinbanco.pe/terminosycondiciones" target="_blank">Términos y Condiciones</a><span class="underline"></span></li>
+                <li><a href="https://alfinbanco.pe/politicasdeprivacidad" target="_blank">Políticas de Privacidad</a><span class="underline"></span></li>
+            </th:block>
+            <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER) or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <li><a th:href="@{/terminos-y-condiciones}" target="_blank">Términos y Condiciones</a><span class="underline"></span></li>
+                <li><a th:href="@{/politica-de-privacidad}" target="_blank">Políticas de Privacidad</a><span class="underline"></span></li>
+            </th:block>
+        </ul>
+
+        <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+            <div class="footer-container-banbif">
+                <div class="offer-container footer-159">
+                    <div class="sponsored-by" >
+                        <small>
+                            <table style="font-family: sans-serif; font-size: 8px; text-align: justify; margin: 10px 0;">
+                                <tbody>
+                                <tr>
+                                    <td class="footer-159-description">
+                                        *En caso no recibas tu Tarjeta de Crédito en la fecha mencionada, agradeceremos contactar a nuestra Banca Telefónica al 631-9000 (Lima) o 0-801-0-0456 (Provincias).
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </small>
+                    </div>
+                </div>
+                <!-- <div class="container-parallelogram">
+                    <div class="first-parallelogram"></div>
+                    <div class="second-parallelogram"></div>
+                </div> -->
+                <div class="bottom-footer">
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </th:block>
+        <div class="wchat"></div>
+    </div>
+    <th:block>
+        <style>
+
+            .azteca-footer {
+                display: none;
+            }
+
+            .azteca-footer-consejero {
+                display: none;
+            }
+
+            .azteca-footer-visible{
+                display: flex !important;
+            }
+
+            #azteca-compromiso{
+                display: none;
+            }
+
+            @media only screen and (max-width:800px) {
+                .azteca-footer tr{
+                    flex-direction: column !important;
+                }
+                #azteca-compromiso{
+                    display: block !important;
+                    max-width: 115px !important;
+                }
+                #azteca-compromiso-base{
+                    display: none;
+                }
+
+                #aztecaRowTCEA{
+                    align-items: center;
+                    display: flex;
+                    flex-direction: row-reverse;
+                }
+
+                .azteca-footer > div:nth-child(1) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2){
+                    text-align: justify !important;
+                }
+            }
+
+        </style>
+        <div class="azteca-footer" style="text-align: center;background-color: #fff;width: 100%;align-items: center;flex: 1;min-width: 100%;justify-content: center;flex-direction: column;justify-content: center;margin-left: auto;margin-right: auto;">
+            <div style="margin:10px 0; border-top: #000 2px solid; border-bottom: #000 2px solid;width: 100%;">
+                <table style="background-color:#fff" width="100%">
+                    <tbody class="" style="width: 100%;">
+                    <tr style="display: flex; flex-direction: row; justify-content:center; align-items: center">
+                        <td id="aztecaRowTCEA">
+                            <img id="azteca-compromiso" src="https://solven-public.s3.amazonaws.com/img/alfin/Sello-de-compromiso-85.png" alt="" style="max-width:125px;float:right;vertical-align:middle;padding:10px;display: none"/>
+                            <img src="https://solven-public.s3.amazonaws.com/img/alfin/CapsulaTCEA4-8340.png" alt="" style="max-width:150px;float:right;vertical-align:middle;"/>
+                        </td>
+                        <td style="max-width: 950px;padding:10px;font-size:11pt;text-align:left;">
+                            Préstamo de S/ 5000 a 12 meses más Seguro Desgravamen de S/ 82.98 financiado, monto total financiado de S/ 5082.98, con cuota mensual de S/ 581.40, total interés S/ 1894.59 con una TCEA referencial de 83.40% sin incluir periodo de gracia. Sujeto a Evaluación Crediticia y de verificaciones domiciliarias y/o laborales, de ser el caso. Para mayor información sobre tasas de interés compensatorios y moratorios, comisiones y gastos, consulte el tarifario o a nuestros ejecutivos en nuestra red de agencias o en www.Alfinbanco.pe
+                        </td>
+                        <td id="azteca-compromiso-base">
+                            <img src="https://solven-public.s3.amazonaws.com/img/alfin/Sello-de-compromiso-85.png" alt="" style="max-width:125px;float:right;vertical-align:middle;padding:10px;"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="azteca-footer-rol-consejero" class="azteca-footer-consejero" style="text-align: center;background-color: #fff;width: 100%;align-items: center;flex: 1;min-width: 100%;justify-content: center;flex-direction: column;justify-content: center;margin-left: auto;margin-right: auto;">
+            <div style="margin: 0 20px">
+                <p style="font-size: 12px">
+                    Este análisis fue realizado con base en la última información disponible del Reporte Consolidado Crediticio otorgado por la SBS y nuestra evaluación interna. Los aspectos analizados son las principales características que podrías tener de tu estado crediticio.
+                </p>
+            </div>
+        </div>
+
+
+    </th:block>
+</th:block>
+
+<th:block th:fragment="paginatorFooter">
+    <div class="custom-paginator">
+        <div class="results-paginator">
+            <span id="rowsRange"></span>&nbsp;de&nbsp;<span id="totalRows" th:text="${totalCount}"></span>&nbsp;Resultados
+        </div>
+        <div class="options-paginator">
+            Páginas:
+            <div id="paginatorButtons"></div>
+        </div>
+    </div>
+    <div class="processing-paginator">
+        Realizando consulta
+    </div>
+</th:block>
+
+</body>
+</html>

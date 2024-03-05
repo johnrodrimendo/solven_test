@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>El cr&eacute;dito que mereces</title>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}" rel="stylesheet"/>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ ${agent?.avatarUrl} ]]*/;
+        $(document).on('ready', function () {
+            var size = 130;
+            if ($(window).width() <= 1280 && $(window).width() > 768) {
+                size = 100;
+            } else if ($(window).width() <= 768) {
+                size = 60;
+            }
+            $('.avatar-advisor').doOnce(function () {
+                $(".avatar-advisor").imgProgress({
+                    img_url: url, // path to the image
+                    size: size, // size in pixels
+                    barSize: 10, // bar size
+                    backgroundColor: $StrokeSolvenColor, // background color - brand
+                    foregroundColor: $FillSolvenColor, // foreground color - brand
+                    backgroundSize: 'cover', // CSS background-size property
+                    percent: 100 // current percentage value
+                });
+            });
+            updateBranding();
+        });
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+</head>
+<body th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: processHeader"></th:block>
+</th:block>
+<th:block layout:fragment="content">
+    <section class="loan-process">
+        <div class="container">
+            <div class="adviser-section animated fadeIn">
+                <div class="avatar-progress">
+                    <div class="avatar-advisor"></div>
+                </div>
+                <div class="horizontal-line">
+                    <div class="line brand-bg-colorweb"></div>
+                </div>
+            </div>
+
+            <div th:if="${type == 'waitingDownPayment'}" class="questions-section animated fadeInRight">
+                <p>Desposita la cuota inicial de <span th:text="${@utilService.integerMoneyFormat(credit.downPayment, credit.downPaymentCurrency)}"/> en las cuentas del concesionario para que puedan emitir la boleta de venta y comience la cuenta regresiva. Te hemos enviado los detalles a tu correo electr&oacute;nico.</p>
+                <div class="note">
+                    (Haz el abono exclusivamente en las cuentas que te hemos enviado a nombre del concesionario y envianos el voucher para realizar las gestiones necesarias).
+                </div>
+            </div>
+
+            <div th:if="${type == 'waitingForEntity'}" class="questions-section animated fadeInRight">
+                <p>Hemos recibido tu abono completo de la cuota inicial. Estamos esperando la confirmaci&oacute;n del concesionario y de <span th:text="${entity.shortName}" />, para que puedas agendar la toma de firmas de los documentos de cr&eacute;dito.</p>
+                <div class="note">
+                    (Este proceso podr&iacute;a tomar hasta 72hs h&aacute;biles).
+                </div>
+            </div>
+
+            <div th:if="${type == 'registerSignatureSchedule'}" class="questions-section animated fadeInRight">
+                <p>¿Por d&oacute;nde podemos pasar (y cu&aacute;ndo) para que firmes tu contrato?</p>
+                <div class="forms contract-date">
+
+                    <form id="questionForm" class="after-contract" th:object="${form}">
+                        <div class="field field-choose">
+                            <div class="field inline">
+                                <label class="input-radio radioubi" th:attr="data-address=${addressPersonal}">
+                                    <input type="radio" class="address" name="locationId" value="1"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner icon icon-dependent">
+                                            <h5>Casa</h5>
+                                            <div class="radio"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="field inline ">
+                                <label class="input-radio radioubi" th:attr="data-address=${addressWorkplace}">
+                                    <input type="radio" class="address" name="locationId" value="2"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner icon icon-independent">
+                                            <h5>Trabajo</h5>
+                                            <div class="radio"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="field inline ">
+                                <label class="input-radio radioubi" th:attr="data-address=${addressAcceso1}">
+                                    <input type="radio" class="address" name="locationId" value="3"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner ico-building">
+                                            <h5>Sede<br/>Jesus Mar&iacute;a</h5>
+                                            <div class="radio"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="field inline ">
+                                <label class="input-radio radioubi" th:attr="data-address=${addressAcceso2}">
+                                    <input type="radio" class="address" name="locationId" value="4"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner ico-building">
+                                            <h5>Sede<br/>Surquillo</h5>
+                                            <div class="radio"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="field field-choose">
+                            <p class="addressResult">
+
+                            </p>
+                        </div>
+
+                        <div class="field inline inline-calendar">
+                            <div class='input-group date' id='datetimepicker1'>
+                                <input th:field="*{scheduleDate}" type="text" class="input-outline document-input form-control" placeholder="DD/MM/YYYY"/>
+                                <span class="input-group-addon">
+                                    <span class="wsi">
+                                        <svg version="1.1" id="calendar" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                             width="20px" height="20px" viewBox="0 0 488.152 488.152" style="enable-background:new 0 0 488.152 488.152;"
+                                             xml:space="preserve">
+                                            <g>
+                                                <g>
+                                                    <path d="M177.854,269.311c0-6.115-4.96-11.069-11.08-11.069h-38.665c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                                        c0,6.123,4.961,11.079,11.074,11.079h38.665c6.12,0,11.08-4.956,11.08-11.079V269.311L177.854,269.311z"/>
+                                                    <path d="M274.483,269.311c0-6.115-4.961-11.069-11.069-11.069h-38.67c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                                        c0,6.123,4.961,11.079,11.074,11.079h38.67c6.108,0,11.069-4.956,11.069-11.079V269.311z"/>
+                                                    <path d="M371.117,269.311c0-6.115-4.961-11.069-11.074-11.069h-38.665c-6.12,0-11.08,4.954-11.08,11.069v38.66
+                                                        c0,6.123,4.96,11.079,11.08,11.079h38.665c6.113,0,11.074-4.956,11.074-11.079V269.311z"/>
+                                                    <path d="M177.854,365.95c0-6.125-4.96-11.075-11.08-11.075h-38.665c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                                        c0,6.119,4.961,11.074,11.074,11.074h38.665c6.12,0,11.08-4.956,11.08-11.074V365.95L177.854,365.95z"/>
+                                                    <path d="M274.483,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                                        c0,6.119,4.961,11.074,11.074,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95z"/>
+                                                    <path d="M371.117,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.12,0-11.08,4.95-11.08,11.075v38.653
+                                                        c0,6.119,4.96,11.074,11.08,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95L371.117,365.95z"/>
+                                                    <path d="M440.254,54.354v59.05c0,26.69-21.652,48.198-48.338,48.198h-30.493c-26.688,0-48.627-21.508-48.627-48.198V54.142
+                                                        h-137.44v59.262c0,26.69-21.938,48.198-48.622,48.198H96.235c-26.685,0-48.336-21.508-48.336-48.198v-59.05
+                                                        C24.576,55.057,5.411,74.356,5.411,98.077v346.061c0,24.167,19.588,44.015,43.755,44.015h389.82
+                                                        c24.131,0,43.755-19.889,43.755-44.015V98.077C482.741,74.356,463.577,55.057,440.254,54.354z M426.091,422.588
+                                                        c0,10.444-8.468,18.917-18.916,18.917H80.144c-10.448,0-18.916-8.473-18.916-18.917V243.835c0-10.448,8.467-18.921,18.916-18.921
+                                                        h327.03c10.448,0,18.916,8.473,18.916,18.921L426.091,422.588L426.091,422.588z"/>
+                                                    <path d="M96.128,129.945h30.162c9.155,0,16.578-7.412,16.578-16.567V16.573C142.868,7.417,135.445,0,126.29,0H96.128
+                                                        C86.972,0,79.55,7.417,79.55,16.573v96.805C79.55,122.533,86.972,129.945,96.128,129.945z"/>
+                                                    <path d="M361.035,129.945h30.162c9.149,0,16.572-7.412,16.572-16.567V16.573C407.77,7.417,400.347,0,391.197,0h-30.162
+                                                        c-9.154,0-16.577,7.417-16.577,16.573v96.805C344.458,122.533,351.881,129.945,361.035,129.945z"/>
+                                                </g>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="errorContainer"></div>
+                        </div>
+
+                        <div class="field inline">
+                            <select th:field="*{scheduleHour}" data-width="140">
+                                <option th:each="schedule : ${@catalogService.getCreditSignatureScheduleHours()}"
+                                        th:value="${schedule.id}" th:text="${schedule.hour}"></option>
+                            </select>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </form>
+                </div>
+
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+
+                    $(document).ready(function () {
+                        var scheduleWeekdays = $('#scheduleHour').html();
+                        var scheduleSaturday = $('#scheduleHour').find('option')[0].outerHTML;
+
+                        $("select").each(function () {
+                            $(this).select2({
+                                minimumResultsForSearch: -1,
+                                placeholder: $(this).data('placeholder'),
+                                width: $(this).data('width') + 'px'
+                            });
+                        });
+                        $('.radioubi').on('change', function(){
+                            $('.addressResult').html($(this).data('address'));
+
+                            $(this).parent().parent().find('label').removeClass('radio-selected');
+                            $(this).addClass('radio-selected')
+
+                            $('.radioubi').each(function(){
+                                $(this).find('input[type=radio]').prop('checked', false).removeAttr('checked');
+                            });
+                            $(this).find('input[type=radio]').prop('checked', true).attr('checked', 'checked');
+                        });
+                        // TODO: restrict holidays
+                        var minDaysAfterToday = 2;
+                        var maxDaysAfterToday = 9;
+
+                        $('#datetimepicker1').datetimepicker({
+                            minDate: moment(1, 'h').add(minDaysAfterToday, 'days'),
+                            maxDate: moment(1, 'h').add(maxDaysAfterToday, 'days'),
+                            viewMode: 'days',
+                            format: 'DD/MM/YYYY',
+                            daysOfWeekDisabled: [0],
+                            disabledDates: [
+                                moment(1, 'h').add(minDaysAfterToday, 'days') // hack because minDate and dp.change have troubles
+                            ]
+                        });
+
+                        $("#datetimepicker1").on("dp.change", function (e) {
+                            var dayOfWeek = e.date.day();
+
+                            if (dayOfWeek == 6) { // Saturday
+                                $('#scheduleHour').html(scheduleSaturday).change();
+                            } else {
+                                $('#scheduleHour').html(scheduleWeekdays).change();
+                            }
+                        });
+
+                        if (moment(1, 'h').add(minDaysAfterToday + 1, 'days').day() == 6) {
+                            $('#scheduleHour').html(scheduleSaturday).change();
+                        }
+
+                        $('#scheduleDate').val('DD/MM/AAAA');
+
+                        $('#scheduleDate').on('focus',function(){
+                            $('.input-group-addon').trigger('click');
+                        });
+
+                        var scheduleJsonValidator = JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/);
+                        $('#questionForm').validateForm(createFormValidationJson(scheduleJsonValidator, $('#questionForm')));
+
+                        $("#sendButton").on('click', function (e) {
+                            e.preventDefault();
+                            if($('#questionForm').valid()){
+                                $('#sendButton').loading('', 2);
+                                defaultAjax({
+                                    url: /*[[@{/__${@evaluationController.URL}__/registerSignatureSchedule}]]*/null,
+                                    type: 'POST',
+                                    data: $.extend($('#questionForm').serializeObject(), {
+                                        token: /*[[${token}]]*/
+                                    }),
+                                    success: function (data) {
+                                        $('#sendButton').unloading();
+                                        location.reload();
+                                    }, error: function (xhr, errorJson) {
+                                        $('#sendButton').unloading();
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    /*]]>*/
+                </script>
+
+            </div>
+
+            <div th:if="${type == 'vehicleDisbursed'}" class="questions-section animated fadeInRight">
+                <p>¡Tu cr&eacute;dito ya se ha activado! El concesionario emiti&oacute; la factura de tu auto nuevo. Ahora si..., cuenta los d&iacute;as para tener el auto de tus sue&ntilde;os.</p>
+                <div class="note">
+                    (Te hemos enviado un correo con los datos de contacto del concesionario, te mantendr&aacute;n al tanto de todos los detalles de la entrega).
+                </div>
+            </div>
+
+            <div th:if="${type == 'waitingForAppointment'}" class="questions-section animated fadeInRight">
+                <p>Por favor selecciona el horario para asistir a la revisi&oacute;n de tu auto y finalizar el proceso de tu cr&eacute;dito.</p>
+                <div style="overflow:hidden;">
+                    <div class="form-group w-schedule-form">
+                        <div class="wrap-radios">
+                            <div class="field inline"  th:each="date, it: ${availableDates}">
+                                <label class="input-radio" name="radio-date">
+                                    <input type="radio" name="date" th:value="${@utilService.dateCustomFormat(date, 'dd/MM/yyyy', #locale)}"/>
+                                    <div class="option-wrapper">
+                                        <div class="iconic-option-inner">
+                                            <h5 th:text="${@utilService.dateCustomFormat(date, 'EEEE dd ''de'' MMMM', #locale)}"></h5>
+                                            <div class="radio"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="w">
+                            <div class="w-select2">
+                                <select id="hour" data-width="200" data-placeholder="Horario">
+                                    <option value="" disabled="true">Horario</option>
+                                </select>
+                            </div>
+                            <button id="scheduleBtn" class="button bg-red">Agendar cita</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="link" th:utext="#{questions.extra.appointment.address}"></span>
+                </div>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+
+                    $(function () {
+                        var hour = $('#hour');
+                        hour.select2();
+
+                        function getDate(availableDate) {
+                            var dateArray = availableDate.split("/");
+                            return new Date(dateArray[2], dateArray[1] - 1, dateArray[0]);
+                        }
+
+                        function renderHours(date) {
+                            console.log('objeto '+/*[[${jsonSchedulesMap}]]*/);
+                            var scheduleJson = JSON.parse(/*[[${jsonSchedulesMap}]]*/);
+
+                            var options = "<option value=''>Horario</option>";
+                            for (i = 0; i < scheduleJson[date].length; i++) {
+                                //console.log(scheduleJson[date][i].startTime + " - " + scheduleJson[date][i].endTime);
+
+                                //html += '<option value="' + arr[i].districtId + '">' + arr[i].name + '</option>';
+                                options += '<option value="' + scheduleJson[date][i].appointmentScheduleId + '">' + scheduleJson[date][i].appointmentSchedule + '</option>';
+
+                            }
+
+                            hour.html(options);
+                        }
+
+                        $('input[name=date]').on('change', function (e) {
+                            //console.log(getDate($(this).val()));
+                            renderHours($(this).val())
+                            $('#hour').select2('open');
+                        });
+
+                        $('#scheduleBtn').click(function(){
+                            var scheduleSelected = hour.val();
+                            var dateSelected = $('input[name=date]:checked').val();
+
+                            if (scheduleSelected != "" && dateSelected != "" && dateSelected != undefined) {
+                                defaultAjax({
+                                    url: /*[[@{/__${@evaluationController.URL}__/registerAppointmentSchedule}]]*/null,
+                                    type: "POST",
+                                    data: {
+                                        appointmentScheduleId: scheduleSelected,
+                                        dateSelected:          dateSelected,
+                                        token:                 /*[[${token}]]*/
+                                    }, success: function(data) {
+
+                                        /*
+                                        swal({
+                                            title: "",
+                                            text: "Llamada agendada correctamente.",
+                                            confirmButtonColor: "#F7323F",
+                                            type: "success"
+                                        }, function() {
+                                            location.reload();
+                                        });
+                                        */
+                                    }
+                                }, "");
+                            } else {
+
+
+
+                                $('#error-content').show().find('.text-black').html("<span>Seleccione el horario y la fecha, por favor.</span>").addClass('help-block-error errorContainer');
+                                $('#error-content').find('.actions').remove();
+
+
+
+                                /*
+                                swal({
+                                    title: "",
+                                    text: "Seleccione el horario y la fecha, por favor.",
+                                    confirmButtonColor: "#F7323F",
+                                    type: "info"
+                                });
+                                */
+
+                            }
+                        });
+                    });
+                    /*]]>*/
+                </script>
+            </div>
+            <div th:if="${type == 'appointmentRegistered'}" class="questions-section animated fadeInRight">
+                <p th:utext="#{questions.extra.appointment.registered(${personFirstName ?: 'Hola'})}"></p>
+                <div class="note typetext">
+                    Te acabamos de enviar a tu correo la confirmaci&oacute;n, indic&aacute;ndote el lugar y horario seleccionados, as&iacute; como con los documentos con los que debes asistir.
+                </div>
+            </div>
+
+            <th:block th:if="${type == 'bancoDelSolFinalMessage'}">
+                <div class="questions-section animated fadeInRight">
+                    <p>La solicitud ya fue subida.
+                    </p>
+                    <div class="note">
+                        <a class="anchor-button bg-red" target="_blank" th:href="@{/funcionarios/beingProcessed}">Regresar a la extranet</a>
+                    </div>
+                </div>
+            </th:block>
+
+            <th:block th:if="${type == 'bancoDelSolUploadContract'}">
+                <div class="questions-section animated fadeInRight">
+                    <p>Ya est&aacute; todo listo, descarg&aacute; la solicitud de cr&eacute;dito para que el cliente la firme.<br/>
+                        Una vez firmada, scaneala y hac&eacute; click en subir para cargar los documentos.
+                    </p>
+                    <div class="note" style="display: flex;flex-direction: row; justify-content: space-evenly;">
+                        <button style="border:none;height: 46px;" id="contractBtn" class="anchor-button bg-red">Descargar contrato</button>
+                        <button style="border:none;height: 46px;" id="uploadContractBtn" class="anchor-button bg-red">Subir documentos firmados</button>
+                    </div>
+                </div>
+
+                <div id="uploadDocumentationModal" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 style="display: inline-block;" class="modal-title">Sub&iacute; todos los documentos firmados</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body"></div>
+                            <div class="modal-footer">
+                                <label th:if="${url != null}">
+                                    <a  id="finish" class="anchor-button bg-red" href="javascript:void(0)">Finalizar</a>
+                                </label>
+                                <a id="btnCancel" type="button" style="cursor:pointer;margin-left: 12px;background:white; color: #003876;" class="anchor-button">Cancelar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    (function() {
+                        updateBranding();
+
+                        var urlCanDownload = /*[[ @{/__${@evaluationController.URL}__/downloadBancoDelSolContract} ]]*/null;
+                        var urlValidateBanboDelSolBase = /*[[ @{/__${@evaluationController.URL}__/validateBanboDelSolBase} ]]*/null;
+                        var urlDownload = /*[[ @{/__${@evaluationController.URL}__/__${token}__/downloadBancoDelSolContract} ]]*/null;
+                        var urlUpload = /*[[ @{/__${@evaluationController.URL}__/uploadBancoDelSolContract} ]]*/null;
+                        var urlCanUpload = /*[[ @{/__${@evaluationController.URL}__/canUploadBancoDelSolContract} ]]*/null;
+                        var urlReturnOfferSchedule = /*[[ @{/__${@evaluationController.URL}__/returnOfferSchedule} ]]*/null;
+                        var urlFinish = /*[[ @{/__${@evaluationController.URL}__/filesUploadedAndRedirect} ]]*/null;
+                        var customDocumentTitle = /*[[ ${customDocumentTitle}]]*/null;
+                        var isCustomDocumentTitle = /*[[ ${isCustomDocumentTitle}]]*/null;
+
+                        if(isCustomDocumentTitle)
+                            document.title = customDocumentTitle;
+
+                        $('#finish').click(function(e){
+                            e.preventDefault();
+
+                            defaultAjax({
+                                url: urlFinish,
+                                type: 'POST',
+                                data: {
+                                    token: /*[[${token}]]*/
+                                },
+                                success: function (data) {
+
+                                },
+                                error: function (data) {
+                                    showErrorModal('Hubo un problema al subir los documentos.');
+
+                                    return false;
+                                }
+                            })
+
+                        });
+                        $('#uploadContractBtn').on('click', function(event) {
+                            event.preventDefault();
+                            $('#uploadContractBtn').loading();
+
+                            // validate still in range
+                            defaultAjax({
+                                url: urlCanDownload,
+                                type: 'POST',
+                                data: {
+                                    token: /*[[${token}]]*/
+                                },
+                                success: function(data) {
+
+                                    // validate base negativa BDS
+                                    defaultAjax({
+                                        url: urlValidateBanboDelSolBase,
+                                        type: 'POST',
+                                        data: {
+                                            token: /*[[${token}]]*/
+                                        },
+                                        success: function(data) {
+
+                                            // validate can upload contract
+                                            defaultAjax({
+                                                url: urlCanUpload,
+                                                type: 'POST',
+                                                data: {
+                                                    token: /*[[${token}]]*/
+                                                },
+                                                success: function() {
+                                                    // open upload modal
+                                                    $("#uploadDocumentationModal").modal('show');
+
+                                                    var maxFilesToUpload = 10;
+
+                                                    $('#uploadDocumentationModal').find('.modal-body').html('');
+                                                    $('#uploadDocumentationModal').find('.modal-body').append("<div id=\"uploadFile\" class=\"dropzone\"></div><!--<small class=\"help-block\">* Máximo " + maxFilesToUpload + " archivos</small>-->");
+                                                    let lastFileBase64 = "";
+                                                    $("#uploadFile").dropzone({
+                                                        url: urlUpload,
+                                                        params: {
+                                                            token: /*[[${token}]]*/
+                                                        },
+                                                        paramName: 'file',
+                                                        maxFilesize: 10,
+                                                        maxFiles: maxFilesToUpload,// MAX DE ARCHIVOS COINCIDE CON CONTROLLER
+                                                        parallelUploads: 1,
+                                                        autoProcessQueue: false,
+                                                        dictDefaultMessage: 'Arrastr&aacute; el/los archivo(s) aqu&iacute; para subirlo(s) o hac&eacute; click para seleccionar uno.',
+                                                        acceptedFiles: 'image/*,application/pdf',
+                                                        headers: addCsrfToJsonHeaders({
+                                                            'x-request-sender-type': 'ajax'
+                                                        }),
+                                                        init: function () {
+                                                            this.on("success", function () {
+                                                                // DO NOTHING
+                                                            });
+                                                            this.on("addedfile", function (file) {
+                                                                let _this=this;
+                                                                let reader = new FileReader();
+                                                                reader.onload = function(event) {
+                                                                    lastFileBase64 = event.target.result;
+                                                                    _this.processQueue()
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            });
+                                                            this.on("sending", function (file, xhr, formData) {
+                                                                formData.append("base64", [lastFileBase64]);
+                                                            });
+                                                            this.on('error', function (file, response) {
+                                                                this.removeFile(file);
+                                                                if (response.constructor == Object) {
+                                                                    if (response.type == "message")
+                                                                        showErrorModal(response.message);
+                                                                } else {
+                                                                    if (response != null && response != '')
+                                                                        showErrorModal(response);
+                                                                    else
+                                                                        showErrorModal('Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.');
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+
+                                                    $("#btnCancel").click(function(){
+                                                        $("#uploadDocumentationModal").modal('hide');
+                                                    });
+
+                                                }, error: function (error) {
+                                                    swal({
+                                                        title: "",
+                                                        text: error.message,
+                                                        type: "info"
+                                                    });
+
+                                                    $("#uploadDocumentationModal").modal('hide');
+                                                }, complete: function () {
+                                                    $('#uploadContractBtn').unloading();
+                                                }
+                                            });
+
+                                        },
+                                        error: function (xhr, errorJson) {
+                                            $('#uploadContractBtn').unloading();
+                                            var response = errorJson.message.split(':');
+                                            if (response[0] === 'REJECT') {
+                                                showRejectionMessageForBaseNegativaModal(response[1]);
+                                            } else if (response[0] === 'REPROCESS') { // 'REPROCESS'
+                                                showNeedToReprocessModal(response[1]);
+                                            } else { // RELOAD
+                                                location.reload();
+                                            }
+
+                                            return false;
+                                        },
+                                        complete: function () {
+
+                                        }
+                                    });
+
+                                },
+                                error: function (xhr, errorJson) {
+                                    $('#uploadContractBtn').unloading();
+                                    if(errorJson.type != "recharge"){
+                                        showReturnToOfferScheduleModal(errorJson.message);
+                                        return false;
+                                    }
+                                },
+                                complete: function () {
+
+                                }
+                            });
+                        });
+
+                        $('#contractBtn').on('click', function(event) {
+                            event.preventDefault();
+                            $('#contractBtn').loading();
+
+                            defaultAjax({
+                                url: urlCanDownload,
+                                type: 'POST',
+                                data: {
+                                    token: /*[[${token}]]*/
+                                },
+                                success: function(data) {
+                                    window.location = urlDownload;
+                                },
+                                error: function (xhr, errorJson) {
+                                    if(errorJson.type != "recharge"){
+                                        showReturnToOfferScheduleModal(errorJson.message);
+                                        return false;
+                                    }
+                                },
+                                complete: function () {
+                                    $('#contractBtn').unloading();
+                                }
+                            });
+                        });
+
+                        function showReturnToOfferScheduleModal(message) {
+                            swal({
+                                title: "",
+                                text: message,
+                                type: "info",
+                                confirmButtonText: "Volver a la pantalla de ofertas",
+                                allowOutsideClick: true
+                            }, function (confirm) {
+                                if (confirm) {
+                                    // return to offer schedule
+                                    defaultAjax({
+                                        url: urlReturnOfferSchedule,
+                                        type: 'POST',
+                                        data: {
+                                            token: /*[[${token}]]*/
+                                        },
+                                        success: function() {
+                                            window.location.reload()
+                                        }
+                                    });
+                                }
+                            });
+                        }
+
+                        function showRejectionMessageForBaseNegativaModal(message) {
+                            swal({
+                                title: "",
+                                text: message,
+                                type: "error",
+                                confirmButtonText: "Aceptar",
+                                allowOutsideClick: true
+                            }, function (confirm) {
+
+                            });
+                        }
+
+                        function showNeedToReprocessModal(message) {
+                            swal({
+                                title: "",
+                                text: message,
+                                type: "error",
+                                confirmButtonText: "Aceptar",
+                                allowOutsideClick: true
+                            }, function (confirm) {
+                                location.reload();
+                            });
+                        }
+                    })();
+                    /*]]>*/
+                </script>
+            </th:block>
+        </div>
+        <hr class="divisor-bottom"/>
+    </section>
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooterChooseAgent"></th:block>
+    </th:block>
+</th:block>
+</body>
+</html>

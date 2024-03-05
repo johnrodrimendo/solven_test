@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:text="#{static.title.nosotros}"></title>
+    <link rel="alternate" href="https://www.solven.pe/nosotros" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/nosotros" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/nosotros" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/nosotros" hreflang="x-default" />
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe main-arg' : 'main-pe'}">
+<th:block layout:fragment="content">
+    <section id="banner" class="main-banner bgbanner-inner">
+        <article>
+            <h1 th:text="#{static.landing.conocenos.title}"></h1>
+            <p th:text="#{static.landing.conocenos.descrip}"></p>
+        </article>
+        <img id="bannerPrincipal" th:attr="data-src=@{/img/bgnosotros.jpg}" alt="" class="lazy"/>
+        <img id="bannerResponsive" th:attr="data-src=@{/img/bgperu_responsive.jpg}" alt=""/>
+    </section>
+    <section id="sec_about" class="gwr wrap-about tabs">
+        <ul>
+            <li>
+                <article class="w-item h1">
+                    <div class="title">
+                        <h2>Facundo Turconi
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/facundoturconi/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>Fundador &amp; CEO</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Facundo.jpg}" alt="Facundo Turconi" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            <li>
+                <article class="w-item h2">
+                    <div class="title">
+                        <h2>Juan Barreiro
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/juanignaciobarreiro/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>CFO &amp; Country Manager Argentina</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Juan.jpg}" alt="Juan Ignacio Barreiro" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            <li>
+                <article class="w-item h3">
+                    <div class="title">
+                        <h2>Mat&iacute;as Fernandez
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/matias-fernandez-manero/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>Project Manager</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Matias.jpg}" alt="Matías Fernandez" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            <li>
+                <article class="w-item h4">
+                    <div class="title">
+                        <h2>John Rodriguez
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/john-mc-kevin-rodriguez-mendoza-6abb37a4/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>Lead Software Developer</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-John.jpg}" alt="John Rodriguez" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            <li>
+                <article class="parragraph p1">
+                    <p><b>Facundo</b> dirige la estrategia de la compa&ntilde;&iacute;a trayendo toda su experiencia en el sector financiero durante m&aacute;s de 15 de a&ntilde;os a lo largo de Latinoam&eacute;rica. Fue Country Manager de Afluenta, Gerente de Negocios en Acceso Crediticio, Gerente de Riesgos en Banco Financiero, Interbank, trabaj&oacute; en BBVA Banco Franc&eacute;s (Argentina) y fue Gerente de Proyectos en Experian, implementando Motores de Decisi&oacute;n, CRM, Cobranzas y Modelos Anal&iacute;ticos en toda la regi&oacute;n.</p>
+                </article>
+            </li>
+            <li>
+                <article class="parragraph p2">
+                    <p><b>Juan</b> est&aacute; a cargo de las Finanzas y el desarrollo del negocio en Argentina, aportando sus m&aacute;s de 8 a&ntilde;os de experiencia en Fintech para la originaci&oacute;n de cr&eacute;ditos. Fue Director de Producto y Gerente de Administraci&oacute;n y Finanzas de Afluenta y previamente consultor en Ernst &amp; Young.</p>
+                </article>
+            </li>
+            <li>
+                <article class="parragraph p3">
+                    <p><b>Mat&iacute;as</b> gestiona los proyectos y los productos que ofrecemos en Solven. Tiene amplia experiencia trabajando con metodolog&iacute;as &aacute;giles, procesos y tecnolog&iacute;a para el crecimiento exitoso de marcas como Sally Beauty y Chevron.</p>
+                </article>
+            </li>
+            <li>
+                <article class="parragraph p4">
+                    <p><b>John</b>  lidera la programación del BackEnd de la plataforma, tiene experiencia en an&aacute;lisis y desarrollo, utilizando tecnolog&iacute;as JAVA. Viene de trabajar en Acceso Crediticio, empresa l&iacute;der de financiaci&oacute;n para autos en Per&uacute;.</p>
+                </article>
+            </li>
+            <li>
+                <article class="w-item h5">
+                    <div class="title">
+                        <h2>Esteban D&aacute;valos
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/123stbn/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>Lead Software Developer</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Esteban.jpg}" alt="Esteban Dávalos" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            <li>
+                <article class="w-item h6">
+                    <div class="title">
+                        <h2>Annel Alfaro
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/annelalfaro/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>Head of Acquisition</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Annel.jpg}" alt="Annel Alfaro" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            <li>
+                <article class="w-item h7">
+                    <div class="title">
+                        <h2>Karin Pe&ntilde;a
+                            <a rel="noopener noreferrer" href="https://www.linkedin.com/in/karin-pe%C3%B1a-marchena-b37a74116/" class="text-lightblue" target="_blank">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </h2>
+                        <span>Customer Success Supervisor</span>
+                        <button>+</button>
+                    </div>
+                    <figure>
+                        <img th:attr="data-src=@{https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Karin.jpg}" alt="Karin Peña" class="lazy" />
+                    </figure>
+                </article>
+            </li>
+            
+            <li>
+                <article class="parragraph p5">
+                    <p><b>Esteban</b> maneja la estructura de informaci&oacute;n, tiene experiencia en el dise&ntilde;o y programaci&oacute;n de Bases de Datos. Viene de trabajar en Acceso Crediticio, empresa l&iacute;der de financiaci&oacute;n para autos en Per&uacute;.</p>
+                </article>
+            </li>
+            <li>
+                <article class="parragraph p6">
+                    <p><b>Annel</b> se encarga de la adquisici&oacute;n de usuarios. Tiene experiencia trabajando en StartUps. Fue Global Campaign Manager y Head of Marketing en Panam&aacute;, para Cabify.</p>
+                </article>
+            </li>
+            <li>
+                <article class="parragraph p7">
+                    <p><b>Karin</b> est&aacute; a cargo de servicio al cliente. Tiene amplia experiencia en Banca Retail, gestionando proyectos de crecimiento en compañías como Scotiabank, Citibank y BCP.</p>
+                </article>
+            </li>
+        </ul>
+    </section>
+
+</th:block>
+<script th:inline="javascript" async="async">
+    /*<![CDATA[*/
+    (function() {
+        $('#subscribe').on('click', function(e){
+            e.preventDefault();
+            var responseBlock = $('#response-block'),
+                btn = $(this);
+            if(!isEmail($('#email').val())){
+                responseBlock.html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+            } else {
+                responseBlock.html('');
+                btn.loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/subscribe}]]*/null,
+                    type: 'POST',
+                    data: {
+                        email: $('#email').val(),
+                    },
+                    success: function (data) {
+                        btn.unloading();
+                        $('#email-block').addClass('block-hidden');
+                        responseBlock.html(successAjaxMessage('Gracias por suscribirte, te enviaremos novedades.'));
+
+                    },
+                    error: function (xhr, data) {
+                        btn.unloading();
+                        responseBlock.html(errorAjaxMessage(data.message));
+                        return false;
+                    }
+                });
+            }
+        });
+        var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+        if (validator != null) {
+            var jsonValidator = JSON.parse(validator);
+            $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+        }
+        $('#sendMessage').on('click', function(event){
+            event.preventDefault();
+            validate();
+        });
+        function validate() {
+            if ($('#contactForm').valid()) {
+                grecaptcha.reset();
+                grecaptcha.execute();
+            }
+        }
+        function submit(){
+            $('#sendMessage').loading('', 2);
+            defaultAjax({
+                url: /*[[@{/contact}]]*/,
+                type: 'POST',
+                formValidation: $('#contactForm').data('validator'),
+                data: $('#contactForm').serializeObject(),
+                success: function (data) {
+                    $('#sendMessage').unloading();
+                    $('#contactForm').data('validator').resetForm();
+                    $('#contactForm')[0].reset();
+                    $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                },
+                error: function () {
+                    $('#sendMessage').unloading();
+                }
+            });
+        }
+    }());
+    /*]]>*/
+</script>
+</body>
+</html>

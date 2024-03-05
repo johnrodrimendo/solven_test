@@ -1,0 +1,183 @@
+/* Animations */
+
+
+@import "app/base/variables";
+
+@mixin keyframes($animation-name) {
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @-ms-keyframes #{$animation-name} {
+    @content;
+  }
+  @-o-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+
+/* Prefix */
+@mixin prefix($map, $vendors: webkit moz ms o) {
+  @each $prop, $value in $map {
+    @if $vendors {
+      @each $vendor in $vendors {
+        #{"-" + $vendor + "-" + $prop}: #{$value};
+      }
+    }
+    // Dump regular property anyway
+    #{$prop}: #{$value};
+  }
+}
+
+@mixin animation($str) {
+  @include prefix((animation: #{$str}));
+}
+
+@mixin icon(){
+  font-family: 'Solven Icons', sans-serif;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background RGBA */
+@mixin background-opacity($color, $opacity: 0.3) {
+  background: $color; /* The Fallback */
+  background: rgba($color, $opacity);
+}
+/* Box sizing */
+@mixin box-sizing($type) {
+/* Acceptable values are border, content, and padding - content is the default W3C model */
+  @include prefix((box-sizing: #{$type}-box), webkit moz);
+}
+
+/* Font smoothing */
+@mixin font-smoothing($value: antialiased) {
+  @if $value == antialiased {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @else {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+}
+
+/* Input placeholder */
+@mixin placeholder {
+  &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    @content;
+  }
+  &::-moz-placeholder { /* Firefox 19+ */
+    @content;
+  }
+  &:-ms-input-placeholder { /* IE 10+ */
+    @content;
+  }
+  &:-moz-placeholder { /* Firefox 18- */
+    @content;
+  }
+}
+
+
+/* Border Radius */
+@mixin border-radius($radius) {
+  @include prefix((border-radius: $radius));
+
+}
+
+/* Box Shadow */
+@mixin box-shadow($top, $left, $blur, $color, $inset: false) {
+  @if $inset {
+    @include prefix((box-shadow: inset $top $left $blur $color), webkit moz);
+  } @else {
+    @include prefix((box-shadow: $top $left $blur $color), webkit moz);
+  }
+}
+/* Transform */
+@mixin transform($transforms) {
+  @include prefix((transform: $transforms), webkit moz o ms );
+}
+
+/* Opacity */
+@mixin opacity($fade) {
+  @include prefix((opacity: $fade), webkit moz o ms );
+}
+
+/* Placeholder */
+@mixin placeholder {
+  &::-webkit-input-placeholder {@content}
+  &:-moz-placeholder           {@content}
+  &::-moz-placeholder          {@content}
+  &:-ms-input-placeholder      {@content}
+}
+/* Grayscale */
+@mixin grayscale_element($value) {
+  @include prefix((filter:#{"grayscale(#{$value})"}), webkit moz);
+}
+
+/* Center vertically */
+@mixin vertical-align($position: relative) {
+  position: $position;
+  @include prefix((transform: translateY(-50%)));
+  top: 50%;
+}
+
+
+@include keyframes(hr-animation) {
+  from{ transform: translate(0, 0); }
+  to{ transform: translate(50%, 0); }
+}
+
+@include keyframes(fadeIn) {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@include keyframes(fadeOut) {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@include keyframes(colorRed) {
+  0% { color: $red-2; }
+  100% { color: $red-3; }
+}
+
+@include keyframes(colorGreen) {
+  0% { color: $lightblue-1; }
+  100% { color: $lightblue-2; }
+}
+
+@include keyframes(prgBar) {
+  0%    {
+      opacity: 0;
+      background: $lightblue-1;
+  }
+  5% {
+      opacity: 1;
+      background: $lightblue-1;
+  }
+  9.99% {
+      opacity: 1;
+      background: $lightblue-1;
+  }
+  10%   {
+      opacity: 1;
+      background: $black-4;
+  }
+  95%   {
+      opacity: 1;
+      background: $black-4;
+  }
+}

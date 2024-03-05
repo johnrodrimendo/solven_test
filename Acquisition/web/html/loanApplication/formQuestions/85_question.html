@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q85">
+            <div>
+                <p th:utext="#{questions.block.independentHasOtherIncome}"></p>
+                <a href="#" class="anchor-button bg-black" data-target="no">No</a>
+                <a href="#" class="anchor-button bg-red" data-target="yes">Si</a>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $('.anchor-button').on('click', function (e) {
+            e.preventDefault();
+            console.log("clicked");
+            switch ($(this).data('target')) {
+                case 'yes':
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        data: {'response': true}
+                    }, "");
+                    break;
+                case 'no':
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        data: {'response': false}
+                    }, "");
+                    break;
+            }
+        });
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

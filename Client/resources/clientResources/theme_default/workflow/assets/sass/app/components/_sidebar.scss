@@ -1,0 +1,90 @@
+.sidebar-breadcrumb {
+    background: $black-5;
+    @include border-radius(0 5px 5px 0);
+    left: 0;
+    position: absolute;
+    top: 25%;
+    z-index: 9999;
+    ul {
+        li {
+            height: 55px;
+            overflow: hidden;
+            padding: .25em 1.5em .5em .5em;
+            position: relative;
+            @include transition(width 1s ease);
+            width: 80px;
+            z-index: 9999;
+            .circle, span {
+                display: inline-block;
+                vertical-align: top;
+            }
+            .circle {
+                background: $black-4;
+                @include border-radius(50%);
+                height: 42px;
+                text-align: center;
+                width: 42px;
+                .icon:before {
+                    color: white;
+                    display: inline-block;
+                    font-size: 1.75em;
+                }
+                .icon-dollar:before {
+                    font-size: 1.65em;
+                    margin-top: .1em;
+                }
+                .icon-percent:before {
+                    font-size: 1.25em;
+                    margin-top: .25em;
+                }
+                .icon-percent:before {
+                    font-size: 1.5em;
+                    margin-top: .25em;
+                }
+                .icon-sign:before {
+                    font-size: 1.5em;
+                    margin-top: .15em;
+                }
+            }
+            span {
+                color: $black-3;
+                font-family: 'Lato Medium', 'Helvetica', sans-serif;
+                font-size: .85em;
+                @include transition(all 1s ease);
+                margin: 1em 0 .5em .75em;
+                width: 115px;
+            }
+            .bullets{
+                color: $black-3;
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                top: 10px;
+                border-radius: 100%;
+                right: 10px;
+            }
+        }
+        .active {
+            position: relative;
+            .circle {
+                background: $lightblue-1;
+            }
+            span {
+                color: $lightblue-1;
+            }
+            .bullets {
+                background-color: $lightblue-1;
+            }
+        }
+        &:hover {
+            li {
+                width: 210px;
+            }
+        }
+    }
+}
+@media only screen and(max-width: 992px) {
+    .sidebar-breadcrumb {
+        display: none !important;
+    }
+}

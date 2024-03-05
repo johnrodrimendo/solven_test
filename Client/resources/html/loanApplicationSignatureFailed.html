@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--TOKY-->
+    <script th:if="${@configuration.TOKY_ACTIVE()}">(function(v,p){
+        var s=document.createElement('script');
+        s.src='https://app.toky.co/resources/widgets/toky-widget.js?v='+v;
+        s.onload=function(){Toky.load(p);};
+        document.head.appendChild(s);
+    })('6800f1c', {"$lang":"es","$username":"Solven","$bubble":false,"$text":"Llámanos Gratis","$color":"#00aabb,#f7323f,#ffffff"})
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader "></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="main-content">
+        <div class="container">
+            <div class="wrap">
+                <div class="failedPage">
+                    <div class="failedBox">
+                        <h3>Te hemos enviado un correo electr&oacute;nico.</h3>
+                        <p>Para poder continuar por favor conf&iacute;rmalo en tu bandeja de entrada<div th:if="${email != null}">&nbsp;(<span th:text="${email}"></span>)</div>. &iquest;No lo encuentras? Ll&aacute;manos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

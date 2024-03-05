@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns="http://java.sun.com/jsf/html">
+<head>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!-- Swipebox -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}" rel="stylesheet"/>
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!-- / Bootstrap DatePicker -->
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/switchery/switchery.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/switchery/switchery.min.css'}"
+          rel="stylesheet"/>
+
+    <!--Mask-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+
+    <link rel="stylesheet" th:href="@{/css/company.css}" />
+
+    <!-- TablePaginator -->
+    <script th:src="@{/js/ext_tablepaginator.js}"></script>
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <!-- Locale -->
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+    <!-- / Locale -->
+</head>
+<body>
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+</th:block>
+
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='createLoanApplications')"/>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div shiro:hasPermission="loan:create:store" class="main-crear-solicitud wrap-main portlet light bordered" >
+                <div class="portlet-title" style="width: 100%;">
+                    <div class="caption font-red-sharp">
+                        <span id="tfaTitleId" class="caption-subject font-green-steel bold">Registro</span>
+                    </div>
+                </div>
+
+                <div class="portlet-body">
+                    <th:block th:if="${countries.size() != 1}">
+                        <div class="row">
+                            <div class="col-md-12" style="margin-bottom: 1rem;">
+                                <span class="w-title">País</span>
+                                <select id="country" name="country" class="form-control form-control-mw" >
+                                    <option value="0" hidden="hidden">País</option>
+                                    <option th:each="country : ${countries}" th:value="${country.id}" th:text="${country.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <script th:inline="javascript">
+                            /*<![CDATA[*/
+                            $('select[name=country]').change(function(){
+                                var url = /*[[@{/createLoanApplications/form}]]*/;
+                                $('#formContainer').defaultLoad(url, null, null, 'GET', {countryId: $(this).val()});
+                            });
+                            /*]]>*/
+                        </script>
+                    </th:block>
+
+                    <div id="formContainer">
+                        <th:block th:if="${countries.size() == 1}">
+                            <th:block th:replace="this :: create_loan_form"></th:block>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+            <div shiro:hasPermission="menu:loan:create:view" class="table-responsive portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption font-red-sharp">
+                        <span id="tfaTitleId" class="caption-subject font-green-steel bold">Resultado</span>
+                    </div>
+                </div>
+                <table id="resultsTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Fecha creación</th>
+                            <th>Tipo Doc.</th>
+                            <th>Nro Doc.</th>
+                            <th>Monto</th>
+                            <th>Plazo</th>
+                            <th>Ofertas</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function refreshResults(){
+            var url = /*[[@{/createLoanApplications/results}]]*/;
+            $('#resultsTable').find('tbody').defaultLoad(url, null, null, 'GET');
+        }
+
+        var loopRunning = false;
+        function startRefreshResultsLoop(){
+            if(!loopRunning){
+                setTimeout(refreshResults,10000);
+                loopRunning = true;
+            }
+            refreshResults();
+        }
+        refreshResults();
+
+
+        setTimeout(function () {
+            var $table = $('#resultsTable');
+            dataTable( $table, false, false, true, false );
+        }, 700);
+
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" shiro:hasPermission="loan:create:assist" >
+        /*<![CDATA[*/
+        function assist(button){
+            var $button = $(button);
+            $button.loading();
+            defaultAjax({
+                url: /*[[@{/createLoanApplications/assistLoan}]]*/null,
+                type: 'POST',
+                redirectInNewTab: true,
+                async: false,
+                data: {loan: $button.data('loan')}
+            });
+            $button.unloading();
+        }
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" shiro:hasPermission="loan:create:returnLoan">
+        /*<![CDATA[*/
+        function sendEmailProcessLink(button) {
+            var $button = $(button);
+            $button.loading();
+
+            defaultAjax({
+                url: /*[[@{/createLoanApplications/sendEmailProcessLink}]]*/null,
+                type: 'POST',
+                redirectInNewTab: true,
+                async: false,
+                data: {loan: $button.data('loan')},
+                success: function () {
+                    swal({
+                        title: "",
+                        text: "Se ha enviado un correo al usuario para que continue el proceso.",
+                        type: "success"
+                    });
+                },
+                complete: function() {
+                    $button.unloading();
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+
+</th:block>
+
+<th:block th:fragment="results">
+    <tr th:if="${applications != null}" th:each="application : ${applications}">
+        <td th:text="${@utilService.datetimeShortFormat(application.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(application?.registerDate)}"></td>
+        <td th:text="${application.documentType.name}"></td>
+        <td th:text="${application.documentNumber}"></td>
+        <td th:text="${@utilService.integerMoneyFormat(application.amount, application.currency)}"></td>
+        <td th:text="${application.installments}"></td>
+        <td>
+            <th:block th:if="${application?.offers != null}">
+                <div th:each="offer : ${application.offers}">
+                    <span th:style="${offer.selected} ? 'font-weight: bold'" th:text="${offer?.getLoanOfferDescription(@utilService, application?.country?.id)}"></span>
+                </div>
+            </th:block>
+        </td>
+        <td th:text="${application.status.status}"></td>
+        <td>
+            <button shiro:hasPermission="loan:create:assist" class="btn blue btn-sm" onclick="assist(this)" th:attr="data-loan=${application.id}">Asistir</button>
+            <button shiro:hasPermission="loan:create:returnLoan" th:if="${application.status.id != T(com.affirm.common.model.catalog.LoanApplicationStatus).EXPIRED}" class="btn blue btn-sm" onclick="sendEmailProcessLink(this)" th:attr="data-loan=${application.id}">Enviar por correo</button>
+        </td>
+    </tr>
+</th:block>
+
+<th:block th:fragment="create_loan_form">
+    <div class="row">
+        <form id="loanForm" class="loanForm-group" th:object="${form}">
+            <div class=" form-group"
+                th:if="${form.countryId != T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                <span class="w-title">Tipo de documento</span>
+                <select th:field="*{docType}" class="form-control">
+                    <option value="1">DNI</option>
+                    <option value="2">CE</option>
+                </select>
+            </div>
+            <div class=" form-group">
+                <th:block th:switch="${form.countryId}">
+                    <span th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                        class="w-title">Número de CUIT, CUIL, CDI</span>
+                    <span th:case="*" class="w-title">Nro. Documento</span>
+                </th:block>
+                <input th:field="*{documentNumber}" type="text" class="form-control" />
+                <div class="errorContainer"></div>
+            </div>
+            <div class=" form-group">
+                <span class="w-title">Nombre</span>
+                <input th:field="*{name}" type="text" class="form-control" />
+                <div class="errorContainer"></div>
+            </div>
+            <div class=" form-group">
+                <span class="w-title"
+                    th:text="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU ? 'Apellido Paterno' : 'Apellido'}"></span>
+                <input th:field="*{surname}" type="text" class="form-control" />
+                <div class="errorContainer"></div>
+            </div>
+                <th:block th:if="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                <div class=" form-group">
+                    <span class="w-title">Apellido Materno</span>
+                    <input th:field="*{lastSurname}" type="text" class="form-control" />
+                    <div class="errorContainer"></div>
+                </div>
+            </th:block>
+
+            <div class=" form-group">
+                <span class="w-title">Fecha Nacimiento</span>
+                <input th:field="*{birthday}" type="text" class="form-control" placeholder="dd/MM/yyyy" />
+                <div class="errorContainer"></div>
+                <script>
+                    $('#birthday').mask('00/00/0000');
+                </script>
+            </div>
+        
+                <th:block th:if="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                    <div class=" form-group">
+                        <span class="w-title">Nacionalidad</span>
+                        <select th:field="*{nationality}" class="form-control">
+                            <option th:each="nat : ${@catalogService.getNationalities(#locale)}" th:value="${nat.id}"
+                                th:text="${nat.name}"></option>
+                        </select>
+                        <div class="errorContainer"></div>
+                    </div>
+                </th:block>
+                <!--  -->
+
+                <div class=" form-group">
+                    <span class="w-title">Monto</span>
+                    <input th:field="*{amount}" type="text" class="form-control" />
+                    <div class="errorContainer"></div>
+                </div>
+                <div class=" form-group">
+                    <span class="w-title">Plazo</span>
+                    <input th:field="*{installments}" type="text" class="form-control" />
+                    <div class="errorContainer"></div>
+                </div>
+                <div class=" form-group">
+                    <span class="w-title">Producto</span>
+                    <select class="form-control" disabled="disabled">
+                        <option value="" selected="selected">Consumo</option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class=" form-group">
+                    <span class="w-title">Motivo</span>
+                    <select th:field="*{reason}" class="form-control">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="reason : ${@catalogService.getLoanApplicationReasonsVisible(#locale)}"
+                            th:value="${reason?.id}" th:text="${reason?.reason}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class=" form-group"
+                    th:classappend="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'w-area' : ''}">
+                    <span class="w-title">Nro. Celular</span>
+                    <th:block
+                        th:if="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                        <input th:field="*{code}" type="text" class="form-control fc-area" />
+                    </th:block>
+                    <input th:field="*{phone}" type="text" class="form-control fc-phone" />
+                    <div class="errorContainer"></div>
+                </div>
+                <div class=" form-group">
+                    <span class="w-title">Email</span>
+                    <input th:field="*{email}" type="text" class="form-control" />
+                    <div class="errorContainer"></div>
+                </div>
+
+            
+
+            <!-- Cuando es Argentina -->
+            <!--<th:block th:if="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA or form.nonExistingPerson}">-->
+                
+
+                
+
+               
+            <!--</th:block>-->
+           
+        </form>
+    </div>
+    <div class="wrap-btn wraxp-full " style="margin-top: 1rem;">
+        <button class="btn red btn-group btn-crear">Crear</button>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var jsonValidator = JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/);
+        $('#loanForm').validateForm(createFormValidationJson(jsonValidator, $('#loanForm')));
+        var parents = $('#loanForm').parents().find(".portlet-body").css("width","100%");
+        $('.btn-crear').click(function(){
+            if($('#loanForm').valid()){
+                $('.btn-crear').loading();
+                defaultAjax({
+                    url: /*[[@{/createLoanApplications}]]*/null,
+                    type: 'POST',
+                    form: $('#loanForm'),
+                    redirectInNewTab: true,
+                    data: $.extend($('#loanForm').serializeObject(), {countryId: $('#country').val()}),
+                    success: function(){
+                        $('.btn-crear').unloading();
+                        resetForm();
+                        startRefreshResultsLoop();
+                    }, error: function(){
+                        $('.btn-crear').unloading();
+                    }
+                });
+            }
+        });
+
+        function resetForm(){
+            $('#docType').val('');
+            $('#documentNumber').val('');
+            $('#name').val('');
+            $('#surname').val('');
+            $('#lastSurname').val('');
+            $('#birthday').val('');
+            $('#email').val('');
+            $('#amount').val('');
+            $('#installments').val('');
+            $('#reason').val('');
+            $('#code').val('');
+            $('#phone').val('');
+            $('#nationality').val($('#nationality').children().first().val());
+            $('#nationality').parent().hide();
+
+            if(/*[[${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}]]*/) {
+                // $('#name').parent().hide();
+                // $('#surname').parent().hide();
+                // $('#lastSurname').parent().hide();
+                // $('#birthday').parent().hide();
+                // $('#nationality').parent().hide();
+                previousDocumentNumber = null;
+            }
+        }
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+        /*<![CDATA[*/
+
+        var staticPhoneNumberMaxlength = $('#loanForm').data('validatorJson').rules.phone.maxlength;
+        $('body').on('keyup', '#code', function () {
+            $('#loanForm').data('validatorJson').rules.phone.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#loanForm').data('validatorJson').rules.phone.minlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#loanForm').validateForm($('#loanForm').data('validatorJson'));
+            $('#loanForm').data('validator').resetForm();
+        });
+
+        $('#phone').mask('000-#');
+        $('body').on('keyup', '#code', function () {
+            var actualCodeLength = $(this).val().length;
+            if (actualCodeLength == 2) {
+                $('#phone').mask('0000-#');
+            } else if (actualCodeLength > 2) {
+                $('#phone').mask('000-#');
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${form.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+        /*<![CDATA[*/
+        $('#phone').unmask();
+
+        var previousDocumentNumber = /*[[${form.documentNumber}]]*/;
+        var docType = $('#docType');
+        docType.on('change', function () {
+            if($(this).val() != /*[[${form.docType}]]*/) {
+                $('#documentNumber').val('');
+                $('#name').val('');
+                $('#surname').val('');
+                $('#lastSurname').val('');
+                $('#birthday').val('');
+                $('#email').val('');
+                $('#amount').val('');
+                $('#installments').val('');
+                $('#reason').val('');
+                $('#code').val('');
+                $('#phone').val('');
+                $('#nationality').val($('#nationality').children().first().val());
+                previousDocumentNumber = null;
+                debugger;
+            }
+
+            $('#nationality').val($('#nationality').children().first().val());
+            if($(this).val() == 2) {
+                $('#nationality').parent().show();
+            } else {
+                $('#nationality').parent().hide();
+            }
+
+            if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.IdentityDocumentType).CE}]]*/) {
+                $('#loanForm').data('validatorJson').rules.documentNumber.minlength = 8;
+                $('#loanForm').data('validatorJson').rules.documentNumber.maxlength = 9;
+            } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.IdentityDocumentType).DNI}]]*/) {
+                $('#loanForm').data('validatorJson').rules.documentNumber.minlength = 8;
+                $('#loanForm').data('validatorJson').rules.documentNumber.maxlength = 8;
+            }
+            $('#loanForm').validateForm($('#loanForm').data('validatorJson'));
+            $('#loanForm').data('validator').resetForm();
+        });
+        docType.change();
+
+        $('#documentNumber').on('blur', function () {
+            if($('#documentNumber').val() == '' || $('#documentNumber').val() == previousDocumentNumber) {
+                return;
+            }
+            if ($(this).valid()) {
+                $('.btn-crear').loading();
+                defaultAjax({
+                    url: /*[[@{/createLoanApplications/documentNumber}]]*/null,
+                    type: 'POST',
+                    data: $.extend($('#loanForm').serializeObject(), {countryId: $('#country').val()}),
+                    success: function(result){
+                        $('.btn-crear').unloading();
+                        $('#formContainer').html(result);
+                    }, error: function(){
+                        $('.btn-crear').unloading();
+                    }
+                });
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

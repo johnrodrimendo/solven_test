@@ -1,0 +1,158 @@
+@import "app/vendors/bourbon/bourbon";
+@import "app/base/typography";
+@import "app/base/mixins";
+@import "app/base/variables";
+@import "app/base/reset";
+@import "app/base/icons";
+@import "app/base/classes";
+
+.two-col {
+  display: inline-block;
+  vertical-align: top;
+  width: 48%;
+  p {
+    font-size: .65em;
+    b {
+      color: $black-1;
+      font-weight: normal;
+    }
+    span {
+      margin-left: 1em;
+    }
+  }
+}
+.column {
+  p {
+    font-size: .65em;
+    b {
+      color: $black-1;
+      font-weight: normal;
+    }
+    span {
+      margin-left: 1em;
+    }
+  }
+  p.on-modal {
+    color: $black_color_main;
+    b {
+      color: $black_color_main;
+      font-weight: bold;
+    }
+  }
+}
+
+.top-summary {
+  @include border-radius(5px);
+  .title-right,
+  .logo-left {
+      display: inline-block;
+      vertical-align: top;
+  }
+  .logo-left {
+    float: left;
+    img {
+      height: 40px;
+    }
+  }
+  .title-right {
+    float: right;
+    text-align: right;
+    h3 {
+      color: $black_color_main;
+      font-family: 'Lato Bold', 'Helvetica', sans-serif;
+      font-size: .75em;
+      margin: 0;
+      margin-bottom: .5em;
+      text-transform: uppercase;
+    }
+    .on-modal {
+      font-size: 1em;
+    }
+  }
+}
+
+.clear {
+  clear: both;
+}
+
+.gray-block {
+  @include border-radius(5px);
+  padding: .25em .5em;
+  margin-bottom: .25em;
+  .row {
+    h3 {
+      color: $black_color_main;
+      font-family: 'Lato Bold', sans-serif;
+      font-weight: bold;
+      font-size: .65em;
+      margin-bottom: .5em;
+    }
+
+    p {
+      font-size: .65em;
+    }
+    .on-modal {
+      color: $black_color_main;
+      font-size: .85em;
+    }
+  }
+  div.on-modal {
+    padding: 1em;
+  }
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+.legal-footer {
+  color: $black-1;
+  font-size: .65em;
+  ol,
+  ul {
+    margin: 0;
+    padding: 0 .25em 0 1.5em;
+  }
+}
+.table-responsive {
+  table {
+    border: 0;
+    width: 100%;
+    thead {
+      background: $black_color_main;
+      tr {
+        border: 0;
+        th {
+          border: 0;
+          font-size: .75em;
+          color: white;
+          text-align: center;
+        }
+      }
+    }
+    tbody {
+      tr {
+        td {
+          border-bottom: 1px solid $blue-3;
+          color: $black_color_main;
+          font-size: .75em;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+@media only screen and(max-width: 640px) {
+  .two-col {
+    p {
+      span {
+        display: block;
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+
+@media print {
+  .pdfPageBreak {page-break-after: always;}
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<div th:fragment="consolidationOffer" class="accordion-container" data-accordion-group="true">
+    <form action="" autocomplete="off">
+        <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(creditCardDebts)}">
+            <div data-control="true" class="head-accordion no-hand">
+                <div class="hero-details">
+                    <h2><span class="circle-step">1</span> <span class="circle-text">Tarjetas de cr&eacute;dito</span>
+                    </h2>
+                </div>
+            </div>
+            <div data-content="true" class="accordion-content">
+                <div class="resume-items">
+                    <ul>
+                        <li th:each="debt : ${creditCardDebts}">
+                            <div class="item-inner no-recommended"
+                                 th:attr="data-balance=${debt.balance}">
+                                <h3><span th:text="${debt.entity.shortName}"></span>
+                                    <small th:text="'('+${@utilService.integerMoneyFormat(debt.balance)}+'; '+${@utilService.percentFormat(debt.rate)}+')'"></small>
+                                </h3>
+                                <div class="actions">
+                                    <button class="consolidationButton no-consolidate-button" data-value="not">
+                                        <span>No consolidar</span>
+                                        <i class="icon remove-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(consumeDebts)}">
+            <div data-control="true" class="head-accordion no-hand">
+                <div class="hero-details">
+                    <h2><span class="circle-step">2</span> <span class="circle-text">Cr&eacute;ditos de consumo</span>
+                    </h2>
+                </div>
+            </div>
+            <div data-content="true" class="accordion-content">
+                <div class="resume-items">
+                    <ul>
+                        <li th:each="debt : ${consumeDebts}">
+                            <div class="item-inner no-recommended"
+                                 th:attr="data-balance=${debt.balance}">
+                                <h3><span th:text="${debt.entity.shortName}"></span>
+                                    <small th:text="'('+${@utilService.integerMoneyFormat(debt.balance)}+'; '+${@utilService.percentFormat(debt.rate)}+')'"></small>
+                                </h3>
+                                <div class="actions">
+                                    <button class="consolidationButton no-consolidate-button" data-value="not">
+                                        <span>No consolidar</span>
+                                        <i class="icon remove-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(commerceDebts)}">
+            <div data-control="true" class="head-accordion no-hand">
+                <div class="hero-details">
+                    <h2><span class="circle-step">3</span> <span class="circle-text">Cr&eacute;ditos para mi negocio</span>
+                    </h2>
+                </div>
+            </div>
+            <div data-content="true" class="accordion-content">
+                <div class="resume-items">
+                    <ul>
+                        <li th:each="debt : ${commerceDebts}">
+                            <div class="item-inner no-recommended"
+                                 th:attr="data-balance=${debt.balance}">
+                                <h3><span th:text="${debt.entity.shortName}"></span>
+                                    <small th:text="'('+${@utilService.integerMoneyFormat(debt.balance)}+'; '+${@utilService.percentFormat(debt.rate)}+')'"></small>
+                                </h3>
+                                <div class="actions">
+                                    <button class="consolidationButton no-consolidate-button" data-value="not">
+                                        <span>No consolidar</span>
+                                        <i class="icon remove-icon"></i>
+                                    </button>
+                                    <!--<button class="consolidationButton consolidate-button" data-value="yes">
+                                        <span>Consolidar</span>
+                                        <i class="remove-icon"></i>
+                                    </button>-->
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="loan-details loanApplicationMonths margin-bottom-3 " style="display: block;">
+            <div class="row">
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                    <div class="slider-section">
+                        <label>&iquest;En que
+                            periodo?</label>
+                        <div id="loanApplicationPeriodMonths"></div>
+                        <div class="values">
+                            <div class="min-value normal-number">2 meses</div>
+                            <div class="max-value normal-number">36 meses</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="resume-total-container">
+            <div class="general-resume">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 column">
+                        <div class="lightblue-box">
+                            <p>Tu ahorro mensual</p>
+                            <div class="saving-wrap">
+                                <div class="prefix">S/</div>
+                                <h2 data-counter="counterup" th:attr="data-value=${preConsolidationMonthlyInstallment}">248.35</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 column">
+                        <ul>
+                            <li>
+                                <p>Monto total calculado: </p>
+                                <div class="amount-wrap">
+                                    <span class="prefix">S/</span>
+                                    <h5 id="totalBalance" data-counter="counterup"
+                                        data-value="1825">0</h5>
+                                </div>
+                            </li>
+                            <li>
+                                <p>Tu nueva cuota mensual: </p>
+                                <div class="amount-wrap">
+                                    <span class="prefix">S/</span>
+                                    <h5 id="monthlyPayment" data-counter="counterup"
+                                        data-value="1825">0</h5>
+                                </div>
+                            </li>
+                            <li>
+                                <p>Comisi&oacute;n: </p>
+                                <div class="amount-wrap">
+                                    <span class="prefix">S/</span>
+                                    <h5 id="totalBalance" data-counter="counterup"
+                                        data-value="1825">0</h5>
+                                </div>
+                            </li>
+                            <li>
+                                <p>TEA: </p>
+                                <div class="amount-wrap">
+                                    <h5 id="teaDebts" data-counter="counterup"
+                                        data-value="1825">0</h5>
+                                    <span class="prefix">%</span>
+                                </div>
+                                <p>- TCEA: </p>
+                                <div class="amount-wrap">
+                                    <h5 id="tceaDebts" data-counter="counterup"
+                                        data-value="1825">0</h5>
+                                    <span class="prefix">%</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-5 column">
+                        <div class="button-wrap">
+                            <button id="cronogramaButton" class="button red-button">Ver cronograma</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

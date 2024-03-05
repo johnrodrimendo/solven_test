@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--Google maps-->
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q164">
+        <div class="form q164">
+            <p th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">Ingresa tu información de contacto</p>
+            <p th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">Registra tus datos para poder mantenerte esta oferta hasta fin de mes.</p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="field inline">
+                    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Número celular" class="input-outline"/>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline">
+                    <input type="text" class="input-outline" placeholder="nombre@dominio.com" id="email" name="email"/>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

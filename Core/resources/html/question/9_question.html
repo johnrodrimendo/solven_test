@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <div class="waiting-block" style="display: none">
+                <p th:utext="#{questions.block.calculating}"></p>
+            </div>
+
+            <div class="delayed-block" style="display: none">
+                <p th:utext="#{questions.block.waitingMessage}"></p>
+            </div>
+
+            <div class="has-result-block" style="display: none">
+                <p th:utext="#{questions.block.foundYourOffer}"></p>
+            </div>
+        </div>
+
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+
+            function sendPost() {
+                questionFlow.callCustomMethod('status', {}, function (data) {
+                    if (data == 'delayed') {
+                        questionFlow.find('.waiting-block').hide();
+                        questionFlow.find('.delayed-block').show();
+                        questionFlow.find('.has-result-block').hide();
+                    }
+                    if (data == 'waiting') {
+                        questionFlow.find('.waiting-block').show();
+                        questionFlow.find('.delayed-block').hide();
+                        questionFlow.find('.has-result-block').hide();
+                    }
+                    if(data == 'hasResult'){
+                        questionFlow.find('.waiting-block').hide();
+                        questionFlow.find('.delayed-block').hide();
+                        questionFlow.find('.has-result-block').show();
+                        questionFlow.loadNextQuestions();
+                    }
+
+                    if (data == null || data == 'waiting' || data == 'delayed') {
+                        setTimeout(function () {
+                            sendPost();
+                        }, data != null && data == 'delayed' ? 60000 : 1000);
+                    }
+
+                });
+            }
+
+            setTimeout(function(){
+                sendPost();
+            }, 1000);
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

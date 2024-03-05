@@ -1,0 +1,146 @@
+<!DOCTYPE html><!--[if IE 8]><html class="ie8 no-js"> <![endif]--><!--[if IE 9]><html class="ie9 no-js"> <![endif]--><!--[if !IE]><!--><html xmlns:th="http://www.thymeleaf.org"      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"><!--<![endif]-->
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Solven | Backoffice</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <!--
+    <style th:inline="text">
+        @font-face {
+            font-family: "Solven Icons";
+            font-style: normal;
+            font-weight: normal;
+            src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")
+        }
+    </style>
+    -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var system = {
+            contextPath : /*[[ ${#httpServletRequest.getContextPath()} ]]*/,
+            unloadAlert: false
+        };
+        window.addEventListener("beforeunload", function (e) {
+            if (system.unloadAlert) {
+                var confirmationMessage = '¿Est&aacute;s seguro que deseas salir de la página?';
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            }
+        });
+        /*]]>*/
+    </script>
+    <!-- BEGIN GLOBAL MANDATORY RESOURCES -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet" type="text/css"/>
+    <!-- css -->
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/font-awesome/css/font-awesome.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/simple-line-icons/simple-line-icons.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/global/css/components-md.min.css'}" rel="stylesheet" id="style_components" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/global/css/plugins-md.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout3/css/layout.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout3/css/themes/red-sunglo.min.css'}" rel="stylesheet" type="text/css" id="style_color"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-toastr/toastr.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.css'}" rel="stylesheet" type="text/css" />
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/summernote/summernote.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/datatables/datatables.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/app.css}" rel="stylesheet" type="text/css"/>
+
+    <style>
+        .pac-container{
+            z-index: 99999 !important;
+        }
+    </style>
+
+    <!--
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout3/css/custom.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-switch/css/bootstrap-switch.min.css'}" rel="stylesheet" type="text/css"/>
+    -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/jquery.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/js/bootstrap.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/js-cookie/js.cookie.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-toastr/toastr.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/blockUI/jquery.blockui.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootbox/bootbox.min.js'}" type="text/javascript"></script>
+    <!--
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-switch/js/bootstrap-switch.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-slimscroll/jquery.slimscroll.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout3/scripts/demo.min.js'}" type="text/javascript"></script>
+    -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/global/scripts/app.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/layout3/scripts/layout.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/metronic/layouts/global/scripts/quick-sidebar.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/summernote/summernote.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/summernote/lang/summernote-es-ES.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.min.js'}"></script>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/datatables/datatables.min.js'}" type="text/javascript"></script>
+    <!--
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+    -->
+    <script th:src="@{/js/util.js}" type="text/javascript"/>
+</head>
+<body class="page-container-bg-solid page-md page-header-menu-fixed">
+    <div class="page-wrapper">
+        <th:block th:replace="fragments/header :: header"></th:block>
+        <div class="page-wrapper-row full-height">
+            <div class="page-wrapper-middle">
+                <div class="page-container">
+                    <div class="page-content-wrapper">
+                        <th:block layout:fragment="content"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <th:block th:replace="fragments/footer :: footer"></th:block>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $( document ).ready(function() {
+            var table = $('table').each(function () {
+                getDatatable($(this), $(this).hasClass('multiselect'));
+            });
+
+            
+            $(document).on('click focus', '.btn-group >a' , function(event){
+                event.preventDefault();
+                event.stopPropagation();
+                $(this).closest('.btn-group').toggleClass('active');
+                $(this).parent().find('>.dropdown-menu').toggleClass('active').focus();
+
+            });
+
+            $(document).on('click', '.btn-group >.dropdown-menu >.dropdown-submenu' , function(event){
+                event.preventDefault();
+
+                event.stopPropagation();
+                $(this).find('.dropdown-menu').addClass('active');
+                $(this).closest('.dropdown-menu').addClass('active');
+                $(this).closest('.btn-group').addClass('active');
+                $(this).parent().removeClass('active');
+            });
+
+
+            $(document).on('focusout', '.btn-group >.dropdown-menu' , function(event){
+                event.preventDefault();
+                event.stopPropagation();
+                $(this).removeClass('active');
+            });
+
+            $(document).on("click",function(e) {
+                var container = $(".btn-group >a");
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
+                    $('.btn-group >.dropdown-menu').removeClass('active');
+                }
+            });
+
+
+
+
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

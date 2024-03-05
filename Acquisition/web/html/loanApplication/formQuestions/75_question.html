@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:text="#{questions.compare.salary}"></p>
+        <div class="note">
+            <span th:text="#{questions.compare.minIncome}"></span>
+        </div>
+        <form id="questionForm" th:object="${form}" autocomplete="off">
+            <div class="field field-amount inline">
+                <div class="wrap-field">
+                    <div class="box-icon prefix-box tiny-input">
+                        <span class="prefix"
+                              th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                    </div>
+                    <input type="text" class="input-outline amount-input" th:field="*{income}"/>
+                    <small th:utext="#{questions.help.netoIncome}" class="input-help">Ingreso bruto</small>
+                </div>
+            </div>
+            <div class="field inline">
+                <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+            <div class="errorContainer"></div>
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    button: $('#sendButton'),
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

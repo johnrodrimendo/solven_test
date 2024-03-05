@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+
+    <title>Tus primeros cr&eacute;ditos</title>
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!-- Owner -->
+    <script th:src="@{/js/registerForm.js}"></script>
+
+    <!-- Burger Menu -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/hamburger/hamburgers.min.css'}"/>
+    <!-- / Burger Menu -->
+
+    <!-- StandoutMe -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/standoutme/css/standoutme.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/standoutme/js/standoutme.min.js'}"></script>
+    <!-- / StandoutMe -->
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.js'}"></script>
+    <!-- / Owl. Carousel -->
+
+    <!-- SwipeBox -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <!-- / SwipeBox -->
+
+    <!-- noUiSlider -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/wnumb-1.0.2/wNumb.min.js'}"></script>
+    <!-- / noUiSlider -->
+
+    <!-- Locale -->
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+    <!-- / Locale -->
+
+    <script th:inline="javascript">
+
+        /*<![CDATA[*/
+        console.log('v1');
+        var entityRates = /*[[${@utilService.toJson(@loanApplicationDAO.getEntityRatesByProduct(#locale, T(com.affirm.common.model.catalog.Product).SHORT_TERM))}]]*/null;
+        var clusters = JSON.parse(/*[[${@catalogService.getClustersJson(#locale)}]]*/);
+        var entityRatesJson = JSON.parse(entityRates);
+        var loanApplicationToken = "";
+
+        function goToEstimaTasa() {
+            $('.loanApplicationDays').show();
+            $('.loanApplicationMonths').hide();
+            $('#loan-amount').html('S/. ' + $('#loanApplicationAmmount-input').val());
+            $('#loan-cuotes').html($('#loanApplicationShorTermDays-input').val() + ' meses');
+            $('#checkYourRate').modal({backdrop: 'static', keyboard: false, show: true});
+            paintCalculation();
+        }
+
+        function letMeKnow() {
+            var baseUrl = /*[[@{/early/2/}]]*/;
+            if (!isEmail($('#earlyEmail').val())) {
+                $('#response-block').html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+            } else {
+                $('#response-block').html('');
+                $('#landingSubmit').loading();
+                defaultAjax({
+                    url: baseUrl,
+                    type: 'POST',
+                    data: $('#frmEarlyAccess').serializeObject(),
+                    success: function (data) {
+                        $('#landingSubmit').unloading();
+                        $('.hideAjax').css({'display': 'none'});
+                        $('#response-block').html(successAjaxMessage('Te avisaremos apenas estemos listos.'));
+                    },
+                    error: function () {
+                        $('#landingSubmit').unloading();
+                    }
+                });
+            }
+        }
+
+        $(document).on('ready', function () {
+
+            <!-- Birthdate -->
+            $('#birthDate').datepicker({
+                endDate: "-18y",
+                autoclose: true,
+                startView: 2,
+                format: "dd/mm/yyyy",
+                focusOnShow: true
+            });
+            <!-- / Birthdate -->
+
+
+            <!-- Header Sticky -->
+            $(window).on('scroll', function () {
+                var scrollTop = $(window).scrollTop(),
+                        header = $('.home-header');
+
+                if (scrollTop > 1) {
+
+                    /*if ($(window).width() > 480) {
+                     $('.cookiesBar').removeClass('slideInDown');
+                     $('.cookiesBar').removeClass('slideInUp');
+                     $('.cookiesBar').css({'bottom': 0}).addClass('slideInDown');
+                     }*/
+
+                    sticky(header);
+                } else {
+
+                    /*if ($(window).width() > 480) {
+                     $('.cookiesBar').removeClass('slideInDown');
+                     $('.cookiesBar').removeClass('slideInUp');
+                     $('.cookiesBar').css({'bottom': '70px'}).addClass('slideInUp');
+                     }*/
+
+                    unSticky(header);
+                }
+
+            });
+            <!-- / Header Sticky -->
+
+            <!--  Min and max values -->
+            var jsonProductShortTerms = {
+                maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMaxAmount()} ]]*/,
+                minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMinAmount()} ]]*/,
+                maxInstallments: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMaxInstallments()} ]]*/,
+                minInstallments: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMinInstallments()} ]]*/
+            };
+            <!--  / Min and max values -->
+
+            <!-- Slider Amount -->
+            var amountSlider = document.getElementById('loanApplicationAmmount'),
+                    ammountLabel = document.getElementById('loanApplicationAmmount-label'),
+                    ammountInput = document.getElementById('loanApplicationAmmount-input');
+
+            $('#shortMountMin').html('S/ ' + jsonProductShortTerms.minValue);
+            $('#shortMountMax').html('S/ ' + jsonProductShortTerms.maxValue);
+
+            $('#minPeriod').html(jsonProductShortTerms.minInstallments + ' mes');
+            $('#maxPeriod').html(jsonProductShortTerms.maxInstallments + ' meses');
+
+            noUiSlider.create(amountSlider, {
+                start: /*[[ ${userRegisterForm.loanApplicationAmmount} ]]*/,
+                step: 10,
+                connect: 'lower',
+                range: {
+                    'min': jsonProductShortTerms.minValue,
+                    'max': jsonProductShortTerms.maxValue
+                },
+                format: wNumb({
+                    decimals: 0,
+                    thousand: ' ',
+                    prefix: 'S/. '
+                })
+            });
+
+            amountSlider.noUiSlider.on('update', function (values, handle) {
+                ammountInput.value = stringToNumber(values[handle]);
+                ammountLabel.innerHTML = values[handle];
+                if (document.getElementById('loan-amount')) {
+                    document.getElementById('loan-amount').innerHTML = values[handle];
+                }
+                paintCalculation();
+            });
+
+            ammountInput.addEventListener('change', function () {
+                amountSlider.noUiSlider.set([null, this.value]);
+            });
+            <!-- / Slider Amount -->
+
+            <!-- Slider Period -->
+            var shortTermDaysSlider = document.getElementById('loanApplicationShorTermDays'),
+                    shortTermDaysLabel = document.getElementById('loanApplicationShorTermDays-label'),
+                    shortTemDaysInput = document.getElementById('loanApplicationShorTermDays-input'),
+                    shortTemDaysFInish = document.getElementById('loanApplicationShorTermDays-finish'),
+                    finishDate;
+
+            if (jsonProductShortTerms.minInstallments != jsonProductShortTerms.maxInstallments) {
+                noUiSlider.create(shortTermDaysSlider, {
+                    start: /*[[ ${userRegisterForm.loanApplicationInstallments} ]]*/,
+                    step: 1,
+                    connect: 'lower',
+                    range: {
+                        'min': jsonProductShortTerms.minInstallments,
+                        'max': jsonProductShortTerms.maxInstallments
+                    },
+                    format: wNumb({
+                        decimals: 0,
+                        postfix: ' meses'
+                    })
+                });
+
+                shortTermDaysSlider.noUiSlider.on('update', function (values, handle) {
+
+                    shortTemDaysInput.value = stringToNumber(values[handle]);
+                    shortTermDaysLabel.innerHTML = values[handle];
+                    finishDate = getFinishDate(stringToNumber(values[handle]) * 2, 'month');
+                    shortTemDaysFInish.innerHTML = 'Finaliza (' + finishDate + ')';
+                    if (document.getElementById('loan-cuotes')) {
+                        document.getElementById('loan-cuotes').innerHTML = values[handle];
+                        document.getElementById('finish-date').innerHTML = 'Finaliza (' + finishDate + ')';
+                    }
+                    paintCalculation();
+
+                });
+
+                shortTemDaysInput.addEventListener('change', function () {
+                    shortTermDaysSlider.noUiSlider.set([null, this.value]);
+                });
+            } else {
+                $('#rangeInstallments').remove();
+                $('.alone-label').css({'margin-top': '1.75em'});
+                shortTemDaysInput.value = jsonProductShortTerms.maxInstallments;
+                finishDate = getFinishDate(jsonProductShortTerms.maxInstallments * 2, 'week');
+                console.log('periodFinish 2' +  periodFinish);
+                shortTermDaysLabel.innerHTML = jsonProductShortTerms.maxInstallments + ' meses';
+                shortTemDaysFInish.innerHTML = 'Finaliza (' + finishDate + ')';
+                document.getElementById('loan-cuotes').innerHTML = jsonProductShortTerms.maxInstallments + ' meses';
+                document.getElementById('finish-date').innerHTML = 'Finaliza (' + finishDate + ')';
+            }
+
+            <!-- / Slider Period -->
+
+
+            <!-- Slider Cluster -->
+            var clusterSlider = document.getElementById('loanApplicationCluster'),
+                    clusterLabel = document.getElementById('loanApplicationCluster-label'),
+                    clusterInput = document.getElementById('loanApplicationCluster-input'),
+                    clusterDesc = document.getElementById('descCluster');
+
+            noUiSlider.create(clusterSlider, {
+                start: 4,
+                step: 1,
+                connect: 'lower',
+                range: {
+                    'min': 1,
+                    'max': 7
+                },
+                format: wNumb({
+                    decimals: 0
+                })
+            });
+
+            clusterSlider.noUiSlider.on('update', function (values, handle) {
+                //debugger;
+                $('.custom-tooltip ul li span').removeClass('active-tp');
+                var activate = document.getElementById('active-' + Number(values[handle]));
+                activate.className = 'active-tp';
+                var clusterData = convertToCluster(Number(values[handle]));
+                clusterInput.value = Number(values[handle]);
+                clusterLabel.innerHTML = clusterData.typeCode;
+                clusterDesc.innerHTML = clusterData.desc;
+                paintCalculation();
+
+            });
+
+            clusterInput.addEventListener('change', function () {
+                clusterSlider.noUiSlider.set([null, this.value]);
+            });
+            <!-- / Slider Cluster -->
+
+            //== Edit on Modal == //
+            var editableMonths = $('#loanApplicationAmmount-input'),
+                    labelMonths = $('#loanApplicationAmmount-label');
+
+            permitOnlyNumbers(editableMonths);
+
+            $('.edit-amount').on('click', function (event) {
+                event.preventDefault();
+                labelMonths.hide(0);
+                editableMonths.attr('maxlength', 5);
+                editableMonths.css({'display': 'block'});
+                editableMonths.focus();
+                editableMonths.standOut();
+                $('.edit-amount').hide();
+            });
+
+            editableMonths.on('blur', function (e) {
+                e.preventDefault();
+                editableMonths.standOff();
+                labelMonths.show(0);
+                labelMonths.html('S/. ' + thousandWithSpace(editableMonths.val()));
+                amountSlider.noUiSlider.set(editableMonths.val());
+                editableMonths.css({'display': 'none'});
+                $('.edit-amount').show();
+                paintCalculation();
+            });
+
+            editableMonths.on('keyup', function (e) {
+                e.preventDefault();
+                if ( e.keyCode == 13 ){
+                    e.preventDefault();
+                    editableMonths.standOff();
+                    labelMonths.show(0);
+                    labelMonths.html('S/. ' + thousandWithSpace(editableMonths.val()));
+                    amountSlider.noUiSlider.set(editableMonths.val());
+                    editableMonths.css({'display': 'none'});
+                    $('.edit-amount').show();
+                    paintCalculation();
+                }
+            });
+
+            <!-- Submit -->
+            var sliderSection = document.getElementById('slides-section'),
+                    docSection = document.getElementById('document-section'),
+                    bSubmit = document.getElementById('apply-for');
+
+            bSubmit.addEventListener('click', function (event) {
+                event.preventDefault();
+                //debugger;
+                hideContent(sliderSection, docSection, '&iexcl;Ya casi estamos!');
+
+                if ($('#countryLocked').length != 0) {
+                    $('#countryLocked').css({'display': 'block'});
+                    hideContent(sliderSection, docSection, 'Ops!');
+                }
+
+                if ($('#document-block').length === 0) {
+                    $('#sooner-section').css({'display': 'block'});
+                } else {
+                    $('#document-block').css({'display': 'block'});
+                    $('#docNumber').focus();
+                    $('#loan-amount').html('S/ ' + $('#loanApplicationAmmount-input').val());
+                    $('#loan-cuotes').html($('#loanApplicationShorTermDays-input').val() + ' meses');
+                }
+
+            });
+
+
+            var docType = $('#docType'),
+                    docNumber = $('#docNumber'),
+                    phoneNumber = $('#phoneNumber'),
+                    dateOfBirth = $('#birthDate'),
+                    smsTokenNumber = $('#smsTokenNumber'),
+                    terms = $('#termsAndConditions');
+
+            // Default options
+            docNumber.attr('maxlength', 8);
+            phoneNumber.attr('maxlength', 9);
+            dateOfBirth.attr('maxlength', 10);
+            smsTokenNumber.attr('maxlength', 4);
+
+            // Ony Numbers
+            permitOnlyNumbers(docNumber);
+            permitOnlyNumbers(phoneNumber);
+            permitOnlyNumbers(smsTokenNumber);
+
+            $(docType).on('change', function () {
+                docNumber.focus();
+                docNumber.val('');
+                $('#docError, #dobError').html('');
+                if (this.value == 1) {
+                    $('#ceSection').css({'display': 'none'});
+                    docNumber.attr('maxlength', 8);
+                } else {
+                    $('#ceSection').css({'display': 'block'});
+                    docNumber.attr('maxlength', 9);
+                    dateOfBirth.attr('maxlength', 10);
+                }
+            });
+
+            var buttons = $('#m-buttons button'),
+                    resendButtonToken = $('#resendToken'),
+                    cellphoneButton = $('#cellphone-button'),
+                    cancelButton = $('#cancel-button'),
+//                    facebookButton = $('#facebook-button'),
+                    applyButton = $('#apply-button'),
+                    dataType,
+                    valid,
+                    documentBlock = $('#document-block'),
+                    cellphoneBlock = $('#cellphone-block'),
+                    tokenBlock = $('#sms-token-block'),
+                    validateButton = $('#validate-button'),
+                    cell;
+
+            resendButtonToken.on('click', function (event) {
+                event.preventDefault();
+
+                var urlResend = /*[[@{/loanapplication/}]]*/;
+                defaultAjax({
+                    url: urlResend + loanApplicationToken + "/resendSmsToken",
+                    type: 'POST',
+                    success: function (data) {
+                        resendButtonToken.fadeOut();
+                        $('.responseResend').html('Te hemos reenviado el PIN');
+                        setTimeout(function () {
+                            resendButtonToken.fadeIn();
+                            $('.responseResend').html('');
+                        }, 30000);
+                        console.log(data);
+                    }
+                });
+
+            });
+
+            buttons.on('click', function (event) {
+
+                event.preventDefault();
+
+                dataType = $(this).data('type');
+
+                //debugger;
+                switch (dataType) {
+                        /*case 'facebook':
+                         loginWithFacebook('frmRate');
+                         //                        valid = validateInputs(docNumber.val(), 8);
+                         //                        if (docType.val() == 2) {
+                         //                            valid = (docNumber.val() != -1 && docNumber.val().length >= 8 && docNumber.val().length <= 12 && (docNumber.val().indexOf(" ") < 0)) ? {msg: 'ok'} : {msg: 'error'};
+                         //                        }
+                         //                        if (valid.msg == 'error') {
+                         //                            docNumber.addClass('error-input');
+                         //                        } else {
+                         //                            docNumber.removeClass('error-input');
+                         //                        }
+                         break;*/
+                    case 'phone':
+                        valid = validateInputs(docNumber.val(), 8);
+                        $('#docError, #dobError').html('');
+
+                        //debugger;
+                        if (docType.val() == 2) {
+                            valid = (docNumber.val() != -1 && docNumber.val().length == 9 && (docNumber.val().indexOf(" ") <= 0) && dateOfBirth.val().length == 10 && (dateOfBirth.val().indexOf("/") == 2)) ? {msg: 'ok'} : {msg: 'error'};
+                        }
+
+                        if (valid.msg == 'error') {
+                            docNumber.addClass('error-input');
+                            dateOfBirth.addClass('error-input');
+
+                            if (docNumber.val() != -1 && docNumber.val().length == 9 && docType.val() == 2) {
+                                docNumber.removeClass('error-input');
+                            } else {
+                                $('#docError').html('Nro. Documento inv&aacute;lido.');
+                                return;
+                            }
+
+                            if (docNumber.val() != -1 && docNumber.val().length == 8 && docType.val() == 1) {
+                                docNumber.removeClass('error-input');
+                            } else {
+                                $('#docError').html('Nro. Documento inv&aacute;lido.');
+                                return;
+                            }
+
+                            if (dateOfBirth.val() != -1 && dateOfBirth.val().length >= 8 && docType.val() == 2) {
+                                dateOfBirth.removeClass('error-input');
+                            } else {
+                                $('#dobError').html('Fecha de nacimiento inv&aacute;lido.');
+                                return;
+                            }
+
+                        } else {
+                            $('#docError, #dobError').html('');
+                            docNumber.removeClass('error-input');
+                            dateOfBirth.removeClass('error-input');
+
+                            var checked = $('#termsAndConditions').prop('checked');
+
+                            if (checked == false) {
+                                $('#terms').fadeIn();
+                                $('#error-response').html('Debe aceptar los t&eacute;rminos y condiciones.');
+                            } else {
+                                $('#terms').css({'display': 'none'});
+                                $('#error-response').html('');
+                                $('#cellphone-button').loading();
+                                defaultAjax({
+                                    url: /*[[@{/user/validateDocument/__${T(com.affirm.common.model.catalog.Product).SHORT_TERM}__}]]*/null,
+                                    type: 'POST',
+                                    data: {
+                                        docType: docType.val(),
+                                        docNumber: docNumber.val(),
+                                        birthDate: dateOfBirth.val()
+                                    },
+                                    success: function (data) {
+                                        console.log(data);
+                                        if (isJsonString(data)) {
+                                            showMessageModal(JSON.parse(data).message);
+                                        }
+
+                                        if (data == "waitCE") {
+                                            setTimeout(function () {
+                                                defaultAjax({
+                                                    url: /*[[@{/user/validCE/}]]*/null,
+                                                    type: 'POST',
+                                                    success: function (data) {
+                                                        docValidationOk();
+                                                    },
+                                                    error: function () {
+                                                        $('#cellphone-button').unloading();
+                                                    }
+                                                });
+                                            }, 30000);
+                                            return;
+                                        }
+                                        docValidationOk();
+                                    },
+                                    error: function () {
+                                        $('#cellphone-button').unloading();
+                                    }
+                                });
+
+                            }
+
+                        }
+
+                        break;
+                    case 'cancel':
+                        resetChecked($('#termsAndConditions'), $('#terms'), $('#error-response'));
+                        validateButton.hide();
+                        documentBlock.show();
+                        cellphoneBlock.hide();
+                        tokenBlock.hide();
+                        phoneNumber.val('');
+                        smsTokenNumber.val('');
+//                        facebookButton.show();
+                        cancelButton.hide();
+                        applyButton.hide();
+                        cellphoneButton.show();
+                        break;
+                    case 'apply':
+                        valid = validateInputs($('#phoneNumber').val(), 9);
+                        cell = isValidCellphone($('#phoneNumber').val());
+
+                        if (!cell) {
+                            phoneNumber.addClass('error-input');
+                            $('.generalError').html('El es n&uacute;mero de celular no es correcto.');
+                        }
+
+                        if (valid.msg == 'error') {
+                            phoneNumber.addClass('error-input');
+                            $('.generalError').html('El n&uacute;mero de celular es obligatorio.');
+                        } else if (valid.msg == 'ok' && cell) {
+                            phoneNumber.removeClass('error-input');
+                            $('.generalError').html('');
+                            formSubmit();
+
+                        }
+
+                        break;
+                    case 'validated':
+                        valid = validateInputs($('#smsTokenNumber').val(), 4);
+                        if (valid.msg == 'error') {
+                            smsTokenNumber.addClass('error-input');
+                            $('.generalError').html('El c&oacute;digo es obligatorio.');
+                        } else if (valid.msg == 'ok') {
+                            //debugger;
+                            $('.generalError').html('');
+                            validateButton.loading();
+                            defaultAjax({
+                                url: /*[[@{/user/cellphone/validate}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    authToken: $('#smsTokenNumber').val(),
+                                    loanAplicationToken: loanApplicationToken
+                                },
+                                success: function () {
+                                    validateButton.unloading();
+                                },
+                                error: function () {
+                                    validateButton.unloading();
+                                }
+                            });
+                        }
+                        break;
+                }
+
+            });
+
+            <!-- / Submit -->
+
+            <!-- Hide content -->
+            var modal = document.getElementById('modalBody');
+
+            function hideContent(toHide, toShow, text) {
+                document.getElementById('backModal-button').style.display = 'block';
+                if (document.getElementById('static-title')) {
+                    document.getElementById('static-title').style.display = 'none';
+                }
+
+                toHide.style.display = 'none';
+
+                if (toShow) {
+                    toShow.style.display = 'block';
+                    toShow.className = 'animated fadeIn';
+                }
+                modal.style.padding = 0;
+                if ($('#docNumber').length) {
+                    $('#docNumber')[0].focus();
+                }
+
+            }
+
+            <!-- / Hide content -->
+
+            <!-- Reset modal -->
+            /* Reset modal on close */
+            $('#checkYourRate').on('hidden.bs.modal', function () {
+                $('#countryLocked').css({'display': 'none'});
+                $('#backModal-button').css({'display': 'none'});
+                $('#document-section').css({'display': 'none'});
+                $('#cellphone-block,#apply-button').css({'display': 'none'});
+                $('#sooner-section').css({'display': 'none'});
+                $('#slides-section').css({'display': 'block'});
+                $('#sms-token-block').css({'display': 'none'});
+                if ($('#header-text').length != 0) {
+                    $('#header-text').css({'display': 'none'});
+                }
+                $('#pick-deals').css({'display': 'block'});
+                $('#docNumber').val('');
+                $('#docError, #dobError').html('');
+                $('#phoneNumber').val('');
+                $('#smsTokenNumber').val('');
+                $('#docNumber').removeClass('error-input');
+                $('#phoneNumber').removeClass('error-input');
+                $('#validate-button').css({'display': 'none'});
+                $('#cellphone-button').css({'display': 'inline-block'});
+                $('#cancel-button').css({'display': 'none'});
+                resetChecked($('#termsAndConditions'), $('#terms'), $('#error-response'));
+                $('#static-title').css({'display': 'block'});
+                $('.modal-body').css({
+                    'padding': '24px 24px 16px 24px'
+                });
+            });
+
+            /* Reset modal on click back */
+            $('#backModal-button').on('click', function () {
+                $('#countryLocked').css({'display': 'none'});
+                $('#document-section').css({'display': 'none'});
+                $('#sooner-section').css({'display': 'none'});
+                $('#cellphone-block').css({'display': 'none'});
+                $('#phoneNumber').val('');
+                $('#sms-token-block').css({'display': 'none'});
+                $('#smsTokenNumber').val('');
+                $('#slides-section').css({'display': 'block'});
+                if ($('#header-text').length != 0) {
+                    $('#header-text').css({'display': 'none'});
+                }
+                $('#pick-deals').css({'display': 'block'});
+                $('#docNumber').val('');
+                $('#docError, #dobError').html('');
+                $('#phoneNumber').val('');
+                $('#docNumber').removeClass('error-input');
+                $('#phoneNumber').removeClass('error-input');
+                $('#static-title').css({'display': 'block'});
+                $('.modal-body').css({
+                    'padding': '24px 24px 16px 24px'
+                });
+
+                resetChecked($('#termsAndConditions'), $('#terms'), $('#error-response'));
+
+                $('#backModal-button').css({'display': 'none'});
+                $('#cellphone-button').css({'display': 'inline-block'});
+                $('#facebook-button').css({'display': 'inline-block'});
+                $('#cancel-button').css({'display': 'none'});
+                $('#apply-button').css({'display': 'none'});
+                $('#validate-button').css({'display': 'none'});
+                <!-- / Reset modal -->
+
+            });
+        });
+
+        function docValidationOk() {
+            $('#cellphone-button').unloading();
+            $('#cellphone-button').hide();
+
+            $('#document-block').hide();
+            $('#cellphone-block').show();
+
+//                    phoneNumber.focus();
+            $('#cancel-button').show();
+            $('#apply-button').show();
+        }
+
+        <!-- Paint Calculator -->
+        function paintCalculation() {
+            //debugger;
+            var calculation;
+            calculation = calculate(stringToNumber(document.getElementById('loanApplicationAmmount-input').value), stringToNumber(document.getElementById('loanApplicationShorTermDays-input').value), 'Affirm');
+            if (calculation) {
+                document.getElementById('estimatedResutlPayment').innerHTML = 'S/. ' + thousandWithSpace(calculation.ammount);
+                document.getElementById('teaLabel').innerHTML = 'TEA';
+//                document.getElementById('estimatedResutlTcea').innerHTML = 'S/. ' + (calculation.teaAmmount + calculation.commission).toFixed(2);
+                document.getElementById('estimatedResutlTcea').innerHTML = calculation.tea + '%';
+            }
+        }
+        <!-- / Paint Calculator -->
+
+        <!-- Conver cluster -->
+        function convertToCluster(value) {
+            var clusters = JSON.parse(/*[[${@catalogService.getClustersJson(#locale)}]]*/);
+            var cluster;
+
+            for (var i = 0; i < clusters.length; i++) {
+                if (value == clusters[i].orderId) {
+                    cluster = {'typeCode': clusters[i].cluster, 'desc': clusters[i].description}
+                }
+            }
+
+            return cluster;
+        }
+        <!-- / Conver cluster -->
+
+        <!-- Calculate -->
+        function calculate(loanAmmount, loanInstallments, entity) {
+            try {
+//                debugger;
+                // Check if the installment is in the array, else use the near one
+                var existInstallment = false;
+                var posibleValues = [];
+                for (i = 0; i < entityRatesJson.length; i++) {
+                    if (entityRatesJson[i].installments == loanInstallments) {
+                        existInstallment = true;
+                        break;
+                    } else {
+                        if ($.inArray(entityRatesJson[i].installments, posibleValues) == -1) {
+                            posibleValues[posibleValues.length] = entityRatesJson[i].installments;
+                        }
+                    }
+                }
+                if (!existInstallment) {
+                    //Order array
+                    posibleValues = posibleValues.sort(function (a, b) {
+                        return a - b;
+                    });
+                    // Default is the major number
+                    var posibleValue = posibleValues[posibleValues.length - 1];
+                    for (i = 0; i < posibleValues.length; i++) {
+                        if (posibleValues[i] > loanInstallments) {
+                            posibleValue = posibleValues[i];
+                            break;
+                        }
+                    }
+                    loanInstallments = posibleValue;
+                }
+
+                for (var i = 0; i < entityRatesJson.length; i++) {
+                    if (entityRatesJson[i].installments == loanInstallments && entityRatesJson[i].cluster.id == getCLusterId()) {
+
+                        //Calculate the tea
+                        var tea = entityRatesJson[i].effectiveAnualRate;
+                        var tem = Math.pow(1 + (tea / 100), 0.0833333333) - 1;
+
+                        var fee = ( (loanAmmount * Math.pow((1 + tem), loanInstallments)) / (Math.pow((1 + tem), loanInstallments) - 1)) * tem;
+                        var teaAmmount = fee - loanAmmount;
+
+                        // Calculate the commission
+                        var commission;
+                        if (entityRatesJson[i].commissionType == 'P') {
+                            commission = loanAmmount * entityRatesJson[i].commission;
+                        } else if (entityRatesJson[i].commissionType == 'V') {
+                            commission = entityRatesJson[i].commission != null ? entityRatesJson[i].commission / loanInstallments : 0;
+                        }
+
+                        return {
+                            ammount: (fee + commission).toFixed(2),
+                            tea: tea.toFixed(2),
+                            teaAmmount: teaAmmount,
+                            commission: commission,
+                            commissionType: entityRatesJson[i].commissionType
+                        };
+                    }
+                }
+            } catch (e) {
+                console.log(e)
+            }
+        }
+
+        //        function calculate(loanAmmount, loanInstallments, entity) {
+        //            debugger;
+        //            try {
+        //                // Check if the installment is in the array, else use the near one
+        //                var existInstallment = false;
+        //                var posibleValues = [];
+        //                for (i = 0; i < entityRatesJson.length; i++) {
+        //                    if (entityRatesJson[i].installments == loanInstallments){
+        //                        existInstallment = true;
+        //                        break;
+        //                    }else{
+        //                        if($.inArray(entityRatesJson[i].installments, posibleValues) == -1){
+        //                            posibleValues[posibleValues.length] = entityRatesJson[i].installments;
+        //                        }
+        //                    }
+        //                }
+        //                if(!existInstallment){
+        //                    //Order array
+        //                    posibleValues = posibleValues.sort(function (a, b) {  return a - b;  });
+        //                    // Default is the major number
+        //                    var posibleValue = posibleValues[posibleValues.length-1];
+        //                    for(i=0; i<posibleValues.length; i++){
+        //                        if(posibleValues[i] > loanInstallments){
+        //                            posibleValue =posibleValues[i];
+        //                            break;
+        //                        }
+        //                    }
+        //                    loanInstallments = posibleValue;
+        //                }
+        //
+        //                for (var i = 0; i < entityRatesJson.length; i++) {
+        //                    if (entityRatesJson[i].installments == loanInstallments && entityRatesJson[i].cluster.id == getCLusterId()) {
+        //                        //Calculate the tea
+        //                        debugger;
+        //                        var tea = entityRatesJson[i].effectiveAnualRate;
+        //                        var tem = Math.pow(1 + (tea / 100), 0.0833333333) - 1;
+        //
+        //                        if (loanInstallments > 1) {
+        //                            var fee = ( (loanAmmount * Math.pow((1 + tem), loanInstallments)) / (Math.pow((1 + tem), loanInstallments) - 1)) * tem;
+        //                            var teaAmmount = fee - loanAmmount;
+        //                        }
+        //                        else {
+        //                            var fee = 0;
+        //                            var teaAmmount = 0;
+        //                        }
+        //
+        //                        // Calculate the commission
+        //                        var commission;
+        //                        if (entityRatesJson[i].commissionType == 'P') {
+        //                            commission = loanAmmount * entityRatesJson[i].commission;
+        //                        } else if (entityRatesJson[i].commissionType == 'V') {
+        //                            commission = entityRatesJson[i].commission;
+        //                        }
+        //
+        //                        return {
+        //                            ammount: (fee + commission).toFixed(2),
+        //                            tea: tea.toFixed(2),
+        //                            teaAmmount: teaAmmount,
+        //                            commission: commission,
+        //                            commissionType: entityRatesJson[i].commissionType
+        //                        };
+        //                    }
+        //                }
+        //            } catch (e) {
+        //                console.log('error')
+        //                console.log(e)
+        //            }
+        //        }
+        <!-- / Calculate -->
+
+        <!-- Get cluster Id -->
+        function getCLusterId() {
+            for (var i = 0; i < clusters.length; i++) {
+                if (clusters[i].orderId == document.getElementById("loanApplicationCluster-input").value) {
+                    return clusters[i].id;
+                    break;
+                }
+            }
+        }
+        <!-- / Get cluster Id -->
+
+        var validator = /*[[${userRegisterForm.validator.toJson(#locale)}]]*/null;
+        var userId;
+        if (validator != null) {
+            var jsonValidator = JSON.parse(validator);
+            jsonFormValidation = createFormValidationJson(jsonValidator, $('#frmRate'));
+
+            jsonFormValidation.rules.termsAndConditions = {};
+            jsonFormValidation.rules.termsAndConditions.required = true;
+            $registerFormValidator = $('#frmRate').validateForm(jsonFormValidation);
+        }
+
+        function formSubmit() {
+            var dataJson = $('#frmRate').serializeObject();
+            dataJson.loanApplicationAmmount = $('#loanApplicationAmmount-input').val();
+            dataJson.loanApplicationReason = 1;
+
+            $('#cancel-button').prop('disabled', true);
+            $('#apply-button').loading();
+            debugger;
+            defaultAjax({
+                url: /*[[@{/shorttermloanapplication/}]]*/null,
+                type: 'POST',
+                formValidation: $registerFormValidator,
+                data: dataJson,
+                success: function (data) {
+                    $('#cancel-button').prop('disabled', false);
+                    $('#apply-button').unloading();
+
+                    var json = JSON.parse(data);
+                    loanApplicationToken = JSON.parse(data).loanApplicationToken;
+
+                    userId = json.userId;
+
+                    $('#validate-button').show();
+                    $('#cellphone-block').hide();
+                    $('#sms-token-block').show();
+//                    smsTokenNumber.focus();
+                    $('#apply-button').hide();
+                },
+                error: function () {
+                    $('#cancel-button').prop('disabled', false);
+                    $('#apply-button').unloading();
+                }
+            });
+
+        }
+
+        function validateInputs(element, range) {
+
+            if (element != -1 && element.length == range && (element.indexOf(" ") < 0)) {
+                return {msg: 'ok'}
+            } else {
+                return {msg: 'error'}
+            }
+        }
+        /*]]>*/
+
+    </script>
+
+    <!--TOKY-->
+    <script th:if="${@configuration.TOKY_ACTIVE()}">
+
+        (function (v, p) {
+            var s = document.createElement('script');
+            s.src = 'https://app.toky.co/resources/widgets/toky-widget.js?v=' + v;
+            s.onload = function () {
+                Toky.load(p);
+            };
+            document.head.appendChild(s);
+        })('6800f1c', {"$username": "Solven", "$bubble": false, "$color": "#00aabb,#f7323f,#ffffff"});
+
+    </script>
+
+</head>
+<body>
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: headerLanding(landingType='shortTermLoan')"></th:block>
+</th:block>
+<!-- /Header -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+    <!-- Cookies -->
+    <!--<div class="cookiesBar animated">
+        <div class="container">
+            <p>Las cookies nos ayudan a mejorar tu experiencia en Solven. Se utilizan tambi&eacute;n en estad&iacute;sticas,
+                redes sociales, controles de calidad y junto con nuestros aliados, en marketing. Al continuar navegando
+                en nuestro sitio web, aceptas el uso. <a href="#" id="acceptCookies">Ocultar</a>.</p>
+        </div>
+    </div>-->
+    <!-- / -->
+
+    <!-- Landing -->
+    <div class="landing short-loan-bg">
+        <div class="overlay"></div>
+        <div class="hero-title landings without-inputs">
+
+            <div class="top">
+                <h2 class="red-text">Te mereces el mejor cr&eacute;dito.</h2>
+                <p>&iquest;Eres fan&aacute;tico de internet? Olv&iacute;date del papeleo y la burocracia. Obt&eacute;n
+                    el cr&eacute;dito
+                    que mereces,
+                    <br/>100% en l&iacute;nea y en el mismo d&iacute;a.</p>
+            </div>
+
+            <div class="middle">
+
+                <div class="form-unlocked">
+
+                    <form class="frm" th:if="${product.active == true and session.countryUnlocked}">
+                        <div class="form-block">
+                            <div class="field">
+                                <button onclick="goToEstimaTasa();return false;" class="button red-button"
+                                        id="rateButton">
+                                    <span>Solic&iacute;talo aqu&iacute;</span></button>
+                                <p class="small-text d-block"><i class="icon creditcard-icon"></i> No afecta tu score
+                                    crediticio.</p>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form class="frm" role="form" id="frmEarlyAccess" action="#"
+                          th:if="${product.active == false and session.countryUnlocked}">
+
+                        <div class="form-block">
+                            <div class="field input-email inline hideAjax">
+                                <input type="hidden" value="null"/>
+                                <input type="hidden" value=""/>
+                                <input type="text" class="input-landing" name="email"
+                                       placeholder="Correo Electr&oacute;nico" id="earlyEmail"/>
+                            </div>
+                            <div class="field inline hideAjax">
+                                <button class="button red-button" id="landingSubmit"
+                                        onclick="letMeKnow();return false;">
+                                    ¡Avísenme!
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="block"></div>
+
+                    </form>
+
+                    <div class="small-text successMessage" id="countryLocked"
+                         th:if="${session.countryUnlocked == false}">Lo sentimos mucho, pero en este momento s&oacute;lo
+                        es posible solicitar productos desde Per&uacute;.
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="scroll-down landing-scroll">
+            <i class="icon down-arrow-icon"></i>
+        </div>
+        <div class="bottom-info bottom-info-landing">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Desde <span
+                            th:text="${@utilService.integerMoneyFormat(product.minAmount)}"></span> a <span
+                            th:text="${@utilService.integerMoneyFormat(product.maxAmount)}"></span></p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Tasas <span
+                            th:text="${@utilService.percentFormat(product.minTea)}"></span> - <span
+                            th:text="${@utilService.percentFormat(product.maxTea)}"></span></p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p><span
+                            th:text="${product.minInstallments}"></span> a <span
+                            th:text="${product.maxInstallments}"></span> cuotas</p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Muy r&aacute;pido</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Landing -->
+
+    <!-- Press -->
+    <div class="press">
+        <div class="container">
+            <th:block layout:fragment="pressCarousel">
+                <th:block th:replace="fragments/pressCarousel :: pressCarousel"></th:block>
+            </th:block>
+        </div>
+    </div>
+    <!-- / Press -->
+
+    <!-- How it works -->
+    <div id="how-it-works-consolidation" class="how-it-works-consolidation">
+        <div class="container">
+            <div class="hero-content">
+                <div class="row">
+                    <h2 class="title-home">&iquest;C&oacute;mo funciona?</h2>
+
+                    <div class="how-works-contaier">
+                        <h3>Saca tu cr&eacute;dito, cumple y pasa al siguiente nivel.</h3>
+                        <p>Podr&aacute;s obtener m&aacute;s dinero, intereses m&aacute;s bajos y acceder a un mayor
+                            plazo para pagar.</p>
+                        <ul class="level-list">
+                            <li th:each="category : ${product.personCategories}">
+                                <div class="box">
+                                    <div class="ribbon-custom" th:text="'Nivel '+${category.id}"></div>
+                                    <h4 th:text="${'Hasta ' + @utilService.integerMoneyFormat(category.maxAmount)}"></h4>
+                                    <p th:text="${category.maxInstallments + (category.maxInstallments>1?' meses':' mes')}"></p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / How it works -->
+    <th:block th:fragment="linkToProducts">
+        <th:block th:replace="fragments/linkToProductsFragment :: linkToProducts"></th:block>
+    </th:block>
+    <!-- Requirements -->
+    <div class="requirements-section" id="requirements">
+        <div class="container">
+            <div class="article">
+                <h2 class="title-home">&iquest;Qu&eacute; necesitas?</h2>
+                <h3>Ante todo, ¡que te encante internet! </h3>
+                <p>Estamos convencidos que los servicios financieros pueden ser mucho más simples y en Solven estamos
+                    trabajando para hacerlo realidad.</p>
+                <ul class="requirement-list">
+                    <li>
+                        <p>- Ser peruano o peruana.</p>
+                    </li>
+                    <li th:with="ageRange=${@catalogService.getProductAgeRange(T(com.affirm.common.model.catalog.Product).SHORT_TERM)}">
+                        <p>- Tener entre <span th:text="${ageRange.minAge}"/> y <span th:text="${ageRange.maxAge}"/>
+                            años.</p>
+                    </li>
+                    <li>
+                        <p>- Recibir ingresos por más de S/ 850 si eres dependiente o por más de S/ 1 200 y más de 3 meses, si
+                            eres independiente.</p>
+                    </li>
+                    <li>
+                        <p>- Contar con un historial crediticio sano <span>(si no tienes historial, lo construimos juntos)</span>.</p>
+                    </li>
+                    <li>
+                        <p>- Tener una cuenta de Gmail, Hotmail o Yahoo y, por supuesto, tener Facebook, =)</p>
+                    </li>
+                    <li>
+                        <p>- Tener cuenta bancaria a tu nombre, para realizar el desembolso de tu crédito.</p>
+                    </li>
+                    <li>
+                        <p>- Tener un smartphone o cámara web y tu documento a mano.</p>
+                    </li>
+                </ul>
+                <div class="note-info">
+                    <p><span class="lightblue-text">*</span> De acuerdo a tu perfil podría ser necesaria alguna
+                        documentación adicional.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / Requirements -->
+
+    <!-- Modal Estimate your rate in Home -->
+    <div class="modal fade" id="checkYourRate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-lightblue-header">
+                    <button type="button" class="closeRoundButton" data-dismiss="modal" aria-label="Close"><i
+                            class="icon close-icon"></i></button>
+
+                    <a href="#" id="backModal-button"><i class="icon back-icon"></i></a>
+                    <h2 class="static-title">Cr&eacute;dito a corto plazo</h2>
+                    <h2 id="header-text"></h2>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <form onkeypress="return event.keyCode != 13;" th:if="${session.countryUnlocked}" role="form" id="frmRate" class="aff-form" action="#"
+
+                          th:object="${userRegisterForm}"
+                          method="post">
+                        <div id="slides-section">
+                            <!-- Days -->
+                            <div class="loan-details loanApplicationDays without-mt">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                        <div class="slider-section">
+                                            <label for="loanApplicationAmmount-input">&iquest;Cu&aacute;nto dinero
+                                                necesitas?</label>
+                                            <div id="loanApplicationAmmount"></div>
+                                            <div class="values">
+                                                <div class="min-value normal-number" id="shortMountMin"></div>
+                                                <div class="max-value normal-number" id="shortMountMax"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                        <div class="square-found editable">
+                                            <h4 id="loanApplicationAmmount-label" class="bold-number"></h4>
+                                            <a href="#" class="icon edit-icon edit-amount" rel="nofollow"
+                                               title="Editar"></a>
+                                            <input type="text" id="loanApplicationAmmount-input"
+                                                   name="loanApplicationAmmount" class="editAmount-home"
+                                                   pattern="[0-9]*"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="loan-details loanApplicationDays">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                        <div class="slider-section">
+                                            <label for="loanApplicationShorTermDays-input" class="alone-label">&iquest;En
+                                                que
+                                                per&iacute;odo?</label>
+                                            <div id="loanApplicationShorTermDays"></div>
+                                            <div class="values" id="rangeInstallments">
+                                                <div class="min-value normal-number" id="minPeriod">3 d&iacute;as</div>
+                                                <div class="max-value normal-number" id="maxPeriod">30 d&iacute;as</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                        <div class="square-found date">
+                                            <div class="two-rows-middle">
+                                                <h4 id="loanApplicationShorTermDays-label" class="bold-number"></h4>
+                                                <span id="loanApplicationShorTermDays-finish"></span>
+                                            </div>
+                                        </div>
+                                        <input type="text" id="loanApplicationShorTermDays-input"
+                                               name="loanApplicationInstallments" class="slider"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="loan-details">
+                                <div class="max-slider">
+                                    <label for="loanApplicationCluster-input">&iquest;Qu&eacute; tan buen pagador
+                                        eres?</label>
+                                    <div class="custom-tooltip">
+                                        <ul>
+                                            <li class="one-tp">
+                                                <span id="active-1">A</span>
+                                            </li>
+                                            <li class="two-tp">
+                                                <span id="active-2">B</span>
+                                            </li>
+                                            <li class="three-tp">
+                                                <span id="active-3">C</span>
+                                            </li>
+                                            <li class="four-tp">
+                                                <span id="active-4">D</span>
+                                            </li>
+                                            <li class="five-tp">
+                                                <span id="active-5">E</span>
+                                            </li>
+                                            <li class="six-tp">
+                                                <span id="active-6">F</span>
+                                            </li>
+                                            <li class="seven-tp">
+                                                <span id="active-7">SE</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div id="loanApplicationCluster"></div>
+                                    <input type="text" name="loanApplicationCluster" id="loanApplicationCluster-input"
+                                           class="slider"/>
+                                </div>
+                                <div class="max-slider-value">
+                                    <div class="square-found">
+                                        <div class="lightblue">
+                                            <h4 id="loanApplicationCluster-label"></h4>
+                                        </div>
+                                        <p id="descCluster"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="loan-details">
+                                <div class="row">
+                                    <div class="col-lg-7 col-sm-7 col-sm-7 col-xs-7 mount-details">
+                                        <div class="info-loan">
+                                            <p><span id="totalAmountText" class="inline-small">Pago mensual</span> <span
+                                                    class="big bold-number"
+                                                    id="estimatedResutlPayment">S/. 177.43</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-sm-5 col-sm-5 col-xs-5 mount-details">
+                                        <div class="info-loan">
+                                            <p>
+                                                <small id="teaLabel" class="inline-small">TEA</small>
+                                                <span class="big bold-number"
+                                                      id="estimatedResutlTcea">18.00 %</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="loan-details actions">
+                                <button class="button red-button" id="apply-for"><span>Solicitar</span></button>
+                            </div>
+
+                        </div>
+                        <div id="document-section"
+                             th:if="${product.active == true and session.countryUnlocked == true}">
+                            <div class="header-loanInfo">
+                                <div class="square-info">
+                                    <h4 id="loan-amount" class="bold-number"></h4>
+                                </div>
+                                <div class="square-info">
+                                    <h4 id="loan-cuotes" class="bold-number"></h4>
+                                    <span id="finish-date"></span>
+                                </div>
+                            </div>
+                            <div class="field-content">
+                                <div class="document-content">
+                                    <div class="wrap-input" id="document-block">
+
+                                        <div class="section" id="dniSection">
+                                            <p>Documento de Identidad</p>
+                                            <div class="content">
+                                                <div class="input-field small-input">
+                                                    <select name="docType" id="docType" class="input-solven">
+                                                        <option th:each="doc : ${@catalogService.getIdentityDocumentTypeByCountry(@countryContextService.getCountryParamsByRequest(#httpServletRequest).id, false)}"
+                                                                th:text="${doc.name}" th:value="${doc.id}"></option>
+                                                    </select>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <div class="input-field medium-number-input">
+                                                    <input type="text" placeholder="Nro. Documento"
+                                                           class="input-solven"
+                                                           autofocus="true" th:field="*{docNumber}" pattern="[0-9]*"/>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <div class="generalError" id="docError"></div>
+                                            </div>
+                                        </div>
+                                        <div class="section" id="ceSection">
+                                            <br/>
+                                            <div class="content">
+                                                <p>Fecha Nacimiento</p>
+                                                <div class="input-field medium-number-input">
+                                                    <input type="text" class="form-control"
+                                                           th:field="*{birthDate}"/>
+                                                </div>
+                                                <div class="generalError" id="dobError"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="wrap-input" id="cellphone-block">
+                                        <div class="section">
+                                            <p>Ingresa tu n&uacute;mero, te enviaremos un c&oacute;digo de verificaci&oacute;n</p>
+                                            <div class="content">
+                                                <div class="input-field small-input">
+                                                    <div class="square-input disabled no-bg">+51</div>
+                                                </div>
+                                                <div class="input-field medium-number-input">
+                                                    <input type="text" placeholder="Nro. Celular" class="input-solven"
+                                                           name="phoneNumber" id="phoneNumber" pattern="[0-9]*"/>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <div class="generalError"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="wrap-input" id="sms-token-block">
+                                        <div class="section">
+                                            <p>Ingresa el PIN que te acabamos de enviar.</p>
+                                            <div class="content">
+                                                <div class="input-field tidy-input-number">
+                                                    <input type="text" placeholder="PIN" class="input-solven"
+                                                           name="smsTokenNumber" id="smsTokenNumber"
+                                                           style="text-align: center;"/>
+                                                    <small><a href="#" id="resendToken">Reenviar</a></small>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <p class="responseResend"></p>
+                                                <div class="generalError"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wrap-input terms" id="terms">
+                                        <div class="section">
+                                            <div class="content">
+                                                <div class="input-field">
+                                                    <label for="termsAndConditions">
+                                                        <input type="checkbox" name="termsAndConditions"
+                                                               id="termsAndConditions"
+                                                               required="true"/>
+                                                        Acepto los <a rel="noopener noreferrer" th:href="@{/terminos-y-condiciones}"
+                                                                      target="_blank">T&eacute;rminos y
+                                                        condiciones</a> y la <a rel="noopener noreferrer"
+                                                                                th:href="@{/politica-de-privacidad}" target="_blank">Pol&iacute;tica
+                                                        de
+                                                        Privacidad</a>.
+                                                    </label>
+                                                    <div class="generalError" id="error-response"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wrap-input" id="m-buttons">
+                                        <button data-type="phone" class="button black-button" id="cellphone-button">
+                                            <i class="icon cellphone-icon"></i>Celular
+                                        </button>
+                                        <button data-type="cancel" class="button black-button" id="cancel-button">
+                                            Cancelar
+                                        </button>
+                                        <!--/* button data-type="facebook" class="button facebook-button"
+                                                id="facebook-button"><i class="icon facebook-icon"></i>Facebook
+                                        </button */-->
+                                        <button data-type="apply" class="button red-button" id="apply-button">
+                                            <span>Enviar</span>
+                                        </button>
+                                        <button data-type="validated" class="button red-button" id="validate-button">
+                                            <span>Validar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+<!-- /Content -->
+
+<!-- Footer -->
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+<!-- / Footer -->
+
+</body>
+</html>

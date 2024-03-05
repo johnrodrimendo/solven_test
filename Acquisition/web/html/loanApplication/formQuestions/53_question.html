@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+            var Yv4vDHAmzdWv = /*[[${@configuration.getAESEncrypt()}]]*/null;
+        /*]]>*/
+
+    </script>
+
+    <div class="questions-section animated fadeInRight">
+        <div id="formPhone" class="forms">
+            <th:block th:if="${customTitle != null}">
+                <p th:text="${customTitle}"></p>
+            </th:block>
+            <th:block th:if="${customTitle == null}">
+                <p th:if="${isSelfEvaluation}" th:text="#{questions.block.yourPhoneNumber.selfEvaluation}"></p>
+                <p th:if="${isEvaluation and !isLoanPayment}" th:utext="#{questions.block.yourPhoneNumber}"></p>
+                <p th:if="${isEvaluation and isLoanPayment}" th:utext="#{questions.block.yourPhoneNumber.payment}"></p>
+                <small class="input-help subtitle"
+                       th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                       th:utext="#{questions.message.cellphones}" style="font-weight: bold"></small>
+            </th:block>
+
+            <form id="questionForm" class="form-53" th:object="${form}" autocomplete="off">
+                <div class="wrap-phones pd-right">
+                    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                        <div class="field inline">
+                            <div class="wrap-field">
+                                <input type="text" class="input-outline tiny-input codeInput" th:field="*{areaCode}"/>
+                                <small class="input-help">Cod. Area (Ej:11)</small>
+                            </div>
+                        </div>
+                        <div class="field inline arg-field">
+                            <div class="wrap-input">
+                                <input type="text" class="small-input phoneInput" th:field="*{phoneNumber}"/>
+                            </div>
+                            <div class="input-help">
+                                <small class="input-help">Nro. Celular (Ej. 1234 5678)</small>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <div class="field inline"
+                         th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                        <input type="text" class="input-outline cellphone-input" th:field="*{phoneNumber}"/>
+                        <small class="input-help">Nro. Celular (Ej. 9876 54321)</small>
+                        <div class="errorContainer"></div>
+                    </div>
+
+                    <div class="field inline"
+                         th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                        <input type="text" class="input-outline cellphone-input" th:field="*{phoneNumber}"/>
+                        <small class="input-help">Nro. Celular (Ej. 300 7654321)</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="inline w-btn">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+
+                <div class="display-block">
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div th:if="${isSelfEvaluation}" class="display-block">,
+                    <a href="#" class="text-lightblue" id="skipButton">Omitir</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    encryptEnabled : true,
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        $('#skipButton').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST",
+                form: $('#questionForm')
+            }, "");
+        });
+
+        //$('input[name=phoneNumber]').mask('0000-#');
+
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        /*<![CDATA[*/
+        var staticPhoneNumberMaxlength = $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength;
+        $('body').on('keyup', '#areaCode', function () {
+            $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').data('validatorJson').rules.phoneNumber.minlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+
+        $('#phoneNumber').mask('000-#');
+        $('body').on('keyup', '#areaCode', function () {
+            var actualCodeLength = $(this).val().length;
+            if (actualCodeLength == 2) {
+                $('#phoneNumber').mask('0000-#');
+            } else if (actualCodeLength > 2) {
+                $('#phoneNumber').mask('000-#');
+            }
+        });
+        $('body').on('keyup', '#phoneNumber', function () {
+            if (event.keyCode == 13) {
+                $(this).closest('.questions-section').find('.button').click();
+                event.preventDefault();
+                return false;
+            }
+        });
+        /*]]>*/
+
+    </script>
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        /*<![CDATA[*/
+        var $phoneNumber = $('#phoneNumber');
+
+        setTimeout(function () {
+            $phoneNumber.focus();
+        }, 320);
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        /*<![CDATA[*/
+        var areaCode = $('#areaCode');
+
+        setTimeout(function () {
+            areaCode.focus();
+        }, 320);
+
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

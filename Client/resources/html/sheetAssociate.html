@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>El cr&eacute;dito que mereces</title>
+    <!-- improgress -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.js'}"></script>
+
+    <!-- reCaptcha -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:if="${@configuration.TOKY_ACTIVE()}">
+
+        (function (v, p) {
+            var s = document.createElement('script');
+            s.src = 'https://app.toky.co/resources/widgets/toky-widget.js?v=' + v;
+            s.onload = function () {
+                Toky.load(p);
+            };
+            document.head.appendChild(s);
+        })('6800f1c', {"$username": "Solven", "$bubble": false, "$color": "#f7323f,#00aabb,#ffffff"});
+
+    </script>
+</head>
+<body th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<th:block layout:fragment="content">
+    <!-- Content begins -->
+    <section class="loan-process">
+        <div class="container">
+            <div class="adviser-section animated fadeIn">
+                <div class="avatar-progress">
+                    <div class="avatar-advisor"></div>
+                </div>
+                <div class="horizontal-line"></div>
+            </div>
+
+            <div class="questions-section animated fadeInRight" th:if="${!associated.validated}">
+                <p th:text="#{questions.block.downloadSheet}"></p>
+                <div class="note">
+                    (Fírmalo y entrégalo a Recursos Humanos, apenas la activen en el sistema podremos desembolsarte el crédito)
+                </div>
+                <a th:href="${associatedUrl}" download="" class="anchor-button bg-red"><i class="icon icon-download"></i> Descargar</a>
+            </div>
+            <div class="questions-section animated fadeInRight" th:if="${associated.validated}">
+                <p>¡Ya está todo listo!</p>
+                <br/>
+                <p th:utext="${entityProductParams.getPostSignatureMessageReplaced(bankAccountInformation?.getBankAccountEncrypted(), bankAccountInformation?.getCciCodeEncrypted())}"></p>
+                <p th:if="${entityProductParams.postSignatureLegalFooter != null}" th:utext="${entityProductParams.getPostSignatureLegalFooterReplaced()}"></p>
+            </div>
+
+        </div>
+        <hr class="divisor-bottom"/>
+    </section>
+
+    <!-- Content ends -->
+
+    <!-- Modal begins -->
+
+    <!-- Header begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <!-- Header ends -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ ${loanApplication.agent != null ? loanApplication.agent.avatarUrl : @catalogService.getHiddenAssistant().avatarUrl} ]]*/;
+
+        var size = 130;
+        if ($(window).width() <= 1280 && $(window).width() > 768) {
+            size = 100;
+        } else if ($(window).width() <= 768) {
+            size = 60;
+        }
+
+        $(document).on('ready', function(){
+            $('.avatar-advisor').doOnce(function () {
+                $(".avatar-advisor").imgProgress({
+
+                    // path to the image
+                    img_url: url,
+
+                    // size in pixels
+                    size: size,
+
+                    // bar size
+                    barSize: 10,
+
+                    // background color
+                    backgroundColor: '#BEEFF2',
+
+                    // foreground color
+                    foregroundColor: '#26CAD3',
+
+                    // CSS background-size property
+                    backgroundSize: 'cover',
+
+                    // current percentage value
+                    percent: 5
+
+                });
+            });
+
+            $('#helpSign').on('click', function (event) {
+                event.preventDefault();
+                $('#hlp-modal').modal({backdrop: 'static', keyboard: false, show: true});
+            });
+        });
+
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(document).ready(function () {
+            var validator = /*[[${processContactForm.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+            }
+
+            $("#sendMessage").on('click', function (e) {
+                e.preventDefault();
+                validate();
+            });
+
+        });
+
+        function validate() {
+            if ($('#contactForm').valid()) {
+                grecaptcha.execute();
+                $('#sendMessage').loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/processContact}]]*/,
+                    type: 'POST',
+                    formValidation: $('#contactForm').data('validator'),
+                    data: $('#contactForm').serializeObject(),
+                    success: function (data) {
+                        $('#sendMessage').unloading();
+                        $('#contactForm').data('validator').resetForm();
+                        $('#contactForm')[0].reset();
+                        $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                    },
+                    error: function () {
+                        $('#sendMessage').unloading();
+                    }
+                });
+            }
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

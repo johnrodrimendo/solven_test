@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate">
+<head>
+
+    <title>Notificaciones</title>
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: dashboardHeader "></th:block>
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <div class="clearfix"> </div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetSidebar"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/client/dashboard}">Tablero</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span class="active">Notificaciones</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+
+            <!-- BEGIN PAGE BASE CONTENT -->
+
+            <div class="portlet box green">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-archive"></i>Notificaciones </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="alert alert-info" th:if="${interactions == null}">
+                        No hay notificaciones para mostrar.
+                    </div>
+                    <div class="panel-group accordion" id="accordion1" th:if="${interactions != null}">
+                        <div class="panel panel-default" th:each="notification : ${interactions}">
+                            <div class="panel-heading bg-green bg-font-green">
+                                <h4 class="panel-title">
+                                    <th:block th:if="${notification.interactionType.id == 1}">
+                                    <a style="color:white;text-decoration: none;" class="accordion-toggle collapsed" data-toggle="collapse" th:attr="data-parent='#accordion'+ ${notification.id}" th:href="${'#collapse_' + notification.id}" aria-expanded="false"><span th:text="${notification.subject}"></span> <small style="color:white;" th:text="'('+${@utilService.datetimeShortFormat(notification.registerDate)} + ')'" th:attr="data-order=${@utilService.datetimeYearFirstFormat(notification?.registerDate)}"></small></a>
+                                    </th:block>
+                                    <th:block th:if="${notification.interactionType.id == 2}">
+                                        <a style="color:white;text-decoration: none;" class="accordion-toggle collapsed" data-toggle="collapse" th:attr="data-parent='#accordion'+ ${notification.id}" th:href="${'#collapse_' + notification.id}" aria-expanded="false"><span>SMS</span> <small style="color:white;" th:text="'('+${@utilService.datetimeShortFormat(notification.registerDate)} + ')'" th:attr="data-order=${@utilService.datetimeYearFirstFormat(notification?.registerDate)}"></small></a>
+                                    </th:block>
+                                </h4>
+                            </div>
+                            <div th:id="${'collapse_' + notification.id}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                <div class="panel-body" style="padding: 1em">
+                                    <p th:utext="${notification.body}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END PAGE BASE CONTENT -->
+
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

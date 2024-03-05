@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q6">
+            <p th:utext="#{questions.block.amountAndInstallments}"></p>
+            <p class="subtitle" th:utext="#{question.6.subtitle}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="field field-amount inline">
+                    <div class="wrap-field">
+                        <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                        </div>
+                        <input type="text" class="input-outline amount-input" th:field="*{amount}"/>
+                        <small class="input-help">Monto a solicitar</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="field field-amount inline">
+                    <input type="text" class="input-outline tiny-input" th:field="*{installments}"/>
+                    <small class="input-help">Plazo (meses)</small>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+        <div th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).COMPARTAMOS)}">
+            <ul class="list-mount">
+                <li>1. El monto máximo es de S/ 10 000</li>
+                <li>2. El plazo máximo es de 12 meses</li>
+            </ul>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        $('#installments').forceLettersOnly("^[0-9]+$", true, 0, 2);
+        $('#amount').forceLettersOnly("^[0-9]+$", true, 0, 6);
+        //$('#installments').focus();
+
+        $('#amount').keydown(function (e) {
+            var code = e.keyCode || e.which;
+            if (code === 9) {
+                e.preventDefault();
+                $('#installments').focus();
+            }
+        });
+
+        var amount = $('#amount');
+        setTimeout(function () {
+            amount.focus();
+        }, 400);
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+            else {
+                var amount = $("#amount");
+                var installments = $("#installments");
+                var maxAmount = /*[[${maxAmount}]]*/;
+                var minAmount = /*[[${minAmount}]]*/;
+                var maxInstallments = /*[[${maxInstallments}]]*/;
+                var minInstallments = /*[[${minInstallments}]]*/;
+
+
+                if (amount.val() > maxAmount) {
+                    amount.val(maxAmount);
+                }
+                else if (amount.val() < minAmount && typeof parseInt(amount.val()) === 'number') {
+                    amount.val('');
+                }
+
+                if (installments.val() > maxInstallments) {
+                    installments.val(maxInstallments);
+                }
+                else if (installments.val() < minInstallments && typeof parseInt(installments.val()) === 'number') {
+                    installments.val('');
+                }
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

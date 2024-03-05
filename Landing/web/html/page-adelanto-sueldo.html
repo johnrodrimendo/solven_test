@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:text="#{static.title.adelanto.sueldo}"></title>
+    <meta name="description" th:attr="content=#{static.description.adelanto.sueldo}" />
+
+    <link rel="alternate" href="https://www.solven.pe/adelanto-de-sueldo" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/adelanto-de-sueldo" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/adelanto-de-sueldo" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/adelanto-de-sueldo" hreflang="x-default" />
+    <style>
+        #adelantoSueldo .link-adelanto-sueldo, #adelantoSueldo .link-empresas{
+            display: none !important;
+        }
+    </style>
+</head>
+<body id="adelantoSueldo" th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe adelanto-sueldo main-arg' : 'main-pe adelanto-sueldo'}">
+<th:block layout:fragment="content">
+    <main id="main" class="main-banner toload main-adelanto-sueldo">
+        <article>
+            <h1 th:text="#{static.landing.salaryAdvance.heroTitle}"></h1>
+            <p th:text="#{static.landing.salaryAdvance.heroPharagraph}"></p>
+            <!-- Process -->
+            <div class="form-container" th:if="${product.active == true and session.countryUnlocked}">
+                <div class="block" id="document-block">
+                    <div class="field inline">
+                        <select name="docType" id="docType" class="select2">
+                            <option value="1">DNI</option>
+                            <option value="2">CE</option>
+                        </select>
+                    </div>
+                    <div class="field inline">
+                        <input type="text" class="input-landing document-input-landing" id="docNumber" placeholder="N&uacute;mero"/>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button bg-red button-landing" th:text="#{button.apply}" data-target="#document-block"></button>
+                    </div>
+                    <small class="small-text display-block" th:utext="#{static.landing.salaryAdvance.applyWithEmail}"></small>
+                </div>
+                <div class="block block-hidden" id="email-block">
+                    <div class="field inline">
+                        <input type="text" id="email" class="input-landing" placeholder="Correo electr&oacute;nico" autocorrect="off" autocapitalize="none"/>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button button-landing bg-red" th:text="#{button.apply}" data-target="#email-block"></button>
+                    </div>
+                    <small class="small-text display-block" th:utext="#{static.landing.salaryAdvance.applyWithDocument}"></small>
+                </div>
+
+                <div class="block block-hidden" id="cellphone-block">
+                    <div class="field inline">
+                        <input type="text" id="cellphone" class="input-landing cellphone-input" placeholder="Celular"/>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button button-landing bg-red" th:text="#{button.send}" data-target="#cellphone-block"></button>
+                    </div>
+                </div>
+                <div class="block block-hidden" id="confirmationPin-block">
+                    <div class="field inline">
+                        <input type="text" id="authToken" class="input-landing pin-input" placeholder="PIN"/>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button button-landing bg-red" th:text="#{button.confirm}" data-target="#confirmationPin-block"></button>
+                    </div>
+                    <small class="small-text display-block" th:utext="#{static.landing.salaryAdvance.enterPIN}"></small>
+                </div>
+            </div>
+            <!-- Early access -->
+            <div class="form-container" th:if="${product.active == false and session.countryUnlocked}">
+                <form id="frmEarlyAccess" autocomplete="off">
+                    <div class="block" id="early-block">
+                        <div class="field inline">
+                            <input type="text" id="earlyEmail" name="email" class="input-landing" placeholder="Correo Electr&oacute;nico" autocorrect="off" autocapitalize="none"/>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" class="button bg-red" id="landingSubmit">¡Avísenme!</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Forbidden -->
+            <div class="form-container" th:if="${session.countryUnlocked == false}">
+                <div class="small-text successMessage" th:if="${session.countryUnlocked == false}">Lo sentimos mucho, pero en este momento s&oacute;lo es posible solicitar productos desde Per&uacute;.</div>
+            </div>
+            <div class="display-block" id="response-block"></div>
+        </article>
+        <ul class="list-benefits">
+            <li>
+                <span>Desde <span th:text="${@utilService.integerMoneyFormat(productParams.minAmount)}"></span> a <span th:text="${@utilService.integerMoneyFormat(productParams.maxAmount)}"></span></span>
+            </li>
+            <li>
+                <span>Hasta 78% más económico</span>
+            </li>
+            <li>
+                <span>De 1 a 20 días</span>
+            </li>
+            <li>
+                <span>Sin costos ocultos</span>
+            </li>
+        </ul>
+        <img id="bannerPrincipal" th:attr="data-src=@{/img/bgcreditoconsumo.jpg}" alt="" class="lazy"/>
+        <img id="bannerResponsive" th:attr="data-src=@{/img/bgperu_responsive.jpg}" alt=""/>
+        <button id="down" class="icon-bottom">Abajo</button>
+    </main>
+    <section class="sec-press toload">
+        <ul class="slider-press owl-carousel " id="slidePress">
+            <li th:each="noticia,stat : ${news}" th:unless="${stat.index >= 4}">
+                <a th:href="${noticia?.link}" target="_blank" rel="noopener noreferrer">
+                    <img th:attr="data-src=@{'https://s3.amazonaws.com/solven-public/img/' + ${noticia?.logo}}"
+                         class="owl-lazy lazy" th:alt="${noticia?.pressMedium}"
+                         th:title="${noticia.getDateFormatted(#locale)}" />
+                </a>
+            </li>
+        </ul>
+    </section>
+    <section class="sec-benefits toload">
+        <article>
+            <h2>Adelanta tu sueldo en<span>30 segundos</span></h2>
+            <p>Recibe el dinero en tu cuenta, paga lo que consideres justo.</p>
+            <img class="lazy solven01" data-src="/img/solven-05.jpg" alt=""/>
+            <img class="lazy solven02" data-src="/img/solven-04.jpg" alt=""/>
+        </article>
+        <ul class="list-steps">
+            <li>
+                <article>
+                    <h3>Rápido</h3>
+                    <p>Adelanta tu sueldo en tan sólo 30 segundos, te lo enviamos en el momento a tu cuenta. Pídelo cuantas veces quieras cada mes.</p>
+                    <span class="steps icon-step-1">1</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Fácil</h3>
+                    <p>Ingresa con tu correo. No revisaremos tu situación crediticia, ni tu endeudamiento. Se trata de tu dinero y tú te lo ganaste trabajando.</p>
+                    <span class="steps icon-step-2">2</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Justo</h3>
+                    <p>Haz tus matemáticas y evita los adelantos en los bancos, con tasas de más de 100% al año. Paga lo que consideras realmente justo.</p>
+                    <span class="steps icon-step-3">3</span>
+                </article>
+            </li>
+            <img class="lazy solven03" data-src="/img/solven-03.png" alt=""/>
+        </ul>
+    </section>
+    <div class="sec-entities toload">
+        <div class="gwr">
+            <h3>Ellos trabajan con nosotros</h3>
+            <ul>
+                <li><a href="http://www.abaco.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/abaco.png" alt="" /></a></li>
+                <li><a href="https://acceso.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/acceso.png" alt="" /></a></li>
+                <li><a href="http://www.bancoripley.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/ripley/logo/solven_banco_ripley.png" alt="" /></a></li>
+                <li><a href="http://cajarurallosandes.com/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/cajalosandes.png" alt="" /></a></li>
+                <li><a href="http://www.cajasullana.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/cajasullana.png" alt="" /></a></li>
+                <li><a href="https://www.compartamos.com.pe" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/compartamos.png" alt="" /></a></li>
+                <li><a href="https://www.efectiva.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/efectiva.png" alt="" /></a></li>
+                <li><a href="https://www.eflglobal.com/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/efl.png" alt="" /></a></li>
+                <li><a href="http://www.qapaq.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/qapaq.png" alt="" /></a></li>
+                <li><a href="http://www.multifinanzas.com.ar/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/trasatlantica.png" alt="" /></a></li>
+            </ul>
+            <img class="lazy solven01" data-src="/img/solven-05.jpg" />
+            <img class="lazy solven02" data-src="/img/solven-03.png" />
+        </div>
+    </div>
+    <section class="sec-youneedhelp toload">
+        <div class="gwr">
+            <article>
+                <span class="h2" th:text="#{static.landing.home.needHelp}"></span>
+                <p th:text="#{static.landing.home.stepSpan2}"><span th:text="#{static.landing.home.stepSpan3}"  ></span></p>
+                <ul class="info-contact">
+                    <li th:text="#{static.landing.hr}"></li>
+                </ul>
+                <span class="info-message">No tomamos solicitudes de crédito por teléfono. Las llamadas pueden ser monitoreadas o grabadas.</span>
+                <a th:href="@{/centro-de-ayuda}" class="g-btn bg-skyeblue">Centro de ayuda</a>
+            </article>
+            <img data-src="/img/ahorro-solven.jpg" class="lazy" alt=""/>
+        </div>
+            <div class="locate gwr" style="padding:15px;"><svg x="0px" y="0px" viewBox="0 0 512 512" style="width: 30px;" xml:space="preserve"><path style="fill:#FF4B55;" d="M38.345,88.273C17.167,88.273,0,105.44,0,126.618v258.759c0,21.177,17.167,38.345,38.345,38.345h132.322V88.273H38.345z"></path><rect x="170.67" y="88.277" style="fill:#FFFFFF;" width="170.67" height="335.45"></rect><path style="fill:#FF4B55;" d="M473.655,88.273H341.333v335.448h132.322c21.177,0,38.345-17.167,38.345-38.345V126.618C512,105.44,494.833,88.273,473.655,88.273z"></path></svg><span style="margin-left: 45px;position: absolute">PE</span></div>
+    </section>
+    <script th:inline="javascript" async="async">
+        /*<![CDATA[*/
+        var loanApplicationToken;
+        var url_loanApplication = /*[[@{/loanapplication}]]*/;
+        var url_salaryAdvance = /*[[@{/salaryadvanceloanapplication}]]*/null;
+        var url_salaryAdvanceCellphone = /*[[@{/__${T(com.affirm.acquisition.controller.SalaryAdvanceController).LANDING_URL}__/cellphone}]]*/null;
+        var url_salaryAdvanceCellphoneValid = /*[[@{/__${T(com.affirm.acquisition.controller.SalaryAdvanceController).LANDING_URL}__/cellphone/validate}]]*/null;
+        var baseUrl = /*[[@{/early/3/}]]*/;
+        /*]]>*/
+    </script>
+</th:block>
+
+
+<script async="async">
+    /*<![CDATA[*/
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    function setCookie(name, value, days){
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        var expires = "; expires=" + date.toGMTString();
+        document.cookie = name + "=" + value + expires + ";path=/";
+    }
+
+    function getParam(p){
+        var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+
+    var source = getParameterByName('utm_source');
+    var medium = getParameterByName('utm_medium');
+    var campaign = getParameterByName('utm_campaign');
+    var term = getParameterByName('utm_term');
+    var content = getParameterByName('utm_content');
+
+    var gclid = getParam('gclid');
+
+
+    document.getElementsByName("utm_source").value = source;
+    document.getElementsByName("utm_medium").value = medium;
+    document.getElementsByName("utm_campaign").value = campaign;
+    document.getElementsByName("utm_term").value = term;
+    document.getElementsByName("utm_content").value = content;
+
+    if(gclid){
+        var gclsrc = getParam('gclsrc');
+        if(!gclsrc || gclsrc.indexOf('aw') !== -1){
+            setCookie('gclid', gclid, 90);
+        }
+    }
+
+    if (!(source === null) && (sessionStorage.getItem("utm_source") === null || sessionStorage.getItem("utm_source") === undefined)) {
+        sessionStorage.setItem("utm_source", source);
+    }
+
+    if (!(medium === null) && (sessionStorage.getItem("utm_medium") === null || sessionStorage.getItem("utm_medium") === undefined)) {
+        sessionStorage.setItem("utm_medium", medium);
+    }
+
+    if (!(campaign === null) && (sessionStorage.getItem("utm_campaign") === null || sessionStorage.getItem("utm_campaign") === undefined)) {
+        sessionStorage.setItem("utm_campaign", campaign);
+    }
+
+    if (!(term === null) && (sessionStorage.getItem("utm_term") === null || sessionStorage.getItem("utm_term") === undefined)) {
+        sessionStorage.setItem("utm_term", term);
+    }
+
+    if (!(content === null) && (sessionStorage.getItem("utm_content") === null || sessionStorage.getItem("utm_content") === undefined)) {
+        sessionStorage.setItem("utm_content", content);
+    }
+    /*]]>*/
+</script>
+
+</body>
+</html>

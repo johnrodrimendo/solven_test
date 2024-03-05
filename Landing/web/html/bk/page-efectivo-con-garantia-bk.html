@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:text="#{static.title.garantizado}"></title>
+    <meta name="description" th:attr="content=#{static.description.vehicular}" />
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe efectivo-garantizado main-arg' : 'main-pe efectivo-garantizado'}">
+<th:block layout:fragment="content">
+    <main id="main" class="main-banner toload  main-adelanto-sueldo main-credito-consumo main-credito-vehicular">
+        <article>
+            <h1 class="animated" th:utext="#{static.garantizado.title}"></h1>
+            <p class="animated" th:utext="#{static.garantizado.description}"></p>
+        </article>
+        <ul class="list-benefits">
+            <li>
+                <span th:text="'Hasta ' + ${@utilService.integerMoneyFormat(25000)}"></span>
+            </li>
+            <li>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <span th:text="'Tasas desde ' + ${@utilService.percentFormat(15.00, 'AR')}"></span>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <span th:text="'Tasas desde ' + ${@utilService.percentFormat(47.00)}"></span>
+                </th:block>
+            </li>
+            <li>
+                <span>Hasta 36 cuotas</span>
+            </li>
+            <li>
+                <span>Sin costos ocultos</span>
+            </li>
+        </ul>
+        <img id="bannerPrincipal" th:attr="data-src=@{/img/landing-autos.jpg}" alt="" class="lazy"/>
+        <button id="down" class="icon-bottom">Abajo</button>
+    </main>
+    <section class="sec-press toload gwr">
+        <ul class="slider-press owl-carousel " id="slidePress">
+            <li th:each="noticia,stat : ${news}" th:unless="${stat.index >= 4}">
+                <a th:href="${noticia?.link}" target="_blank" rel="noopener noreferrer">
+                    <img th:attr="data-src=@{'https://s3.amazonaws.com/solven-public/img/' + ${noticia?.logo}}"
+                         class="owl-lazy lazy" th:alt="${noticia?.pressMedium}" th:title="${noticia.getDateFormatted(#locale)}" />
+                </a>
+            </li>
+        </ul>
+        <a th:href="@{/noticias}" class="view vflex" title="Ver más noticias" >
+            <span></span>
+            <span class="wsi">
+                <svg version="1.1" id="viewmore" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 width="36px" height="36px" viewBox="0 0 438.533 438.533" style="enable-background:new 0 0 438.533 438.533;"
+                 xml:space="preserve">
+                    <g>
+                        <path d="M409.133,109.203c-19.608-33.592-46.205-60.189-79.798-79.796C295.736,9.801,259.058,0,219.273,0
+                            c-39.781,0-76.47,9.801-110.063,29.407c-33.595,19.604-60.192,46.201-79.8,79.796C9.801,142.8,0,179.489,0,219.267
+                            c0,39.78,9.804,76.463,29.407,110.062c19.607,33.592,46.204,60.189,79.799,79.798c33.597,19.605,70.283,29.407,110.063,29.407
+                            s76.47-9.802,110.065-29.407c33.593-19.602,60.189-46.206,79.795-79.798c19.603-33.596,29.403-70.284,29.403-110.062
+                            C438.533,179.485,428.732,142.795,409.133,109.203z M334.332,232.111L204.71,361.736c-3.617,3.613-7.896,5.428-12.847,5.428
+                            c-4.952,0-9.235-1.814-12.85-5.428l-29.121-29.13c-3.617-3.613-5.426-7.898-5.426-12.847c0-4.941,1.809-9.232,5.426-12.847
+                            l87.653-87.646l-87.657-87.65c-3.617-3.612-5.426-7.898-5.426-12.845c0-4.949,1.809-9.231,5.426-12.847l29.121-29.13
+                            c3.619-3.615,7.898-5.424,12.85-5.424c4.95,0,9.233,1.809,12.85,5.424l129.622,129.621c3.613,3.614,5.42,7.898,5.42,12.847
+                            C339.752,224.213,337.945,228.498,334.332,232.111z"/>
+                    </g>
+                </svg>
+            </span>
+        </a>
+    </section>
+    <section class="sec-benefits carFinancing toload">
+        <article>
+            <h2 th:utext="#{static.garantizado.stepTitle}"></h2>
+            <p th:utext="#{static.garantizado.stepTitle2}"></p>
+            <img class="lazy solven01" data-src="/img/solven-05.jpg" alt=""/>
+            <img class="lazy solven02" data-src="/img/solven-04.jpg" alt=""/>
+        </article>
+        <ul class="list-steps">
+            <li>
+                <article>
+                    <h3 th:text="#{static.garantizado.step1}"></h3>
+                    <p th:text="#{static.garantizado.desc1}"></p>
+                    <span class="steps icon-step-1">1</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3 th:text="#{static.garantizado.step2}"></h3>
+                    <p th:text="#{static.garantizado.desc2}"></p>
+                    <span class="steps icon-step-2">2</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3 th:text="#{static.garantizado.step3}"></h3>
+                    <p th:text="#{static.garantizado.desc3}"></p>
+                    <span class="steps icon-step-3">3</span>
+                </article>
+            </li>
+            <img class="lazy solven03" data-src="/ img/solven-03.png" alt=""/>
+        </ul>
+    </section>
+    <div class="sec-entities toload">
+        <div class="gwr">
+            <h3>Ellos trabajan con nosotros</h3>
+            <ul>
+                <li><a href="http://www.abaco.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/abaco.png" alt="" /></a></li>
+                <li><a href="https://acceso.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/acceso.png" alt="" /></a></li>
+                <li><a href="http://www.bancoripley.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/ripley/logo/solven_banco_ripley.png" alt="" /></a></li>
+                <li><a href="http://cajarurallosandes.com/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/cajalosandes.png" alt="" /></a></li>
+                <li><a href="http://www.cajasullana.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/cajasullana.png" alt="" /></a></li>
+                <li><a href="https://www.compartamos.com.pe" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/compartamos.png" alt="" /></a></li>
+                <li><a href="https://www.efectiva.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/efectiva.png" alt="" /></a></li>
+                <li><a href="https://www.eflglobal.com/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/efl.png" alt="" /></a></li>
+                <li><a href="http://www.qapaq.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/qapaq.png" alt="" /></a></li>
+                <li><a href="http://www.multifinanzas.com.ar/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/trasatlantica.png" alt="" /></a></li>
+            </ul>
+            <img class="lazy solven01" data-src="/img/solven-05.jpg" />
+            <img class="lazy solven02" data-src="/img/solven-03.png" />
+        </div>
+    </div>
+    <section class="sec-youneedhelp toload">
+        <div class="gwr">
+            <article>
+                <span class="h2" th:text="#{static.landing.home.needHelp}"></span>
+                <p th:text="#{static.landing.home.stepSpan2}"><span th:text="#{static.landing.home.stepSpan3}"  ></span></p>
+                <ul class="info-contact">
+                    <li th:text="#{static.landing.hr}"></li>
+                </ul>
+                <span class="info-message">No tomamos solicitudes de crédito por teléfono. Las llamadas pueden ser monitoreadas o grabadas.</span>
+                <a th:href="@{/centro-de-ayuda}" class="g-btn bg-skyeblue">Centro de ayuda</a>
+            </article>
+            <img data-src="/img/ahorro-solven.jpg" class="lazy" alt=""/>
+        </div>
+
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <div class="locate"><span class="gwr flags arg">AR</span></div>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <div class="locate"><span class="gwr flags pe">PE</span></div>
+        </th:block>
+    </section>
+</th:block>
+<div class="modal" id="confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+    <div class="modal-dialog" role="confirmation">
+        <div class="modal-content">
+            <div class="modal-top">
+                <div class="title-wrap">
+                    <h4 class="title-modal" th:text="#{modal.confirmationCode.title}"></h4>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-middle">
+                <div class="block-content">
+                    <p th:text="#{modal.confirmationCode.subTitle}"></p>
+                    <form action="">
+                        <div class="field inline">
+                            <small class="input-help">C&oacute;digo de confirmaci&oacute;n</small>
+                            <input type="text" class="input-outline" id="cofirmCodePromo" />
+                        </div>
+                        <div class="field inline">
+                            <small class="input-help">&nbsp;</small>
+                            <button type="button" class="button bg-red" th:text="#{button.confirm}"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay"></div>
+</div>
+<script th:inline="javascript" async="async">
+    /*<![CDATA[*/
+    (function() {
+
+        $('#cofirmCodePromo').forceLettersOnly('', true, 10, 10);
+
+        var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+        if (validator != null) {
+            var jsonValidator = JSON.parse(validator);
+            $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+        }
+        $('#sendMessage').on('click', function(event){
+            event.preventDefault();
+            validate();
+        });
+        function validate() {
+            if ($('#contactForm').valid()) {
+                grecaptcha.reset();
+                grecaptcha.execute();
+            }
+        }
+        function submit(){
+            $('#sendMessage').loading('', 2);
+            defaultAjax({
+                url: /*[[@{/contact}]]*/,
+                type: 'POST',
+                formValidation: $('#contactForm').data('validator'),
+                data: $('#contactForm').serializeObject(),
+                success: function (data) {
+                    $('#sendMessage').unloading();
+                    $('#contactForm').data('validator').resetForm();
+                    $('#contactForm')[0].reset();
+                    $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                },
+                error: function () {
+                    $('#sendMessage').unloading();
+                }
+            });
+        }
+    }());
+    /*]]>*/
+</script>
+</body>
+</html>

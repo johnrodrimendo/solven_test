@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.80.dependents}"></p>
+            <div class="form-group">
+                <select class="form-control" th:field="*{dependents}" >
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option value="0">Ninguno</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">M&aacute;s de 4</option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('select[name=dependents]').on('change', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

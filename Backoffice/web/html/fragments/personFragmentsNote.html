@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+
+<div th:fragment="tab-notes-log" th:remove="tag">
+    <div id="tabLoading" style="display: none">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de Log de notas</li>
+        </ul>
+    </div>
+    <div th:if="${firstCall == null or !firstCall}" id="tabData" data-accordion="notes">
+        <div class="portlet box green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <div th:remove="tag" th:text="'Log de notas'"/>
+                </div>
+                <div class="tools">
+                    <a th:if="${loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL or
+                            loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).EVAL_APPROVED or
+                            loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED or
+                            loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED_AUTOMATIC or
+                            loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED_AUTOMATICALLY_EVALUATION}" href="javascript:;" class="note-add" data-original-title="" title="Agregar" onclick="openRegisterNote()" style="font-size: 18px;">
+                        <i class="fa fa-file" style=""> </i></a>
+                    <a href="javascript:;" class="reload" data-original-title="" title="Actualizar"> </a>
+                    <a href="javascript:;" class="expand" data-original-title="" title=""> </a>
+                </div>
+            </div>
+            <div class="portlet-body" style="display: none;">
+                <ul class="fa-ul" style="min-width: 100%;padding-right: 50px;">
+
+                    <th:block th:if="${onlyView != null  AND onlyView}">
+                        <div th:replace="fragments/personFragmentsNote :: tab-notes-acordeon"/>
+                    </th:block>
+
+                    <th:block th:unless="${onlyView != null  AND onlyView}  ">
+                        <li>
+                            <i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de Log de Notas
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--Modal for upload-->
+<!--    TODO SHOULD IT BE OUTSIDE. AT PERSON.HTML????-->
+    <div id="registerNoteModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-lightblue-header" style="padding: 1.5em">
+                    <!--<button type="button" class="close" data-dismiss="modal">&times;</button>-->
+                    <h4 style="text-align: center; font-weight: bold;">Agregar nota</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea id="txaNote" cols="30" rows="3" maxlength="500"></textarea>
+                    <p>M&aacute;ximo de caracteres: <small id="sm-log">500</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn red" onclick="closeRegisterNoteModal()">
+                        Cerrar
+                    </button>
+                    <button type="button" class="btn green" onclick="registerNoteModal()">
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var selectedRegisterButton;
+        var selectedNoteId;
+        var selectedNoteOperatorId;
+
+        $(document).on('click', '.note-add, .note-edit', function () {
+            selectedRegisterButton = $(this);
+        });
+
+        function openRegisterNote(noteId, operatorId, comment) {
+            if(comment !== null) {
+                $('#registerNoteModal #txaNote').val(comment);
+            }
+            $('#registerNoteModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            selectedNoteId = noteId;
+            selectedNoteOperatorId = operatorId;
+        }
+
+        // TexT AREA CONTADOR
+        $(document).on('keyup', "[maxlength]", function (e) {
+            var este = $(this),
+                maxlength = este.attr('maxlength'),
+                maxlengthint = parseInt(maxlength),
+                textoActual = este.val(),
+                currentCharacters = este.val().length,
+                remainingCharacters = maxlengthint - currentCharacters,
+                espan = $('#sm-log');
+            // Detectamos si es IE9 y si hemos llegado al final, convertir el -1 en 0 - bug ie9 porq. no coge directamente el
+
+            espan.html(remainingCharacters);
+        });
+
+        function closeRegisterNoteModal() {
+            $('#registerNoteModal').modal('hide');
+            $('#txaNote').val('');
+            selectedRegisterButton = undefined;
+            selectedNoteId = undefined;
+            selectedNoteOperatorId = undefined;
+        }
+
+        function registerNoteModal() {
+            if($('#txaNote').val() !== '') {
+                var button = selectedRegisterButton;
+                defaultAjax({
+                    url: /*[[ @{/person/__${loanApplication.personId}__/application/__${loanApplication.id}__/notes} ]]*/,
+                    data: {
+                        noteId: selectedNoteId,
+                        operatorId: selectedNoteOperatorId,
+                        message: $('#txaNote').val()
+                    },
+                    type: 'POST',
+                    success: function () {
+                        closeRegisterNoteModal();
+                        setTimeout(function () {
+                            button.closest('[data-accordion=notes]').find('> .portlet > .portlet-title').find('.tools a.reload').click();
+                        }, 300);
+                    }
+                });
+            }
+        }
+
+        /*]]>*/
+    </script>
+</div>
+
+<div class="panel-group" id="accordion" th:fragment="tab-notes-acordeon">
+    <div th:if="${notes == null}" class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-12">La solicitud no tiene notas</div>
+            </div>
+        </div>
+    </div>
+    <div th:each="note,iterStat : ${notes}"
+         class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   th:href="'#collapse' + ${note?.id} + ${iterStat.index}"
+                   class="col-md-12">
+                    <dl class="dl-horizontal">
+                        <dt>Usuario</dt>
+                        <dd th:text="${@sysUserService.getSysUserById(note?.sysUserId)?.getFullName()}"
+                            style="font-weight: bold"></dd>
+                        <dt>Fecha</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(note?.registerDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(note?.registerDate)}"></dd>
+                    </dl>
+                </a>
+<!--                <a th:if="${loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL and note?.sysUserId == @backofficeService.getLoggedSysuser().getId()}" href="javascript:;" class="note-edit col-md-1" data-original-title="" title="Editar"-->
+<!--                    th:onclick="${'openRegisterNote(' + note?.id + ', ' + note?.sysUserId + ', ''' + note?.comment + ''')'}">-->
+<!--                    <i class="fa fa-edit"> </i></a>-->
+            </div>
+        </div>
+        <div th:id="'collapse' + ${note?.id} + ${iterStat.index}" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="note-html">
+                </div>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var htmlforReplace = /*[[${note?.comment}]]*/;
+                    var htmlInteraction = $('#collapse' + [[${note?.id}]] + [[${iterStat.index}]]).find('.note-html');
+                    htmlforReplace = htmlforReplace.replace(/\\r\\n/g, '<br/>');
+                    htmlInteraction.html(htmlforReplace);
+                    /*]]>*/
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

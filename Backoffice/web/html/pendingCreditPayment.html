@@ -1,0 +1,243 @@
+    <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Confirmar Pagos</title>
+
+    <!--X-Editable-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css'}" rel="stylesheet"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            $('#pendingCreditPaymentTable').find('.group-checkable').change(function () {
+                var set = $(this).attr("data-set");
+                var checked = $(this).is(":checked");
+                $(set).each(function () {
+                    if (checked) {
+                        $(this).prop("checked", true);
+                    } else {
+                        $(this).prop("checked", false);
+                    }
+                });
+            });
+
+            $('#pendingCreditPaymentTable').find('input[type="checkbox"]').change(function () {
+                var cheks = $('#pendingCreditPaymentTable').find('input[type="checkbox"][data-payment-id]:checked');
+                if (cheks.length > 0) {
+                    $('#registerSelectedPaymentsConfirmationButton').show(300);
+                } else {
+                    $('#registerSelectedPaymentsConfirmationButton').hide(300);
+                }
+            });
+        });
+
+        function registerCreditPaymentConfirmation() {
+            var jsonIds = [];
+            $('#pendingCreditPaymentTable').find('input[type="checkbox"][data-payment-id]:checked').each(function () {
+                jsonIds[jsonIds.length] = {id: parseInt($(this).attr("data-payment-id"))};
+                console.log(jsonIds)
+            });
+
+            var baseUrl = /*[[@{/creditPayment/confirm/}]]*/;
+            defaultAjax({
+                url: baseUrl,
+                type: 'POST',
+                data: {
+                    ids: JSON.stringify(jsonIds)
+                },
+                success: function (data) {
+                    refreshPendingCreditPaymentConfirmation();
+                }
+            })
+        }
+
+        function refreshPendingCreditPaymentConfirmation() {
+            var baseUrl = /*[[@{/creditPayment/pending}]]*/;
+            $('#portletPendingCreditPayment').load(baseUrl + ' #portletPendingCreditPayment > *', null, function () {
+            });
+        }
+
+        function getDefaultXEditableJson() {
+            return {
+                viewformat: 'DD/MM/YYYY',
+                format: 'DD/MM/YYYY',
+                showbuttons: 'bottom',
+                send: 'always',
+                emptytext: 'Sin Asignar',
+                params: {
+                    creditPaymentId: null,
+                },
+                ajaxOptions: {
+                    type: 'post',
+                    headers: addCsrfToJsonHeaders({'x-request-sender-type':'ajax'})
+                },
+                error: function (response, newValue) {
+                    console.log('error: ' + response);
+                }
+            }
+        }
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Imputaciones</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Confirmar Pagos</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletPendingCreditPayment"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Confirmar Pagos</span>
+                                </div>
+                                <div class="actions">
+                                    <a id="registerSelectedPaymentsConfirmationButton" href="javascript:;"
+                                       style="display: none"
+                                       th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                                       th:onclick="'registerCreditPaymentConfirmation()'">Confirmar
+                                        Selec.</a>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(payments)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive">
+                                    <table id="pendingCreditPaymentTable" class="table table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>País</th>
+                                            <th>
+                                                <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                                    <input type="checkbox" class="group-checkable"
+                                                           data-set="#pendingCreditPaymentTable .checkboxes"/>
+                                                    <span></span>
+                                                </label>
+                                            </th>
+                                            <th>Crédito</th>
+                                            <th>Banco</th>
+                                            <th>Fec. Pago</th>
+                                            <th>Cod. depositante</th>
+                                            <th>Nom. depositante</th>
+                                            <th>Monto</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="payment, iterCreditPayment : ${payments}">
+                                            <td th:text="${iterCreditPayment.count}"></td>
+                                            <td>
+                                                <div class="choose-country">
+                                                    <span th:class="'c-language c' + ${payment?.country?.id}"></span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                                    <input type="checkbox" class="checkboxes" value="1"
+                                                           th:attr="data-payment-id=${payment?.id}"/>
+                                                    <span></span>
+                                                </label>
+                                            </td>
+
+                                            <td th:if="${payment?.credit != null}">
+                                                <a th:href="@{/person(personId=${payment?.credit?.personId}, tab='credits', creditId=${payment?.credit?.id})}"
+                                                   th:text="${payment?.credit?.code}"></a></td>
+                                            <td th:if="${payment?.credit} == null">
+                                                <a href="#" th:id="'creditPayment_' + ${payment?.id}"
+                                                   th:text="${payment?.credit?.code}"></a>
+                                                <script th:inline="javascript">
+                                                    /*<![CDATA[*/
+                                                    var editableJson = getDefaultXEditableJson();
+                                                    editableJson.type = 'text';
+                                                    editableJson.url = /*[[ @{/creditPayment/updateCreditPayment} ]]*/;
+                                                    editableJson.title = 'Crédito';
+                                                    editableJson.params.creditPaymentId = /*[[ ${payment?.id} ]]*/;
+                                                    editableJson.value = /*[[ ${payment?.credit?.code} ]]*/;
+                                                    editableJson.error = function (response, newValue) {
+                                                        editableJson.responseText = 'Código inválido';
+                                                        //alert("Código inválido");
+                                                    };
+                                                    $('#creditPayment_[[ ${payment?.id} ]]').editable(editableJson);
+                                                    /*]]>*/
+                                                </script>
+                                            </td>
+                                            <td th:text="${payment?.bank?.name}"></td>
+                                            <td th:text="${@utilService.dateFormat(payment?.paymentDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(payment?.paymentDate)}"></td>
+                                            <td th:text="${payment?.depositorId}"></td>
+                                            <td th:text="${payment?.depositorName}"></td>
+                                            <td th:text="${@utilService.doubleMoneyFormat(payment?.ammount, payment?.country?.currency?.symbol, payment?.country?.separator)}"></td>
+                                            <td>
+                                                <span th:text="${@utilService.doubleMoneyFormat(payment?.pendingAmount, payment?.country?.currency?.symbol, payment?.country?.separator)}"
+                                                      class="label label-xs label-info"></span>
+                                                <span th:if="${payment?.overAlert}"
+                                                      class="label label-xs label-danger">Monto Mayor</span>
+                                                <span th:if="${payment?.underAlert}"
+                                                      class="label label-xs label-danger">Monto Menor</span>
+                                                <span th:if="${payment?.statusAlert}"
+                                                      class="label label-xs label-warning">Crédito Inactivo</span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END SAMPLE TABLE PORTLET-->
+                    </div>
+                </div>
+            </div>
+            <!-- END PAGE CONTENT INNER -->
+        </div>
+    </div>
+    <!-- END PAGE CONTENT BODY -->
+    <!-- END CONTENT BODY -->
+
+    <!-- BEGIN MODAL -->
+    <div id="registerDisbursementModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+            UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+
+</html>

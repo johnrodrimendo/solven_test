@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:utext="#{questions.block.tellMeAboutAdditionalIncome}"></p>
+            <div class="field inline">
+                <label class="input-radio">
+                    <input type="radio" class="howEarnMoney" name="activity"
+                           th:value="${T(com.affirm.common.model.catalog.ActivityType).DEPENDENT}"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <i class="icon icon-dependent"></i>
+                            <h5 th:text="#{form.field.activityType.dependent}"></h5>
+                            <div class="radio"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline">
+                <label class="input-radio">
+                    <input type="radio" class="howEarnMoney" name="activity"
+                           th:value="${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT}"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <i class="icon icon-independent"></i>
+                            <h5 th:text="#{form.field.activityType.independent}"></h5>
+                            <div class="radio"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline"
+                 th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                <label class="input-radio">
+                    <input type="radio" class="howEarnMoney" name="activity"
+                           th:value="${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA}"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <i class="icon icon-independent"></i>
+                            <h5 th:text="#{form.field.activityType.monotributista}"></h5>
+                            <div class="radio"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline"
+                 th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                <label class="input-radio">
+                    <input type="radio" class="howEarnMoney" name="activity"
+                           th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <i class="icon icon-independent"></i>
+                            <h5 th:text="#{form.field.activityType.pensioner}"></h5>
+                            <div class="radio"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('.howEarnMoney').on('change', function () {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST",
+                data: {
+                    activity: $('input[name=activity]:checked').val()
+                }
+            }, "");
+        });
+
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

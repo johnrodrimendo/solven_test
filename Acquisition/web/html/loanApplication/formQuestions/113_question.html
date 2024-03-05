@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div id="modal_msg_question_pep" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="help">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <span class="circle"></span>
+                        <span class="text">Personas Expuestas Polícitamente (PEP)</span>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <p th:utext="#{questions.pep.explanation}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="questions-section animated fadeInRight" id="pepQuestion">
+        <div class="forms">
+            <div class="actions">
+                <p th:utext="#{questions.block.pepQuestion}"></p>
+                <a href="#" class="anchor-button bg-black" data-target="no">No</a>
+                <a href="#" class="anchor-button bg-red" data-target="yes">Sí</a>
+                <div class="display-block question-pep">
+                    <span>¿Qué es una persona expuesta pol&iacute;ticamente <a id="open-modal-question-pep" href="#">(PEP)</a>?</span>
+                </div>
+            </div>
+            <div style="display: none;" id="pepDetailContainer">
+                <form id="questionForm" th:object="${form}" autocomplete="off">
+                    <span class="display-block question-pep-message">Nos informaste que eres una Persona Políticamente Expuesta, por favor indicanos tu cargo, función o jerarquía, o relación con la persona políticamente expuesta.</span>
+                    <div class="display-block wrap-detail-pep">
+                        <textarea class="input-outline" name="pepDetail" id="pepDetail" maxlength="140"></textarea>
+                        <small class="display-block question-pep">Máximo 140 caracteres</small>
+                        <div class="errorContainer"></div>
+                    </div>
+
+                    <button id="sendButton" type="button" class="button bg-red">Continuar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var $pepDetail = $('#pepDetail');
+        var $pepContainer = $('#pepDetailContainer');
+        var $questionForm = $('#questionForm');
+        var $sendButton = $('#sendButton');
+        var $openModalQuestionPep = $('#open-modal-question-pep');
+        var $modalQuestionPep = $('#modal_msg_question_pep');
+        var $btn = $('.anchor-button');
+        var total_letras = 140;
+
+        questionFw.validateForm($questionForm,
+            JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        $btn.on('click', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            console.log("clicked");
+            switch ($this.data('target')) {
+                case 'yes':
+                    $questionForm.data('validatorJson').rules.pepDetail.required = true;
+                    $pepContainer.show();
+                    break;
+                case 'no':
+                    $questionForm.data('validatorJson').rules.pepDetail.required = false;
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        data: {'isPep': false}
+                    }, "");
+                    break;
+            }
+        });
+
+        $openModalQuestionPep.on('click', function (event) {
+            event.preventDefault();
+            $modalQuestionPep.modal('show');
+        });
+
+        //        $pepDetail.keyup(function () {
+        //            var longitud = $(this).val().length;
+        //            var resto = total_letras - longitud;
+        //            if (resto <= 0) {
+        //                $pepDetail.attr("maxlength", 139);
+        //            }
+        //        });
+
+        $sendButton.on('click', function () {
+            if ($questionForm.valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {
+                        'isPep': true,
+                        'pepDetail': $pepDetail.val()
+                    },
+                    button: $sendButton,
+                    form: $questionForm,
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

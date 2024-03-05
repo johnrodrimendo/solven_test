@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q24">
+            <form th:object="${form}" class="form" id="questionForm" autocomplete="off">
+                <p th:utext="#{questions.block.educationLevel}"></p>
+                <!--div class="field inline">
+                    <select th:field="*{studyLevel}" data-width="245" data-placeholder="Nivel de estudios">
+                        <th:block th:each="level : ${@catalogService.getStudyLevels(#locale)}">
+                            <option disabled="disabled" selected="selected" value=""></option>
+                            <option th:value="${level.id}" th:text="${level.level}"></option>
+                        </th:block>
+                    </select>
+                </div -->
+
+                <div class="field inline" th:each="level : ${studyLevels}">
+                    <label class="h-input-radio">
+                        <input type="radio" name="studyLevel" th:value="${level.id}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline" th:text="${level.level}"></h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+
+                <!--div class="field inline">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div-->
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        updateBranding();
+        $('.h-input-radio').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    //button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                    //data: {studyLevel: $('#studyLevel').val(), concludedStudies: $('#concludedStudies').prop('checked')}
+
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+    <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            updateBranding();
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+
+</th:block>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question"> <!-- Antes de la pregunta 3, si es nuevo crédito irá a la pregunta 3 -->
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="chooseCredit">
+            <p th:if="${isEvaluation}" th:utext="#{question.block.preoptions}"></p>
+            <p th:text="#{form.credit.reason}"></p>
+            <form id="questionForm" th:object="${form}" class="q107" autocomplete="off">
+                <div class="field inline"
+                     th:each="category : ${@catalogService.getProductCategoriesVisible(@countryContextService.getCountryParamsByRequest(#httpServletRequest).id, #locale)}">
+                    <label class="input-radio">
+                        <input type="radio" class="howEarnMoney" name="activityType" th:id="${category?.id}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <figure>
+                                    <img th:src="${category?.image}" alt=""/>
+                                </figure>
+                                <h5 th:text="${category.categoryName}"></h5>
+                                <div class="radio"></div>
+                            </div>
+                        </div>
+                    </label>
+                    <small class="input-help" th:text="${category.message}"></small>
+                </div>
+            </form>
+            <hr class="divisor-bottom"/>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=activityType]:radio').change(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {productCategory: $(this).attr("id")}
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

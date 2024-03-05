@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Reporte de Originaciones 2</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            var tableFilter = new TableFilter($('#principalPortlet'));
+            tableFilter.resultsContainer = $('#table')
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Reportes</span>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Dashboard de Originaciones</span>
+                </li>
+            </ul>
+                <div class="page-content-inner" id="dashboard-originacion">
+                <div id="principalPortlet" th:class="${@frontEndService.getDefaultPortletClass()}">
+                    <div class="portlet-title tabbable-line">
+                        <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Dashboard de Originación</span>
+                        </div>
+                        <div class="actions">
+                            <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'" href="javascript:;"><i class="fa fa-filter"></i> Filtros</a>
+                        </div>
+                    </div>
+                    <div class="portlet-title tablefilter-filters" style="display: none">
+                        <form role="form" method="post" th:action="@{/reporting/originationDashboard/result}">
+                            <div class="form-row">
+                                <!-- Fecha de Período 1 -->
+                                <div class="form-row col-md-4">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label"><b>Período 1</b><br />Desde</label>
+                                        <input id="period1FromFilter" name="period1FromFilter" type="text" class="form-control form-control-sm" placeholder="Desde" />
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label"><b></b><br/>Hasta</label>
+                                        <input id="period1ToFilter" name="period1ToFilter" type="text" class="form-control form-control-sm" placeholder="Hasta" />
+                                    </div>
+
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var period1FromFilter = $('#period1FromFilter');
+                                        var period1ToFilter = $('#period1ToFilter');
+                                        datepicker(period1FromFilter);
+                                        datepicker(period1ToFilter);
+                                        function datepicker( obj ){
+                                            obj.datepicker({
+                                                autoclose: true,
+                                                format: "dd-mm-yyyy",
+                                                focusOnShow: true,
+                                                endDate: "today"
+                                            });
+                                        }
+                                        period1FromFilter.on('change', function () {
+                                            period1ToFilter.datepicker('setStartDate', period1FromFilter.val());
+                                        });
+                                        /*]]>*/
+                                    </script>
+                                </div>
+                                <!-- Fecha de Período 2 -->
+                                <div class="form-row col-md-4">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label"><b>Período 2</b><br />Desde</label>
+                                        <input id="period2FromFilter" name="period2FromFilter" type="text" class="form-control form-control-sm" placeholder="Desde" />
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label"><b></b><br/>Hasta</label>
+                                        <input id="period2ToFilter" name="period2ToFilter" type="text" class="form-control form-control-sm" placeholder="Hasta" />
+                                    </div>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var period2FromFilter = $('#period2FromFilter');
+                                        var period2ToFilter = $('#period2ToFilter');
+                                        datepicker(period2FromFilter);
+                                        datepicker(period2ToFilter);
+                                        function datepicker( obj ){
+                                            obj.datepicker({
+                                                autoclose: true,
+                                                format: "dd-mm-yyyy",
+                                                focusOnShow: true,
+                                                endDate: "today"
+                                            });
+                                        }
+                                        period2FromFilter.on('change', function () {
+                                            period2ToFilter.datepicker('setStartDate', period2FromFilter.val());
+                                        });
+                                        /*]]>*/
+                                    </script>
+                                </div>
+                                <!-- Entidad -->
+                                <div class="form-group col-md-2">
+                                    <label class="control-label"><b></b><br/>Entidad</label>
+                                    <select name="entity" class="form-control form-control-sm">
+                                        <option value="">Todos</option>
+                                        <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="portlet-body">
+                        <div id="table">
+                            <th:block th:replace="this :: results"></th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+<th:block th:fragment="results">
+    <div class="form-row tablefilter-table">
+
+        <div class="form-row col-md-4">
+            <div class="form-group col-md-6">
+                <label class="control-label"><b>Período 1</b><br /><span th:text="${@utilService.dateFormat(period1From)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(period1From)}"/> - <span th:text="${@utilService.dateFormat(period1To)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(period1To)}"/></label>
+            </div>
+            <div class="form-group col-md-6">
+                <label class="control-label"><b>Período 2</b><br /><span th:text="${@utilService.dateFormat(period2From)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(period2From)}"/> - <span th:text="${@utilService.dateFormat(period2To)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(period2To)}"/></label>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="portlet-title">
+                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Originación (#)</span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th style="width: 250px"></th>
+                            <th style="width: 200px" th:each="period : ${report.periods}" th:text="${period.period}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="originationGroup : ${report.originations}">
+                            <tr class="bg-grey-mint font-grey-cararra">
+                                <th th:text="${originationGroup.getOriginationName()}"></th>
+                                <td class="text-center" th:each="period : ${report.periods}"
+                                    th:text="${originationGroup.getTotalDetailQuantityByPeriod(period.period)}"></td>
+                            </tr>
+                            <tr th:each="productGroup : ${originationGroup.products}">
+                                <td th:text="${productGroup.product.name}"></td>
+                                <td class="text-center" th:each="period : ${report.periods}"
+                                    th:text="${productGroup.getDetailByPeriod(period.period).quantity}"></td>
+                            </tr>
+                        </th:block>
+                        <th:block th:with="totalOriginationType=${report.getTotalOriginations()}">
+                            <tr class="bg-grey-mint font-grey-cararra">
+                                <th th:text="${totalOriginationType.getOriginationName()}"></th>
+                                <td class="text-center" th:each="period : ${report.periods}"
+                                    th:text="${totalOriginationType.getTotalDetailQuantityByPeriod(period.period)}"></td>
+                            </tr>
+                            <tr th:each="productGroup : ${totalOriginationType.products}">
+                                <td th:text="${productGroup.product.name}"></td>
+                                <td class="text-center" th:each="period : ${report.periods}"
+                                    th:text="${productGroup.getDetailByPeriod(period.period).quantity}"></td>
+                            </tr>
+                        </th:block>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="portlet-title">
+                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}" th:text="'Originación (' + ${@currencyService.getCurrencySymbolReport() + ')'}"></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th style="width: 250px"></th>
+                            <th style="width: 200px" th:each="period : ${report.periods}"
+                                th:text="${period.period}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="originationGroup : ${report.originations}">
+                            <tr class="bg-grey-mint font-grey-cararra">
+                                <th th:text="${originationGroup.getOriginationName()}"></th>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(originationGroup.getTotalDetailLoanCapitalByPeriod(period.period))}"></td>
+                            </tr>
+                            <tr th:each="productGroup : ${originationGroup.products}">
+                                <td th:text="${productGroup.product.name}"></td>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(productGroup.getDetailByPeriod(period.period).loanCapital)}"></td>
+                            </tr>
+                        </th:block>
+                        <th:block th:with="totalOriginationType=${report.getTotalOriginations()}">
+                            <tr class="bg-grey-mint font-grey-cararra">
+                                <th th:text="${totalOriginationType.getOriginationName()}"></th>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(totalOriginationType.getTotalDetailLoanCapitalByPeriod(period.period))}"></td>
+                            </tr>
+                            <tr th:each="productGroup : ${totalOriginationType.products}">
+                                <td th:text="${productGroup.product.name}"></td>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(productGroup.getDetailByPeriod(period.period).loanCapital)}"></td>
+                            </tr>
+                        </th:block>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="portlet-title">
+                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}" th:text="'Comisiones (' + ${@currencyService.getCurrencySymbolReport() + ')'}"></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th style="width: 250px"></th>
+                            <th style="width: 200px" th:each="period : ${report.periods}"
+                                th:text="${period.period}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="originationGroup : ${report.originations}">
+                            <tr class="bg-grey-mint font-grey-cararra">
+                                <th th:text="${originationGroup.getOriginationName()}"></th>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(originationGroup.getTotalDetailEntityCommissionByPeriod(period.period))}"></td>
+                            </tr>
+                            <tr th:each="productGroup : ${originationGroup.products}">
+                                <td th:text="${productGroup.product.name}"></td>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(productGroup.getDetailByPeriod(period.period).entityCommission)}"></td>
+                            </tr>
+                        </th:block>
+                        <th:block th:with="totalOriginationType=${report.getTotalOriginations()}">
+                            <tr class="bg-grey-mint font-grey-cararra">
+                                <th th:text="${totalOriginationType.getOriginationName()}"></th>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(totalOriginationType.getTotalDetailEntityCommissionByPeriod(period.period))}"></td>
+                            </tr>
+                            <tr th:each="productGroup : ${totalOriginationType.products}">
+                                <td th:text="${productGroup.product.name}"></td>
+                                <td class="numeric" th:each="period : ${report.periods}"
+                                    th:text="${@utilService.integerOnlyMoney(productGroup.getDetailByPeriod(period.period).entityCommission)}"></td>
+                            </tr>
+                        </th:block>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

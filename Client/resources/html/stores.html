@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>El cr&eacute;dito que mereces</title>
+    <!-- improgress -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.js'}"></script>
+
+    <!-- reCaptcha -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+</head>
+<body>
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: processHeader"></th:block>
+</th:block>
+<!-- Header ends -->
+
+
+<th:block layout:fragment="content">
+    <!-- Content begins -->
+    <section class="loan-process">
+        <div class="container">
+            <div class="adviser-section animated fadeIn">
+                <div class="avatar-progress">
+                    <div class="avatar-advisor"></div>
+                </div>
+                <div class="horizontal-line"></div>
+            </div>
+
+            <div class="questions-section animated bounceInRight">
+                <p>Selecciona la tienda más cercana para recoger tu dinero en las próximas 72hs.</p>
+                <div class="stores-container">
+                    <ul>
+                        <li>
+                            <button>Store 1</button>
+                        </li>
+                        <li>
+                            <button>Store 2</button>
+                        </li>
+                        <li>
+                            <button>Store 3</button>
+                        </li>
+                        <li>
+                            <button>Store 4</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <hr class="divisor-bottom"/>
+    </section>
+
+    <!-- Content ends -->
+
+    <!-- Modal begins -->
+
+    <!-- Header begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <!-- Header ends -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ @{/img/faces/rosa.jpg} ]]*/;
+
+        $(document).on('ready', function () {
+            $('.avatar-advisor').doOnce(function () {
+                $(".avatar-advisor").imgProgress({
+
+                    // path to the image
+                    img_url: url,
+
+                    // size in pixels
+                    size: 100,
+
+                    // bar size
+                    barSize: 10,
+
+                    // background color
+                    backgroundColor: '#BEEFF2',
+
+                    // foreground color
+                    foregroundColor: '#26CAD3',
+
+                    // CSS background-size property
+                    backgroundSize: 'cover',
+
+                    // current percentage value
+                    percent: 5
+
+                });
+            });
+        });
+
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(document).ready(function () {
+            var validator = /*[[${processContactForm.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+            }
+
+            $("#sendMessage").on('click', function (e) {
+                e.preventDefault();
+                validate();
+            });
+
+        });
+
+        function validate() {
+            if ($('#contactForm').valid()) {
+                grecaptcha.execute();
+                $('#sendMessage').loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/processContact}]]*/,
+                    type: 'POST',
+                    formValidation: $('#contactForm').data('validator'),
+                    data: $('#contactForm').serializeObject(),
+                    success: function (data) {
+                        $('#sendMessage').unloading();
+                        $('#contactForm').data('validator').resetForm();
+                        $('#contactForm')[0].reset();
+                        $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                    },
+                    error: function () {
+                        $('#sendMessage').unloading();
+                    }
+                });
+            }
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

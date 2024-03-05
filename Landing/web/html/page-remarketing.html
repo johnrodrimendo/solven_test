@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <title th:text="#{static.title.credito.consumo}"></title>
+    <meta name="description" th:attr="content=#{static.description.credito.consumo}" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/credito-de-consumo" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="x-default" />
+    <th:block layout:fragment="css">
+        <style>
+        </style>
+        <link rel="preload" as="style" th:href="@{/css/landingRemarketing.css}" />
+        <link rel="stylesheet" th:href="@{/css/landingRemarketing.css}" />
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function calcHeight() {
+                var chv = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                document.getElementById("main").setAttribute("style", "height:" + chv + "px;");
+            }
+            /*window.onload=function(){
+                var e = new XMLHttpRequest;e.open("GET","https://fonts.googleapis.com/css?family=Lato:300,400,700,900",!0),e.onreadystatechange=function(){if(4==e.readyState&&200==e.status){var t=document.createElement("style");t.innerHTML=e.responseText,document.head.appendChild(t)}},e.send();
+            };
+            */
+            window.onresize = function (event) {
+                calcHeight();
+            };
+            /*]]>*/
+        </script>
+        <script defer="true" type="text/javascript" th:src="@{/js/landingRemarketing.js}"></script>
+    </th:block>
+
+</head>
+
+<body
+    th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe credito-consumo main-arg rm' : 'main-pe credito-consumo rm'}">
+   <th:block layout:fragment="header">
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeaderArgentina"></th:block>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeader"></th:block>
+        </th:block>
+    </th:block>
+    <th:block layout:fragment="content">
+        <main id="main" class="main-banner toload  main-adelanto-sueldo main-credito-consumo">
+            <article class="flex">
+                <div>
+                    <h1 th:utext="#{static.rmk.title}"></h1>
+                </div>
+
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <div class="form-container cbo-saca-credito">
+                        <form id="frmRemarketing" class="block white form">
+                            <!-- <h2 th:utext="#{static.rmk.form.title}"></h2> -->
+                            <div class="wrap form-group">
+                                <div class="w-doc ">
+                                    <div class="field inline">
+                                        <select name="documentType" id="documentType" class="select2">
+                                            <option value="1">DNI</option>
+                                            <option value="2">CE</option>
+                                        </select>
+                                    </div>
+                                    <div class="field inline">
+                                        <input type="text" class="input-landing document-input-landing form-control"
+                                            id="documentNumber" name="documentNumber" placeholder="N&uacute;mero" />
+                                    </div>
+                                </div>
+                                <div class="w-email">
+                                    <div class="field inline">
+                                        <input type="text" id="email" name="email" class="input-landing"
+                                            placeholder="Correo electr&oacute;nico" autocorrect="off"
+                                            autocapitalize="none" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="errorContainer">
+                            </div>
+                            <div class="w-btn field">
+                                <button id="btnRemarketing" type="button" class="button bg-red button-landing"
+                                    data-target="#frmRemarketing">Ingresar</button>
+                            </div>
+                        </form>
+                    </div>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <div class="form-container">
+                        <form class="block form" id="frmRemarketing">
+                            <div class="wrap">
+                                <div class="w">
+                                    <div class="w-doc">
+                                        <div class="field inline">
+                                            <input type="text" class="input-landing document-input-landing"
+                                                id="documentNumber" name="documentNumber"
+                                                placeholder="Número de CUIT / CUIL / CDI" style=" width: 220px;" />
+                                        </div>
+                                    </div>
+                                    <div class="w-email">
+                                        <div class="field inline">
+                                            <input type="text" id="email" name="email" class="input-landing"
+                                                placeholder="Correo electr&oacute;nico" autocorrect="off"
+                                                autocapitalize="none" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="errorContainer">
+                            </div>
+                            <div class="field inline w-btn">
+                                <button id="btnRemarketing" type="button" class="button bg-red button-landing"
+                                    data-target="#frmRemarketing">Ir a mi solicitud</button>
+                            </div>
+                        </form>
+                    </div>
+                </th:block>
+            </article>
+
+            <ul class="list-benefits">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <img id="bannerPrincipal"
+                src="https://s3.amazonaws.com/solven-public/img/solven/remarketing/bg-remarketing.jpg" alt=""
+                class="lazy" />
+        </main>
+        <div class="modal" id="confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+            <div class="modal-dialog" role="confirmation">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal" th:text="#{modal.confirmationCode.title}"></h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-middle">
+                        <div class="block-content">
+                            <p th:text="#{modal.confirmationCode.subTitle}"></p>
+                            <form action="">
+                                <div class="field inline">
+                                    <small class="input-help">C&oacute;digo de confirmaci&oacute;n</small>
+                                    <input type="text" class="input-outline" id="cofirmCodePromo" />
+                                </div>
+                                <div class="field inline">
+                                    <small class="input-help">&nbsp;</small>
+                                    <button type="button" class="button bg-red" th:text="#{button.confirm}"></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-overlay"></div>
+        </div>
+    </th:block>
+    <th:block layout:fragment="js">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var ajaxValidator = /*[[${contactForm.validator.toJson(#locale)}]]*/ null;
+            var ajaxContact = /*[[@{/contact}]]*/ ;
+            var ajaxLoanApplication = /*[[@{/loanapplication}]]*/ ;
+            var ajaxSalaryAdvanceApplication = /*[[@{/salaryadvanceloanapplication}]]*/ null;
+           
+            var ajaxCellPhone = /*[[@{adelanto-de-sueldo/cellphone}]]*/ null;
+            var ajaxCellPhoneValidate=/*[[@{adelanto-de-sueldo/cellphone/validate}]]*/ null;
+            var ajaxSubcribe = /*[[@{/subscribe}]]*/ null;
+            var loanApplicationToken;
+            var GA_LOCAL_STORAGE_KEY = 'ga:clientId';
+            var early = /*[[@{/early/3/}]]*/ ;
+            window.addEventListener('load', function () {
+                var validator = /*[[${form.validator.toJson(#locale)}]]*/ null;
+                if (validator != null) {
+                    var jsonValidator = JSON.parse(validator);
+                    $('#frmRemarketing').validateForm(createFormValidationJson(jsonValidator, $(
+                        '#frmRemarketing')));
+                }
+                (function () {
+                    var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/ null;
+                    if (validator != null) {
+                        var jsonValidator = JSON.parse(validator);
+                        $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $(
+                            '#contactForm')));
+                    }
+
+                }());
+            });
+
+            /*]]>*/
+        </script>
+
+    </th:block>
+</body>
+
+</html>

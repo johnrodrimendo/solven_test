@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Cola de Procesos</title>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function pauseBufferTransaction(bufferTransactionId, pause) {
+            var baseUrl = /*[[@{/buffer/}]]*/;
+            defaultAjax({
+                url: baseUrl + bufferTransactionId + "/pauseBufferTransaction/",
+                type: 'POST',
+                data: {
+                    pause: pause
+                },
+                success: function (data) {
+                    refreshBufferTransaction();
+                }
+            })
+        }
+
+        function deleteBufferTransaction(bufferTransactionId) {
+            var baseUrl = /*[[@{/buffer/}]]*/;
+            defaultAjax({
+                url: baseUrl + bufferTransactionId + "/deleteBufferTransaction/",
+                type: 'POST',
+                success: function (data) {
+                    refreshBufferTransaction();
+                }
+            })
+        }
+
+        function refreshBufferTransaction() {
+            var baseUrl = /*[[@{/buffer}]]*/;
+            $('#portletBufferTransactions').load(baseUrl + ' #portletBufferTransactions > *', null, function () {
+            });
+        }
+        /*]]>*/
+    </script>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <!-- Home, Cola de Procesos.-->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Cola de Procesos</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletBufferTransactions"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Cola de Procesos</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(bufferTransactions)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>ID</th>
+                                            <th>Crédito</th>
+                                            <th>Producto</th>
+                                            <th>Cliente</th>
+                                            <th>Programado</th>
+                                            <th>Transacción</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="bufferTransaction, iterBuff : ${bufferTransactions}">
+                                            <td th:text="${iterBuff.count}"></td>
+                                            <td th:text="${bufferTransaction?.id}"></td>
+                                            <td>
+                                                <a th:href="@{/person(personId=${bufferTransaction?.personId}, tab='credits')}"
+                                                   th:text="${bufferTransaction?.creditCode}"></a>
+                                            </td>
+                                            <td th:text="${bufferTransaction?.product.name}"></td>
+                                            <td th:text="${bufferTransaction?.getFullName()}"></td>
+                                            <td th:text="${@utilService.datetimeShortFormat(bufferTransaction?.scheduledDate)}"></td>
+                                            <!--<td th:text="${bufferTransaction?.BufferTransactionType?.transaction}"></td>-->
+                                            <td th:switch="${bufferTransaction?.bufferTransactionType?.id}">
+                                                <div th:case="'1'">
+                                                    <span class="label label-xs label-primary"
+                                                          th:text="Desembolso"></span>
+                                                    <th:block th:if="${bufferTransaction?.disbursementType} == 'C'">
+                                                        <span th:text="' | Cheque | '"></span>
+                                                        <span th:text="'Nro. ' + ${bufferTransaction?.checkNumber}"></span>
+                                                    </th:block>
+                                                    <span th:if="${bufferTransaction?.disbursementType} == 'T'"
+                                                          th:text="' | Transferencia'"></span>
+                                                    <span th:if="${bufferTransaction?.bankAccountType} == 'S'"
+                                                          th:text="' | Cta. de Ahorros | '"></span>
+                                                    <span th:if="${bufferTransaction?.bankAccountType} == 'C'"
+                                                          th:text="' | Cta. Corriente| '"></span>
+                                                    <span th:text="${bufferTransaction?.bankAccount}"></span>
+                                                </div>
+                                                <span th:case="'2'" class="label label-xs label-warning"
+                                                      th:text="'Rechazo de crédito'"></span>
+                                                <span th:case="'3'"
+                                                      class="label label-xs label-info">Imputacion de pago</span>
+                                            </td>
+                                            <td>
+                                                <a th:if="${bufferTransaction?.paused} == false" href="javascript:;"
+                                                   th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                                   th:onclick="'pauseBufferTransaction('+${bufferTransaction?.id}+', true)'">Pausar</a>
+
+                                                <a th:if="${bufferTransaction?.paused} == true" href="javascript:;"
+                                                   th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                                   th:onclick="'pauseBufferTransaction('+${bufferTransaction?.id}+', false)'">Quitar
+                                                    Pausa</a>
+                                                <a th:if="${bufferTransaction?.paused} == false" href="javascript:;"
+                                                   th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                                   th:onclick="'deleteBufferTransaction('+${bufferTransaction?.id}+')'">Eliminar</a>
+                                                <span th:if="${bufferTransaction?.paused} == true"
+                                                      class="label label-xs label-warning" th:text="Pausada"></span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+
+</html>

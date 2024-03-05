@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Solven Referidos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <link rel="preload" as="style" th:href="@{/css/howItWorks.css}" />
+  <link rel="stylesheet" th:href="@{/css/howItWorks.css}" />
+  <link id="favicon" rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+  <script defer="true" type="text/javascript" th:src="@{/js/howItWorks.js}"></script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    var logoutUrl = /*[[@{/solvers/logout}]]*/;
+
+    function generateEncodedURL(el) {
+      console.log(el.dataset.href + escape(el.dataset.message));
+      if (el.dataset && el.dataset.href && el.dataset.message) {
+        window.open(el.dataset.href + escape(el.dataset.message), '_blank');
+      }
+    }
+    /*]]>*/
+  </script>
+</head>
+
+<body>
+  <div class="header-inner">
+    <div class="header">
+      <div class="gwr">
+        <div class="menu-desktop"><a class="link-solven" th:href="@{/solvers}">
+            <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 129.35 41.95">
+              <g id="Capa_2" data-name="Capa 2">
+                <g id="nav">
+                  <path class="cls-1"
+                    d="M.19 40.59v-5.41a19.52 19.52 0 0 0 7 1.41c2.53 0 3.51-.73 3.51-2 0-1.56-2.24-1.76-5.16-2.73S0 28.85 0 24.66c0-5.22 4-7.46 9.69-7.46a23.22 23.22 0 0 1 6.34.93v5.45a19.76 19.76 0 0 0-6-1C7.8 22.56 7 23.15 7 24.22c0 1.22 1 1.51 4.19 2.39 3.36 1 6.62 2.77 6.62 7.6 0 5.06-3.85 7.74-9.55 7.74a19.62 19.62 0 0 1-8.07-1.36zM19.19 29.58c0-6.43 3.9-12.38 12-12.38s11.89 5.41 11.89 12.38C43.07 36 39.17 42 31.13 42s-11.94-5.46-11.94-12.42zm16.18 0c0-4.29-1.17-6.92-4.24-6.92s-4.19 2.63-4.19 6.92 1.17 6.87 4.24 6.87 4.19-2.54 4.19-6.87zM55.71 2h7.21L48.5 42h-7.21zM58.8 17.2h8.1l3.52 13.23c.4 1.51.81 3.88.91 4.23h.1c.1-.4.55-2.82.9-4.23L75.8 17.2h7.9L75.55 42h-8.7zM82.46 29.58c0-6.63 3.9-12.38 11.64-12.38 8 0 10.63 5.41 10.63 11.35a20.6 20.6 0 0 1-.15 2.44H90.11c.1 3.36 1.36 5.46 5.65 5.46A18.17 18.17 0 0 0 103 35v5.6a21.81 21.81 0 0 1-7.78 1.4c-9.11 0-12.76-5.16-12.76-12.42zm15-2.78v-.29c0-2-1-4-3.32-4s-3.6 1.71-3.85 4.24zM107.27 17.2h7.38v2.33a10.64 10.64 0 0 1 6.68-2.33c6 0 8 3.66 8 8.57V42h-7.52V26.9c0-2.62-.9-3.81-3.37-3.81a6.34 6.34 0 0 0-3.61 1.39V42h-7.58zM52.9 37.62a4.44 4.44 0 0 1 8.87 0 4.44 4.44 0 0 1-8.87 0z">
+                  </path>
+                  <path fill="none" d="M0 0h129.35v41.95H0z"></path>
+                </g>
+              </g>
+            </svg></a>
+          <div class="menu-list">
+            <ul>
+              <li><a th:href="@{/solvers/howItWorks}">C&oacute;mo funciona</a></li>
+              <li> <a class="statistics-payments" th:href="@{/solvers/statisticsPayments}">Estad&iacute;sticas y pagos</a></li>
+              <li> <a th:href="@{/solvers/userData}">datos personales</a></li>
+              <li> <a class="button log-out-btn">LOG OUT</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="menu-mobile">
+          <div class="hamburger">
+            <div class="hamburger-layer hamburger-layer-top"></div>
+            <div class="hamburger-layer hamburger-layer-mid"></div>
+            <div class="hamburger-layer hamburger-layer-bottom"></div>
+          </div>
+          <div class="menu-list">
+            <ul>
+              <li><a th:href="@{/solvers/howItWorks}">C&oacute;mo funciona</a></li>
+              <li> <a class="statistics-payments" th:href="@{/solvers/statisticsPayments}">Estad&iacute;sticas y pagos</a></li>
+              <li> <a th:href="@{/solvers/userData}">datos personales</a></li>
+              <li class="button"> <a class="log-out-btn">LOG OUT</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="gwr">
+      <h1>APRENDE A GANAR DINERO DESDE CASA</h1>
+      <div class="search">
+        <input id="textToCopy" type="text" readonly="readonly" th:value="${referralLink}" />
+        <div class="redes">
+          <span tooltip="Se ha copiado en el portapapeles" flow="down">
+            <button class="bg-red" id="copyTextBtn" data-clipboard-target="#textToCopy">Copiar link</button></span>
+          <div style="display:flex">
+            <a th:attr="data-href='https://api.whatsapp.com/send?text=', data-message=${referralLink}" href="javascript:void(0)" onclick="generateEncodedURL(this)" style="cursor: pointer;">
+              <svg class="icons-redes icon-whatsapp" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                   xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512.303 512.303"
+                   style="enable-background:new 0 0 512.303 512.303;" xml:space="preserve">
+              <path style="fill:#4CAF50;"
+                    d="M256.014,0.134C114.629,0.164,0.038,114.804,0.068,256.189c0.01,48.957,14.059,96.884,40.479,138.1  L0.718,497.628c-2.121,5.496,0.615,11.671,6.111,13.792c1.229,0.474,2.534,0.717,3.851,0.715c1.222,0.006,2.435-0.203,3.584-0.619  l106.667-38.08c120.012,74.745,277.894,38.048,352.638-81.965s38.048-277.894-81.965-352.638  C350.922,13.495,303.943,0.087,256.014,0.134z"></path>
+                <path style="fill:#FAFAFA;"
+                      d="M378.062,299.889c0,0-26.133-12.8-42.496-21.333c-18.517-9.536-40.277,8.32-50.517,18.475  c-15.937-6.122-30.493-15.362-42.816-27.179c-11.819-12.321-21.059-26.877-27.179-42.816c10.155-10.261,27.968-32,18.475-50.517  c-8.427-16.384-21.333-42.496-21.333-42.517c-1.811-3.594-5.49-5.863-9.515-5.867h-21.333c-31.068,5.366-53.657,32.474-53.333,64  c0,33.493,40.085,97.835,67.115,124.885s91.371,67.115,124.885,67.115c31.526,0.324,58.634-22.266,64-53.333v-21.333  C384.018,305.401,381.71,301.686,378.062,299.889z"></path>
+              </svg>
+            </a>
+            <a th:attr="data-href='https://www.facebook.com/sharer/sharer.php?u=', data-message=${referralLink}" href="javascript:void(0)" onclick="generateEncodedURL(this)" style="cursor: pointer;">
+              <svg class="icons-redes icon-messeger" xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                   viewBox="0 0 40 40">
+                <defs>
+                  <style>.fb-1 {
+                    fill: #3b5998;
+                  }
+
+                  .fb-2 {
+                    fill: #fff;
+                  }</style>
+                </defs>
+                <g transform="translate(1 -2)">
+                  <circle class="fb-1" cx="20" cy="20" r="20" transform="translate(-1 2)"></circle>
+                  <path class="fb-2"
+                        d="M49.581,34.654H45.944V47.595H40.433V34.654H37.812V30.106h2.621V27.163c0-2.1,1.029-5.4,5.56-5.4l4.082.017v4.414H47.113a1.106,1.106,0,0,0-1.169,1.24V30.11h4.118Z"
+                        transform="translate(-25.089 -12.582)"></path>
+                </g>
+              </svg>
+            </a>
+<!--            <a th:href="${'https://www.facebook.com/sharer/sharer.php?u=' + referralLink}" target="_blank"-->
+<!--               rel="nofollow">-->
+<!--              <svg class="icons-redes icon-messeger" xmlns="http://www.w3.org/2000/svg" width="40.046" height="40.05"-->
+<!--                   viewBox="0 0 40.046 40.05">-->
+<!--                <defs>-->
+<!--                  <style>-->
+<!--                    .ms-1 {-->
+<!--                      fill: #2196f3;-->
+<!--                    }-->
+
+<!--                    .ms-2 {-->
+<!--                      fill: #fafafa;-->
+<!--                    }-->
+<!--                  </style>-->
+<!--                </defs>-->
+<!--                <g transform="translate(-0.025 0)">-->
+<!--                  <path class="ms-1"-->
+<!--                        d="M20.048,0A19.641,19.641,0,0,0,.025,19.193,18.827,18.827,0,0,0,6.7,33.476v5.74a.834.834,0,0,0,1.276.708l4.65-2.9a20.66,20.66,0,0,0,7.422,1.363A19.641,19.641,0,0,0,40.071,19.193,19.641,19.641,0,0,0,20.048,0Z"-->
+<!--                        transform="translate(0 0)"></path>-->
+<!--                  <path class="ms-2"-->
+<!--                        d="M111.9,171.03a.834.834,0,0,0-1.068-.234l-8.677,4.73-5.4-4.629a.834.834,0,0,0-1.133.043L85.615,180.953a.834.834,0,0,0,.989,1.322l8.677-4.73,5.4,4.63a.834.834,0,0,0,1.133-.043l10.011-10.011A.834.834,0,0,0,111.9,171.03Z"-->
+<!--                        transform="translate(-78.672 -157.343)"></path>-->
+<!--                </g>-->
+<!--              </svg>-->
+<!--            </a>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="square-inner">
+      <div class="gwr">
+        <div class="square-container">
+          <div class="square-1">
+            <div class="square-middle">
+              <div class="square">
+                <p class="title">¿CÓMO?</p>
+                <p class="subtitle">
+                  Ganas por cada persona que refieras y que obtenga un crédito a través de
+                  Solven.
+                </p>
+                <p class="descrip">
+                  1. El link a compartir es único y contiene tu ID (con esto sabemos que persona
+                  es la que nos está enviando el referido). Compartelo por el medio que prefieras.
+                </p>
+                <p class="descrip">
+                  2. Tu referido ingresa a través de tu link y se registra en Solven. Si aprueba,
+                  firma digitalmente y realiza la verificación de sus datos, tendrá el crédito en su cuenta
+                  bancaria en 24-48hs.
+                </p>
+                <p class="descrip" style="margin-bottom: 0;">3. Una vez a la semana, te abonamos el dinero en tu cuenta bancaria.</p>
+                <p class="descrip" style="margin-top: 0;">¡No hay límites o topes!</p>
+                <div class="border-bottom"></div>
+              </div>
+            </div>
+          </div>
+          <div class="square-2">
+            <div class="square-middle">
+              <div class="square">
+                <p class="title">REQUISITOS</p>
+                <p class="subtitle">El perfil del solicitante que aprueba es este (solo a ellos deberás enviar tu link):</p>
+                <p class="descrip">- Dependientes que estén laborando actualmente. </p>
+                <p class="descrip">- Ingresos mínimos de S/1,500. </p>
+                <p class="descrip">
+                  - Personas con experiencia crediticia previa y con buen comportamiento en el sistema
+                  financiero (últimos 6 reportes deben estar en NORMAL, al día siempre).
+                </p>
+                <p class="descrip">- De 25 a 65 años. </p>
+                <p class="descrip">- Que vivan en la Ciudad de Lima.</p>
+                <div class="border-bottom"></div>
+              </div>
+              <svg class="icon-mobile" xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 31 31">
+                <g id="Grupo_12" data-name="Grupo 12" transform="translate(-146 -477)">
+                  <circle id="Elipse_8" data-name="Elipse 8" cx="15.5" cy="15.5" r="15.5" transform="translate(146 477)" fill="#f7323f"></circle>
+                  <g id="down-arrow" transform="translate(154.622 465.982)">
+                    <g id="Grupo_9" data-name="Grupo 9" transform="translate(0 26.534)">
+                      <g id="Grupo_8" data-name="Grupo 8" transform="translate(0)">
+                        <path id="Trazado_20" data-name="Trazado 20" d="M13.226,213.432a.29.29,0,0,0-.409,0l-6.161,6.161L.494,213.432a.289.289,0,1,0-.409.409l6.366,6.366a.29.29,0,0,0,.409,0l6.366-6.366A.29.29,0,0,0,13.226,213.432Z" transform="translate(0 -213.347)" fill="#fff" stroke="#fff" stroke-width="1"></path>
+                      </g>
+                    </g>
+                    <g id="Grupo_11" data-name="Grupo 11" transform="translate(0 21.325)">
+                      <g id="Grupo_10" data-name="Grupo 10" transform="translate(0 0)">
+                        <path id="Trazado_21" data-name="Trazado 21" d="M13.226,21.41a.29.29,0,0,0-.409,0L6.656,27.572.494,21.41a.289.289,0,0,0-.409.409l6.366,6.366a.291.291,0,0,0,.2.085.287.287,0,0,0,.2-.085l6.366-6.366A.29.29,0,0,0,13.226,21.41Z" transform="translate(0 -21.325)" fill="#fff" stroke="#fff" stroke-width="1"></path>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+              <svg class="icon-desktop" xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 31 31">
+                <g id="Grupo_12" data-name="Grupo 12" transform="translate(-146 -477)">
+                  <circle id="Elipse_8" data-name="Elipse 8" cx="15.5" cy="15.5" r="15.5" transform="translate(146 477)" fill="#f7323f"></circle>
+                  <g id="down-arrow" transform="translate(154.622 465.982)">
+                    <g id="Grupo_9" data-name="Grupo 9" transform="translate(0 26.534)">
+                      <g id="Grupo_8" data-name="Grupo 8" transform="translate(0)">
+                        <path id="Trazado_20" data-name="Trazado 20" d="M13.226,213.432a.29.29,0,0,0-.409,0l-6.161,6.161L.494,213.432a.289.289,0,1,0-.409.409l6.366,6.366a.29.29,0,0,0,.409,0l6.366-6.366A.29.29,0,0,0,13.226,213.432Z" transform="translate(0 -213.347)" fill="#fff" stroke="#fff" stroke-width="1"></path>
+                      </g>
+                    </g>
+                    <g id="Grupo_11" data-name="Grupo 11" transform="translate(0 21.325)">
+                      <g id="Grupo_10" data-name="Grupo 10" transform="translate(0 0)">
+                        <path id="Trazado_21" data-name="Trazado 21" d="M13.226,21.41a.29.29,0,0,0-.409,0L6.656,27.572.494,21.41a.289.289,0,0,0-.409.409l6.366,6.366a.291.291,0,0,0,.2.085.287.287,0,0,0,.2-.085l6.366-6.366A.29.29,0,0,0,13.226,21.41Z" transform="translate(0 -21.325)" fill="#fff" stroke="#fff" stroke-width="1"></path>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    <div class="iframe-inner">
+      <div class="gwr">
+        <div class="iframe">
+          <iframe src="https://www.youtube.com/embed/UYk0CI7rFTo" frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

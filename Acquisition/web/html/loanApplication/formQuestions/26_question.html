@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section q26 animated fadeInRight">
+        <div class="forms no-top" id="how-earn-block">
+            <p th:utext="#{questions.block.whatDoYouDo}"></p>
+            <div class="how-earn-options">
+                <th:block th:unless="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <div class="field inline">
+                        <label class="input-radio sendResult">
+                            <input type="radio" class="howEarnMoney" name="activityType"
+                                   th:value="${T(com.affirm.common.model.catalog.ActivityType).DEPENDENT}"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <!--i class="icon icon-dependent"></i-->
+                                    <div class="wsi">
+                                        <svg version="1.1" id="dependent" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                             viewBox="0 50 400 300" width="100px" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+                                        <g>
+                                            <path class="st2" d="M247.9,117.3C247.5,117.3,247.5,117,247.9,117.3l-0.3-1.4l0,0c-0.3-0.7-0.7-1.7-1-2.4l-0.3-0.7
+                                                c-0.3-0.7-0.7-1.4-1-1.7c-2.7-3.7-6.8-6.4-13.2-6.4l0,0h-63.6c0,0,0,0,0.3,0c-6.1,0.3-10.2,2.7-12.5,6.4c-0.3,0.7-0.7,1-1,1.7l0,0
+                                                c0,0,0,0.3-0.3,0.7c-0.3,1-1,2.4-1,3.4c-1,3-1,6.4-1.4,9.5l0,0c0,0,0,0.3,0,0.7v0.3c0,0.3,0,1,0,1.7c0,0.3,0,0.3,0,0.7
+                                                c0.3,5.1,1.4,15.6,5.4,27.4l0,0c3.4,11.2,7.8,17.9,11.2,22.3l0,0l0,0c4.7,5.4,8.5,6.8,8.5,6.8l23-22.7l-26.4-41.6
+                                                c-1-1.7,0-4.1,2.4-4.1h24h0.3h0.3h24c2,0,3.4,2.4,2.4,4.1l-27.1,41.6l23.7,22.7c0,0,5.1-1.7,10.8-9.8l0,0l0,0
+                                                c3-4.4,6.1-10.5,8.8-19.3c0.7-2,1-3.4,1-3.4s0,0,0-0.3c0.3-1.7,1-3.4,1.4-5.1c1-4.4,2-8.5,2.4-12.2
+                                                C248.9,131.9,249.6,124.1,247.9,117.3z"/>
+                                            <path class="st2" d="M254.7,128.9h-1c0,3-0.3,6.1-0.7,8.8c-0.3,4.1-1.4,8.1-2.4,12.9c-0.3,1.7-0.7,3.4-1.4,5.1c0,0-0.3,1.7-1,3.7
+                                                c-2.4,8.1-5.8,14.9-9.5,20.3l0,0l0,0c-6.4,9.1-12.2,11.5-12.9,11.5c-1.7,0.7-3.7,0.3-4.7-1l-10.8-10.5l-2.7,8.8h-6.4h-6.4l-2.7-8.8
+                                                l-10.8,10.5c-1,1-2,1.4-3.4,1.4c-0.7,0-1,0-1.7-0.3c-0.7-0.3-5.1-2-10.2-8.1l0,0c-5.1-6.1-9.1-13.9-12.2-24
+                                                c-4.4-12.5-5.4-23.4-5.8-28.8v-0.7c0-0.3,0-0.7,0-0.7h-1c-12.2,0-22,9.8-22,22v130c0,12.2,9.8,22,22,22h108c12.2,0,22-9.8,22-22
+                                                v-130C276.7,138.7,266.8,128.9,254.7,128.9z M218.4,258.2l-17.9,17.9l-17.9-17.9c-2-2-2.7-5.1-2-7.8l14.6-57.2h5.4h5.4l14.6,57.2
+                                                C221.1,253.1,220.5,256.1,218.4,258.2z"/>
+                                        </g>
+                                    </svg>
+                                    </div>
+                                    <h5 th:text="#{form.field.activityType.dependent}"></h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <div class="field inline">
+                        <label class="input-radio sendResult">
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                <input type="radio" class="howEarnMoney" name="activityType" value="1"/>
+                            </th:block>
+                            <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                <input type="radio" class="howEarnMoney" name="activityType" value="dependiente"/>
+                            </th:block>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <!--i class="icon icon-dependent"></i-->
+                                    <div class="wsi">
+                                        <svg version="1.1" id="dependent" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                             viewBox="0 50 400 300" width="100px" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+                                        <g>
+                                            <path class="st2" d="M247.9,117.3C247.5,117.3,247.5,117,247.9,117.3l-0.3-1.4l0,0c-0.3-0.7-0.7-1.7-1-2.4l-0.3-0.7
+                                                c-0.3-0.7-0.7-1.4-1-1.7c-2.7-3.7-6.8-6.4-13.2-6.4l0,0h-63.6c0,0,0,0,0.3,0c-6.1,0.3-10.2,2.7-12.5,6.4c-0.3,0.7-0.7,1-1,1.7l0,0
+                                                c0,0,0,0.3-0.3,0.7c-0.3,1-1,2.4-1,3.4c-1,3-1,6.4-1.4,9.5l0,0c0,0,0,0.3,0,0.7v0.3c0,0.3,0,1,0,1.7c0,0.3,0,0.3,0,0.7
+                                                c0.3,5.1,1.4,15.6,5.4,27.4l0,0c3.4,11.2,7.8,17.9,11.2,22.3l0,0l0,0c4.7,5.4,8.5,6.8,8.5,6.8l23-22.7l-26.4-41.6
+                                                c-1-1.7,0-4.1,2.4-4.1h24h0.3h0.3h24c2,0,3.4,2.4,2.4,4.1l-27.1,41.6l23.7,22.7c0,0,5.1-1.7,10.8-9.8l0,0l0,0
+                                                c3-4.4,6.1-10.5,8.8-19.3c0.7-2,1-3.4,1-3.4s0,0,0-0.3c0.3-1.7,1-3.4,1.4-5.1c1-4.4,2-8.5,2.4-12.2
+                                                C248.9,131.9,249.6,124.1,247.9,117.3z"/>
+                                            <path class="st2" d="M254.7,128.9h-1c0,3-0.3,6.1-0.7,8.8c-0.3,4.1-1.4,8.1-2.4,12.9c-0.3,1.7-0.7,3.4-1.4,5.1c0,0-0.3,1.7-1,3.7
+                                                c-2.4,8.1-5.8,14.9-9.5,20.3l0,0l0,0c-6.4,9.1-12.2,11.5-12.9,11.5c-1.7,0.7-3.7,0.3-4.7-1l-10.8-10.5l-2.7,8.8h-6.4h-6.4l-2.7-8.8
+                                                l-10.8,10.5c-1,1-2,1.4-3.4,1.4c-0.7,0-1,0-1.7-0.3c-0.7-0.3-5.1-2-10.2-8.1l0,0c-5.1-6.1-9.1-13.9-12.2-24
+                                                c-4.4-12.5-5.4-23.4-5.8-28.8v-0.7c0-0.3,0-0.7,0-0.7h-1c-12.2,0-22,9.8-22,22v130c0,12.2,9.8,22,22,22h108c12.2,0,22-9.8,22-22
+                                                v-130C276.7,138.7,266.8,128.9,254.7,128.9z M218.4,258.2l-17.9,17.9l-17.9-17.9c-2-2-2.7-5.1-2-7.8l14.6-57.2h5.4h5.4l14.6,57.2
+                                                C221.1,253.1,220.5,256.1,218.4,258.2z"/>
+                                        </g>
+                                    </svg>
+                                    </div>
+                                    <h5 th:text="#{form.field.activityType.dependent}"></h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <div class="field inline">
+                        <label class="input-radio sendResult">
+                            <input type="radio" class="howEarnMoney" name="activityType"
+                                   th:value="${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA}"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <!--i class="icon icon-independent"></i-->
+                                    <div class="wsi">
+                                        <svg version="1.1" id="independent" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                             viewBox="0 50 400 300" width="100px" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+                                        <g>
+                                            <path class="st2" d="M247.9,117C247.9,116.6,247.6,116.6,247.9,117l-0.3-1.4l0,0c-0.3-1-0.7-1.7-1-2.4l-0.3-0.7
+                                                c-0.3-0.7-0.7-1.4-1-1.7c-2.7-3.7-6.8-6.5-13.3-6.5l0,0H168c0,0,0,0,0.3,0c-6.1,0.3-10.2,2.7-12.6,6.5c-0.3,0.7-0.7,1-1,1.7l0,0
+                                                c0,0,0,0.3-0.3,0.7c-0.3,1-1,2.4-1,3.4c-1,3.1-1,6.5-1.4,9.5l0,0c0,0,0,0.3,0,0.7v0.3c0,0.3,0,1,0,1.7c0,0.3,0,0.3,0,0.7
+                                                c0.3,5.1,1.4,15.6,5.4,27.5l0,0c3.4,11.2,7.8,18,11.2,22.4l0,0l0,0c4.8,5.4,8.5,6.8,8.5,6.8l23.1-22.8l-26.5-41.8
+                                                c-1-1.7,0-4.1,2.4-4.1h24.1h0.3h0.3h24.1c2,0,3.4,2.4,2.4,4.1l-27.2,41.8l23.8,22.8c0,0,5.1-1.7,10.9-9.9l0,0l0,0
+                                                c3.1-4.4,6.1-10.5,8.8-19.4c0.7-2,1-3.4,1-3.4s0,0,0-0.3c0.3-1.7,1-3.4,1.4-5.1c1-4.4,2-8.8,2.4-12.2
+                                                C249,131.6,249.6,123.8,247.9,117z"/>
+                                            <path class="st2" d="M254.7,128.5h-1c0,3.1-0.3,6.1-0.7,8.8c-0.3,4.1-1.4,8.5-2.4,12.9c-0.3,1.7-0.7,3.4-1.4,5.1c0,0-0.3,1.7-1,3.7
+                                                c-2.4,8.2-5.8,15-9.5,20.4l0,0l0,0c-6.5,9.2-12.2,11.6-12.9,11.9c-1.7,0.7-3.7,0.3-4.8-1l-20.4-19.7l-19.7,19.7c-1,1-2,1.4-3.4,1.4
+                                                c-0.7,0-1,0-1.7-0.3s-5.1-2-10.2-8.2l0,0c-5.1-6.1-9.2-13.9-12.2-24.1c-4.4-12.6-5.4-23.5-5.8-28.9v-0.7c0-0.3,0-0.7,0-0.7h-1
+                                                c-12.2,0-22.1,9.9-22.1,22.1v129.9c0,12.2,9.9,22.1,22.1,22.1h108.8c12.2,0,22.1-9.9,22.1-22.1V150.6
+                                                C276.8,138.4,267,128.5,254.7,128.5z M269.7,245.2c0,2.7-1.7,5.4-4.4,6.5l-16,5.4c-0.7,0.3-1.4,0.3-2.4,0.3s-1.4,0-2.4-0.3l-16-5.4
+                                                c-2.7-1-4.4-3.4-4.4-6.5v-36.7c0-3.7,3.1-6.8,6.8-6.8h31.6c3.7,0,6.8,3.1,6.8,6.8v36.7H269.7z"/>
+                                            <path class="st2" d="M262.9,206.4h-31.6c-1,0-2,1-2,2v37.1c0,1,0.7,1.7,1.4,2l16,5.4c0.3,0,1,0,1.4,0l16-5.4c0.7-0.3,1.4-1,1.4-2
+                                                v-37.1C264.9,207.1,264.3,206.4,262.9,206.4z"/>
+                                        </g>
+                                    </svg>
+                                    </div>
+                                    <h5 th:text="#{form.field.activityType.monotributista}"></h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </th:block>
+                <div class="field inline">
+                    <label class="input-radio sendResult">
+                        <input type="radio" class="howEarnMoney" name="activityType"
+                               th:value="${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <!--1i class="icon icon-independent"></1i-->
+                                <div class="wsi">
+                                    <svg version="1.1" id="independent" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                         viewBox="0 50 400 300" width="100px" style="enable-background:new 0 0 400 400;"
+                                         xml:space="preserve">
+                                    <g>
+                                        <path class="st2" d="M247.9,117C247.9,116.6,247.6,116.6,247.9,117l-0.3-1.4l0,0c-0.3-1-0.7-1.7-1-2.4l-0.3-0.7
+                                                c-0.3-0.7-0.7-1.4-1-1.7c-2.7-3.7-6.8-6.5-13.3-6.5l0,0H168c0,0,0,0,0.3,0c-6.1,0.3-10.2,2.7-12.6,6.5c-0.3,0.7-0.7,1-1,1.7l0,0
+                                                c0,0,0,0.3-0.3,0.7c-0.3,1-1,2.4-1,3.4c-1,3.1-1,6.5-1.4,9.5l0,0c0,0,0,0.3,0,0.7v0.3c0,0.3,0,1,0,1.7c0,0.3,0,0.3,0,0.7
+                                                c0.3,5.1,1.4,15.6,5.4,27.5l0,0c3.4,11.2,7.8,18,11.2,22.4l0,0l0,0c4.8,5.4,8.5,6.8,8.5,6.8l23.1-22.8l-26.5-41.8
+                                                c-1-1.7,0-4.1,2.4-4.1h24.1h0.3h0.3h24.1c2,0,3.4,2.4,2.4,4.1l-27.2,41.8l23.8,22.8c0,0,5.1-1.7,10.9-9.9l0,0l0,0
+                                                c3.1-4.4,6.1-10.5,8.8-19.4c0.7-2,1-3.4,1-3.4s0,0,0-0.3c0.3-1.7,1-3.4,1.4-5.1c1-4.4,2-8.8,2.4-12.2
+                                                C249,131.6,249.6,123.8,247.9,117z" />
+                                        <path class="st2"
+                                              d="M254.7,128.5h-1c0,3.1-0.3,6.1-0.7,8.8c-0.3,4.1-1.4,8.5-2.4,12.9c-0.3,1.7-0.7,3.4-1.4,5.1c0,0-0.3,1.7-1,3.7
+                                                c-2.4,8.2-5.8,15-9.5,20.4l0,0l0,0c-6.5,9.2-12.2,11.6-12.9,11.9c-1.7,0.7-3.7,0.3-4.8-1l-20.4-19.7l-19.7,19.7c-1,1-2,1.4-3.4,1.4
+                                                c-0.7,0-1,0-1.7-0.3s-5.1-2-10.2-8.2l0,0c-5.1-6.1-9.2-13.9-12.2-24.1c-4.4-12.6-5.4-23.5-5.8-28.9v-0.7c0-0.3,0-0.7,0-0.7h-1
+                                                c-12.2,0-22.1,9.9-22.1,22.1v129.9c0,12.2,9.9,22.1,22.1,22.1h108.8c12.2,0,22.1-9.9,22.1-22.1V150.6
+                                                C276.8,138.4,267,128.5,254.7,128.5z M269.7,245.2c0,2.7-1.7,5.4-4.4,6.5l-16,5.4c-0.7,0.3-1.4,0.3-2.4,0.3s-1.4,0-2.4-0.3l-16-5.4
+                                                c-2.7-1-4.4-3.4-4.4-6.5v-36.7c0-3.7,3.1-6.8,6.8-6.8h31.6c3.7,0,6.8,3.1,6.8,6.8v36.7H269.7z" />
+                                        <path class="st2" d="M262.9,206.4h-31.6c-1,0-2,1-2,2v37.1c0,1,0.7,1.7,1.4,2l16,5.4c0.3,0,1,0,1.4,0l16-5.4c0.7-0.3,1.4-1,1.4-2
+                                                v-37.1C264.9,207.1,264.3,206.4,262.9,206.4z" />
+                                    </g>
+                                </svg>
+                                </div>
+                                <h5 th:text="#{form.field.activityType.independent}"></h5>
+                                <div class="radio"></div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <div class="field inline">
+                        <label class="input-radio sendResult">
+                            <input type="radio" class="howEarnMoney" name="activityType"
+                                   th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <!--i class="icon icon-independent"></i-->
+                                    <div class="wsi">
+                                        <svg version="1.1" id="independent" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                             viewBox="0 50 400 300" width="100px" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+                                        <g>
+                                            <path class="st2" d="M247.9,117C247.9,116.6,247.6,116.6,247.9,117l-0.3-1.4l0,0c-0.3-1-0.7-1.7-1-2.4l-0.3-0.7
+                                                c-0.3-0.7-0.7-1.4-1-1.7c-2.7-3.7-6.8-6.5-13.3-6.5l0,0H168c0,0,0,0,0.3,0c-6.1,0.3-10.2,2.7-12.6,6.5c-0.3,0.7-0.7,1-1,1.7l0,0
+                                                c0,0,0,0.3-0.3,0.7c-0.3,1-1,2.4-1,3.4c-1,3.1-1,6.5-1.4,9.5l0,0c0,0,0,0.3,0,0.7v0.3c0,0.3,0,1,0,1.7c0,0.3,0,0.3,0,0.7
+                                                c0.3,5.1,1.4,15.6,5.4,27.5l0,0c3.4,11.2,7.8,18,11.2,22.4l0,0l0,0c4.8,5.4,8.5,6.8,8.5,6.8l23.1-22.8l-26.5-41.8
+                                                c-1-1.7,0-4.1,2.4-4.1h24.1h0.3h0.3h24.1c2,0,3.4,2.4,2.4,4.1l-27.2,41.8l23.8,22.8c0,0,5.1-1.7,10.9-9.9l0,0l0,0
+                                                c3.1-4.4,6.1-10.5,8.8-19.4c0.7-2,1-3.4,1-3.4s0,0,0-0.3c0.3-1.7,1-3.4,1.4-5.1c1-4.4,2-8.8,2.4-12.2
+                                                C249,131.6,249.6,123.8,247.9,117z"/>
+                                            <path class="st2" d="M254.7,128.5h-1c0,3.1-0.3,6.1-0.7,8.8c-0.3,4.1-1.4,8.5-2.4,12.9c-0.3,1.7-0.7,3.4-1.4,5.1c0,0-0.3,1.7-1,3.7
+                                                c-2.4,8.2-5.8,15-9.5,20.4l0,0l0,0c-6.5,9.2-12.2,11.6-12.9,11.9c-1.7,0.7-3.7,0.3-4.8-1l-20.4-19.7l-19.7,19.7c-1,1-2,1.4-3.4,1.4
+                                                c-0.7,0-1,0-1.7-0.3s-5.1-2-10.2-8.2l0,0c-5.1-6.1-9.2-13.9-12.2-24.1c-4.4-12.6-5.4-23.5-5.8-28.9v-0.7c0-0.3,0-0.7,0-0.7h-1
+                                                c-12.2,0-22.1,9.9-22.1,22.1v129.9c0,12.2,9.9,22.1,22.1,22.1h108.8c12.2,0,22.1-9.9,22.1-22.1V150.6
+                                                C276.8,138.4,267,128.5,254.7,128.5z M269.7,245.2c0,2.7-1.7,5.4-4.4,6.5l-16,5.4c-0.7,0.3-1.4,0.3-2.4,0.3s-1.4,0-2.4-0.3l-16-5.4
+                                                c-2.7-1-4.4-3.4-4.4-6.5v-36.7c0-3.7,3.1-6.8,6.8-6.8h31.6c3.7,0,6.8,3.1,6.8,6.8v36.7H269.7z"/>
+                                            <path class="st2" d="M262.9,206.4h-31.6c-1,0-2,1-2,2v37.1c0,1,0.7,1.7,1.4,2l16,5.4c0.3,0,1,0,1.4,0l16-5.4c0.7-0.3,1.4-1,1.4-2
+                                                v-37.1C264.9,207.1,264.3,206.4,262.9,206.4z"/>
+                                        </g>
+                                    </svg>
+                                    </div>
+                                    <h5 th:text="#{form.field.activityType.pensioner}"></h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </th:block>
+                <!--<th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <div class="field inline">
+                        <label class="input-radio otherCas">
+                            <input type="radio" class="howEarnMoney" name="activityType" value="-1" />
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    i class="icon icon-others"></i
+                                    <div class="swi">
+
+                                        <svg viewBox="0 50 400 300" width="100">
+                                            <path class="st2"
+                                                  d="M247.9 117c0-.4-.3-.4 0 0l-.3-1.4c-.3-1-.7-1.7-1-2.4l-.3-.7c-.3-.7-.7-1.4-1-1.7-2.7-3.7-6.8-6.5-13.3-6.5h-64 .3c-6.1.3-10.2 2.7-12.6 6.5-.3.7-.7 1-1 1.7 0 0 0 .3-.3.7-.3 1-1 2.4-1 3.4-1 3.1-1 6.5-1.4 9.5V129.5c.3 5.1 1.4 15.6 5.4 27.5 3.4 11.2 7.8 18 11.2 22.4 4.8 5.4 8.5 6.8 8.5 6.8l23.1-22.8-26.5-41.8c-1-1.7 0-4.1 2.4-4.1H224.9c2 0 3.4 2.4 2.4 4.1l-27.2 41.8 23.8 22.8s5.1-1.7 10.9-9.9c3.1-4.4 6.1-10.5 8.8-19.4.7-2 1-3.4 1-3.4v-.3c.3-1.7 1-3.4 1.4-5.1 1-4.4 2-8.8 2.4-12.2.6-4.3 1.2-12.1-.5-18.9z">
+                                            </path>
+                                            <path class="st2"
+                                                  d="M254.7 128.5h-1c0 3.1-.3 6.1-.7 8.8-.3 4.1-1.4 8.5-2.4 12.9-.3 1.7-.7 3.4-1.4 5.1 0 0-.3 1.7-1 3.7-2.4 8.2-5.8 15-9.5 20.4-6.5 9.2-12.2 11.6-12.9 11.9-1.7.7-3.7.3-4.8-1l-20.4-19.7-19.7 19.7c-1 1-2 1.4-3.4 1.4-.7 0-1 0-1.7-.3s-5.1-2-10.2-8.2c-5.1-6.1-9.2-13.9-12.2-24.1-4.4-12.6-5.4-23.5-5.8-28.9v-.7-.7h-1c-12.2 0-22.1 9.9-22.1 22.1v129.9c0 12.2 9.9 22.1 22.1 22.1h108.8c12.2 0 22.1-9.9 22.1-22.1V150.6c-.7-12.2-10.5-22.1-22.8-22.1zm15 0 2.7-1.7 5.4-4.4 6.5l-16 0-.7.3-0-0-0 0-2.4-.3l-16-5.4c-2.7-1-4.4-3.4-4.4-0-0-0 3.1-6.8 6.0.0.0c0.7 0 0.0 3.1 6.8 6.8v36.7h.4z">
+                                            </path>
+                                            <path class="st2"
+                                                  d="M262.9 206.4h-31.6c-1 0-2 1-2 2v37.1c0 1 .7 1.7 1.4 2l16 5.4h1.4l16-5.4c.7-.3 1.4-1 1.4-2v-37.1c-.6-1.3-1.2-2-2.6-2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <h5 class="title-cas">Cas
+                                        <sub>*</sub>
+                                    </h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </th:block>-->
+                <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+
+                    <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                        <div class="field inline">
+                            <label class="input-radio sendResult">
+                                <input type="radio" class="howEarnMoney" name="activityType"
+                                       th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <!--i class="icon icon-dependent"></i-->
+                                        <div class="wsi">
+                                            <svg width="100px" height="75px" xmlns="http://www.w3.org/2000/svg" viewBox="0 -15 53.99 100"><defs><style>.cls-1{fill:#7a7f8c;}.cls-2{fill:none;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Layer_1" data-name="Layer 1"><path class="cls-1" d="M22.54,23H27c1.48,0,3,0,4.45,0,1.08,0,1.71-.4,1.66-1.05s-.72-1-1.58-1h-9c-.87,0-1.55.26-1.54,1.05S21.67,23,22.54,23Z"/><path class="cls-1" d="M24.45,19.55c1.71,0,3.41,0,5.12,0,.79,0,1.35-.33,1.37-1s-.56-1.07-1.39-1.09-1.67,0-2.5,0-1.75,0-2.61,0-1.34.37-1.33,1.06S23.65,19.54,24.45,19.55Z"/><path class="cls-1" d="M27.41,41.71h0c.25,0,.41.17.64.44l.07.08A5.16,5.16,0,0,0,31,44.32a11.48,11.48,0,0,0,5.56-.49,4.94,4.94,0,0,1-1.3-.94c-.28-.25-.55-.52-.82-.78l-.53-.5-.7-.68a17.64,17.64,0,0,0-2.89-2.43,1.74,1.74,0,0,0-2.52.33l-.27.28-.26-.3a1.79,1.79,0,0,0-2.72-.48A9.68,9.68,0,0,0,23,39.58c-.25.23-.5.46-.76.67A15.23,15.23,0,0,0,21,41.5a9.29,9.29,0,0,1-2.58,2.11,10.9,10.9,0,0,0,5.66.48,4.85,4.85,0,0,0,2.7-1.92C27,41.88,27.16,41.71,27.41,41.71Z"/><rect class="cls-1" x="18.72" y="27.4" width="2.59" height="6.05" rx="1.04"/><rect class="cls-1" x="34" y="27.4" width="2.59" height="6.05" rx="1.04"/><path class="cls-2" d="M28.07,50.94A14.79,14.79,0,0,0,41.81,36.62c.11-3.33,0-6.67,0-10A6.79,6.79,0,0,0,39,20.86a14.13,14.13,0,0,1-4.65-5.61,6.26,6.26,0,0,0-4.82-3.85,20.48,20.48,0,0,0-5.07,0c-2.44.33-3.93,2-5,4.15a12.19,12.19,0,0,1-4.16,5,7.09,7.09,0,0,0-3.12,6c0,1.74-.11,2.58-.11,4.32l.35,7.74A14.74,14.74,0,0,0,28.07,50.94Z"/><path class="cls-1" d="M26.13,59.88l-.08-.09a1.07,1.07,0,0,1-.1-.22l-4.5-6.75a24.14,24.14,0,0,0,5.6.73,23.36,23.36,0,0,0,5.57-.73l-4.7,7.09,4.49,6.14L39.86,52.2c-1.16-.4-2.37-.71-3.7-1.1a4.59,4.59,0,0,1,.45-.48,18,18,0,0,0,6.66-8.27,1.55,1.55,0,0,1,1-.69,6.66,6.66,0,0,0,5.59-8.88,4.55,4.55,0,0,1-.16-1.8c.55-5.33.68-10.65-.71-15.89-1.82-6.9-6-11.66-12.89-13.79A32.91,32.91,0,0,0,21.81.38,20.6,20.6,0,0,0,11.28,4.72a2.79,2.79,0,0,0-.54.55A17.88,17.88,0,0,0,7.59,9a2,2,0,0,0-.35.5,33.46,33.46,0,0,0-1.72,3.76C3.51,19,3.67,25,4.24,31A5.46,5.46,0,0,1,4,33,6.61,6.61,0,0,0,9.49,41.6a1.47,1.47,0,0,1,1.41,1.06A17.08,17.08,0,0,0,17,50.39c.25.18.48.39.91.75l-1.22.29a23.14,23.14,0,0,0-2.57.74l7.46,13.88ZM12.47,38.7,12.12,31c0-1.74.08-2.58.11-4.32a7.09,7.09,0,0,1,3.12-6,12.19,12.19,0,0,0,4.16-5c1-2.11,2.53-3.82,5-4.15a20.48,20.48,0,0,1,5.07,0,6.26,6.26,0,0,1,4.82,3.85A14.13,14.13,0,0,0,39,20.86a6.79,6.79,0,0,1,2.8,5.76c0,3.33.1,6.67,0,10A14.78,14.78,0,0,1,12.47,38.7Z"/><path class="cls-1" d="M54,71.61c0-.14,0-.27,0-.41v0h0A21,21,0,0,0,41.22,52.73l-8.08,15a.72.72,0,0,1-.59.37h0a.71.71,0,0,1-.58-.29l-4.85-6.63,0,0L27,61.13l-4.89,6.69a.69.69,0,0,1-.58.29h-.05a.72.72,0,0,1-.58-.37l-8.1-15A20.94,20.94,0,0,0,5.35,58c-1.9,1.46-3.49,5.35-3.49,5.35A21.14,21.14,0,0,0,0,72.15c0,.91,0,1.65,0,2.31H54s0-.08,0-.13C54,73.43,54,72.52,54,71.61Z"/><polygon class="cls-1" points="27 61.13 27.05 61.22 27.07 61.19 27.02 61.1 27 61.13"/><path class="cls-1" d="M26,59.57c0,.1.05.15.1.22l.08.09,0,0Z"/></g></g></svg>
+
+                                        </div>
+                                        <h5>Pensionista/ Jubilado</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </th:block>
+                    <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                        <div class="field inline">
+                            <label class="input-radio otherRadio">
+                                <input type="radio" class="howEarnMoney" name="activityType" value="others"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <!--i class="icon icon-others"></i-->
+                                        <div class="swi">
+                                            <svg version="1.1" id="others" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                                 viewBox="0 50 400 300" width="100px" style="enable-background:new 0 0 400 400;" xml:space="preserve">
+                                    <g>
+                                        <g>
+                                            <circle class="st2" cx="264.5" cy="214.5" r="19.3"/>
+                                        </g>
+                                        <circle class="st2" cx="264.5" cy="214.5" r="19.3"/>
+                                        <circle class="st2" cx="206.2" cy="214.5" r="19.3"/>
+                                        <circle class="st2" cx="147.5" cy="214.5" r="19.3"/>
+                                        <circle class="st2" cx="206.2" cy="214.5" r="19.3"/>
+                                    </g>
+                                </svg>
+                                        </div>
+                                        <h5>Otros</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </th:block>
+                </th:block>
+            </div>
+
+
+        </div>
+        <div class="forms" id="others-block">
+            <th:block th:if="${loanApplication?.entityId != null and loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                <div class="field inline">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Pensionista/ Jubilado</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </th:block>
+            <th:block th:unless="${loanApplication?.entityId != null and loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                <div class="field inline">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               th:value="${T(com.affirm.common.model.catalog.ActivityType).STUDENT}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Soy estudiante</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="field inline"
+                     th:unless="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Soy pensionista</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="field inline">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               th:value="${T(com.affirm.common.model.catalog.ActivityType).HOUSEKEEPER}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Soy empleado(a) del hogar</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="field inline">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               th:value="${T(com.affirm.common.model.catalog.ActivityType).UNEMPLOYED}"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">No tengo ingresos</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </th:block>
+        </div>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <div class="forms" id="others-dependiente">
+                <div class="field inline">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               value="1"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Estoy en planilla</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="field inline">
+                    <label class="h-input-radio sendResult">
+                        <input class="whatDoYouDo" type="radio" name="activityType"
+                               value="-1"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline" style="position:relative">Contrato ADM. SERV.
+                                    <sup style="font-size:12px;position:absolute;top: -2px;">*</sup>
+                                </h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <p class="small-cas">*Contrato administrativo de servicios </p>
+            </div>
+        </th:block>
+        <div class="forms" id="sub-independiente" style="display: none">
+            <div class="field inline">
+                <label class="h-input-radio sendResult">
+                    <input class="whatDoYouDo" type="radio" name="activityType"
+                           value="-2"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Formal</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline">
+                <label class="h-input-radio sendResult">
+                    <input class="whatDoYouDo" type="radio" name="activityType"
+                           value="-3"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline" style="position:relative">Informal
+                            </h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var isPeru = [[${@countryContextService.isCountryContextInPeru(#httpServletRequest)}]];
+        var isAzteca = [[${loanApplication?.entityId != null and loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}]];
+        var others_block = $('#others-block');
+        var others_dependiente = $('#others-dependiente');
+        var sub_independiente = $('#sub-independiente');
+        updateBranding();
+        $('input[name=activityType]').on('click', function () {
+            switch ($(this).val()) {
+                case 'others':
+                    others_block.toggleClass('gVisible');
+                    others_dependiente.removeClass('gVisible');
+                    sub_independiente.hide();
+                    break;
+                case 'dependiente':
+                    if(!isPeru){
+                        var activityType = $(this).val();
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "POST",
+                            data: {
+                                activityType: activityType
+                            }
+                        }, "");
+                        break;
+                    }
+                    others_dependiente.toggleClass('gVisible');
+                    sub_independiente.hide();
+                    others_block.removeClass('gVisible');
+                    break;
+                case '2':
+                    if(!isAzteca){
+                        var activityType = $(this).val();
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "POST",
+                            data: {
+                                activityType: activityType
+                            }
+                        }, "");
+                        break;
+                    }
+                    sub_independiente.show();
+                    others_dependiente.removeClass('gVisible');
+                    others_block.removeClass('gVisible');
+                    break;
+                default:
+                    var activityType = $(this).val();
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        data: {
+                            activityType: activityType
+                        }
+                    }, "");
+                    break;
+            }
+        });
+        var inputRadio = $('.input-radio');
+        inputRadio.on('click', function () {
+            var $this = $(this);
+            $('.input-radio').removeClass('active');
+            $this.addClass('active');
+
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

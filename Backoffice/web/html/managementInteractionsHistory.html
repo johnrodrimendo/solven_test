@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Cargar Reporte Cobranza Acceso</title>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function reloadResults(){
+            defaultAjax({
+                url: /*[[@{/system/interactionsHistory/list}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#resultTable').html(data);
+                }
+            });
+            setTimeout(reloadResults, 15 * 1000);
+        }
+        setTimeout(reloadResults, 5 * 1000);// FIRST TIME
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Sistema</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Historial de Interacciones Gestión</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="modal" id="modalRespuesta" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Respuestas de Whatsapp</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" id="responsesTable">
+                                <th:block th:replace="this :: interactionResponses"></th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var selectedQueryBotId;
+                    var currentIntervalId;
+
+                    function loadWhatsappResponses() {
+                        var url = /*[[@{/system/interactionsHistory/responses}]]*/null;
+
+                        defaultAjax({
+                            url: url,
+                            data: {
+                                queryBotId: selectedQueryBotId
+                            },
+                            type: 'POST',
+                            success: function (data) {
+                                $('#responsesTable').html(data);
+                            }
+                        });
+                    }
+
+                    $(document).on('click', ".whatsApp-answers", function () {
+                        selectedQueryBotId = $(this).data('querybotid');
+
+                        loadWhatsappResponses();
+
+                        currentIntervalId = setInterval(function () {
+                            loadWhatsappResponses();
+                        }, 5 * 1000);
+                    });
+
+                    $('#modalRespuesta').on('hidden.bs.modal', function () {
+                        clearInterval(currentIntervalId);
+                    });
+                    /*]]>*/
+                </script>
+
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-md-12 ">
+                                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                                            <div class="portlet-title">
+                                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Historico de Interacciones</span>
+                                                </div>
+                                                <div class="actions">
+                                                    <div class="table-paginator-info"
+                                                         style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body" th:switch="${#lists.isEmpty(interactionsHistory)}">
+                                                <div th:case="true">
+                                                    <p>No hay resultados</p>
+                                                </div>
+                                                <div th:case="false" class="table-responsive" id="resultTable">
+                                                    <th:block th:replace="this :: results"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END PAGE CONTENT INNER -->
+        </div>
+    </div>
+    <!-- END PAGE CONTENT BODY -->
+    <!-- END CONTENT BODY -->
+
+    <!-- BEGIN MODAL -->
+    <!-- END MODAL -->
+</th:block>
+<th:block th:fragment="results">
+    <table class="table table-bordered">
+        <thead>
+        <tr class="text-center">
+            <th>Fec. env&iacute;o</th>
+            <th>Usuario que proces&oacute;</th>
+            <th>Interacción enviada</th>
+            <th>Estado</th>
+            <th># Enviados</th>
+            <th>Filtros aplicados</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="history : ${interactionsHistory}">
+            <tr class="text-center">
+                <td th:text="${@utilService.datetimeShortFormat(history.sentDate)}"></td>
+                <td th:text="${@sysUserService.getSysUserById(history.userId)?.userName}"></td>
+                <td th:text="${@catalogService.getInteractionContent(history?.interactionId, country)?.content}"></td>
+                <th:block th:switch="${history.statusId}">
+                    <td th:case="1"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="2"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="3"><span class="label label-xs label-success">Procesada</span></td>
+                    <td th:case="4"><span class="label label-xs label-danger">Fallido</span></td>
+                    <td th:case="5"><span class="label label-xs label-danger">Cancelado</span></td>
+                </th:block>
+                <td th:text="${history?.totalInteractions}"></td>
+                <td th:text="${history?.appliedFilters}"></td>
+                <td>
+                    <a href="#" class="whatsApp-answers" data-toggle="modal" data-target="#modalRespuesta" th:attr="data-querybotid=${history.queryBotId}">
+                        Ver Respuestas de Whatsapp
+                    </a>
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</th:block>
+
+<th:block th:fragment="responses">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Respuesta</th>
+                <th></th>
+            </tr>
+        </thead>
+        <th:block th:each="interactions : ${interactions}">
+            <th:block th:each="responses : ${interactions?.interactionResponses}">
+                <tbody>
+                    <tr>
+                        <td th:text="${responses?.response?.userProfile?.name}"></td>
+                        <td th:text="${responses?.response?.source}"></td>
+                        <td th:text="${responses?.message}"></td>
+                        <td><a target="_blank" th:attr="href=${'https://web.whatsapp.com/send?phone=' + responses?.response?.source + '&amp;text=&amp;source=&amp;data='}">Continuar conversaci&oacute;n</a></td>
+                    </tr>
+                </tbody>
+            </th:block>
+        </th:block>
+    </table>
+</th:block>
+
+</body>
+
+</html>

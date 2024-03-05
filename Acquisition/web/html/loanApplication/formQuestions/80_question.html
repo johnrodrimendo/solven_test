@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:text="#{questions.80.dependents}"></p>
+        <div class="forms">
+            <form id="questionForm" class="q80" autocomplete="off">
+
+                <!--div class="field inline">
+                    <select data-width="130" id="dependents" name="dependents">
+                        <option value="0">Ninguno</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">M&aacute;s de 4</option>
+                    </select>
+                </div>
+                <div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div -->
+
+                <div class="wrap-radios" id="dependents">
+                    <div class="field inline">
+                        <label class="input-radio">
+                            <input type="radio" name="dependents" value="0"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <h5>Ninguna</h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline">
+                        <label class="input-radio">
+                            <input type="radio" name="dependents" value="1"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <h5>Una</h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline">
+                        <label class="input-radio">
+                            <input type="radio" name="dependents" value="2"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <h5>Dos</h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline">
+                        <label class="input-radio">
+                            <input type="radio" name="dependents" value="3"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <h5>Tres</h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline">
+                        <label class="input-radio">
+                            <input type="radio" name="dependents" value="4"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <h5>Más de tres</h5>
+                                    <div class="radio"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="display-block">
+                    <div class="errorContainer"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var keytop = $('.keypress-top'),
+            keydown = $('.keypress-down'),
+            inputNumber = $('#dependents'),
+            limit = [[${form.validator.dependents.maxValue}]];
+
+        keytop.on('click', function (e) {
+            e.preventDefault();
+            var val = inputNumber.val();
+
+            if (inputNumber.val() < limit) {
+                inputNumber.val(parseInt(inputNumber.val()) + 1);
+            }
+        });
+
+        keydown.on('click', function (e) {
+            e.preventDefault();
+            var val = inputNumber.val();
+            if (inputNumber.val() > 0) {
+                inputNumber.val(parseInt(inputNumber.val()) - 1);
+            }
+        });
+        $('.input-radio').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    //button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: {
+                        dependents: $(this).find('input').val()
+                    }
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

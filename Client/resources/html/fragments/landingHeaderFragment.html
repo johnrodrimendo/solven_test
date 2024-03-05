@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<header id="header" th:fragment="landingHeader">
+    <div class="gwr" th:with="
+                adelantoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).ADELANTO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())},
+                autosCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).VEHICULO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())},
+                consumoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).CONSUMO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())}">
+        <a th:href="@{/}" class="logo">
+            <svg version="1.1" id="logoSolven" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                 viewBox="0 0 295 95" style="enable-background:new 0 0 295 95;width: 150px;fill: #F7323F;"
+                 xml:space="preserve">
+                    <g id="XMLID_1_">
+                        <path id="XMLID_16_" class="st0"
+                              d="M4.099,89.699v-12.1c4,1.7,10.4,3.2,15.6,3.2c5.7,0,7.8-1.6,7.8-4.6c0-3.5-5-3.9-11.6-6.1c-6.9-2.2-12.3-6.7-12.3-16c0-11.7,8.8-16.7,21.7-16.7c5.3,0,11.1,1.1,14.2,2.1v12.2c-3.5-1.1-8-2.3-13.3-2.3c-5.1,0-7,1.3-7,3.7c0,2.7,2.3,3.4,9.4,5.3c7.5,2.2,14.8,6.2,14.8,17c0,11.3-8.6,17.3-21.4,17.3C13.899,92.799,8.199,91.599,4.099,89.699z"/>
+                        <path id="XMLID_13_" class="st0"
+                              d="M46.599,65.099c0-14.4,8.7-27.7,26.8-27.7c18,0,26.6,12.1,26.6,27.7c0,14.4-8.7,27.7-26.7,27.7S46.599,80.699,46.599,65.099z M82.799,65.099c0-9.6-2.6-15.5-9.5-15.5c-6.8,0-9.4,5.9-9.4,15.5c0,9.7,2.6,15.4,9.5,15.4C80.199,80.399,82.799,74.799,82.799,65.099z"/>
+                        <path id="XMLID_11_" class="st0" d="M128.299,3.199h16.1l-32.3,89.5h-16.1L128.299,3.199z"/>
+                        <path id="XMLID_9_" class="st0"
+                              d="M135.199,38.199h17.6l7.6,28.7c0.9,3.3,1.7,8.4,2,9.2h0.2c0.2-0.9,1.2-6.1,2-9.2l7.5-28.7h17.1l-17.7,53.6h-18.9L135.199,38.199z"/>
+                        <path id="XMLID_6_" class="st0"
+                              d="M188.199,65.099c0-14.8,8.7-27.7,26.1-27.7c18,0,23.8,12.1,23.8,25.4c0,1.7-0.1,3.6-0.3,5.5h-32.4c0.2,7.5,3.1,12.2,12.6,12.2c6.7,0,12.3-1.5,16.2-3.3v12.5c-4.8,1.9-10.8,3.1-17.4,3.1C196.399,92.799,188.199,81.299,188.199,65.099z M221.699,58.799v-0.7c0-4.5-2.3-8.8-7.4-8.8c-5.2,0-8.1,3.8-8.6,9.5H221.699z"/>
+                        <path id="XMLID_4_" class="st0"
+                              d="M243.699,38.199h16.3v4.3c2.9-2.2,7.5-5.1,14.7-5.1c13.2,0,17.7,8.1,17.7,18.9v35.6h-16.6v-33.1c0-5.8-2-8.4-7.4-8.4c-3.1,0-5.9,1.5-8,3.1v38.5h-16.7V38.199z"/>
+                        <path id="XMLID_2_" class="st0"
+                              d="M121.999,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C126.199,92.799,121.999,88.299,121.999,83.099z"/>
+                    </g>
+                </svg>
+            <svg version="1.1" id="logoSolvenResponsive" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                 viewBox="0 0 55 95" style="enable-background:new 0 0 55 95;width: 16px;fill: #F7323F;"
+                 xml:space="preserve">
+                    <g id="XMLID_1_">
+                        <path id="XMLID_11_" class="st0" d="M35.298,3.199h16.1l-32.3,89.5h-16.1L35.298,3.199z"/>
+                        <path id="XMLID_2_" class="st0" d="M28.998,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7
+                            C33.198,92.799,28.998,88.299,28.998,83.099z"/>
+                    </g>
+                </svg>
+           <!--<span>Solven</span>-->
+        </a>
+        <nav>
+            <ul class="list">
+                <li class="link link-nosotros"><a th:href="@{/nosotros}">Nosotros</a></li>
+                <li class="link link-empresas"><a th:href="@{/empresas}">Empresas</a></li>
+                <li class="link current-menu">
+                    <a href="#">Productos</a>
+                    <ul class="list-products sub-menu">
+                        <li th:if="${adelantoCategoryCountry != null}">
+                            <a th:href="@{/adelanto-de-sueldo}" class="product icon-adelanto-sueldo"
+                               th:classappend="${adelantoCategoryCountry?.active ? '' : 'sooner'}">
+                                <span th:utext="#{static.product.salaryAdvance}"></span>
+                            </a>
+                        </li>
+                        <li th:if="${autosCategoryCountry != null}">
+                            <a th:href="@{/efectivo-con-garantia}" class="product icon-credito-vehicular">
+                                <span>Efectivo con Garantía</span>
+                            </a>
+                        </li>
+                        <li th:if="${consumoCategoryCountry != null}">
+                            <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}"
+                               class="product icon-credito-personal"
+                               th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}">
+                                <span th:utext="#{static.product.personalLoan}"></span>
+                            </a>
+                        </li>
+                        <li class="info">
+                            <p>
+                                <span th:text="#{static.landing.hr}"></span>
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+                <!--li class="link-autoevaluacion">
+                    <a th:href="@{/autoevaluacion}" th:text="#{button.selfEvaluation}" class="g-btn btn-contacto bg-skyeblue"></a>
+                </li-->
+                <li class="link-credito-vehicular">
+                    <a id="chooseBrand" class="g-btn bg-red sooner" th:text="#{button.applyHere}"></a>
+                </li>
+                <li class="link-credito-consumo">
+                    <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}"
+                       class="g-btn bg-red" th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}"
+                       th:text="#{button.applyHere}">
+                    </a>
+                </li>
+                <li class="link-adelanto-sueldo">
+                    <a class="g-btn bg-red" th:text="#{button.applyHere}"></a>
+                </li>
+                <li class="link-garantizado">
+                    <a th:href="${processUrl}"
+                       class="g-btn bg-red"
+                       th:classappend="${guaranteedProduct != null and guaranteedProduct?.active ? '' : 'sooner'}"
+                       th:text="#{button.applyHere}">
+                    </a>
+                </li>
+            </ul>
+            <ul id="available-languages">
+                <li class="peru active">
+                    <button data-iso="pe" title="Perú">
+                        <span>PE</span>
+                    </button>
+                </li>
+            </ul>
+            <button id="action_preEvaluation_open"><span>Menu</span></button>
+            <button id="hamburger">
+                <span>menu</span>
+            </button>
+        </nav>
+    </div>
+</header>
+<header id="header" th:fragment="landingHeaderArgentina">
+    <div class="gwr" th:with="consumoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).CONSUMO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())}">
+        <a th:href="@{/}" class="logo">
+            <svg version="1.1" id="logoSolven" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                 viewBox="0 0 295 95" style="enable-background:new 0 0 295 95;width: 152px;fill: #F7323F;"
+                 xml:space="preserve">
+                    <g id="XMLID_1_">
+                        <path id="XMLID_16_" class="st0"
+                              d="M4.099,89.699v-12.1c4,1.7,10.4,3.2,15.6,3.2c5.7,0,7.8-1.6,7.8-4.6c0-3.5-5-3.9-11.6-6.1c-6.9-2.2-12.3-6.7-12.3-16c0-11.7,8.8-16.7,21.7-16.7c5.3,0,11.1,1.1,14.2,2.1v12.2c-3.5-1.1-8-2.3-13.3-2.3c-5.1,0-7,1.3-7,3.7c0,2.7,2.3,3.4,9.4,5.3c7.5,2.2,14.8,6.2,14.8,17c0,11.3-8.6,17.3-21.4,17.3C13.899,92.799,8.199,91.599,4.099,89.699z"/>
+                        <path id="XMLID_13_" class="st0"
+                              d="M46.599,65.099c0-14.4,8.7-27.7,26.8-27.7c18,0,26.6,12.1,26.6,27.7c0,14.4-8.7,27.7-26.7,27.7S46.599,80.699,46.599,65.099z M82.799,65.099c0-9.6-2.6-15.5-9.5-15.5c-6.8,0-9.4,5.9-9.4,15.5c0,9.7,2.6,15.4,9.5,15.4C80.199,80.399,82.799,74.799,82.799,65.099z"/>
+                        <path id="XMLID_11_" class="st0" d="M128.299,3.199h16.1l-32.3,89.5h-16.1L128.299,3.199z"/>
+                        <path id="XMLID_9_" class="st0"
+                              d="M135.199,38.199h17.6l7.6,28.7c0.9,3.3,1.7,8.4,2,9.2h0.2c0.2-0.9,1.2-6.1,2-9.2l7.5-28.7h17.1l-17.7,53.6h-18.9L135.199,38.199z"/>
+                        <path id="XMLID_6_" class="st0"
+                              d="M188.199,65.099c0-14.8,8.7-27.7,26.1-27.7c18,0,23.8,12.1,23.8,25.4c0,1.7-0.1,3.6-0.3,5.5h-32.4c0.2,7.5,3.1,12.2,12.6,12.2c6.7,0,12.3-1.5,16.2-3.3v12.5c-4.8,1.9-10.8,3.1-17.4,3.1C196.399,92.799,188.199,81.299,188.199,65.099z M221.699,58.799v-0.7c0-4.5-2.3-8.8-7.4-8.8c-5.2,0-8.1,3.8-8.6,9.5H221.699z"/>
+                        <path id="XMLID_4_" class="st0"
+                              d="M243.699,38.199h16.3v4.3c2.9-2.2,7.5-5.1,14.7-5.1c13.2,0,17.7,8.1,17.7,18.9v35.6h-16.6v-33.1c0-5.8-2-8.4-7.4-8.4c-3.1,0-5.9,1.5-8,3.1v38.5h-16.7V38.199z"/>
+                        <path id="XMLID_2_" class="st0"
+                              d="M121.999,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C126.199,92.799,121.999,88.299,121.999,83.099z"/>
+                    </g>
+                </svg>
+            <!-- 19957012 -->
+            <svg version="1.1" id="logoSolvenResponsive" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                 viewBox="0 0 55 95" style="enable-background:new 0 0 55 95;width: 20px;fill: #F7323F;"
+                 xml:space="preserve">
+                    <g id="XMLID_1_">
+                        <path id="XMLID_11_" class="st0" d="M35.298,3.199h16.1l-32.3,89.5h-16.1L35.298,3.199z"/>
+                        <path id="XMLID_2_" class="st0"
+                              d="M28.998,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C33.198,92.799,28.998,88.299,28.998,83.099z"/>
+                    </g>
+                </svg>
+            <!--<span>Solven</span>-->
+        </a>
+        <nav>
+            <ul class="list">
+                <li class="link link-nosotros"><a th:href="@{/nosotros}" th:text="#{static.menu.item.aboutUs}"></a></li>
+                <li>
+                    <a th:href="${consumoCategoryCountry.active} ? @{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__} : 'javascript:;'"
+                       class="g-btn btn-contacto bg-red"
+                       th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}">Solicitalo aquí</a></li>
+                <!--li class="link-autoevaluacion"><a th:href="@{/autoevaluacion}" th:text="#{button.selfEvaluation}" class="g-btn btn-contacto bg-skyeblue"></a></li-->
+            </ul>
+            <ul id="available-languages">
+                <li class="argentina active">
+                    <button data-iso="ar" title="Argentina"><span>AR</span></button>
+                </li>
+            </ul>
+            <button id="action_preEvaluation_open"><span>Menu</span></button>
+            <button id="hamburger">
+                <span>menu</span>
+            </button>
+        </nav>
+    </div>
+</header>
+<header id="header" th:fragment="innerHeader">
+    <div class="gwr">
+        <ul>
+            <li>
+                <a th:href="@{/}" class="logo">
+                    <th:block>
+                        <th:block th:if="${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+                            <img id="logo-al-toque" src="/img/icon-al-toque.png"/>
+                        </th:block>
+                        <th:block th:unless="${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+                            <img th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).ACCESO)}" width="200px" src="https://s3.amazonaws.com/solven-public/img/acceso/branding/Prestifacil-pastilla-2.png" alt=""/>
+                            <th:block th:if="${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).ACCESO)}">
+                                <svg  version="1.1" id="logoSolven" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                      viewBox="0 0 295 95"
+                                      style="enable-background:new 0 0 295 95;width: 152px;fill: #F7323F;"
+                                      xml:space="preserve">
+                    <g id="XMLID_1_">
+                        <path id="XMLID_16_" class="st0"
+                              d="M4.099,89.699v-12.1c4,1.7,10.4,3.2,15.6,3.2c5.7,0,7.8-1.6,7.8-4.6c0-3.5-5-3.9-11.6-6.1c-6.9-2.2-12.3-6.7-12.3-16c0-11.7,8.8-16.7,21.7-16.7c5.3,0,11.1,1.1,14.2,2.1v12.2c-3.5-1.1-8-2.3-13.3-2.3c-5.1,0-7,1.3-7,3.7c0,2.7,2.3,3.4,9.4,5.3c7.5,2.2,14.8,6.2,14.8,17c0,11.3-8.6,17.3-21.4,17.3C13.899,92.799,8.199,91.599,4.099,89.699z"/>
+                        <path id="XMLID_13_" class="st0"
+                              d="M46.599,65.099c0-14.4,8.7-27.7,26.8-27.7c18,0,26.6,12.1,26.6,27.7c0,14.4-8.7,27.7-26.7,27.7S46.599,80.699,46.599,65.099z M82.799,65.099c0-9.6-2.6-15.5-9.5-15.5c-6.8,0-9.4,5.9-9.4,15.5c0,9.7,2.6,15.4,9.5,15.4C80.199,80.399,82.799,74.799,82.799,65.099z"/>
+                        <path id="XMLID_11_" class="st0" d="M128.299,3.199h16.1l-32.3,89.5h-16.1L128.299,3.199z"/>
+                        <path id="XMLID_9_" class="st0"
+                              d="M135.199,38.199h17.6l7.6,28.7c0.9,3.3,1.7,8.4,2,9.2h0.2c0.2-0.9,1.2-6.1,2-9.2l7.5-28.7h17.1l-17.7,53.6h-18.9L135.199,38.199z"/>
+                        <path id="XMLID_6_" class="st0"
+                              d="M188.199,65.099c0-14.8,8.7-27.7,26.1-27.7c18,0,23.8,12.1,23.8,25.4c0,1.7-0.1,3.6-0.3,5.5h-32.4c0.2,7.5,3.1,12.2,12.6,12.2c6.7,0,12.3-1.5,16.2-3.3v12.5c-4.8,1.9-10.8,3.1-17.4,3.1C196.399,92.799,188.199,81.299,188.199,65.099z M221.699,58.799v-0.7c0-4.5-2.3-8.8-7.4-8.8c-5.2,0-8.1,3.8-8.6,9.5H221.699z"/>
+                        <path id="XMLID_4_" class="st0"
+                              d="M243.699,38.199h16.3v4.3c2.9-2.2,7.5-5.1,14.7-5.1c13.2,0,17.7,8.1,17.7,18.9v35.6h-16.6v-33.1c0-5.8-2-8.4-7.4-8.4c-3.1,0-5.9,1.5-8,3.1v38.5h-16.7V38.199z"/>
+                        <path id="XMLID_2_" class="st0"
+                              d="M121.999,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C126.199,92.799,121.999,88.299,121.999,83.099z"/>
+                    </g>
+                </svg>
+                                <svg version="1.1" id="logoSolvenResponsive" xmlns="http://www.w3.org/2000/svg" x="0px"
+                                     y="0px"
+                                     viewBox="0 0 55 95" style="enable-background:new 0 0 55 95;width: 20px;fill: #F7323F;"
+                                     xml:space="preserve">
+                    <g id="XMLID_1_">
+                        <path id="XMLID_11_" class="st0" d="M35.298,3.199h16.1l-32.3,89.5h-16.1L35.298,3.199z"/>
+                        <path id="XMLID_2_" class="st0" d="M28.998,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7
+                            C33.198,92.799,28.998,88.299,28.998,83.099z"/>
+                    </g>
+                </svg>
+                            </th:block>
+
+                            <!--<span>Solven</span>-->
+                        </th:block>
+                    </th:block>
+                </a>
+            </li>
+            <!--<li>-->
+                <!--<a href="#" class="circle callForm" title="Ayuda">-->
+                    <!--<i class="icon-question"><span></span></i>-->
+                <!--</a>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</header>
+</body>
+</html>

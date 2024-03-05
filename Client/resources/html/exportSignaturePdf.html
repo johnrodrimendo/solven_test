@@ -1,0 +1,37 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title th:text="${title}"></title>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/pdfExport.css}"/>
+</head>
+<body>
+
+<div class="pdfViewer">
+    <div class="container">
+        <div class="pdfWrapper pdfPageBreak" th:if="${params?.contract?.pdfPath == null}">
+            <!-- Contract -->
+            <div th:text="${@creditService.renderContract(loanApplication.creditId, #locale, false, signature)}"></div>
+            <!-- /Contract -->
+        </div>
+        <div class="pdfWrapper">
+            <div th:replace="fragments/modalScheduleFragment :: summarySheet"></div>
+        </div>
+        <div class="pdfWrapper" th:switch="${credit != null}">
+            <th:block th:case="${true}">
+            <div th:replace="fragments/modalScheduleFragment :: creditSchedule"></div>
+            </th:block>
+            <th:block th:case="${false}">
+            <div th:replace="fragments/modalScheduleFragment :: offerSchedule"></div>
+            </th:block>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

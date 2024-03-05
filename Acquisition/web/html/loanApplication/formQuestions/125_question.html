@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="q125">
+            <th:block th:if="${title == null}" th:switch="${rescueOfferCount == 1}">
+                <div class="w" th:case="true" th:utext="#{static.question.125.p(${personFirstName})}"></div>
+                <div class="w" th:case="false" th:utext="#{static.question.125.p2(${personFirstName})}"></div>
+                <!--<div class="w" th:case="true" th:utext="#{static.question.125.p.autoplan(${personFirstName})}"></div>
+                <div class="w" th:case="false" th:utext="#{static.question.125.p2.autoplan(${personFirstName})}"></div>-->
+            </th:block>
+            <th:block th:if="${title != null}">
+                <div class="w" th:utext="${title}"></div>
+            </th:block>
+            <form id="questionForm" >
+                <div class="modoPage">
+                    <div class="field inline" id="tarjetaPrepago" th:if="${showPrepayCard}">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <img class="cinta" src="/img/cinta.png"/>
+                                <div class="modoPage-sub-content">
+                                    <img src="/img/tarjeta.png"/>
+                                </div>
+                                <div class="modoPage-text">
+                                    <span>TARJETA LIGO</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline" id="garantizado" th:if="${showGuaranteed} ">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <div class="modoPage-sub-content">
+                                    <img src="/img/garantia.jpg"/>
+                                </div>
+                                <div class="modoPage-text">
+                                    <span>EFECTIVO CON TU AUTO</span>
+                                </div>
+
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline" id="autoPlan" th:if="${showAutoplan}">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <div class="modoPage-sub-content">
+                                    <img src="/img/autoplan.jpg"/>
+                                </div>
+                                <div class="modoPage-text">
+                                    <span>AUTOPLAN AHORRO</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline" id="consolidacion" th:if="${showConsolidation}">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <div class="modoPage-sub-content">
+                                    <img src="/img/consolidacion-deudas.jpg"/>
+                                </div>
+                                <div class="modoPage-text">
+                                    <span>Consolidar deudas</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="field inline" id="leadsRedirect" th:if="${showLeadsRedirect} ">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <div class="modoPage-sub-content">
+                                    <img src=""/>
+                                </div>
+                                <div class="modoPage-text">
+                                    <span>Oferta externa</span>
+                                </div>
+
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline" id="ilcLead" th:if="${showILCLead}">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <div class="modoPage-sub-content">
+                                    <img src="/img/inversiones_la_cruz_rescate.png"/>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="field inline" id="prestamypeLead" th:if="${showPrestamype}">
+                        <label class="input-radio">
+                            <div class="modoPage-content">
+                                <img class="cinta" src="/img/cinta.png"/>
+                                <div class="modoPage-sub-content">
+                                    <img src="/img/prestamype_lead_rescate.png"/>
+                                </div>
+                                <div class="modoPage-text">
+                                    <span>PR&Eacute;STAMO CON GARANT&Iacute;A <br/>HIPOTECARIA</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal_garantizado" class="modal fade" tabindex="-1" role="dialog" th:if="${showGuaranteed}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <!--<div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Efectivo con Garant&iacute;a</h4>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="modal-img">
+                    <img  class="banner" src="/img/garantia.jpg"/>
+                    <div class="modal-text">
+                        <span>EFECTIVO CON TU AUTO</span>
+                    </div>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div>
+                            <p>Si tienes un auto a tu nombre, podr&aacute;s acceder a un cr&eacute;dito de hasta <th:block th:text="${@utilService.integerMoneyFormat(guaranteedParam?.maxAmount, loanApplication?.currency)}"/>, a tan solo <th:block th:text="${@utilService.percentFormat(guaranteedParam?.maxTea)}"/> y en 36 meses.</p>
+                            <p style="margin-bottom: -6px">Requisitos:</p>
+                            <ul>
+                                <li>No marcas chinas - salvo BYD.</li>
+                                <li>Autos desde el 2012 en adelante.</li>
+                                <li>Hasta 90,000km de recorrido.</li>
+                                <li>No m&aacute;s de S/ 2 000 en multas impagas. Verificaci&oacute;n t&eacute;cnica y SOAT vigentes.</li>
+                            </ul>
+                            <a href="#" class="anchor-button accept" id="g_agreement">&iexcl;Lo quiero!</a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_autoPlan" class="modal fade" tabindex="-1" role="dialog" th:if="${showAutoplan}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-img">
+                    <img  class="banner" src="/img/modal-autoplan.jpg"/>
+                    <div class="modal-text">
+                        <span>AUTOPLAN AHORRO</span>
+                    </div>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div>
+                            <p>Compra un auto con el sistema de fondos colectivos. Este financiamiento se realiza a trav&eacute;s de aportes mensuales de personas asociadas a un grupo.</p>
+                            <p style="margin-bottom: -6px">Tu carro en 4 pasos:</p>
+                            <ul>
+                                <li>Te contactamos.</li>
+                                <li>Haz el pago de la inscripci&oacute;n y 1º cuota.</li>
+                                <li>Asiste a las asambleas.</li>
+                                <li>&iexcl;Carro nuevo!</li>
+                            </ul>
+                            <a href="#" class="anchor-button accept" id="auto_agreement">&iexcl;Lo quiero!</a>
+                        </div>
+                    </div>
+                    <script>
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_consolidacion" class="modal fade" tabindex="-1" role="dialog" th:if="${showConsolidation}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <!--<div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Consolidación de deudas</h4>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="modal-img">
+                    <img class="banner" src="/img/tarjeta.png"/>
+                    <div class="modal-text">
+                        <span>TARJETA LIGO</span>
+                    </div>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-img">
+                    <img src="/img/tarjeta.png"/>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div>
+                            <p>Si tienes cr&eacute;ditos que deseas consolidar en uno nuevo, accede ahora con las mejores condiciones a trav&eacute;s de Solven.</p>
+                            <p>Caracter&iacute;sticas:</p>
+                            <ul>
+                                <li>Hasta <th:block th:text="${@utilService.integerMoneyFormat(consolidationParam?.maxAmount, loanApplication?.currency)}"/>, con una tasa del <th:block th:text="${@utilService.percentFormat(consolidationParam?.maxTea)}"/> y hasta 18 meses de plazo.</li>
+                                <li>Nos encargamos de pagar todas tus deudas en 48hs.</li>
+                                <li>Ahorrar&aacute;s pagos de comisiones e intereses. </li>
+                                <li>Tendr&aacute;s un solo nuevo cr&eacute;dito que pagar, a trav&eacute;s de Solven.</li>
+                            </ul>
+                            <a href="#" class="anchor-button accept" id="c_agreement" >&iexcl;Lo quiero!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_prepay_card" class="modal fade" tabindex="-1" role="dialog" th:if="${showPrepayCard}">
+        <div class="modal-dialog" role="edit">
+            <img class="cinta" src="/img/cinta.png"/>
+            <div class="modal-content">
+                <div class="modal-img">
+                    <img class="banner" src="/img/tarjeta.png"/>
+                    <div class="modal-text">
+                        <span>TARJETA LIGO</span>
+                    </div>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content"> 
+                        <div>
+                            <p class="text-modal-prepago">Es la tarjeta recargable sin cuenta bancaria, para comprar en internet o donde quieras.</p>
+                            <p><strong>Exclusivo en Solven: </strong></p>
+                            <ul>
+                                <li>Env&iacute;o <strong>GRATIS</strong> a tu domicilio.</li>
+                                <li><strong>Sin costos</strong> de mantenimiento.</li>
+
+                            </ul>
+                            <p>Ventajas:</p>
+                            <ul>
+                                <li>Compra de forma f&aacute;cil, segura, r&aacute;pida en donde quieras, sin bancos.</li>
+                                <li>Suscr&iacute;bete a Netflix, Spotify, af&iacute;liate a Paypal y compra miles de juegos online en tus p&aacute;ginas preferidas.</li>
+                            </ul>
+                            <div>
+                                <label for="acceptConditions" class="custom-check" style="display: flex;flex-direction: row;justify-content: space-between;align-items: center">
+                                    <span class="check-inner">
+                                        <i class="icon icon-check"></i>
+                                    </span>
+                                    <div style="margin-left: 1rem">
+                                        <span class="check-label">Acepto las condiciones de
+                                            <a class="render-ligo-contract" target="_blank">prestación de servicios</a> - Tarjetas Peruanas Prepago S.A.
+                                        </span>
+                                        <input type="checkbox" class="real-check" id="acceptConditions"/>
+                                    </div>
+                                </label>
+                            </div>
+                            <a href="#" class="anchor-button accept btn" id="p_agreement">&iexcl;La quiero!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_lead_redirect" class="modal fade" tabindex="-1" role="dialog" th:if="${showLeadsRedirect}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-img">
+                    <img class="banner" src=""/>
+                    <div class="modal-text">
+                        <span>Oferta externa</span>
+                    </div>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div>
+                            <p class="text-modal-prepago">TODO</p>
+                            <p>Ventajas:</p>
+                            <ul>
+                                <li>FOO</li>
+                                <li>BAR</li>
+                                <li>FOOBAR</li>
+                            </ul>
+                            <a href="#" class="anchor-button bg-red accept" id="l_agreement">&iexcl;Lo quiero!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_ilc_lead" class="modal fade" tabindex="-1" role="dialog" th:if="${showILCLead}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-img">
+                    <img class="banner" src="/img/inversiones_la_cruz_rescate.png" style="width: 100%"/>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content"  style="text-align: center">
+                        <div>
+                            <p class="text-modal-prepago" style="margin-bottom: 45px">¿Tienes una <b>Joya</b> o <b>Electro</b> para dejar en garantia? Si es as&iacute;, &iexcl;Tenemos un cr&eacute;dito para ti!</p>
+                            <a href="#" class="anchor-button accept bg-red" id="ilc_agreement">&iexcl;La quiero!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_ilc_lead_result" class="modal fade" tabindex="-1" role="dialog" th:if="${showILCLead}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-img">
+                    <img class="banner" src="/img/inversiones_la_cruz_lead_result.png" style="width: 100%"/>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content"  style="text-align: center">
+                        <div>
+                            <p class="text-modal-prepago" style="margin-bottom: 45px">&iexcl;Listo! Nos pondremos en contacto contigo en 24 hrs h&aacute;biles, para que puedas obtener tu cr&eacute;dito.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var $c_garantizado = $('#garantizado');
+        var $c_consolidar = $('#consolidacion');
+        var $c_autoPlan = $('#autoPlan');
+        var $c_tarjeta_prepago = $('#tarjetaPrepago');
+        var $c_lead_redirect = $('#leadsRedirect');
+        var $c_ilc_lead = $('#ilcLead');
+        var $c_prestamype_lead = $('#prestamypeLead');
+
+        var $modal_garantizado = $('#modal_garantizado');
+        var $modal_autoPlan = $('#modal_autoPlan');
+        var $modal_consolidar = $('#modal_consolidacion');
+        var $modal_tarjeta_prepago = $('#modal_prepay_card');
+        var $modal_lead_redirect = $('#modal_lead_redirect');
+        var $modal_ilc_lead = $('#modal_ilc_lead');
+
+        var $not_interested_btn = $('#notInterestedBtn');
+
+        var $render_ligo_contract_btn = $('a.render-ligo-contract');
+
+        $c_garantizado.on('click',function(event){
+            event.preventDefault();
+            $modal_garantizado.modal('show');
+        });
+        $c_consolidar.on('click', function(event){
+            event.preventDefault();
+            $modal_consolidar.modal('show');
+        });
+        $c_tarjeta_prepago.on('click', function(event){
+            event.preventDefault();
+            $modal_tarjeta_prepago.modal('show');
+        });
+        $c_lead_redirect.on('click', function(event){
+            event.preventDefault();
+            $modal_lead_redirect.modal('show');
+        });
+        $c_autoPlan.on('click', function(event){
+            event.preventDefault();
+            $modal_autoPlan.modal('show');
+        });
+        $c_ilc_lead.on('click', function(event){
+            event.preventDefault();
+            $modal_ilc_lead.modal('show');
+        });
+        $c_prestamype_lead.on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    entityProductParam: [[${T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_PRESTAMYPE_PRESTAMO_GAR_HIPOT}]]
+                }
+            }, "");
+        });
+
+        $('#g_agreement').on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    product: [[${T(com.affirm.common.model.catalog.Product).GUARANTEED}]]
+                }
+            }, "");
+            $modal_garantizado.modal('hide');
+        });
+        $('#c_agreement').on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    product: [[${T(com.affirm.common.model.catalog.Product).DEBT_CONSOLIDATION_OPEN}]]
+                }
+            }, "");
+            $modal_consolidar.modal('hide');
+        });
+        $('#p_agreement').on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    product: [[${T(com.affirm.common.model.catalog.Product).PREPAY_CARD}]]
+                }
+            }, "");
+            $modal_tarjeta_prepago.modal('hide');
+        });
+        $('#l_agreement').on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    entityProductParam: [[${T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_WENANCE_LEAD}]]
+                }
+            }, "");
+            $modal_lead_redirect.modal('hide');
+        });
+        $('#auto_agreement').on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    entityProductParam: [[${T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AUTOPLAN_LEAD}]]
+                }
+            }, "");
+            $modal_autoPlan.modal('hide');
+        });
+        $('#ilc_agreement').on('click', function(event){
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    entityProductParam: [[${T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_INVERSIONES_LA_CRUZ}]]
+                }, success: function(){
+                    $modal_ilc_lead.modal('hide');
+                    $('#modal_ilc_lead_result').modal('show');
+                }
+            }, "ilcLead");
+        });
+        $not_interested_btn.click(function(){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "");
+        });
+        $render_ligo_contract_btn.attr('href', questionFw.generateURlToCurrentQuestionController('contract') + '?token='+questionFw.token);
+
+        $modal_tarjeta_prepago.on('shown.bs.modal', resetLigoCardRescueOfferModal);
+        $modal_tarjeta_prepago.on('hide.bs.modal', resetLigoCardRescueOfferModal);
+
+        function resetLigoCardRescueOfferModal() {
+            $modal_tarjeta_prepago.find('#acceptConditions').attr('checked', false);
+            $modal_tarjeta_prepago.find('#p_agreement').addClass('disabled');
+        }
+
+        $modal_tarjeta_prepago.find('#p_agreement').on('click', function(event) {
+            if($(this).hasClass('disabled')) {
+                event.preventDefault();
+            }
+        });
+
+        $modal_tarjeta_prepago.find('#acceptConditions').on('change', function() {
+            $modal_tarjeta_prepago.find('#p_agreement').toggleClass('disabled');
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

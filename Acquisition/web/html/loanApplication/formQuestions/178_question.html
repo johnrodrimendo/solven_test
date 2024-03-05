@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--Google maps-->
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <style>
+
+        @media only screen and (min-width: 480px) and (min-height: 720px){
+            .wrap-pages .loan-process {
+                min-height: calc(80vh - 100px);
+            }
+        }
+
+        :root {
+            --branding-loading-color: #26CAD3;
+            --branding-second-color: #FFA100;
+        }
+        .caja-semaforo {
+            display: block;
+        }
+
+        .caja-porcentaje {
+            display: none;
+        }
+
+        .progress-bar {
+            height: 120px;
+            border-radius: 24px;
+            width: 40%;
+            margin: 0 auto;
+            float: none;
+        }
+
+        .progress-bar--gradient {
+            background: linear-gradient(to right, red 0, red 30%, orange 50%, yellowgreen 85%, green 100%);
+            border-radius: 5px;
+            height: inherit;
+            width: 100%;
+            display: flex;
+        }
+
+        .progress-bar--progress {
+            /*min-width: 48px;*/
+            min-width: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .progress-bar--progress-selector {
+            display: block;
+            color: white;
+            /*padding: 0 .625rem;*/
+            background: var(--branding-loading-color);
+            width: 3px;
+            height: 125px;
+        }
+
+        .progress-bar--progress-value {
+            margin-bottom: 140px;
+            margin-right: -25px;
+            color: var(--branding-loading-color);
+        }
+
+        .progress-bar--not-progress {
+            flex-grow: 1;
+            /* 	flex-shrink: 1; */
+            height: inherit;
+            background: #ccc;
+            border-end-end-radius: 5px;
+            border-start-end-radius: 5px;
+            /* 	border-top-right-radius: 24px;
+                border-bottom-right-radius: 24px; */
+        }
+
+        .panel-group .panel + .panel {
+            margin-top: 0px !important;
+        }
+
+        .panel-default > .panel-heading {
+            color: #333333;
+            background-color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .panel-heading {
+            padding: 15px 15px;
+        }
+
+        .circle {
+            background: var(--branding-loading-color);
+            color: white;
+            display: block;
+            font-weight: normal;
+            line-height: 1.6em;
+            text-align: center;
+            margin-right: 5px;
+            width: 1.6em;
+            height: 1.6em;
+            border-radius: 0.8em;
+        }
+
+        .lista > li {
+            margin-left: 35px;
+        }
+
+        .panel {
+            border: none;
+            border-bottom: 1px #ddd solid;
+        }
+
+        .panel-title {
+            display: flex;
+        }
+
+        .panel-title > a {
+            display: block;
+            line-height: 1.6em;
+            width: 90%;
+        }
+
+        .active-collapse {
+            background-color: #fa461621 !important;
+            color: var(--branding-loading-color) !important;
+            font-weight: bold;
+        }
+
+        .panel-heading .accordion-toggle:before {
+            content: "";
+            display: block;
+            height: 15px;
+            width: 15px;
+            background-size: 15px 15px;
+            background-image: url("https://solven-public.s3.amazonaws.com/img/iconos_extranet/arrow-down-sign-to-navigate.svg");
+            background-repeat: no-repeat;
+            float: right;
+            transform: rotate(-180deg);
+            margin-top: 5px;
+        }
+
+        .panel-heading .accordion-toggle.collapsed:before {
+            transform: rotate(0deg);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--branding-loading-color) !important;
+            background-color: white !important;
+            color: var(--branding-loading-color) !important;
+        }
+
+        .btn-green{
+            background: var(--branding-loading-color);
+            color: rgb(255, 255, 255);
+        }
+
+        .btn-green:disabled{
+            background: var(--branding-loading-color) !important;
+            opacity: 0.5;
+            cursor: default;
+            box-shadow: none;
+         }
+        .btn-green:disabled:hover{
+            box-shadow: none;
+        }
+
+        .btn-outline:disabled {
+            border: 1px solid var(--branding-loading-color) !important;
+            background-color: white !important;
+            color: var(--branding-loading-color) !important;
+            cursor: default;
+            box-shadow: none;
+            opacity: 0.5;
+        }
+        .btn-outline:disabled:hover {
+            box-shadow: none;
+        }
+
+        .panel-group {
+            text-align: start;
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        @media only screen and (max-width: 900px) {
+            .progress-bar {
+                width: 50%;
+            }
+
+            .panel-group {
+                width: 70%;
+            }
+        }
+
+        @media only screen and (max-width: 750px) {
+            .progress-bar {
+                width: 60%;
+            }
+
+            .panel-group {
+                width: 80%;
+            }
+        }
+
+        @media only screen and (max-width: 550px) {
+            .progress-bar {
+                width: 70%;
+            }
+
+            .panel-group {
+                width: 90%;
+            }
+        }
+
+        .mb-10 {
+            margin-bottom: 10px !important;
+        }
+
+        .icon-list {
+            width: 18px !important;
+            margin-right: 7px;
+            height: 20px;
+            vertical-align: middle !important;
+        }
+
+        .actions button{
+            min-height: 54px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+    </style>
+    <div class="questions-section animated fadeInRight q178">
+        <div class="form q178">
+            <form id="questionForm" th:object="${form}" autocomplete="off"
+                  style="justify-content: center">
+
+                <div class="caja-semaforo">
+                    <p class="question-option-title" style="margin-bottom: 26px"
+                       th:utext="${textSemaforo}"></p>
+
+                    <div class="progress-bar">
+                        <div class="progress-bar--gradient">
+                            <div class="progress-bar--progress">
+                                <span class="progress-bar--progress-value">Tu posición</span>
+                                <span class="progress-bar--progress-selector"></span>
+                            </div>
+                            <div class="progress-bar--not-progress"></div>
+                        </div>
+                    </div>
+
+                    <p class="question-subtitle" style="width: 85%; margin: 0 auto;padding-top: 15px;"
+                       th:utext="${message}"></p>
+
+                </div>
+
+                <div class="caja-porcentaje">
+                    <p class="question-option-title">¿Por qué tengo esta posición?</p>
+                    <p class="question-subtitle">Hay aspectos que debes tener en cuenta para mantener una buena salud financiera:</p>
+                    <p><span><img class="icon-list" src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/check.svg" alt=""/>mantener</span>
+                        <span style="margin-left: 20px"><img class="icon-list" src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/alerta.svg" alt=""/>por mejorar</span></p>
+
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+                        <div class="panel panel-default" th:each="diagnostic, iterDiagnostic : ${diagnostics}">
+                            <div class="panel-heading" role="tab" th:id="'heading' + ${iterDiagnostic.index + 1}">
+                                <h4 class="panel-title">
+                                    <span class="circle" th:utext="${iterDiagnostic.index + 1}"></span>
+                                    <a th:if="${diagnostic.haveDescription()}" class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                                       data-parent="#accordion" th:href="'#collapse' + ${iterDiagnostic.index + 1}" aria-expanded="false"
+                                       th:attr="aria-controls='collapse' + ${iterDiagnostic.index + 1}" th:utext="${diagnostic.titulo}">
+                                    </a>
+                                    <span style="display: block;line-height: 1.6em;" th:if="${!diagnostic.haveDescription()}" th:utext="${diagnostic.titulo}"></span>
+                                </h4>
+                            </div>
+                            <div th:id="'collapse' + ${iterDiagnostic.index + 1}" class="panel-collapse collapse" role="tabpanel"
+                                 th:attr="aria-labelledby='heading' + ${iterDiagnostic.index + 1}">
+                                <div class="panel-body">
+                                    <ul class="lista">
+                                        <li style="display: flex" th:each="descripcion, iterDescripcion : ${diagnostic.Descripciones}"
+                                            th:if="${descripcion.Estatus != 0}" class="mb-10">
+                                            <img th:if="${descripcion.Estatus == 1}" class="icon-list"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/check.svg"
+                                                 alt=""/>
+                                            <img th:if="${descripcion.Estatus == 2}" class="icon-list"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/alerta.svg"
+                                                 alt=""/>
+                                            <div style="max-width: 450px;">
+                                                <span th:utext="${descripcion.Descripcion}"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingOne">
+                                <h4 class="panel-title">
+                                    <span class="circle">1</span>
+                                    <a class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                                       data-parent="#accordion" href="#collapseOne" aria-expanded="false"
+                                       aria-controls="collapseOne">
+                                        Puntualidad y voluntad de pago
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                                 aria-labelledby="headingOne">
+                                <div class="panel-body">
+                                    <ul class="lista">
+                                        <li th:each="diagnostic, iterDiagnostic : ${diagnostics}"
+                                            th:if="${diagnostic.Estatus != 0}" class="mb-10">
+                                            <span th:utext="${diagnostic.Descripcion}"></span>
+                                            <img th:if="${diagnostic.Estatus == 1}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/check.svg"
+                                                 alt=""/>
+                                            <img th:if="${diagnostic.Estatus == 2}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/alerta.svg"
+                                                 alt=""/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingTwo">
+                                <h4 class="panel-title">
+                                    <span class="circle">2</span>
+                                    <a class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                                       data-parent="#accordion" href="#collapseTwo" aria-expanded="false"
+                                       aria-controls="collapseTwo">
+                                        Capacidad de pago y buen manejo de tus deudas
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+                                 aria-labelledby="headingTwo">
+                                <div class="panel-body">
+                                    <ul class="lista">
+                                        <li th:each="diagnostic, iterDiagnostic : ${diagnostics}"
+                                            th:if="${diagnostic.Estatus != 0}" class="mb-10">
+                                            <span th:utext="${diagnostic.Descripcion}"></span>
+                                            <img th:if="${diagnostic.Estatus == 1}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/check.svg"
+                                                 alt=""/>
+                                            <img th:if="${diagnostic.Estatus == 2}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/alerta.svg"
+                                                 alt=""/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingThree">
+                                <h4 class="panel-title">
+                                    <span class="circle">3</span>
+                                    <a class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                                       data-parent="#accordion" href="#collapseThree" aria-expanded="false"
+                                       aria-controls="collapseThree">
+                                        Información de tus ingresos
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel"
+                                 aria-labelledby="headingThree">
+                                <div class="panel-body">
+                                    <ul class="lista">
+                                        <li th:each="diagnostic, iterDiagnostic : ${diagnostics}"
+                                            th:if="${diagnostic.Estatus != 0}" class="mb-10">
+                                            <span th:utext="${diagnostic.Descripcion}"></span>
+                                            <img th:if="${diagnostic.Estatus == 1}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/check.svg"
+                                                 alt=""/>
+                                            <img th:if="${diagnostic.Estatus == 2}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/alerta.svg"
+                                                 alt=""/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingFour">
+                                <h4 class="panel-title">
+                                    <span class="circle">4</span>
+                                    <a class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                                       data-parent="#accordion" href="#collapseFour" aria-expanded="false"
+                                       aria-controls="collapseFour">
+                                        Historial de crédito
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseFour" class="panel-collapse collapse" role="tabpanel"
+                                 aria-labelledby="headingFour">
+                                <div class="panel-body">
+                                    <ul class="lista">
+                                        <li th:each="diagnostic, iterDiagnostic : ${diagnostics}"
+                                            th:if="${diagnostic.Estatus != 0}" class="mb-10">
+                                            <span th:utext="${diagnostic.Descripcion}"></span>
+                                            <img th:if="${diagnostic.Estatus == 1}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/check.svg"
+                                                 alt=""/>
+                                            <img th:if="${diagnostic.Estatus == 2}" class="w-15"
+                                                 src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/alerta.svg"
+                                                 alt=""/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                         -->
+                    </div>
+                </div>
+
+                <div class="actions text-center" style="display: flex;justify-content: center;margin-top: 2em;">
+                    <div style="max-width: 160px;margin-right: 8px">
+                        <button  type="button" class="button btn-outline" id="btnSemaforo"
+                                th:disabled="${disablePresMiPerfil}"> Mi Perfil
+                        </button>
+                        <span id="detalleBtnMiPerfil" style="margin-top: 10px;display: block;font-size: 13px;font-family: 'Lato Light', sans-serif;">Para saber más de tu perfil y recomendaciones.</span>
+                    </div>
+                    <div style="max-width: 160px">
+                        <th:block th:if="${redirectLink}">
+                            <a th:href="${redirectLink}" onclick="callFbEvent()">
+                                <button type="button" class="button btn-green"
+                                         th:utext="${textButton}">
+                                </button>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${redirectLink}">
+                            <button  id="sendBtn" type="button" class="button btn-green"
+                                     th:disabled="${disablePresAlTokeButton}" th:utext="${textButton}">
+                            </button>
+                            <span th:if="${!disablePresAlTokeButton}" style="margin-top: 10px;display: block;font-size: 13px;font-family: 'Lato Light', sans-serif;">Tenemos esta solución financiera para ti.</span>
+                        </th:block>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        document.documentElement.style.setProperty('--branding-loading-color', /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#26CAD3')}]]*/);
+        document.documentElement.style.setProperty('--branding-second-color', /*[[${@brandingService.getEntityBrandingSecundaryColor(#httpServletRequest, '#FFA100')}]]*/);
+
+        var showCustomFooter = /*[[${showCustomFooter}]]*/false;
+        if(showCustomFooter) $(showCustomFooter).show();
+
+        showSemaforo = true;
+
+        $('#btnSemaforo').click(function () {
+            if (showSemaforo) {
+                $('.caja-porcentaje').css("display", "block");
+                $('.caja-semaforo').css("display", "none");
+                $('#btnSemaforo').html("Regresar")
+                $('#detalleBtnMiPerfil').css("display", "none");
+                showSemaforo = false;
+            } else {
+                $('.caja-semaforo').css("display", "block");
+                $('.caja-porcentaje').css("display", "none");
+                $('#btnSemaforo').html("Mi Perfil")
+                $('#detalleBtnMiPerfil').css("display", "block");
+                showSemaforo = true;
+            }
+
+        })
+
+        var message = /*[[${message}]]*/;
+        var evaluationStatus = /*[[${evaluationStatus}]]*/;
+
+        valueProgress(evaluationStatus);
+
+
+        function valueProgress(evaluationStatus) {
+
+            let progress = 0;
+            switch (evaluationStatus) {
+                case "C03":
+                    progress = 30;
+                    break;
+                case "C02":
+                    progress = 45;
+                    break;
+                case "SE01":
+                    progress = 50;
+                    break;
+                case "SB02":
+                    progress = 55;
+                    break;
+                case "SB01":
+                case "C01":
+                    progress = 60;
+                    break;
+                case "SA0":
+                case "S02":
+                    progress = 65;
+                    break;
+                case "S01":
+                    progress = 70;
+                    break;
+                case "M03":
+                    progress = 75;
+                    break;
+                case "M02":
+                    progress = 80;
+                    break;
+                case "M01":
+                    progress = 85;
+                    break;
+                case "P01":
+                    progress = 88;
+                    break;
+                case "P02":
+                    progress = 90;
+                    break;
+                case "P03":
+                    progress = 95;
+                    break;
+                default:
+                    progress = 0;
+                    break;
+            }
+
+            let el1 = $('.progress-bar--progress')[0];
+            el1.style.width = progress + '%';
+
+            /*let el2 = $('.progress-bar--progress-value')[0];
+            el2.textContent = progress + '%'*/
+        }
+
+        $('#accordion > .panel').on('show.bs.collapse', function (e) {
+            $('.panel-heading').removeClass("active-collapse");
+            $(this).find('.panel-heading').addClass("active-collapse");
+        });
+
+        $('#sendBtn').click(function () {
+            callFbEvent();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {}
+            }, "prestAlToke");
+        })
+
+        var isFbCalled = false;
+        var fbEventOnClick = /*[[${fbEventOnClick}]]*/null;
+        function callFbEvent(){
+            try {
+                if (fbEventOnClick != null && !isFbCalled) {
+                    fbq('trackCustom', fbEventOnClick);
+                    isFbCalled = true;
+                }
+            }catch(e){
+                console.log(e)
+            }
+            return true;
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

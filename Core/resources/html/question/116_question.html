@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+
+        <p th:text="#{questions.62.schedule.tittle(${name})}"></p>
+
+        <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

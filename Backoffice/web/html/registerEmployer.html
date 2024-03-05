@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Creacion de Empresas</title>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <script th:src="@{/js/bo_tablepaginator.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+
+    <!--
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}" rel="stylesheet"/>
+    -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+            var formEmployer = $('#createEmployerForm');
+            var jsonValidator = createFormValidationJson(JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/), formEmployer);
+            formEmployer.validateForm(jsonValidator);
+            $('#createEmployerBtn').click(function (event) {
+                if (formEmployer.valid()) {
+                    $('#createEmployerBtn').loading();
+                    defaultAjax({
+                        url: /*[[@{/employers}]]*/null,
+                        type: 'POST',
+                        form: formEmployer,
+                        data: formEmployer.serializeObject(),
+                        success: function (data) {
+                            $('#createEmployerBtn').unloading();
+                            clearElementsInContainer(formEmployer);
+                            swal({title: "", text: "Empresa registrada", type: "success"});
+                        },
+                        error: function () {
+                            $('#createEmployerBtn').unloading();
+                        }
+                    });
+                }
+            });
+            $('.activeBtn').click(function () {
+                var active = $(this).data('active');
+                var btnSelected = $(this);
+                defaultAjax({
+                    url: /*[[@{/employers/activate}]]*/null,
+                    type: 'POST',
+                    data: {
+                        active: !active,
+                        employerId: $(this).data('id'),
+                    },
+                    success: function (data) {
+                        if (active) {
+                            swal({title: "", text: "Desactivación satisfactoria", type: "success"});
+                            btnSelected.text("Inactivo");
+                        } else {
+                            swal({title: "", text: "Activación satisfactoria", type: "success"});
+                            btnSelected.text("Activo");
+                        }
+                        btnSelected.toggleClass('btn-primary');
+                        btnSelected.toggleClass('btn-danger');
+                        btnSelected.data('active', !active);
+                    },
+                    error: function () {
+                        swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                    }
+                });
+            });
+
+            $('.editBtn').click(function () {
+                $('#cancelEditEmployerBtn').show();
+                $('#confirmEditEmployerBtn').show();
+                $('#createEmployerBtn').hide();
+                $('#name').focus();
+
+                var active = $(this).data('active');
+                var btnSelected = $(this);
+                var employerId= $(this).data('id');
+
+                $("#id").val(employerId);
+                defaultAjax({
+                    url: /*[[@{/employers/employer}]]*/null,
+                    type: 'POST',
+                    data: {
+                        employerId: $(this).data('id'),
+                    },
+                    success: function (data) {
+                        $('.form-control').each(function(){
+                            $(this).val('');
+                        });
+                        var dataJson = JSON.parse(data);
+                        var employer=dataJson.employer;
+                        $('#id').val(employerId);
+                        $('#name').val(employer.name);
+                        $('#ruc').val(employer.ruc);
+                        $('#address').val(employer.address);
+                        $('#phone').val(employer.phone);
+                        $('#profession').val(employer.profession);
+                        $('#daysBeforeEndOfMonth').val(employer.daysBeforeEndOfMonth);
+                        $('#daysAfterEndOfMonth').val(employer.daysAfterEndOfMonth);
+
+                        var usersEmployer=dataJson.usersEmployer;
+                        for(var i=0;i<usersEmployer.length;i++){
+                            $('#user'+i+'Id').val(usersEmployer[i].employerUserId);
+                            $('#user'+i+'Name').val(usersEmployer[i].personName);
+                            $('#user'+i+'FirstSurname').val(usersEmployer[i].firstSurname);
+                            $('#user'+i+'LastSurname').val(usersEmployer[i].lastSurname);
+                            $('#user'+i+'Email').val(usersEmployer[i].email);
+                            if(i>3){
+                                break;
+                            }
+                        }
+                    },
+                    error: function () {
+                        swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                    }
+                });
+            });
+
+            $('#cancelEditEmployerBtn').click(function () {
+                $(this).hide();
+                $('#confirmEditEmployerBtn').hide();
+                $('#createEmployerBtn').show();
+                $('.form-control').each(function(){
+                    $(this).val('');
+                });
+            });
+
+            $('#confirmEditEmployerBtn').click(function () {
+                var active = $(this).data('active');
+                var btnSelected = $(this);
+                $('#confirmEditEmployerBtn').loading();
+
+                defaultAjax({
+                    url: /*[[@{/employers/update}]]*/null,
+                    type: 'POST',
+                    form: formEmployer,
+                    data: formEmployer.serializeObject(),
+                    success: function (data) {
+                        $('#confirmEditEmployerBtn').unloading();
+                        var id=formEmployer.serializeObject().id;
+                        $('#name'+id).html(formEmployer.serializeObject().name);
+                        $('#ruc'+id).html(formEmployer.serializeObject().ruc);
+                        $('#phone'+id).html(formEmployer.serializeObject().phone);
+                        $('#daysAfter'+id).html(formEmployer.serializeObject().daysAfterEndOfMonth);
+                        $('#daysBefore'+id).html(formEmployer.serializeObject().daysBeforeEndOfMonth);
+                        clearElementsInContainer(formEmployer);
+                        $('#confirmEditEmployerBtn').hide();
+                        $('#cancelEditEmployerBtn').hide();
+                        $('#createEmployerBtn').show();
+                        swal({title: "", text: "Datos de la empresa actualizados", type: "success"});
+
+                    },
+                    error: function () {
+                        $('#confirmEditEmployerBtn').unloading();
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold uppercase">Creaci&oacute;n / Edici&oacute;n de Empresas</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <form id="createEmployerForm" role="form" class="form" th:object="${form}">
+                                <div class="form-row">
+                                    <input th:field="*{id}" type='hidden' class="form-control form-control-sm" />
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>Nombre de la empresa (*)</label>
+                                        <input th:field="*{name}" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>RUC (*)</label>
+                                        <input th:field="*{ruc}" type="text" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>Direcci&oacute;n (*)</label>
+                                        <input th:field="*{address}" type="text" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>Tel&eacute;fono (*)</label>
+                                        <input th:field="*{phone}" type="text" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>Rubro (*)</label>
+                                        <select th:field="*{profession}" class="form-control form-control-sm">
+                                            <option value="" hidden="hidden" selected="selected"></option>
+                                            <option th:each="profession : ${@catalogService.getProfessionsActive(#locale)}"
+                                                    th:value="${profession.id}" th:text="${profession.profession}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <input th:field="*{user1Id}" type="hidden" class="form-control"/>
+                                    <div class="form-group col-md-12">
+                                        <label class="control-label"><b></b><br/>Usuario 1 (*)</label>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user1Name}" type="text" class="form-control form-control-sm" placeholder="Nombre..."/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user1FirstSurname}" type="text" class="form-control form-control-sm" placeholder="Ap. paterno"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user1LastSurname}" type="text" class="form-control form-control-sm" placeholder="Ap. materno"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user1Email}" type="text" class="form-control form-control-sm" placeholder="Email..."/>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <input th:field="*{user2Id}" type="hidden" class="form-control"/>
+                                    <div class="form-group col-md-12">
+                                        <label class="control-label"><b></b><br/>Usuario 2 (*)</label>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user2Name}" type="text" class="form-control form-control-sm" placeholder="Nombre..."/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user2FirstSurname}" type="text" class="form-control form-control-sm" placeholder="Ap. paterno"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user2LastSurname}" type="text" class="form-control form-control-sm" placeholder="Ap. materno"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user2Email}" type="text" class="form-control form-control-sm" placeholder="Email..."/>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <input th:field="*{user3Id}" type="hidden" class="form-control"/>
+                                    <div class="form-group col-md-12">
+                                        <label class="control-label"><b></b><br/>Usuario 3 (*)</label>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user3Name}" type="text" class="form-control form-control-sm" placeholder="Nombre..."/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user3FirstSurname}" type="text" class="form-control form-control-sm" placeholder="Ap. paterno"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user3LastSurname}" type="text" class="form-control form-control-sm" placeholder="Ap. materno"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input th:field="*{user3Email}" type="text" class="form-control form-control-sm" placeholder="Email..."/>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>Fecha de Inicio (*)</label>
+                                        <input th:field="*{daysAfterEndOfMonth}" class="form-control form-control-sm" maxlength="2"/>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label"><b></b><br/>D&iacute;as previos a fin de mes (*)</label>
+                                        <input th:field="*{daysBeforeEndOfMonth}" class="form-control form-control-sm" maxlength="2"/>
+                                    </div>
+                                </div>
+
+                                <div class="errorContainer"></div>
+                                <div class="form-actions">
+                                    <button id="createEmployerBtn" type="button" class="btn red">Crear</button>
+                                    <button id="confirmEditEmployerBtn" type="button" class="btn red" style="display: none;">Actualizar</button>
+                                    <button id="cancelEditEmployerBtn" type="button" class="btn red" style="display: none;">Cancelar</button>
+                                </div>
+                            </form>
+
+                            <br/>
+
+                            <table id="tableResults" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre de la empresa</th>
+                                        <th>RUC</th>
+                                        <th>Tel&eacute;fono</th>
+                                        <th>Inicio de adelanto</th>
+                                        <th>D&iacute;as previos a fin de mes</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="employer : ${employers}">
+                                    <td th:id="${'name'+employer?.id}" th:text="${employer?.name}"></td>
+                                    <td th:id="${'ruc'+employer?.id}" th:text="${employer?.ruc}"></td>
+                                    <td th:id="${'phone'+employer?.id}" th:text="${employer?.phoneNumber}"></td>
+                                    <td th:id="${'daysAfter'+employer?.id}" th:text="${employer?.daysAfterEndOfMonth}"></td>
+                                    <td th:id="${'daysBefore'+employer?.id}" th:text="${employer?.daysBeforeEndOfMonth}"></td>
+                                    <td>
+                                        <button class="btn btn-sm activeBtn" th:attr="data-id=${employer.id}, data-active=${employer?.entityActive}" th:text="${employer?.entityActive ? 'Activo' : 'Inactivo'}" th:classappend="${employer?.entityActive ? 'btn-primary' : 'btn-danger'}"></button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-set editBtn" th:attr="data-id=${employer.id}, data-active=${employer?.entityActive}">Editar</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:utext="#{questions.block.pensionerIncomes}"></p>
+            <form id="questionForm" th:object="${form}" class="q98" autocomplete="off">
+                <div class="wrap-field">
+                    <div class="field field-amount inline">
+                        <div class="wrap-field">
+                            <div class="box-icon prefix-box tiny-input">
+                               <span class="prefix"
+                                     th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                            </div>
+                            <input type="text" class="input-outline amount-input" th:field="*{income}"/>
+                            <small class="input-help">Promedio mensual</small>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field field-birthdate inline">
+                        <div class="wrap-field">
+                            <input type="text" th:field="*{retirementMonth}" class="input-outline tiny-input" placeholder="mm"
+                                   pattern="[0-9]*" />
+                            <input type="text" th:field="*{retirementYear}" class="input-outline tiny-input" placeholder="yyyy"
+                                   pattern="[0-9]*" />
+                        </div>
+                        <small class="input-help">Fecha de jubilaci&#243;n</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="retirement">
+                        <div class="field inline"
+                             th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                            <select th:field="*{scheme}">
+                                <option value="">Seleccion</option>
+                                <option th:each="retirement : ${@catalogService.getRetirementSchemes()}"
+                                        th:value="${retirement.id}" th:text="${retirement.scheme}">
+                                </option>
+                            </select>
+                            <small class="input-help">Regimen de jubilaci&#243;n</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                    <div class="field inline">
+                        <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var amountinput = $('#income');
+        var currentYear = (new Date()).getFullYear();
+
+        $('#retirementMonth').forceIntegerOnly(true, 1, 31);
+        $('#retirementYear').forceIntegerOnly(true, currentYear - 50, currentYear);
+        setTimeout(function () {
+            amountinput.focus();
+        }, 300);
+
+        $('#retirementMonth').on('keyup', function () {
+            if(	$(this).val().length == 2)
+                $('#retirementYear').focus();
+        });
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

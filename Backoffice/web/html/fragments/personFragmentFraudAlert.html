@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<div th:fragment="tab-fraud-alerts-body" th:remove="tag">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // console.log(/*[[${loanApplication.lastFraudAlertsBotStatusId}]]*/);
+        // console.log(/*[[${loanApplication.id}]]*/);
+        // $('.updated-bot-date').text(/*[[${@utilService.datetimeShortFormat(loanApplication.lastFraudAlertsBotRegisterDate)}]]*/);
+        // $('.updated-bot-status').text(/*[[${loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE || loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING ? 'En cola' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_SUCCESS ? 'Ejecutado' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_FAIL ? 'Fallido' : 'Pendiente'}]]*/);
+        let loopRefresh = /*[[${loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE || loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING}]]*/false;
+        // console.log(loopRefresh);
+        if (loopRefresh) {
+            loopIntervalId = setTimeout(function () {
+                loadLoanApplicationFraudAlertsFragment(/*[[${loanApplication.id}]]*/);
+            }, 5 * 1000);
+        }
+
+        if ($('#fraudToggle' + loanApplicationId).hasClass('expand') && loopIntervalId) {
+            clearInterval(loopIntervalId);
+            loopIntervalId = null;
+        }
+        /*]]>*/
+    </script>
+
+    <div class="tab-content">
+        <span>Última ejecución
+            <span th:text="${@utilService.datetimeShortFormat(loanApplication.lastFraudAlertsBotRegisterDate)}"></span>
+            &nbsp;
+            <span class="label label-sm"
+                  th:classappend="${loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE || loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING ? 'label-warning' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_SUCCESS ? 'label-success' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_FAIL ? 'label-danger' : 'label-default'}"
+                  th:text="${loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE || loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING ? 'En cola' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_SUCCESS ? 'Ejecutado' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_FAIL ? 'Fallido' : 'Pendiente'}"></span>
+        </span>
+        <button shiro:hasPermission="person:fraudAlert:rejectAll" th:if="${not #lists.isEmpty(loanApplicationFraudAlerts)}" id="btnRejectAllLoanApplicationFraudAlerts"
+                onclick="rejectAllLoanApplicationFraudAlerts()" class="btn btn-sm btn-outline-danger pull-right"
+                style="margin-bottom: 5px;">Desestimar todas</button>
+        <div class="table-responsive"  >
+            <table class="table table-bordered table-striped table-hover" id="fraudsTable">
+                <thead>
+                <tr>
+                    <th>Elemento de Alarma</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>LA ID</th>
+                    <th>Nombres</th>
+                    <th>Apellido</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Flag de Fraude</th>
+                    <th>Acción</th>
+                    <th th:if="${showActions}">Asignar flag de fraude</th>
+                    <th th:if="${!showActions}">Operador</th>
+                    <th th:if="${!showActions}">Fecha</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="loanApplicationFraudAlert,iter : ${loanApplicationFraudAlerts}" th:style="'background-color:'+ ${loanApplicationFraudAlert?.fraudAlert?.supervisionRequired ? '#FFE5CC' : '#FFFFCC' }">
+                    <td th:text="${loanApplicationFraudAlert?.fraudAlert?.fraudAlertElemnt}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.fraudAlert?.fraudAlertCode}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.fraudAlert?.fraudAlertDescription}"></td>
+                    <td>
+                        <a th:href="@{/person(personId=${loanApplicationFraudAlert?.relatedLoanApplication?.personId}, tab='applications', applicationId=${loanApplicationFraudAlert?.relatedLoanApplication?.id})} + ${'#' + loanApplicationFraudAlert?.relatedLoanApplication?.code}"
+                           th:text="${loanApplicationFraudAlert?.relatedLoanApplication?.code}"></a></td>
+                    <td th:text="${loanApplicationFraudAlert?.firstName}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.lastName}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.department}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.relatedLoanApplication?.status?.status}"></td>
+                    <td th:text="${@catalogService.getFraudFlag(loanApplicationFraudAlert?.relatedLoanApplication?.fraudFlagId)?.flag}"></td>
+                    <td th:if="${showActions}">
+                        <div th:if="${!loanApplicationFraudAlert?.fraudAlert?.supervisionRequired and loanApplication.creditAnalystSysUserId != null}">
+                            <a class="btn green btn-outline btn-xs"
+                               th:onclick="'rejectLoanApplicationFraudAlert('+${loanApplicationFraudAlert?.id}+','+this+')'">Desestimar</a>
+                        </div>
+                        <div th:if="${loanApplicationFraudAlert?.fraudAlert?.supervisionRequired and loanApplication.creditAnalystSysUserId != null} ">
+                            <a shiro:hasPermission="person:fraudAlert:reject" class="btn green btn-outline btn-xs"
+                               th:onclick="'rejectLoanApplicationFraudAlert('+${loanApplicationFraudAlert?.id}+','+this+')'">Desestimar</a>
+                        </div>
+                    </td>
+                    <td th:if="${!showActions}"><div  th:text="Desestimado"></div></td>
+                    <td th:if="${showActions}"><a th:if="${loanApplicationFraudAlert?.relatedLoanApplication?.id != null}" class="btn green btn-outline btn-xs"
+                                                  th:onclick="'showModalLoanApplicationFraudAlert('+${loanApplicationFraudAlert?.relatedLoanApplication?.id} + ', \'' + ${loanApplicationFraudAlert?.relatedLoanApplication?.code} + '\', \'' + ${loanApplicationFraudAlert?.firstName != null ? loanApplicationFraudAlert?.firstName : ''} +  ' ' + ${loanApplicationFraudAlert?.lastName != null ? loanApplicationFraudAlert?.lastName : ''} + '\', \'' + ${loanApplicationFraudAlert?.dni}  + '\')'">Asignar</a></td>
+                    <td th:if="${!showActions}" th:text="${loanApplicationFraudAlert?.operatorName} + ' ' + ${loanApplicationFraudAlert?.operatorLastName} "></td>
+                    <td th:if="${!showActions}" th:text="${@utilService.datetimeShortFormat(loanApplicationFraudAlert?.registeredDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplicationFraudAlert?.registeredDate)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div th:fragment="tab-fraud-alerts" th:remove="tag">
+    <div id="tabLoading" style="display: none">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de alertas
+            </li>
+        </ul>
+    </div>
+    <div th:if="${firstCall == null or !firstCall}" id="tabData">
+
+        <div class="portlet box" th:classappend="green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <div th:remove="tag" th:text="${sectionName}"></div>
+                </div>
+                <div class="tools">
+<!--                    <span>Última ejecución : <span class="updated-bot-date" th:text="${@utilService.datetimeShortFormat(loanApplication.lastFraudAlertsBotRegisterDate)}"></span></span>-->
+<!--                    <span class="updated-bot-status label label-sm label-info" th:text="${loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_QUEUE || loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_RUNNING ? 'En cola' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_SUCCESS ? 'Ejecutado' : loanApplication.lastFraudAlertsBotStatusId == T(com.affirm.common.model.transactional.QueryBot).STATUS_FAIL ? 'Fallido' : 'Pendiente'}"></span>-->
+                    <a href="javascript:;" class="reload" data-original-title="" title="Actualizar" th:id="fraudReload+${loanApplication.id}"> </a>
+                    <a href="javascript:;" class="expand" data-original-title="" title="" th:id="fraudToggle+${loanApplication.id}"> </a>
+                </div>
+            </div>
+
+            <div class="portlet-body" th:id="fraud-alerts-body+${loanApplication.id}"  style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="registerModalLoanApplicationFraudAlert" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterApplicationRejectionModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="fraudFlagId">Flag de Fraude</label>
+                                    <select class="form-control" name="fraudFlagId"
+                                            id="fraudFlagId">
+                                        <option th:each="flag : ${@catalogService.getFraudFlags()}"
+                                                th:value="${flag.id}" th:text="${flag.flag}"></option>
+                                    </select>
+                                    <label class="control-label" for="commentary">
+                                        Comentarios / Detalles
+                                    </label>
+                                    <div>
+                                        <dl class="dl-horizontal dl-loan-application">
+                                            <dt>LA ID</dt>
+                                            <dd id="laId"></dd>
+                                            <dt>Nombre y Apellido</dt>
+                                            <dd id="fullName"></dd>
+                                            <dt>Dni</dt>
+                                            <dd id="documentNumber"></dd>
+                                        </dl>
+                                    </div>
+                                    <textarea class="form-control" name="fraudFlagCommetary"
+                                              id="commentary"></textarea>
+                                    <input type="hidden" id="loanApplicationId"/>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-info" th:if="${showActions}"
+                       th:onclick="'closeLoanApplicationFraudAlertModal()'">Cancelar</a>
+                    <a id="btnSaveFraudAlert" class="btn btn-info" th:if="${showActions}"
+                       th:onclick="'rejectLoanApplicationFraudAlertModal()'">Guardar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loopIntervalId;
+        var loanApplicationId = /*[[${loanApplication.id}]]*/null;
+
+        $('#fraudToggle'+loanApplicationId).one('click',function(){
+            if($(this).hasClass('expand'))
+                loadLoanApplicationFraudAlertsFragment(parseInt($(this).attr('id').substring(11),10));
+        });
+        $('#fraudReload' + loanApplicationId).on('click', function () {
+            loadLoanApplicationFraudAlertsFragment(parseInt($(this).attr('id').substring(11), 10));
+        });
+
+        function loadLoanApplicationFraudAlertsFragment(id) {
+            defaultAjax({
+                url: /*[[@{/person/reject/loanApplicationFraudAlert}]]*/null,
+                type: 'GET',
+                data: {
+                    loanApplicationId: id,
+                    showActions: /*[[${showActions}]]*/null
+
+                },
+                success: function (data) {
+                    $('#fraud-alerts-body' + id).html(data);
+                }
+            })
+        }
+
+        function closeLoanApplicationFraudAlertModal() {
+            $('#registerModalLoanApplicationFraudAlert').modal('hide');
+        }
+        
+        function rejectLoanApplicationFraudAlert(loanApplicationFraudAlertId,fraud) {
+            var row = $(fraud).closest('tr')
+
+            defaultAjax({
+                url: /*[[@{/person/reject/loanApplicationFraudAlert}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationFraudAlertId: loanApplicationFraudAlertId
+                },
+                success: function (data) {
+                    row.fadeOut(750,function(){
+                        row.remove();
+                    });
+                }
+            })
+        }
+
+        function assignLoanApplicationFraudFlag(loanApplicationId, fraudFlagId, commentary) {
+            defaultAjax({
+                url: /*[[@{/person/assign/loanApplicationFraudFlag}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationId: loanApplicationId,
+                    fraudFlagId: fraudFlagId,
+                    commentary: commentary
+                },
+                success: function (data) {
+                    $('#frmRegisterApplicationRejectionModal').trigger('reset');
+                    // Refresh the applications tab
+                    //refreshTabAjax('applications');
+                }
+            })
+        }
+
+        function showModalLoanApplicationFraudAlert(loanApplicationId, loanApplicationCode, personaFullName, personDocumentNumber) {
+            $("#loanApplicationId").val(loanApplicationId);
+
+            $("#laId").text(loanApplicationCode);
+            $("#fullName").text(personaFullName);
+            $("#documentNumber").text(personDocumentNumber);
+
+            $('#registerModalLoanApplicationFraudAlert').modal();
+        }
+
+        function rejectLoanApplicationFraudAlertModal() {
+            $('#registerModalLoanApplicationFraudAlert').modal('hide');
+            assignLoanApplicationFraudFlag($("#loanApplicationId").val(), $("#fraudFlagId").val(), $("#commentary").val());
+        }
+
+        function rejectAllLoanApplicationFraudAlerts() {
+            swal({
+                    title: "",
+                    text: "¿Está seguro que desea desestimar todas las alertas?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "¡Sí, desestimar todas!",
+                    cancelButtonText: "Cancelar",
+                    closeOnConfirm: false,
+                    html: true
+                },
+                function(){
+                    swal.close();
+                    defaultAjax({
+                        url: /*[[@{/person/reject/allLoanApplicationFraudAlerts}]]*/null,
+                        type: 'POST',
+                        data: {
+                            loanApplicationId: loanApplicationId
+                        },
+                        success: function (data) {
+                            $('#fraudReload'+loanApplicationId).click();
+                        }
+                    });
+                });
+        }
+
+        /*]]>*/
+    </script>
+</div>
+
+
+</html>

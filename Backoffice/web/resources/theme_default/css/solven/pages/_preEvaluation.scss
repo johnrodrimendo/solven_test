@@ -1,0 +1,113 @@
+#aff-template-pages-private {
+  .evaluation-section,
+  .pre-evaluation,
+   .offer-response {
+    margin: 1.5em 0;
+    .container {
+      #runningDiv,
+      #successDiv {
+        .message-container {
+          background: white;
+          @include border-radius(5px);
+          @include box-shadow(0, 1px, 4px, rgba(0, 0, 0, .1));
+          color: $black_color_main;
+          padding: 6em 1em;
+          text-align: center;
+          h2 {
+            color: $black_color_main;
+            font-family: 'Proxima-Nova Semibold', sans-serif;
+            margin-top: 1em;
+          }
+          p {
+            margin-top: .5em;
+          }
+        }
+        h2 {
+          color: $black_color_main;
+          font-family: 'Proxima-Nova Semibold', sans-serif;
+          margin-top: 1em;
+        }
+        p {
+          margin-top: .5em;
+        }
+      }
+      #failDiv {
+        .well {
+          background: white;
+          border-top: 10px solid $red_color_main;
+          @include border-radius(5px);
+          h2 {
+            text-align: center;
+            margin: 1em;
+          }
+          .message-area {
+            margin: 2em;
+            max-width: 80%;
+            p:last-child {
+              margin-top: 1em;
+            }
+          }
+          .aff-thanks {
+            margin: 2em auto;
+            max-width: 80%;
+            text-align: center;
+            a {
+              color: $lightblue_color_main;
+              display: block;
+              margin-top: 1em;
+              text-decoration: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+/* Accordion */
+.accordion-container {
+  margin: 0 auto;
+  width: 95%;
+}
+button.accordion {
+  background-color: $graysoft_color;
+  border: none;
+  @include border-radius(5px);
+  color: #444;
+  cursor: pointer;
+  font-family: 'Proxima-Nova Semibold', sans-serif;
+  margin: .5em 0;
+  outline: none;
+  padding: 18px;
+  text-align: left;
+  transition: 0.4s;
+  width: 100%;
+}
+button.accordion.active, button.accordion:hover {
+  background-color: #ddd;
+}
+
+div.panel-ac {
+  background-color: white;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 1em;
+  transition: 0.6s ease-in-out;
+}
+
+div.panel-ac.show {
+  opacity: 1;
+  padding: 1em;
+  max-height: 500px; /* Whatever you like, as long as its more than the height of the content (on all screen sizes) */
+}
+button.accordion:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+button.accordion.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
+}

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Gestión de operadores</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function exportToExcel(){
+            var filters = $('.form-control.input-sm.form-control-sm')
+            var jsonParams = {};
+            for (var i = 0; i < filters.length; i++) {
+                if (jsonParams[filters[i].name] == undefined) {
+                    jsonParams[filters[i].name] = [];
+                }
+                jsonParams[filters[i].name][jsonParams[filters[i].name].length] = filters[i].value;
+            }
+            debugger;
+            defaultAjax({
+                url: /*[[@{/reporting/operatorsManagements/export}]]*/null,
+                type: 'POST',
+                data: jsonParams,
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        }
+
+        function reloadResults(){
+            defaultAjax({
+                url: /*[[@{/reporting/operatorsManagements/result}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#table').html(data);
+                }
+            });
+            setTimeout(reloadResults, 5000);
+        }
+        setTimeout(reloadResults, 5000);
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>Reportes<i class="fa fa-circle"></i></li>
+                <li>
+                    <span>Gestión de Operadores</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Gestión de Operadores</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}" href="javascript:exportToExcel()" >
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div id="filter">
+                                <form role="form" method="post" th:action="@{/reporting/operatorsManagements/result}">
+                                    <div class="form-row">
+
+                                        <!-- Fecha -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Periodo 1</b><br />Desde</label>
+                                                <input id="period1FromFilter" name="period1FromFilter" type="text" class="form-control input-sm form-control-sm" th:value="${period1From != null ? @utilService.dateCustomFormat(period1From, 'dd-MM-yyyy', #locale) : ''}" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="period1ToFilter" name="period1ToFilter" type="text" class="form-control input-sm form-control-sm" th:value="${period1To != null ? @utilService.dateCustomFormat(period1To, 'dd-MM-yyyy', #locale) : ''}" />
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var period1FromFilter = $('#period1FromFilter');
+                                                var period1ToFilter = $('#period1ToFilter');
+                                                datepicker(period1FromFilter);
+                                                datepicker(period1ToFilter);
+                                                function datepicker( obj ){
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+                                                period1FromFilter.on('change', function () {
+                                                    period1ToFilter.datepicker('setStartDate', period1FromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+
+                                        <!-- Fecha -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Periodo 2</b><br />Desde</label>
+                                                <input id="period2FromFilter" name="period2FromFilter" type="text" class="form-control input-sm form-control-sm" th:value="${period1From != null ? @utilService.dateCustomFormat(period1From, 'dd-MM-yyyy', #locale) : ''}" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="period2ToFilter" name="period2ToFilter" type="text" class="form-control input-sm form-control-sm" th:value="${period1To != null ? @utilService.dateCustomFormat(period1To, 'dd-MM-yyyy', #locale) : ''}" />
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var period2FromFilter = $('#period2FromFilter');
+                                                var period2ToFilter = $('#period2ToFilter');
+                                                datepicker(period2FromFilter);
+                                                datepicker(period2ToFilter);
+                                                function datepicker( obj ){
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+                                                period2FromFilter.on('change', function () {
+                                                    period2ToFilter.datepicker('setStartDate', period2FromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+
+                                        <!-- Analista -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br />Analista</label>
+                                            <select name="sysUser"  class="form-control input-sm form-control-sm">
+                                                <option value="">Todos</option>
+                                                <option th:each="sysUser : ${@catalogService.getManagementAnalystSysusers()}" th:value="${sysUser.id}" th:text="${sysUser.getFullName()}"></option>
+                                            </select>
+                                        </div>
+
+
+                                        <!-- Producto -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br />Producto</label>
+                                            <select name="product" class="form-control input-sm form-control-sm">
+                                                <option value="">Todos</option>
+                                                <option value="0">Sin producto</option>
+                                                <option th:each="product : ${@catalogService.getProducts()}" th:value="${product.id}" th:text="${product.name}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Financiador -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br />Financiador</label>
+                                            <select name="entity" class="form-control input-sm form-control-sm">
+                                                <option value="">Todos</option>
+                                                <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet transparent">
+                                                <div class="portlet-title">
+                                                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Historico de Reportes</span>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="table-responsive" id="table">
+                                                        <th:block th:replace="this :: list"></th:block>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Fec. Registro</th>
+            <th>Fec. Procesamiento</th>
+            <th>Estatus</th>
+            <th>Periodo 1</th>
+            <th>Periodo 2</th>
+            <th>Analista</th>
+            <th>Producto</th>
+            <th>Financiador</th>
+            <th>Url</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="report : ${historicReports}">
+            <tr>
+                <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                <th:block th:switch="${report.status}">
+                    <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                    <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                </th:block>
+                <td th:text="${(report.params != null and !report.params.isNull('period1From') ? report.params.get('period1From')?.toString() : '') + ' - ' + (report.params != null and !report.params.isNull('period1To') ? report.params.get('period1To')?.toString() : '')}"></td>
+                <td th:text="${(report.params != null and !report.params.isNull('period2From') ? report.params.get('period2From')?.toString() : '') + ' - ' + (report.params != null and !report.params.isNull('period2To') ? report.params.get('period2To')?.toString() : '')}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('sysUserId') ? @sysUserService.getSysUserById(report.params.get('sysUserId'))?.getFullName() : 'Todos'}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('productId') ? @utilService.getProductsFunnelByIds('[' + report.params.get('productId') + ']') : 'Todos'}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('entityId') ? @utilService.getEntitiesFunnelByIds('[' + report.params.get('entityId') + ']') : 'Todos'}"></td>
+                <td>
+                    <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</th:block>
+</body>
+</html>

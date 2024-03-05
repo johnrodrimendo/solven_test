@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <th:block layout:fragment="title-pe">
+        <title>Solven | Finanzas Personales</title>
+    </th:block>
+    <th:block layout:fragment="title-ar">
+        <title>Solven | Finanzas Personales</title>
+    </th:block>
+    <th:block layout:fragment="keywords-pe">
+        <meta name="keywords"
+            content="crédito en línea, crédito online, solven, crédito, créditos, crédito en línea, prestamo, prestamos, tarjeta de crédito, tarjetas de crédito, adelanto de sueldo, seguros, financiera, banco, el crédito que mereces, consejos financieros, consejo de finanzas, consejos para tener crédito" />
+        <meta name="description"
+            content="Creamos una experiencia financiera distinta. Nos asociamos con las mejores compañías para ofrecerte créditos sin letras chicas y a tasas bajas." />
+    </th:block>
+    <th:block layout:fragment="keywords-ar">
+        <meta name="keywords"
+            content="crédito en línea, crédito online, solven, crédito, créditos, crédito en linea, prestamo, prestamos, tarjeta de crédito, tarjetas de crédito, adelanto de sueldo, seguros, financiera, banco, el crédito que merecés, consejos financieros, consejo de finanzas, consejos para tener crédito"/>
+        <meta name="description" content="Creamos una experiencia financiera distinta. Nos asociamos con las mejores compañías para ofrecerte créditos sin letras chicas y a tasas bajas." />
+
+    </th:block>
+    <link rel="alternate" hreflang="es" href="https://www.solven.pe/blog" />
+    <link rel="alternate" hreflang="es-pe" href="https://www.solven.pe/blog" />
+    <link rel="alternate" hreflang="es-ar" href="https://www.solven.com.ar/blog" />
+    <link rel="alternate" hreflang="x-default" href="https://www.solven.pe/blog" />
+    <th:block layout:fragment="css">
+        <link rel="preload" as="style" th:href="@{/css/landingBlog.css}" />
+        <link rel="stylesheet" th:href="@{/css/landingBlog.css}" />
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function calcHeight() {
+                var chv = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                document.getElementById("main").setAttribute("style", "height:" + chv + "px;");
+            }
+            /*window.onload=function(){
+                var e = new XMLHttpRequest;e.open("GET","https://fonts.googleapis.com/css?family=Lato:300,400,700,900",!0),e.onreadystatechange=function(){if(4==e.readyState&&200==e.status){var t=document.createElement("style");t.innerHTML=e.responseText,document.head.appendChild(t)}},e.send();
+            };
+            */
+            window.onresize = function (event) {
+                calcHeight();
+            };
+            /*]]>*/
+        </script>
+        <script defer="true" type="text/javascript" th:src="@{/js/landingBlog.js}"></script>
+    </th:block>
+</head>
+
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe main-arg' : 'main-pe'}">
+   <th:block layout:fragment="header">
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeaderArgentina"></th:block>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeader"></th:block>
+        </th:block>
+    </th:block>
+    <th:block layout:fragment="content">
+        <section id="banner" class="main-banner bgbanner-inner bg-blog">
+            <article>
+                <h1>Blog</h1>
+                <p th:text="#{static.pages.blog.title}"></p>
+                <div class="form-container">
+                    <div class="block" id="email-block">
+                        <div class="field inline">
+                            <input type="text" class="input-landing input-email" placeholder="Correo electr&oacute;nico"
+                                id="email" />
+                        </div>
+                        <div class="field inline">
+                            <button class="button bg-red" id="subscribe"
+                                th:text="#{static.pages.button.subscribe}"></button>
+                        </div>
+                    </div>
+                    <div id="response-block"></div>
+                </div>
+            </article>
+            <img id="bannerPrincipal" th:attr="data-src=@{/img/bgblog.jpg}" alt="" class="lazy" />
+            <img id="bannerResponsive" th:attr="data-src=@{/img/bgperu_responsive.jpg}" alt="" />
+        </section>
+        <section class="w-list-news">
+
+            <ul class="breadcrumbs">
+                <li>Home</li>
+                <li>Blog</li>
+            </ul>
+
+            <ul class="list-news">
+                <li class="item-news" th:each="post : ${posts}">
+                    <article>
+                        <h2><a th:href="'/blog/' + ${post.slug}" th:utext="${post.title.rendered}"></a></h2>
+                        <div id="p" class="pharagraph" th:utext="${post.excerpt.rendered}"></div>
+                        <ul class="list-categories">
+                            <li th:each="category : ${post.categories}">
+                                <span th:text="${category}"></span>
+                            </li>
+                        </ul>
+                        <a th:href="@{/blog/__${post.slug}__}">
+                            <figure>
+                                <img th:attr="data-src=${post.featuredImageUrlMediumLarge}"
+                                    th:alt="${post.title.rendered}" class="lazy" />
+                            </figure>
+                        </a>
+                        
+                    </article>
+                    <article class="avatar-person">
+                        <div class="avatar">
+                            <span class="autor" th:text="${post.getAuthorFirstName()}"></span><br />
+                            <figure>
+                                <img th:attr="data-src=${post.author[1]}" alt="" class="lazy" />
+                            </figure>
+                        </div>
+                        <time th:text="${@utilService.datetimeShortFormat(post.getDateAsDate())}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(post?.getDateAsDate())}"></time>
+                    </article>
+                </li>
+            </ul>
+
+            <div class="search">
+                <form class="m-search" type="get">
+                    <h2>Búsqueda de publicaciones</h2>
+                    <div class="wsearch">
+                        <input type="text" name="search" />
+                        <button class=" button btnSearch ">
+                            <svg version="1.1" id="search-icon" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 30.239 30.239"
+                                style="enable-background:new 0 0 30.239 30.239;" xml:space="preserve">
+                                <g>
+                                    <path d="M20.194,3.46c-4.613-4.613-12.121-4.613-16.734,0c-4.612,4.614-4.612,12.121,0,16.735
+                                    c4.108,4.107,10.506,4.547,15.116,1.34c0.097,0.459,0.319,0.897,0.676,1.254l6.718,6.718c0.979,0.977,2.561,0.977,3.535,0
+                                    c0.978-0.978,0.978-2.56,0-3.535l-6.718-6.72c-0.355-0.354-0.794-0.577-1.253-0.674C24.743,13.967,24.303,7.57,20.194,3.46z
+                                    M18.073,18.074c-3.444,3.444-9.049,3.444-12.492,0c-3.442-3.444-3.442-9.048,0-12.492c3.443-3.443,9.048-3.443,12.492,0
+                                    C21.517,9.026,21.517,14.63,18.073,18.074z" />
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="recent-post">
+                    <h2>Publicaciones recientes</h2>
+                    <ul>
+                        <li th:each="post : ${mostRecentPosts}">
+                            <a th:href="@{/blog/__${post.slug}__}" th:utext="${post.title.rendered}"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="recent-post">
+                    <h2>Categorías</h2>
+                    <ul>
+                        <li th:each="category : ${postCategories}">
+                            <a th:href="@{/blog(category=${category.id})}" th:utext="${category.name}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <nav aria-label="Page navigation example" class="nav-pagination" th:if="${#lists.size(posts) > 0}">
+                <ul class="pagination" th:with="currentUrl=(${#httpServletRequest.requestURI})">
+                    <li class="page-item" th:if="${currentPage != 1}" style="display: none">
+                        <a class="page-link" th:href="@{${currentUrl}(page=1)}">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item prev" th:if="${currentPage > 1}">
+                        <a class="page-link" th:href="@{${currentUrl}(page=${currentPage}-1)}" aria-label="Previous">
+                            Anterior
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="page : ${#numbers.sequence(1, pages)}">
+                        <a class="page-link" th:href="@{${currentUrl}(page=${page})}" th:text="${page}" th:class="${page==currentPage}?active:''"></a>
+                    </li>
+                    <li class="page-item next" th:if="${pages > currentPage}">
+                        <a class="page-link" th:href="@{${currentUrl}(page=${currentPage}+1)}" aria-label="Next">
+                            Siguiente
+                        </a>
+                    </li>
+                    <li class="page-item" th:if="${pages != currentPage}" style="display: none">
+                        <a class="page-link" th:href="@{${currentUrl}(page=${pages})}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </th:block>
+    <th:block layout:fragment="js">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var ajaxValidator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+            var ajaxSubcribe = /*[[@{/subscribe}]]*/null;
+
+            /*]]>*/
+        </script>
+    </th:block>
+</body>
+</html>

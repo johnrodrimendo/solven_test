@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <title>Home</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Backoffice |</title>
+
+    <!--Bootstrap-->
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/css/bootstrap.min.css'}" rel="stylesheet"/>
+    <!-- Font Awesome -->
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/gentelella/vendors/font-awesome/css/font-awesome.min.css'}" rel="stylesheet"/>
+    <!--Mega Menu-->
+    <link th:href="@{/css/mega_menu.css}" rel="stylesheet"/>
+    <!--BackOffice Theme Style-->
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/gentelella/production/css/custom.css'}" rel="stylesheet"/>
+    <!-- Own -->
+    <link th:href="@{/css/backoffice.css}" rel="stylesheet"/>
+    <style>
+        .loanCircleIndicator {
+            width: 20px;
+            height: 20px;
+            -webkit-border-radius: 25px;
+            -moz-border-radius: 25px;
+            border-radius: 25px;
+        }
+
+    </style>
+</head>
+<body class="nav-md">
+<div class="container body fixed_top_nav">
+    <div class="main_container">
+
+        <!-- top navigation -->
+        <div th:replace="fragments/header :: header-login"></div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <!--<div class="page-title">-->
+                <!--<div class="title_left">-->
+                <!--<h3>-->
+                <!--Loan Offers-->
+                <!--</h3>-->
+                <!--</div>-->
+
+                <!--<div class="title_right">-->
+                <!--<div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">-->
+                <!--<div class="input-group">-->
+                <!--<input type="text" class="form-control" placeholder="Search for..."/>-->
+                <!--<span class="input-group-btn">-->
+                <!--<button class="btn btn-default" type="button">Go!</button>-->
+                <!--</span>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--<div class="clearfix"></div>-->
+
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <span class="x_panel_title">Loan Offers
+                            </span>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" th:switch="${#lists.isEmpty(loanApplications)}">
+                            <div th:case="true">
+                                <p>No hay resultados</p>
+                            </div>
+                            <div th:case="false" class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>Fecha</th>
+                                        <th>Solicitud</th>
+                                        <th>Estado</th>
+                                        <th>Tipo doc.</th>
+                                        <th>Numero doc.</th>
+                                        <th>Nombre completo</th>
+                                        <th>Zona</th>
+                                        <th>Actividad</th>
+                                        <th>Producto</th>
+                                        <th>Monto solicitado</th>
+                                        <th>Oferta</th>
+                                        <th>Buró</th>
+                                        <th>Score</th>
+                                        <th>Qlty<br/>Score</th>
+                                        <th>Cluster</th>
+                                        <th>Origen</th>
+                                        <th>Asignado</th>
+                                        <th>Propuestas</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="loan, iterLoanOffer2 : ${loanApplications}"
+                                        th:style="'background-color:'+${loan?.lineColor}">
+                                        <td th:text="${loan?.rowNumber}"></td>
+                                        <td>
+                                            <div class="loanCircleIndicator"
+                                                 th:style="'background-color:'+${loan?.ballColor}"
+                                            >
+                                            </div>
+                                        </td>
+                                        <td th:text="${@utilService.datetimeShortFormat(loan?.waitingapprovalDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.waitingapprovalDate)}"></td>
+                                        <td><a th:href="@{/person(personId=${loan?.personId}, tab='applications')}"
+                                               th:text="${loan?.code}"></a></td>
+                                        <td th:text="${loan?.status?.status}"></td>
+                                        <td th:text="${loan?.documentType?.name}"></td>
+                                        <td th:text="${loan?.documentNumber}"></td>
+                                        <td th:text="${loan.getFullName()}"></td>
+                                        <td th:text="${loan?.ubigeo?.getDepartment().getName()}"></td>
+                                        <td th:text="${loan?.activityType?.type}"></td>
+                                        <td th:text="${loan?.productCategory?.category}"></td>
+                                        <td style="white-space: nowrap"
+                                            th:text="${loan?.getLoanApplicationAmmount(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+                                        <td>
+                                            <table th:if="${loan?.offers != null}">
+                                                <tr th:each="offer : ${loan.offers}">
+                                                    <td style="white-space: nowrap"
+                                                        th:text="${offer?.getLoanOfferDescription(@utilService,  loan?.country?.id)}"></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td></td>
+                                        <td th:text="${loan?.score}"></td>
+                                        <td></td>
+                                        <td th:text="${loan?.cluster}"></td>
+                                        <td></td>
+                                        <td th:text="${loan?.getAnalystFullName()}"></td>
+                                        <td></td>
+                                        <td><a rel="noopener noreferrer" target="_blank" th:href="${@utilService.createLoanApplicationClientUrl(loan?.userId, loan?.id, loan?.personId)}">Ver como cliente</a></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <div th:replace="fragments/footer :: footer-login"></div>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<!--Jquery-->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/dist/jquery.min.js'}" type="text/javascript"></script>
+<!--Bootstrap-->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/js/bootstrap.min.js'}"></script>
+<!-- FastClick -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/gentelella/vendors/fastclick/lib/fastclick.js'}"></script>
+<!-- NProgress -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/gentelella/vendors/nprogress/nprogress.js'}"></script>
+<!-- Custom Theme Scripts -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/gentelella/production/js/custom.js'}"></script>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:text="#{questions.block.athenticateWithSocials}"></p>
+            <div class="block" id="social-networks">
+                <!-- outline-box-active -->
+                <a id="facebook" class="outline-box" th:classappend="${facebook != null ? 'outline-box-active' : ''}"
+                   onclick="login('facebook')"><i class="icon icon-facebook"></i></a>
+                <a id="linkedin" class="outline-box" th:classappend="${linkedin != null ? 'outline-box-active' : ''}"
+                   onclick="login('linkedin')"><i class="icon icon-linkedin"></i></a>
+                <a id="mercadolibre" class="outline-box"
+                   th:classappend="${mercadolibre != null ? 'outline-box-active' : ''}"
+                   onclick="login('mercadolibre')"><i class="icon icon-mercadolibre"></i></a>
+            </div>
+            <div class="display-block" th:if="false">
+                <a href="#" class="text-lightblue" id="skipButton">Omitir</a>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        oauthy.setupNetwork('facebook',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('linkedin',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('mercadolibre',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).MERCADOLIBRE.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).MERCADOLIBRE.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).MERCADOLIBRE.getDefaultPermission()}]]*/null);
+
+        $('#skipButton').on('click', function (e) {
+            e.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: 'POST'
+            }, "skip");
+        });
+
+        function login(network) {
+            oauthy.login(network, function (code) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: 'POST',
+                    data: {
+                        networkProvider: network == 'facebook' ? 'F' : network == 'linkedin' ? 'L' : network == 'mercadolibre' ? 'M' : null,
+                        authCode: code
+                    }
+                }, "");
+            }, function () {
+                showErrorModal('Se produjo un error al intentar vincular tus redes, <br/>por favor int&eacute;ntalo nuevamente o cont&aacute;ctanos.');
+            });
+        }
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <form id="questionForm" th:object="${form}" class="form" autocomplete="off">
+                <p th:text="#{questions.block.joinWithEmail}"></p>
+                <div class="field inline">
+                    <input type="text" class="input-outline fullname-input" th:field="*{email}" autocorrect="off"
+                           autocapitalize="none"/>
+                </div>
+                <div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

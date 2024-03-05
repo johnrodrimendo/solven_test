@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q29">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <p th:utext="#{questions.block.whatIsYourOccupation}"></p>
+                <div class="field inline">
+                    <select data-width="245" th:field="*{ocupation}"
+                            th:attr="data-placeholder=#{question.map.charge}">
+                        <th:block th:each="ocupation : ${occupations}">
+                            <option value="" disabled="disabled" selected="selected"></option>
+                            <option th:value="${ocupation.id}" th:text="${ocupation.ocupation}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var $ocupation = $('#ocupation');
+        $ocupation.on('select2:select', function () {
+            if ($('#questionForm').valid()) {
+                button: $('#sendButton'),
+                    questionFw.ajaxToCurrentQuestionController({
+                        //button: $('#sendButton'),
+                        type: "POST",
+                        form: $('#questionForm'),
+                        data: $('#questionForm').serializeObject()
+                    }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

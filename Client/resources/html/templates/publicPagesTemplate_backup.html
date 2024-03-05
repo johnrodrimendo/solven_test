@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Creditorio | Dev</title>
+    <meta name="description" th:content="${T(com.affirm.system.configuration.Configuration).APP_NAME}"/>
+    <meta name="keywords" th:content="${T(com.affirm.system.configuration.Configuration).APP_NAME}"/>
+    <meta name="Resource-type" content="Document"/>
+
+    <style th:inline="text">
+        @font-face {
+            font-family: "Solven Icons";
+            font-style: normal;
+            font-weight: normal;
+            src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")
+        }
+    </style>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Variable globales
+        var system = {
+            contextPath : /*[[ ${#httpServletRequest.getContextPath()} ]]*/
+        };
+        /*]]>*/
+    </script>
+
+    <!-- Common scritps and css -->
+
+    <!-- Jquery -->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/dist/jquery.min.js'}"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <!-- Jquery UI -->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-ui/jquery-ui.min.js'}"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+    <!-- Bootstrap -->
+    <!--<link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/css/bootstrap.min.css'}"/>-->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/js/bootstrap.min.js'}"></script>-->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}"/>
+    <script th:src="@{/js/bootstrap.js}"></script>
+
+    <!--Botstrap material-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/js/material.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/css/bootstrap-material-design.css'}"/>
+
+    <!-- Font Awesome-->
+    <!--<link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/font-awesome/css/font-awesome.min.css'}"/>-->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/font-awesome.min.css}"/>
+
+    <!-- BootBox -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootbox/bootbox.min.js'}"></script>
+
+    <!--Range slider-->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.skinNice.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/js/ion.rangeSlider.min.js'}"></script>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!-- Own -->
+    <!--link rel="stylesheet" type="text/css" th:href="@{/css/materialize.css}"/-->
+    <!--link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-material-design.css}"/-->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/affirm.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-forms.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-assets.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-responsive.css}"/>
+    <script th:src="@{/js/util.js}"></script>
+
+    <!-- /Common scritps and css -->
+    <th:block layout:fragment="head"/>
+    <script>
+        $('#myModal').modal('toggle')
+    </script>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $.material.init({
+                validate: false
+            });
+            $('.dropdown-toggle').dropdown();
+
+        });
+    </script>
+</head>
+<body>
+
+<!-- header -->
+<div th:replace="fragments/headers :: publicHomeHeader"></div>
+<!-- /header -->
+
+<main id="fullpage">
+
+    <!-- content -->
+    <div layout:fragment="content"/>
+    <!-- /content -->
+
+    <!-- footer -->
+    <section class="section fp-auto-height" id="section5">
+        <div th:replace="fragments/footers :: footerDefault"></div>
+    </section>
+    <!-- /footer -->
+
+</main>
+
+<!-- modals -->
+<div layout:fragment="modals"/>
+<!-- /modals -->
+
+</body>
+</html>

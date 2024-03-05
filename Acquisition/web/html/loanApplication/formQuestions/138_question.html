@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q138" autocomplete="off">
+            <p>Por favor confirmá que los datos sean correctos.</p>
+             <div class="content-q138">
+                <div class="grid-title">• Datos Personales</div>
+                <div class="grid">
+                    <div class="columns"> 
+                        <div class="gird-flx">
+                            <label>Nombre</label>
+                            <label th:text="${person.name}"></label>
+                        </div>
+                    </div>    
+                    <div class="columns"> 
+                        <div class="gird-flx">  
+                            <label>Apellido</label>
+                            <label th:text="${person.firstSurname}"></label>
+                        </div>
+                    </div>    
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>CUIT</label>
+                            <label th:text="${person.documentNumber}"></label>
+                        </div>   
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Destino</label>
+                            <label th:text="${loanApplication.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).BANCO_DEL_SOL_LOAN_DESTINATION.getKey())}"></label>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Motivo contacto</label>
+                            <label th:text="${loanApplication.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).BANCO_DEL_SOL_LOAN_REASON.getKey())}"></label>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Tipo cliente</label>
+                            <label th:text="${loanApplication.getEntityCustomData(T(com.affirm.common.model.transactional.LoanApplication.EntityCustomDataKeys).BANCO_DEL_SOL_LOAN_CLIENT_TYPE.getKey())}"></label>     
+                        </div>    
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Fecha nacimiento</label>
+                            <label th:text="${@utilService.dateFormat(person.birthday)}"></label> 
+                        </div>
+                    </div> 
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Email</label>
+                            <label th:text="${personContactInformation?.email}"></label>  
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Celular</label>  
+                            <label th:text="${personContactInformation?.phoneNumber}"></label>  
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label> Tel&eacute;fono personal</label>
+                            <label th:text="${person.landline}"></label> 
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-1"> 
+                    <div class="columns"> 
+                        <div class="gird-flx">
+                            <label>Direcci&oacute;n</label> 
+                            <label th:text="${personContactInformation?.fullAddressBO}"></label>
+                        </div>
+                        
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>CBU</label>
+                            <label th:text="${personBankAccount?.cciCode + ' - ' + personBankAccount?.bank?.name}"></label>
+                        </div> 
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Estado civil</label>  
+                            <label th:text="${person.maritalStatus?.status}"></label>  
+                        </div>   
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Actividad</label>
+                            <label th:text="${personOcupationalInformation != null ? personOcupationalInformation :''}"></label>
+                        </div>    
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Pep</label>  
+                            <label th:text="${isPep == null or !isPep ? 'No' : 'Si'}"></label>  
+                        </div>    
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>FATCA</label>
+                            <label th:text="${isFatca == null or !isFatca ? 'No' : 'Si'}"></label>  
+                        </div>   
+                    </div>
+                </div>
+                <div class="grid-title">• Datos Cr&eacute;dito</div>
+                <div class="grid">
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Monto</label>
+                            <label th:text="${@utilService.doubleMoneyFormat(offer?.ammount, offer?.currency)}"></label>                   
+                        </div>
+                    </div>    
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Plazo</label>
+                            <label th:text="${offer?.installments + ' meses'}"></label>
+                        </div>
+                        
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>Cuota</label>
+                            <label th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></label>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>TNA</label>
+                            <label th:text="${@utilService.percentFormat(offer?.nominalAnualRate,offer?.currency)}"></label>
+                        </div>
+                        
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>TEA</label>
+                            <label th:text="${@utilService.percentFormat(offer?.effectiveAnualRate,offer?.currency)}"></label>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="gird-flx">
+                            <label>CFT</label> 
+                            <label th:text="${@utilService.percentFormat(offer?.effectiveAnnualCostRate,offer?.currency)}"></label>
+                        </div>    
+                    </div>   
+                </div>
+             </div>
+            <div class="data-button">
+                <button type="button" id="modifyBtn" class="button bg-red" style="background: #F7323F">Modificar</button>
+                <button type="button" id="submitBtn" class="button bg-red" style="background: #F7323F">Siguiente</button>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        $('#modifyBtn').click(function() {
+             questionFw.ajaxToCurrentQuestionController({
+                 button: $(this),
+                 type: "POST"
+             }, "modify");
+        });
+
+        $('#submitBtn').click(function() {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $(this),
+                type: "POST"
+            }, "");
+        });
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Cargar Pagos</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment-with-locales.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker/bootstrap-datetimepicker.js'}"></script>
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ @{/preImputatorOpen} ]]*/null;
+        var urlSingle = /*[[ @{/imputatorSingleOpen} ]]*/null;
+        var dropzone;
+        $(document).ready(function () {
+
+            dropzone = $("#bankFile").dropzone({
+                url: url,
+                paramName: 'file',
+                maxFilesize: 10, // MB
+                maxFiles: 1,
+                dictDefaultMessage: 'Arrastra un archivo aquí para subirlo, o haz click para seleccionar uno.',
+                acceptedFiles: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/wps-office.xls',
+                headers: addCsrfToJsonHeaders({
+                    'x-request-sender-type': 'ajax'
+                }),
+                init: function () {
+                    this.on("success", function (file, response) {
+                        uploadedSuccess = true;
+                        clearForm();
+                        if(response.length>0){
+                            swal("Carga correcta del archivo.", "", "success");
+                            paintResults(response);
+                        }else{
+                            showErrorModal('No se pudo leer un registro por favor verifique que se hayan insertado los datos correctamente. ');
+                        }
+                    });
+                    this.on("sending", function (file, xhr, data) {
+                        data.append("bankId", $('#bank').val());
+                    })
+                }
+            });
+
+            $('#bankFileDiv').show(300);
+
+        });
+
+        function validateForm(){
+            var isValid = true;
+            $('#frmUploadBase').find('.form-control').each(function() {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red",
+                        "background": "#FFCECE"
+                    });
+                }else {
+                    $(this).css({
+                        "border": "",
+                        "background": ""
+                    });
+                }
+            });
+
+            return isValid;
+        }
+
+        function paintResults(payments) {
+            $('#resultContainer').show();
+            $('#paymentsTable > tbody').empty();
+            for (i = 0; i < payments.length; i++) {
+                var row = $('<tr></tr>');
+                row.append($('<td>' + payments[i].codPais + '</td>'));
+                row.append($('<td>' + payments[i].tipoDocumento + '</td>'));
+                row.append($('<td>' + payments[i].numDocumento + '</td>'));
+                row.append($('<td>' + payments[i].codCredito + '</td>'));
+                row.append($('<td>' + payments[i].codDepositante + '</td>'));
+                row.append($('<td>' + payments[i].fechaPago + '</td>'));
+                row.append($('<td>' + payments[i].montoPago + '</td>'));
+                row.append($('<td>' + payments[i].numOperacion + '</td>'));
+                $('#paymentsTable').append(row);
+            }
+        }
+
+        function singlePayment() {
+            if(validateForm())
+            swal({
+                        title: "&iquest;Est&aacute;s seguro?",
+                        text: "No podr&aacute;s revertir el cambio.",
+                        type: "warning",
+                        html: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#36c6d3",
+                        confirmButtonText: "Si, Imputar!",
+                        closeOnConfirm: true
+                    },
+                    function(){
+                        defaultAjax({
+                            url: urlSingle,
+                            type: 'POST',
+                            data: {
+                                codPais : $('#country').val(),
+                                tipoDocumento : $('#documentType').val(),
+                                numDocumento : $('#docNumber').val(),
+                                codCredito : $('#creditCode').val(),
+                                codDepositante : $('#depCode').val(),
+                                fechaPago : $('#paymentDate').val(),
+                                montoPago : $('#amount').val(),
+                                numOperacion : $('#operationNumber').val()
+                            },
+                            success: function (data) {
+                                clearForm();
+                                swal("Aprobado.", "", "success");
+                            }
+                        })
+                    });
+        }
+
+        function clearForm(){
+            $('#country').prop('selectedIndex',0);
+            $('#documentType').find('option').remove();
+            $('#docNumber').val('');
+            $('#creditCode').val('');
+            $('#depCode').val('');
+            $('#paymentDate').val('');
+            $('#amount').val('');
+            $('#operationNumber').val('');
+            $('#resultContainer').hide();
+            Dropzone.forElement("#bankFile").removeAllFiles(true);
+
+            $('#frmUploadBase').find('.form-control').each(function() {
+                $(this).css({
+                    "border": "",
+                    "background": ""
+                });
+            });
+        }
+
+        function multiplePayments() {
+            swal({
+                        title: "&iquest;Est&aacute;s seguro?",
+                        text: "No podr&aacute;s revertir el cambio.",
+                        type: "warning",
+                        html: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#36c6d3",
+                        confirmButtonText: "Si, Imputar!",
+                        closeOnConfirm: true
+                    },
+                    function(){
+                        defaultAjax({
+                            url: /*[[@{/imputatorOpen}]]*/null,
+                            type: 'POST',
+                            data: {
+
+                            },
+                            success: function (data) {
+                                clearForm();
+                                swal("Aprobado.", "", "success");
+                            }
+                        })
+                    });
+        }
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Imputaciones</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Cuotas Open Market</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="portlet light">
+                                <span class="caption-subject font-green-steel bold portlet-title"> Cargar Manual </span>
+                                <form id="frmUploadBase">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">País</label>
+                                            <select id="country" name="country" class="form-control form-control-sm" tabindex="1">
+                                                <option value="" hidden="hidden">País</option>
+                                                <option th:each="country : ${@catalogService.getCountryParams()}" th:value="${country.id}" th:text="${country.name}"></option>
+                                            </select>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#country').on('change', function(){
+                                                    var countryId = $('#country').val();
+                                                    defaultAjax({
+                                                        url: /*[[@{/country/documentType}]]*/null,
+                                                        data: {
+                                                            countryId: countryId
+                                                        },
+                                                        type: 'POST',
+                                                        success: function (data) {
+                                                            if(data != null && data != ""){
+                                                                var arr = JSON.parse(data);
+                                                                var html = '<option value="" hidden="hidden"></option>';
+                                                                var len = arr.length;
+                                                                for (var i = 0; i < len; i++) {
+                                                                    html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                                                                }
+                                                                $('#documentType').html(html);
+                                                            }else{
+                                                                $('#documentType').find('option').remove();
+                                                            }
+                                                        },
+                                                        error: function (data) {
+                                                            showErrorModal('Hubo un problema al obtener los tipos de documento.');
+                                                        }
+                                                    });
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Tipo de Documento</label>
+                                            <select id="documentType" name="documentType" class="form-control form-control-sm" tabindex="2"></select>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Código de Crédito</label>
+                                            <input id="creditCode" name="creditCode" type="text" class="form-control form-control-sm" tabindex="3"/>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#creditCode').forceLettersOnly('^[a-zA-Z0-9.\\- ()]+$', true, 14, 14);
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Fecha de Pago</label>
+                                            <input id="paymentDate" name="paymentDate" type="text" class="form-control form-control-sm" tabindex="4"/>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#paymentDate').datetimepicker({
+                                                    format: 'DD/MM/YYYY',
+                                                    maxDate: new Date()
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Número de Operación</label>
+                                            <input id="operationNumber" name="operationNumber" type="text" class="form-control form-control-sm" tabindex="5"/>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#operationNumber').forceLettersOnly('^[a-zA-Z0-9.\\- ()]+$', true, 1, 50);
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Número de Documento</label>
+                                            <input id="docNumber" name="docNumber" type="text" class="form-control form-control-sm" tabindex="6"/>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#docNumber').forceLettersOnly('^[0-9]+$', true, 8, 8);
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Código de Depositante</label>
+                                            <input id="depCode" name="depCode" type="text" class="form-control form-control-sm" tabindex="7"/>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#depCode').forceLettersOnly('^[a-zA-Z0-9.\\- ()]+$', true, 1, 50);
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label">Monto de Pago</label>
+                                            <input id="amount" name="amount" type="text" class="form-control form-control-sm" tabindex="8"/>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                $('#amount').forceDoubleOnly(true, 1, 10000);
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <a href="javascript:;" onclick="singlePayment()" class="btn blue btn-outline pull-right">Imputar Pago</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="portlet light">
+                                <span class="caption-subject font-green-steel bold portlet-title"> Cargar Masiva </span>
+
+                                <div id="bankFileDiv" class="col-md-6" style="display: none">
+                                    <div id="bankFile" class="dropzone"></div>
+                                    <div align="center">
+                                        <a th:href="@{/backoffice/imputationOpenMarket/excel/template}" class="btn green" download="Campos_imputador_open.xls" style="margin-top: 1em"> Descargar Formato<i class="fa fa-download"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-body">
+                                <div class="row">
+
+                                    <div id="resultContainer" class="col-md-12" style="display: none">
+                                        <div class="portlet transparent">
+                                            <div class="portlet-title">
+                                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Pagos a imputar</span>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive">
+                                                    <table id="paymentsTable" class="table table-bordered table-striped table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>País</th>
+                                                                <th>Tipo de Documento</th>
+                                                                <th>Número de Documento</th>
+                                                                <th>Código de Crédito</th>
+                                                                <th>Código de Depositante</th>
+                                                                <th>Fecha de Pago</th>
+                                                                <th>Monto de Pago</th>
+                                                                <th>Número de Operación</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td>2</td>
+                                                                <td>3</td>
+                                                                <td>4</td>
+                                                                <td>5</td>
+                                                                <td>6</td>
+                                                                <td>7</td>
+                                                                <td>8</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <a href="javascript:;" onclick="multiplePayments()" class="btn blue btn-outline pull-right">Imputar Pagos</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END PAGE CONTENT INNER -->
+        </div>
+    </div>
+    <!-- END PAGE CONTENT BODY -->
+    <!-- END CONTENT BODY -->
+
+    <!-- BEGIN MODAL -->
+    <!-- END MODAL -->
+</th:block>
+</body>
+
+</html>

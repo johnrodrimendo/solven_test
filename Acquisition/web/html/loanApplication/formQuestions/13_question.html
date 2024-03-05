@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q13">
+            <p th:utext="#{questions.block.giveTips(${personFirstName != null and !personFirstName.isEmpty() ? personFirstName : 'Hola'})}"></p>
+            <div th:if="${helpMessage != null}" class="note">
+                <div id="helpMessageTitle" th:utext="${helpMessage.tittle}"></div>
+                <div id="helpMessageBody" th:utext="${helpMessage.body}"></div>
+            </div>
+            <a th:unless="${@brandingService.isBranded(#httpServletRequest)}" th:href="@{/blog}"
+               class="anchor-button bg-red">BLOG</a>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

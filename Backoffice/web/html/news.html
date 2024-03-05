@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <!--Bootstrap 3-->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <!-- Home, Perfil.-->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Noticias</span>
+                </li>
+            </ul>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="portletAdmin"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Noticias</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body" id="listNews">
+                                <th:block th:replace="this :: list"></th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerModal">
+                            Registrar noticia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Registro de noticia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <form method="post" class="form-horizontal" role="form" id="newForm" th:action="@{/news/register}" enctype="multipart/form-data">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label>Pais</label>
+
+                                        <select class="form-control form-control-sm" name="country" id="country">
+                                            <option value="">--Seleccione--</option>
+                                            <option th:each="country : ${countries}" th:value="${country.id}" th:text="${country.name}"></option>
+                                        </select>
+
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label >T&iacute;tulo de la noticia</label>
+                                        <input type="text" name="title" id="title" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Resumen de la noticia</label>
+                                        <textarea name="summary" id="summary" class="form-control form-control-sm" rows="4" />
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Url de la noticia</label>
+                                        <input type="text" name="link" id="link" class="form-control form-control-sm" />
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label >Fecha de la noticia</label>
+                                        <div class="input-group date">
+                                            <input type="text" name="date" id="date" class="datepicker form-control form-control-sm" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Medio de prensa</label>
+                                        <div >
+                                            <select class="form-control form-control-sm" name="pressMedium" id="pressMedium">
+                                                <option value="">--Seleccione--</option>
+                                                <option th:each="pressMedium: ${pressMediums}" th:value="${pressMedium}" th:text="${pressMedium}"></option>
+                                                <option value="OTRO">OTRO</option>
+                                            </select>
+
+                                            <input type="text" class="form-control newPressMedium" style="display: none; margin-top: 10px;" name="newPressMedium" id="newPressMedium" placeholder="Nuevo medio de prensa" />
+                                            <input type="file" class="form-control newPressMedium" style="display: none; margin-top: 10px;" name="newLogo" id="newLogo" />
+
+                                            <span>Ingresar una imagen de 202 x 81, solo PNG</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnRegistrar">Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        $(function(){
+            var validator = /*[[${registerForm.validator.toJson(#locale)}]]*/null;
+
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                $('#newForm').validateForm(createFormValidationJson(jsonValidator, $('#newForm')));
+            }
+
+            $('#date').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true
+            });
+            $('.input-group-addon').click(function(){
+                $('#date').focus();
+            });
+
+            $('#btnRegistrar').click(function(){
+                if ($('#newForm').valid()) {
+                    var dataPost = new FormData;
+                    var pressMedium = $('#pressMedium').val();
+
+                    if (pressMedium === "OTRO") {
+                        dataPost.append("newLogo", $('#newLogo')[0].files[0]);
+                        dataPost.append("newPressMedium", $('#newPressMedium').val());
+                    }
+                    dataPost.append("country", $('#country').val());
+                    dataPost.append("date", $('#date').val());
+                    dataPost.append("link", $('#link').val());
+                    dataPost.append("pressMedium", pressMedium);
+                    dataPost.append("title", $('#title').val());
+                    dataPost.append("summary", $('#summary').val());
+
+                    defaultAjax({
+                        url: /*[[@{/news/register}]]*/null,
+                        type: 'POST',
+                        data: dataPost,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            defaultAjax({
+                                url: /*[[@{/news/list}]]*/null,
+                                type: 'GET',
+                                success: function (data) {
+                                    $('#listNews').html(data);
+                                    $('#registerModal').modal('toggle');
+                                }
+                            });
+                        },
+                        error: function (response) {
+                            console.log(response);
+                        }
+                    });
+                }
+            });
+
+            $('#pressMedium').change(function(){
+               var val = $(this).val();
+               if (val === "OTRO") {
+                   $('.newPressMedium').show();
+               } else {
+                   $('.newPressMedium').hide();
+               }
+            });
+        });
+    </script>
+</th:block>
+
+<th:block th:fragment="list">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Pais</th>
+            <th>Link</th>
+            <th>Medio de prensa</th>
+            <th>Fecha</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="noticia, it : ${news}">
+            <td th:text="${it.count}"></td>
+            <td th:text="${noticia?.country?.name}"></td>
+            <td><a th:href="${noticia?.link}" th:text="${noticia?.link}"></a></td>
+            <td th:text="${noticia?.pressMedium}"></td>
+            <td th:text="${noticia.getDateFormatted(#locale)}"></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+
+</body>
+</html>

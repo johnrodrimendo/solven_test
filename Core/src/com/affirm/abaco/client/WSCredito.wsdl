@@ -1,0 +1,350 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://servicio.ws/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  name="WSCreditoService" targetNamespace="http://servicio.ws/">
+  <wsdl:types>
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://servicio.ws/" elementFormDefault="unqualified" targetNamespace="http://servicio.ws/" version="1.0">
+
+      <xs:element name="CreditoFault" type="tns:eCreditoFault"/>
+
+      <xs:element name="actualizarSocio" type="tns:actualizarSocio"/>
+
+      <xs:element name="actualizarSocioResponse" type="tns:actualizarSocioResponse"/>
+
+      <xs:element name="crearCredito" type="tns:crearCredito"/>
+
+      <xs:element name="crearCreditoResponse" type="tns:crearCreditoResponse"/>
+
+      <xs:element name="crearSocio" type="tns:crearSocio"/>
+
+      <xs:element name="crearSocioResponse" type="tns:crearSocioResponse"/>
+
+      <xs:element name="credito" type="tns:eCredito"/>
+
+      <xs:element name="esSocio" type="tns:esSocio"/>
+
+      <xs:element name="esSocioResponse" type="tns:esSocioResponse"/>
+
+      <xs:element name="persona" type="tns:ePersona"/>
+
+      <xs:element name="rptaDeudaSocio" type="tns:eRptaCredito"/>
+
+      <xs:element name="rptaSocio" type="tns:eMensaje"/>
+
+      <xs:element name="socio" type="tns:eSocio"/>
+
+      <xs:complexType name="crearCredito">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="entidadCredito" type="tns:eCredito"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="eCredito">
+        <xs:sequence>
+          <xs:element name="codigoCredito" type="xs:int"/>
+          <xs:element name="codigoCreditoAbaco" type="xs:int"/>
+          <xs:element name="monedaCredito" type="xs:string"/>
+          <xs:element name="montoCredito" type="xs:double"/>
+          <xs:element name="montoDesembolsar" type="xs:double"/>
+          <xs:element name="numeroCuotas" type="xs:int"/>
+          <xs:element name="razonCredito" type="xs:int"/>
+          <xs:element name="tipoCredito" type="xs:int"/>
+          <xs:element name="tea" type="xs:double"/>
+          <xs:element name="tcea" type="xs:double"/>
+          <xs:element name="comision" type="xs:double"/>
+          <xs:element name="impuestoComision" type="xs:double"/>
+          <xs:element name="totalComision" type="xs:double"/>
+          <xs:element name="fechaFirma" type="xs:string"/>
+          <xs:element name="codigoBanco" type="xs:int"/>
+          <xs:element name="numeroCuentaAsociado" type="xs:string"/>
+          <xs:element name="tipoCuentaAsociado" type="xs:string"/>
+          <xs:element name="cuotas">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="cuota" type="tns:eCuota"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="codigoCliente" type="xs:string"/>
+          <xs:element name="codigoCreditoCancelar" type="xs:string"/>
+          <xs:element name="montoCreditoCancelar" type="xs:double"/>
+          <xs:element name="urlDescargaDNI" type="xs:string"/>
+          <xs:element name="urlDescargaSelfie" type="xs:string"/>
+          <xs:element name="urlDescargaResumen" type="xs:string"/>
+          <xs:element name="urlDescargaContrato" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="eCuota">
+        <xs:sequence>
+          <xs:element name="codigoCuota" type="xs:int"/>
+          <xs:element name="fechaVencimientoCuota" type="xs:string"/>
+          <xs:element name="remanenteCapital" type="xs:double"/>
+          <xs:element name="capitalCuota" type="xs:double"/>
+          <xs:element name="interesCuota" type="xs:double"/>
+          <xs:element name="subtotalCuota" type="xs:double"/>
+          <xs:element name="montoSeguro" type="xs:double"/>
+          <xs:element name="totalCuota" type="xs:double"/>
+          <xs:element name="comision" type="xs:double"/>
+          <xs:element name="impuestoComision" type="xs:double"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="crearCreditoResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="rptaCredito" type="tns:eRptaCredito"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="eRptaCredito">
+        <xs:sequence>
+          <xs:element name="codigoMensaje" type="xs:int"/>
+          <xs:element name="idSocio" type="xs:string"/>
+          <xs:element minOccurs="0" name="idCredito" type="xs:string"/>
+          <xs:element name="saldoCredito" type="xs:double"/>
+          <xs:element name="capitalCredito" type="xs:double"/>
+          <xs:element name="cuotasTotales" type="xs:int"/>
+          <xs:element name="cuotasPagadas" type="xs:int"/>
+          <xs:element minOccurs="0" name="codigoOperacion" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="eCreditoFault">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="faultCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="faultString" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="crearSocio">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="entidadSocio" type="tns:eSocio"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="eSocio">
+        <xs:complexContent>
+          <xs:extension base="tns:ePersona">
+            <xs:sequence>
+              <xs:element name="nombreEmpleador" type="xs:string"/>
+              <xs:element name="fechaIngresoEmpleador" type="xs:string"/>
+              <xs:element minOccurs="0" name="direccionEmpleador" type="xs:string"/>
+              <xs:element name="telefonoEmpleador" type="xs:string"/>
+              <xs:element name="tiempoPermanencia" type="xs:string"/>
+              <xs:element name="rucEmpleador" type="xs:string"/>
+              <xs:element minOccurs="0" name="nombresConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="apellidoPaternoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="apellidoMaternoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="nacionalidadConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="fechaNacimientoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="tipoDocumentoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="nroDocumentoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="telefonoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="generoConyugue" type="xs:string"/>
+              <xs:element minOccurs="0" name="estadoCivilConyugue" type="xs:string"/>
+              <xs:element name="ingresoNetoMensual" type="xs:double"/>
+              <xs:element name="ingresoBrutoMensual" type="xs:double"/>
+              <xs:element minOccurs="0" name="entidadFinanciadora" type="xs:string"/>
+              <xs:element name="montoLineaCredito" type="xs:double"/>
+              <xs:element minOccurs="0" name="tipoPrestamo" type="xs:string"/>
+              <xs:element minOccurs="0" name="empresaEsSocio" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+
+      <xs:complexType name="ePersona">
+        <xs:sequence>
+          <xs:element name="idSocio" type="xs:string"/>
+          <xs:element name="nombres" type="xs:string"/>
+          <xs:element name="apellidoPaterno" type="xs:string"/>
+          <xs:element name="apellidoMaterno" type="xs:string"/>
+          <xs:element minOccurs="0" name="nacionalidad" type="xs:string"/>
+          <xs:element name="fechaNacimiento" type="xs:string"/>
+          <xs:element minOccurs="0" name="gradoInstruccion" type="xs:string"/>
+          <xs:element minOccurs="0" name="profesion" type="xs:string"/>
+          <xs:element minOccurs="0" name="ocupacion" type="xs:string"/>
+          <xs:element name="tipoDocumento" type="xs:string"/>
+          <xs:element name="nroDocumento" type="xs:string"/>
+          <xs:element name="clasePersona" type="xs:string"/>
+          <xs:element minOccurs="0" name="genero" type="xs:string"/>
+          <xs:element minOccurs="0" name="estadoCivil" type="xs:string"/>
+          <xs:element minOccurs="0" name="direccion" type="xs:string"/>
+          <xs:element minOccurs="0" name="ciiu" type="xs:string"/>
+          <xs:element minOccurs="0" name="tipoDomicilio" type="xs:string"/>
+          <xs:element minOccurs="0" name="telefonoFijo" type="xs:string"/>
+          <xs:element name="celular" type="xs:string"/>
+          <xs:element name="email" type="xs:string"/>
+          <xs:element name="tipoActividad" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="crearSocioResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="rptaMensaje" type="tns:eMensaje"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="eMensaje">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="mensaje" type="xs:string"/>
+          <xs:element name="codigoMensaje" type="xs:int"/>
+          <xs:element minOccurs="0" name="idSocio" type="xs:string"/>
+          <xs:element minOccurs="0" name="nroCuentaAportacion" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="esSocio">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="tipoDocumento" type="xs:string"/>
+          <xs:element minOccurs="0" name="documento" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="esSocioResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="rptaCredito" type="tns:eRptaCredito"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="actualizarSocio">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="entidadSocio" type="tns:eSocio"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="actualizarSocioResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="rptaMensaje" type="tns:eMensaje"/>
+        </xs:sequence>
+      </xs:complexType>
+
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="crearCreditoResponse">
+    <wsdl:part element="tns:crearCreditoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="crearCredito">
+    <wsdl:part element="tns:crearCredito" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="actualizarSocio">
+    <wsdl:part element="tns:actualizarSocio" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="crearSocio">
+    <wsdl:part element="tns:crearSocio" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="esSocio">
+    <wsdl:part element="tns:esSocio" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="actualizarSocioResponse">
+    <wsdl:part element="tns:actualizarSocioResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="crearSocioResponse">
+    <wsdl:part element="tns:crearSocioResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="esSocioResponse">
+    <wsdl:part element="tns:esSocioResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CreditoException">
+    <wsdl:part element="tns:CreditoFault" name="CreditoException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="WSCredito">
+    <wsdl:operation name="crearCredito">
+      <wsdl:input message="tns:crearCredito" name="crearCredito">
+      </wsdl:input>
+      <wsdl:output message="tns:crearCreditoResponse" name="crearCreditoResponse">
+      </wsdl:output>
+      <wsdl:fault message="tns:CreditoException" name="CreditoException">
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="crearSocio">
+      <wsdl:input message="tns:crearSocio" name="crearSocio">
+      </wsdl:input>
+      <wsdl:output message="tns:crearSocioResponse" name="crearSocioResponse">
+      </wsdl:output>
+      <wsdl:fault message="tns:CreditoException" name="CreditoException">
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="esSocio">
+      <wsdl:input message="tns:esSocio" name="esSocio">
+      </wsdl:input>
+      <wsdl:output message="tns:esSocioResponse" name="esSocioResponse">
+      </wsdl:output>
+      <wsdl:fault message="tns:CreditoException" name="CreditoException">
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="actualizarSocio">
+      <wsdl:input message="tns:actualizarSocio" name="actualizarSocio">
+      </wsdl:input>
+      <wsdl:output message="tns:actualizarSocioResponse" name="actualizarSocioResponse">
+      </wsdl:output>
+      <wsdl:fault message="tns:CreditoException" name="CreditoException">
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSCreditoServiceSoapBinding" type="tns:WSCredito">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="crearCredito">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="crearCredito">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="crearCreditoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CreditoException">
+        <soap:fault name="CreditoException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="crearSocio">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="crearSocio">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="crearSocioResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CreditoException">
+        <soap:fault name="CreditoException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="esSocio">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="esSocio">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="esSocioResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CreditoException">
+        <soap:fault name="CreditoException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="actualizarSocio">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="actualizarSocio">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="actualizarSocioResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CreditoException">
+        <soap:fault name="CreditoException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSCreditoService">
+    <wsdl:port binding="tns:WSCreditoServiceSoapBinding" name="WSCreditoPort">
+      <soap:address location="xxxxxxxxxxxxxxxxxxxx"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/companyTemplate">
+<head>
+
+    <title>Planilla</title>
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!-- / Bootstrap DatePicker -->
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/switchery/switchery.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/switchery/switchery.min.css'}"
+          rel="stylesheet"/>
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+
+    <link rel="stylesheet" th:href="@{/css/company.css}" />
+
+    <!-- TablePaginator -->
+    <script th:src="@{/js/ext_tablepaginator.js}"></script>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+
+    <!-- Locale -->
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+    <!-- / Locale -->
+
+    <script th:inline="javascript">
+
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+
+            var validator = /*[[${employeeform.validator.toJson(#locale)}]]*/null;
+            $('#addEmployeeForm').validateForm(createFormValidationJson(JSON.parse(validator), $('#addEmployeeForm')));
+
+            $('#docType').on('change', function () {
+
+                if ($(this).val() == 2) {
+                    $('#addEmployeeForm').data('validatorJson').rules.docNumber.maxlength = 9;
+                } else {
+                    $('#addEmployeeForm').data('validatorJson').rules.docNumber.maxlength = 8;
+                }
+                $('#addEmployeeForm').validateForm($('#addEmployeeForm').data('validatorJson'));
+                $('#addEmployeeForm').data('validator').resetForm();
+            });
+
+            $('#contractType').on('change', function () {
+                if ($('#contractType').val() == "I") {
+                    $('#contractEndDate').val('').hide();
+                } else {
+                    $('#contractEndDate').fadeIn();
+                }
+            });
+
+            $('#addEmployeeModal').on('hidden.bs.modal', function () {
+
+                $('#addEmployeeForm').data('validator').resetForm();
+                $('#addEmployeeForm')[0].reset();
+
+            });
+
+            $('#uploadPaysheetFileModal').on('hidden.bs.modal', function () {
+                console.log('modal close');
+                Dropzone.forElement("div#uploadUserFile").destroy();
+                $('#response-block, #usersWillBeAdded').html('');
+            });
+
+            <!-- DueDate -->
+            var contractFrom = $('#employmentStartDate');
+            var contractTo = $('#contractEndDate');
+            $('#employmentStartDate').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true,
+                endDate: "today"
+            });
+            $('#contractEndDate').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true,
+            });
+            contractFrom.on('change', function () {
+                contractTo.datepicker('setStartDate', contractFrom.val());
+            });
+            <!-- / DueDate -->
+
+            $('#uploadFile').on('click', function (event) {
+
+                event.preventDefault();
+
+                $("#uploadUserFile").dropzone({
+                    url: /*[[ @{/paysheet/file} ]]*/,
+                    paramName: 'file',
+                    maxFilesize: /*[[ ${@configuration.MAX_UPLOAD_FILE_SIZE_MB()} ]]*/, // MB
+                    maxFiles: 1,
+                    dictDefaultMessage: 'Arrastra el archivo excel para cargar o actualizar tu planilla de sueldos.',
+                    dictFallbackMessage: "El navegador no soporta esta funcionalidad.",
+                    dictFallbackText: 'Ocurrio un error.',
+                    dictInvalidFileType: 'El formato no es v&aacute;lido.',
+                    dictFileTooBig: 'El tamaño excede el l&iacute;mite.',
+                    dictResponseError: 'Ocurrio un error.',
+                    dictCancelUpload: 'La operaci&oacute;n fue cancelada.',
+                    dictCancelUploadConfirmation: 'La operaci&oacute;n fue cancelada.',
+                    dictMaxFilesExceeded: 'Solo se puede subir un archivo a la vez.',
+                    acceptedFiles: '.xls',
+                    headers: addCsrfToJsonHeaders({
+                        'x-request-sender-type': 'ajax'
+                    }),
+                    init: function () {
+                        this.on("success", function (file, response) {
+                                    resetTimer();
+                                    $("#bankMappings").hide();
+                                    $("#bankMappingsContainer").html('');
+                                    $('#response-block').html('');
+
+
+                                    $('#uploadErrorContainer').html("").hide();
+                                    $('#usersWillBeAdded').html(successAjaxMessage('Se agregar&aacute;(n) ' + response.employeesToAdd + ' colaborador(es)'));
+
+                                    if (response.repeatedEmployees) {
+                                        debugger;
+                                        for (var i = 0; i < response.repeatedEmployees.length; i++) {
+                                            var repeatedEmployee = response.repeatedEmployees[i];
+                                            $('#uploadErrorContainer').append('Se ignorar&aacute;n <b>' + repeatedEmployee .count + '</b> empleados con el mismo '+
+                                                    repeatedEmployee.repeatedField +' : '+ repeatedEmployee.repeatedValue+'<br/>');
+                                        }
+                                        $('#uploadErrorContainer').show();
+                                    }
+                                    if (response.employeesWithErrors) {
+                                        debugger;
+                                        $('#response-block').html(errorAjaxMessage("Se ignorar&aacute;(n) " + response.employeesWithErrors.length + " colaborador(es)."));
+                                        for (var i = 0; i < response.employeesWithErrors.length; i++) {
+                                            var formErrorJson = response.employeesWithErrors[i];
+                                            $('#uploadErrorContainer').append('<b>' + formErrorJson.docNumber + '</b><br/>');
+                                            for (var key in formErrorJson.errorJson) {
+                                                if (formErrorJson.errorJson.hasOwnProperty(key)) {
+                                                    var campo = "";
+                                                    switch(key){
+                                                        case 'docType' :
+                                                            campo = 'Tipo de documento';
+                                                            break;
+                                                        case 'docNumber' :
+                                                            campo = 'Nro. Documento';
+                                                            break;
+                                                        case 'name' :
+                                                            campo = 'Nombres';
+                                                            break;
+                                                        case 'firstSurname' :
+                                                            campo = 'Apellido Paterno';
+                                                            break;
+                                                        case 'lastSurname' :
+                                                            campo = 'Apellido Materno';
+                                                            break;
+                                                        case 'employmentStartDate' :
+                                                            campo = 'Fecha de ingreso laboral';
+                                                            break;
+                                                        case 'contractType' :
+                                                            campo = 'Tipo de Contrato';
+                                                            break;
+                                                        case 'contractEndDate' :
+                                                            campo = 'Fin del contrato';
+                                                            break;
+                                                        case 'email' :
+                                                            campo = 'Email';
+                                                            break;
+                                                        case 'phoneNumber' :
+                                                            campo = 'Teléfono Móvil';
+                                                            break;
+                                                        case 'address' :
+                                                            campo = 'Dirección';
+                                                            break;
+                                                        case 'fixedGrossIncome' :
+                                                            campo = 'Ingreso Fijo Bruto';
+                                                            break;
+                                                        case 'variableGrossIncome' :
+                                                            campo = 'Ingreso Bruto Variable';
+                                                            break;
+                                                        case 'monthlyDeduction' :
+                                                            campo = 'Descuentos';
+                                                            break;
+                                                        case 'bank' :
+                                                            campo = 'Banco';
+                                                            break;
+                                                        case 'accountNumber' :
+                                                            campo = 'Número de Cuenta';
+                                                            break;
+                                                        case 'accountNumberCci' :
+                                                            campo = 'CCI';
+                                                            break;
+                                                        case 'salaryGarnishment' :
+                                                            campo = 'Salario con Embargo';
+                                                            break;
+                                                        case 'unpaidLeave' :
+                                                            campo = 'Licencia s/ goce de haberes';
+                                                            break;
+                                                        case 'employerRuc' :
+                                                            campo = 'RUC empresa';
+                                                            break;
+                                                    }
+                                                    $('#uploadErrorContainer').append(campo + ' -> ' + formErrorJson.errorJson[key] + '<br/>');
+                                                }
+                                            }
+                                        }
+                                        $('#uploadErrorContainer').show();
+                                    }
+
+
+                                    $('#actionButtons').fadeIn();
+
+                                    if (response.banksWithoutMatch != null) {
+                                        var rogueBanks = JSON.parse(response.banksWithoutMatch);
+                                        if (rogueBanks.length > 0) {
+                                            $("#bankMappings").show();
+
+
+                                            for (i = 0; i < rogueBanks.length; i++) {
+                                                var rogueBankGroup = $('<div class="row rogueBankGroup"></div>');
+                                                rogueBankGroup.append($('<div class="col-lg-4 col-md-4 text-left"><label>' + rogueBanks[i] + '</label></div>'));
+                                                rogueBankGroup.append($("#repeatCbo").clone());
+                                                $("#bankMappingsContainer").append(rogueBankGroup);
+                                            }
+                                        }
+                                    }
+                                },
+                                this.on('error', function (file, response) {
+                                    this.removeFile(file);
+                                    console.log(response);
+                                    $('#usersWillBeAdded').html('');
+                                    debugger;
+                                    if (response.constructor == Object) {
+                                        if (response.type == "message")
+                                            $('#response-block').html(errorAjaxMessage(response.message));
+                                    } else {
+                                        if (response != null && response != '')
+                                            $('#response-block').html(errorAjaxMessage(response));
+                                        else
+                                            $('#response-block').html(errorAjaxMessage('Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.'));
+                                    }
+                                }));
+                    }
+                });
+
+                $("#bankMappings").hide();
+                $("#bankMappingsContainer").html('');
+                $("#uploadErrorContainer").hide();
+                $('#actionButtons').hide();
+                $('#uploadPaysheetFileModal').modal({backdrop: 'static', keyboard: false, show: true});
+
+            });
+
+
+            var switchery = new Switchery(document.querySelector('#disablePrevious'), { color: '#32c5d2', size: 'small' });
+            var changeCheckbox = document.querySelector('#disablePrevious');
+
+            changeCheckbox.onchange = function() {
+                if(changeCheckbox.checked){
+                    $("#planillaLabel").text("Actualizar planilla anterior");
+                }else{
+                    $("#planillaLabel").text("Descartar planilla anterior");
+                }
+            };
+
+            $('#confirmUpload').on('click', function (event) {
+                event.preventDefault();
+
+                var bankNotSelected = $('.selectpicker:visible').filter(function (index, item) {
+                            return $(item).val() == "-1";
+                        }).size() > 0;
+                if (bankNotSelected) {
+                    showErrorModal("Por favor, selecciona los bancos de nuestro catálogo.");
+                    return;
+                }
+
+                var bankMappings = [];
+                $('.rogueBankGroup').each(function () {
+                    debugger;
+                    var jsonBank = {
+                        name: $(this).find('label').text(),
+                        catalogName: $(this).find('.selectpicker option:selected').text()
+                    };
+                    bankMappings[bankMappings.length] = jsonBank;
+                });
+
+                $('#confirmUpload').loading();
+                defaultAjax({
+                    url: /*[[@{/paysheet/file/confirm}]]*/null,
+                    type: 'POST',
+                    data: {
+                        bankArray: JSON.stringify(bankMappings),
+                        disablePrevious: $('#disablePrevious').prop('checked') ? false : true
+                    },
+                    success: function (data) {
+                        resetTimer();
+                        var dataJson = JSON.parse(data);
+
+                        $('#confirmUpload').unloading();
+                        $('#usersWillBeAdded').html('');
+                        if (dataJson.toAdd > 0)
+                            $('#usersWillBeAdded').html(successAjaxMessage('Se a&nacute;adieron ' + dataJson.toAdd + ' empleados.<br/>'));
+                        if (dataJson.toUpdate > 0)
+                            $('#usersWillBeAdded').html(successAjaxMessage('Se actualizaron ' + dataJson.toUpdate + ' empleados.'));
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    }
+                    , error: function () {
+                        $('#confirmUpload').unloading();
+                        $('#response-block').html(errorAjaxMessage('Se produjo un error inesperado, <br/>por favor int&eacute;ntalo nuevamente o cont&aacute;ctanos.'));
+                    }
+                });
+
+            });
+
+            $('#selectAll').on('change', function (e) {
+
+                e.preventDefault();
+                if ($(this).prop('checked')) {
+                    selectAll();
+                } else {
+                    unselectAll();
+                }
+
+            });
+
+            $('#addEmployee').on('click', function (event) {
+
+                event.preventDefault();
+                $('#docType, #docNumber').attr('readonly', false);
+                $('#modal-response').html('');
+
+                $('#addEmployeeModal').modal({backdrop: 'static', keyboard: false, show: true});
+
+                $('#headerDynamic').html('Agregar colaborador a la lista');
+                $('#addEmployeeButton').html('Agregar colaborador');
+
+            });
+
+
+            $('#addEmployeeButton').on('click', function (event) {
+
+                event.preventDefault();
+
+                $('#modal-response').html('');
+
+                if ($('#addEmployeeForm').valid()) {
+                    $('#addEmployeeButton').loading('', 2);
+                    defaultAjax({
+                        url: /*[[@{/paysheet/employee}]]*/null,
+                        type: 'POST',
+                        form: $('#addEmployeeForm'),
+                        data: $('#addEmployeeForm').serializeObject(),
+                        success: function (data) {
+                            resetTimer();
+                            $('#addEmployeeButton').unloading();
+//                            $('#addEmployeeForm')[0].reset();
+
+                            if ($('#employeeIdData').data('id')) {
+                                $('#modal-response').html(successAjaxMessage('Se ha actualizado correctamente.'));
+                            } else {
+                                $('#modal-response').html(successAjaxMessage('Se ha agregado un nuevo colaborador.'));
+                            }
+
+                            $('#employeeIdData').attr('data-id', '');
+                            $('#addEmployeeButton').unloading();
+                            window.location.reload();
+
+                        }
+                        , error: function () {
+                            $('#addEmployeeButton').unloading();
+                            $('#modal-response').html(errorAjaxMessage('Se produjo un error inesperado, <br/>por favor int&eacute;ntalo nuevamente o cont&aacute;ctanos.'));
+                        }
+                    });
+                }
+                return false;
+
+            });
+
+            $(document).on('click', '.row-employee .editEmployee', function (event) {
+                event.preventDefault();
+
+                var employeeId = $(this).data('id');
+
+                $('#employeeIdData').attr('data-id', employeeId);
+
+                $('#docType, #docNumber').attr('readonly', true);
+
+                if (employeeId) {
+                    defaultAjax({
+                        url: /*[[@{/paysheet/edit/employee}]]*/null,
+                        type: 'GET',
+                        datatype: 'json',
+                        data: {
+                            employeeId: employeeId
+                        },
+                        success: function (data) {
+                            resetTimer();
+                            $('#modal-response').html('');
+                            $('#addEmployeeModal').modal({backdrop: 'static', keyboard: false, show: true});
+                            $('#headerDynamic').html('Actualizar colaborador');
+                            $('#addEmployeeButton').html('Actualizar colaborador');
+
+
+                            var employee = JSON.parse(data);
+                            var endDate = '',
+                                    employmentStartDate = '';
+                            if (employee.contractEndDate) {
+                                var d = new Date(employee.contractEndDate);
+                                d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+                                endDate = formatDate(d, '/');
+                            }
+                            if (employee.employmentStartDate) {
+                                var d = new Date(employee.employmentStartDate);
+                                d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+                                employmentStartDate = formatDate(d, '/');
+                            }
+
+                            $('#employeeId').val(employee.id);
+                            $('#docType').val(employee.docType.id);
+                            $('#docNumber').val(employee.docNumber);
+                            $('#name').val(employee.name);
+                            $('#firstSurname').val(employee.firstSurname);
+                            $('#lastSurname').val(employee.lastSurname);
+                            $('#employmentStartDate').val(employmentStartDate);
+                            $('#contractType').val(employee.contractType);
+                            $('#contractEndDate').val(endDate);
+                            $('#email').val(employee.workEmail);
+                            $('#phoneNumber').val(employee.phoneNumber);
+                            $('#address').val(employee.address);
+                            $('#fixedGrossIncome').val(employee.fixedGrossIncome);
+                            $('#variableGrossIncome').val(employee.variableGrossIncome);
+                            $('#monthlyDeduction').val(employee.monthlyDeduction);
+                            if(employee.bank)
+                                $('#bank').val(employee.bank.toUpperCase());
+                            else
+                                $('#bank').val("Banco");
+                            $('#accountNumber').val(employee.accountNumber);
+                            $('#accountNumberCci').val(employee.accountNumberCci);
+
+                            $('#salaryGarnishment').val((employee.salaryGarnishment == true) ? 1 : 0);
+                            $('#unpaidLeave').val((employee.unpaidLeave == true) ? 1 : 0);
+                            $('#customMaxAmount').val(employee.customMaxAmount);
+
+                            $('#docType, #contractType').change();
+
+                            console.log(employee);
+                        }
+                        , error: function (e) {
+                            console.log(e);
+                        }
+                    });
+                }
+
+
+            });
+
+
+            $('.rowSelected input[type="checkbox"]').each(function () {
+                $(document).on('change', $(this), function () {
+                    if (checkChecked('rowSelected') == false) {
+                        $('#deletebutton,#activatebutton').addClass('disabled').attr('disabled', true);
+                    } else {
+                        $('#employeesIds').val(checkChecked('rowSelected'));
+                        $('#deletebutton,#activatebutton').removeClass('disabled').attr('disabled', false);
+                    }
+                });
+            });
+
+
+            $('#deletebutton').on('click', function (event) {
+
+                event.preventDefault();
+
+                if ($('#employeesIds').length > 0) {
+                    var totalUsers = (checkChecked('rowSelected').length > 1) ? "Se desactivar&aacute;n " + checkChecked('rowSelected').length + " colaboradores de la lista" : "Se desactivar&aacute; " + checkChecked('rowSelected').length + " colaborador de la lista";
+                    swal({
+                                title: "&iquest;Est&aacute;s seguro?",
+                                text: totalUsers,
+                                html: true,
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "¡Sí, desactivar!",
+                                cancelButtonText: "¡No, cancelar!",
+                                closeOnConfirm: true,
+                                closeOnCancel: true
+                            },
+                            function () {
+                                defaultAjax({
+                                    url: /*[[@{/paysheet/removeEmployee}]]*/null,
+                                    type: 'POST',
+                                    data: {employeeIds: $('#employeesIds').val()},
+                                    success: function (data) {
+                                        resetTimer();
+                                        //swal("Eliminado!", "Empleados eliminados de la lista.", "success");
+                                        window.location.reload();
+                                    }
+                                    , error: function () {
+                                        swal("Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.");
+                                    }
+                                });
+
+
+                            });
+
+
+                }
+
+            });
+
+            $('#activatebutton').on('click', function (event) {
+
+                event.preventDefault();
+
+                if ($('#employeesIds').length > 0) {
+                    var totalUsers = (checkChecked('rowSelected').length > 1) ? "Se activar&aacute;n " + checkChecked('rowSelected').length + " colaboradores de la lista" : "Se desactivar&aacute; " + checkChecked('rowSelected').length + " colaborador de la lista";
+                    swal({
+                                title: "&iquest;Est&aacute;s seguro?",
+                                text: totalUsers,
+                                html: true,
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "¡Sí, activar!",
+                                cancelButtonText: "¡No, cancelar!",
+                                closeOnConfirm: true,
+                                closeOnCancel: true
+                            },
+                            function () {
+                                defaultAjax({
+                                    url: /*[[@{/paysheet/activateEmployee}]]*/null,
+                                    type: 'POST',
+                                    data: {employeeId: $('#employeesIds').val()},
+                                    success: function (data) {
+                                        resetTimer();
+                                        window.location.reload();
+                                    }
+                                    , error: function () {
+                                        swal("Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.");
+                                    }
+                                });
+
+
+                            });
+
+
+                }
+
+            });
+
+            $(document).on('click', '.row-employee .activateEmployeeButton',function (event) {
+
+                event.preventDefault();
+
+                $(this).addClass('rowSelected');
+                var totalUsers = "El colaborador ser&aacute; dado de alta";
+                var id = $(this).data('id');
+                swal({
+                    title: "&iquest;Est&aacute;s seguro?",
+                    text: totalUsers,
+                    html: true,
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#36c6d3",
+                    confirmButtonText: "¡Sí, activar!",
+                    cancelButtonText: "¡No, cancelar!",
+                    closeOnConfirm: true,
+                    closeOnCancel: true
+                    },
+                    function () {
+                        defaultAjax({
+                            url: /*[[@{/paysheet/activateEmployee}]]*/null,
+                            type: 'POST',
+                            data: {employeeId: id},
+                            success: function (data) {
+                                resetTimer();
+
+                                if (data != '') {
+                                    $('#msg').val(data);
+                                    $('#msg').trigger('change');
+                                } else {
+                                    window.location.reload();
+                                }
+
+                            }
+                            , error: function (xhr, data) {
+                                swal('Error', data);
+                            }
+                        });
+                    });
+                    return false;
+            });
+
+
+            $('#msg').on('change', function(){
+                debugger;
+                if ($('#msg').val() != '') {
+                    swal({
+                        title: "Fecha de fin de contrato expir&oacute;",
+                        text: $('#msg').val(),
+                        type: "info",
+                        html:true,
+                        closeOnConfirm: false
+                    },
+                    function(){
+                        window.location.reload();
+                    });
+                }
+            });
+
+            $('#search').on('change', function(){
+                var url = /*[[${activePaysheet == 'activa'} ? @{/paysheet/search/activa} : @{/paysheet/search/inactiva}]]*/;
+                var search = $(this).val();
+
+                $('#tableContent').defaultLoad(url, null, function(){
+                }, 'GET', {search: search});
+            });
+        });
+
+        function selectAll() {
+            $('.checkbox').prop('checked', true);
+        }
+
+        function unselectAll() {
+            $('.checkbox').prop('checked', false);
+        }
+
+        function checkChecked(formname) {
+            var anyBoxesChecked = false,
+                    listIds = [];
+            $('.' + formname + ' input[type="checkbox"]').each(function () {
+                if ($(this).is(":checked")) {
+                    anyBoxesChecked = true;
+                    listIds.push($(this).val());
+                }
+            });
+
+            if (anyBoxesChecked == false) {
+                return false;
+            } else {
+                return listIds;
+            }
+        }
+        /*]]>*/
+
+    </script>
+
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <th:block th:replace="fragments/headers :: companyDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block
+            th:replace="fragments/extranetSidebarFragments :: extranetCompanySidebar(currentPage='paysheet-'+${activePaysheet})"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <span class="active">Planilla</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+            <div><input type="hidden" id="msg"/></div>
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <span class="caption-subject bold uppercase"><i class="icon-settings font-dark"></i> <div
+                                th:remove="tag" th:text="'Planilla ' + ${activePaysheet}"></div></span>
+                    </div>
+                    <div class="actions">
+                        <th:block th:if="${activePaysheet == 'activa'}">
+                            <button type="button" class="btn red mt-ladda-btn ladda-button btn-circle disabled"
+                                    data-style="slide-right" id="deletebutton" disabled="disabled">
+                                <span class="ladda-label"><i class="fa fa-trash"></i> Desactivar</span>
+                            </button>
+                        </th:block>
+                        <th:block th:if="${activePaysheet == 'inactiva'}">
+                            <button type="button" class="btn green-meadow mt-ladda-btn ladda-button btn-circle disabled"
+                                    data-style="slide-right" id="activatebutton" disabled="disabled">
+                                <span class="ladda-label"><i class="fa fa-check"></i> Activar</span>
+                            </button>
+                        </th:block>
+
+                        <div class="btn-group">
+                            <a class="btn green btn-circle" href="javascript:;" data-toggle="dropdown"
+                               aria-expanded="true">
+                                <i class="fa fa-cog"></i> Acciones
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+
+                                <li th:if="${activePaysheet == 'activa'}">
+                                    <a href="#" id="addEmployee">
+                                        <i class="fa fa-user-plus"></i> &nbsp;&nbsp;Agregar Colaborador </a>
+                                </li>
+
+                                <li th:if="${activePaysheet == 'activa'}">
+                                    <a href="#" id="uploadFile">
+                                        <i class="fa fa-upload"></i> &nbsp;&nbsp;Subir Planilla </a>
+                                </li>
+                                <li>
+                                    <!--<a th:href="@{/static/campos_employee.xls}" id="downloadFile"
+                                       download="campos_employee.xls">
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>-->
+                                    <a th:href="@{/paysheet/__${activePaysheet}__/excel}" id="exportToExcel">
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="fixed-table-toolbar">
+                        <div class="pull-right search">
+                            <input class="form-control" type="text" placeholder="buscar" width="300" id="search"/>
+                        </div>
+                        <div style="clear:both"></div>
+                    </div>
+                    <div th:if="${employees?.size() > 0}" id="sample_1_2_wrapper" class="dataTables_wrapper">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover table-checkable order-column dataTable"
+                                   id="paysheetList" role="grid" aria-describedby="sample_1_2_info">
+                                <thead>
+                                <tr role="row">
+                                    <th style="width: 36px">
+                                        <th:block th:if="${activePaysheet == 'activa'}">
+                                            <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                                <input type="checkbox" id="selectAll"/>
+                                                <span></span>
+                                            </label>
+                                        </th:block>
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;">
+                                        #
+                                    </th>
+                                    <th class="sorting companyCol" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:left;display:none;">
+                                        Empresa
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;">
+                                        T.D.
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;">
+                                        N&uacute;mero doc.
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;"> Nombres
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Apellido paterno
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Apellido materno
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;width: 200px;">
+                                        Email
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;width: 100px">
+                                        Ingreso
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;">
+                                        Descuentos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending"
+                                        style="text-align:center;">
+                                        Cta. Bancaria
+                                    </th>
+                                    <!--<th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"-->
+                                    <!--aria-label=" Actions : activate to sort column ascending"-->
+                                    <!--style="text-align:center;">-->
+                                    <!--Estado-->
+                                    <!--</th>-->
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Actions : activate to sort column ascending"
+                                        style="text-align:center;width: 200px;">
+                                        Acciones
+                                    </th>
+                                    <th class="sorting contractCol" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Actions : activate to sort column ascending"
+                                        style="text-align:center;">
+                                        <span>Contrato</span>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody id="tableContent">
+                                <th:block th:replace="this :: list"></th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div th:if="${employees == null or employees?.size() == 0}">No hay empleados para mostrar</div>
+                </div>
+            </div>
+
+            <div id="uploadPaysheetFileModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-top">
+                            <div class="title-wrap">
+                                <h4 class="title-modal">Subir nueva lista</h4>
+                            </div>
+                            <div class="corner-close">
+                                <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <div class="modal-middle text-center">
+                            <div id="uploadUserFile" class="dropzone text-center"></div>
+                            <div class="text-center">
+                                <a th:href="@{/paysheet/excel/template}" class="btn green" download="campos_employee.xls"
+                                   style="margin-top: 1em"> Descargar Formato
+                                    <i class="fa fa-download"></i>
+                                </a>
+                            </div>
+
+                            <div id="usersWillBeAdded"
+                                 style="text-align: left; margin-top: 1em;text-align:center;"></div>
+                            <div class="block" style="padding: .5em;" id="response-block"></div>
+                            <div class="errorMessage" id="uploadErrorContainer"
+                                 style="text-align: left; margin-bottom: 1em"></div>
+
+                            <div id="bankMappings" class="field" style="margin: 0 auto;max-width: 400px;">
+                                <div style="display:none">
+                                    <div id="repeatCbo" class="field">
+                                        <div class="col-lg-8 col-md-8">
+                                            <div class="form-group field-wrap">
+                                                <select class="selectpicker form-control">
+                                                    <option value="-1">Seleccione</option>
+                                                    <option th:each="bank : ${banksCatalog}" th:value="${bank.id}"
+                                                            th:text="${bank.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <br/>
+                                <small class="red-text" style="display: block">No hemos podido asociar los siguientes
+                                    nombres de bancos:
+                                </small>
+                                <br/>
+                                <div id="bankMappingsContainer"></div>
+                            </div>
+
+
+                            <div id="actionButtons" style="display: none">
+                                <div class="disablePreviuos">
+                                    <input type="checkbox" id="disablePrevious" checked="checked" class="js-switch"/>
+                                    <div id="planillaLabel" style="color: #34465d;">Actualizar planilla anterior</div>
+                                </div>
+                                <br/>
+                                <button type="button" class="button black-button" data-dismiss="modal" aria-label="Close">
+                                    Cancelar
+                                </button>
+                                <button type="button" class="button bg-red" id="confirmUpload">
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="addEmployeeModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-top">
+                            <div class="title-wrap">
+                                <h4 class="title-modal" id="headerDynamic">Agregar colaborador a la lista</h4>
+                            </div>
+                            <div class="corner-close">
+                                <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <div class="modal-middle">
+                            <form action="#" class="form-inline" id="addEmployeeForm" th:object="${employeeform}">
+                                <div>
+                                    <input type="hidden" th:field="*{employeeId}"/>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <p style="text-align: left;">
+                                            <span class="help-block" style="font-size: .85em;">Documento de identidad <sup class="red-text">*</sup></span>
+                                        </p>
+                                        <div class="form-group col-md-3" style="min-height: 50px">
+                                            <select th:field="*{docType}" class="form-control dni-input">
+                                                <option value="1">DNI</option>
+                                                <option value="2">CE</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-8" style="min-height: 50px">
+                                            <input type="text" class="form-control medium-number-input" th:field="*{docNumber}" placeholder="N&uacute;mero"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="form-group" style="display: block;min-height: 70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Nombres<sup class="red-text">*</sup></span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{name}"
+                                                   placeholder="Nombres" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group" style="display: block;min-height: 70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block"
+                                                      style="font-size: .85em;">Apellido paterno<sup class="red-text">*</sup></span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{firstSurname}"
+                                                   placeholder="Apellido Paterno" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group" style="display: block;min-height: 70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block"
+                                                      style="font-size: .85em;">Apellido materno</span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{lastSurname}"
+                                                   placeholder="Apellido Materno" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height: 50px">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Fecha de Ingreso<sup
+                                                        class="red-text">*</sup></span>
+                                            </p>
+                                            <input type="text" class="form-control align-center medium-number-input"
+                                                   th:field="*{employmentStartDate}" placeholder="dd/mm/yyyy"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <p style="text-align: left;">
+                                            <span class="help-block" style="font-size: .85em;">Tipo de contrato /Fin del contrato</span>
+                                        </p>
+                                        <div class="form-group" style="min-height: 50px">
+                                            <select th:field="*{contractType}" class="form-control medium-number-input">
+                                                <option value="I">Indeterminado</option>
+                                                <option value="D">Determinado</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group" style="min-height: 50px">
+                                            <input type="text" class="form-control align-center medium-number-input"
+                                                   th:field="*{contractEndDate}" placeholder="dd/mm/yyyy"
+                                                   style="display: none"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+
+                                        <div class="form-group" style="display: block;min-height:70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Email</span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{email}"
+                                                   placeholder="Email" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height: 70px">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Tel&eacute;fono /Celular</span>
+                                            </p>
+                                            <input type="text" class="form-control input-document"
+                                                   th:field="*{phoneNumber}"
+                                                   placeholder="N&uacute;mero Tel&eacute;fono"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="form-group" style="min-height: 70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Direcci&oacute;n<sup
+                                                        class="red-text">*</sup></span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{address}"
+                                                   placeholder="Direcci&oacute;n" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <p style="text-align: left;">
+                                            <span class="help-block" style="font-size: .85em;">Sueldo bruto<sup
+                                                    class="red-text">*</sup> /Sueldo variable / Descuentos</span>
+                                        </p>
+
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6">
+                                                <div class="form-group" style="min-height: 50px">
+                                                    <input type="text" class="form-control"
+                                                           th:field="*{fixedGrossIncome}" placeholder="Sueldo bruto *" style="width: 100%"/>
+                                                    <small class="errorContainer"></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 second-col-md-6">
+                                                <div class="form-group" style="min-height: 50px">
+                                                    <input type="text" class="form-control"
+                                                           th:field="*{variableGrossIncome}" placeholder="Sueldo variable" style="width: 100%"/>
+                                                    <small class="errorContainer"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12">
+                                                <div class="form-group" style="min-height: 50px;">
+                                                    <input type="text" class="form-control"
+                                                           th:field="*{monthlyDeduction}" placeholder="Descuentos" style="width: 100%"/>
+                                                    <small class="errorContainer"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height: 50px">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Banco</span>
+                                            </p>
+                                            <select name="bank" id="bank" class="form-control input-cities">
+                                                <option value="" selected="true">Banco</option>
+                                                <option th:each="bank : ${@catalogService.getBanks(@extranetCompanyService.getLoggedUserActiveEntity(), true)}"
+                                                        th:value="${#strings.toUpperCase(bank.name)}"
+                                                        th:text="${bank.name}"></option>
+                                            </select>
+                                            <small class="errorContainer"></small>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height:70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block"
+                                                      style="font-size: .85em;">Nro. Cta. Bancaria</span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{accountNumber}"
+                                                   placeholder="N&uacute;mero de cuenta" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height:70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">C&oacute;digo interbancario (CCI)</span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{accountNumberCci}"
+                                                   placeholder="C&oacute;digo interbancario" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height:70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block"
+                                                      style="font-size: .85em;">Salario con Embargo<sup
+                                                        class="red-text">*</sup></span>
+                                            </p>
+                                            <select th:field="*{salaryGarnishment}" class="form-control input-cities">
+                                                <option value="0">No</option>
+                                                <option value="1">Si</option>
+                                            </select>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height:70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Licencia sin goce de haber<sup
+                                                        class="red-text">*</sup></span>
+                                            </p>
+                                            <select th:field="*{unpaidLeave}" class="form-control input-cities">
+                                                <option value="0">No</option>
+                                                <option value="1">Si</option>
+                                            </select>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" th:if="${customMaxAmountActivated}">
+                                    <div class="col-lg-6 col-md-6" style="text-align: left">
+                                        <div class="form-group" style="min-height:70px;width: 100%">
+                                            <p style="text-align: left;">
+                                                <span class="help-block" style="font-size: .85em;">Monto m&aacute;ximo de préstamo</span>
+                                            </p>
+                                            <input type="text" class="form-control" th:field="*{customMaxAmount}"
+                                                   placeholder="Monto m&aacute;ximo" style="width: 100%"/>
+                                            <small class="errorContainer"></small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <span id="employeeIdData"></span>
+                                <div class="block text-center" style="margin-top: .5em;" id="modal-response"></div>
+
+                                <div class="actions text-center" style="padding-top: 15px">
+                                    <button type="button" class="button bg-red" id="addEmployeeButton">
+                                        Agregar colaborador
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+<th:block th:fragment="list">
+    <tr role="row" class="row-employee" th:each="employee, iterEmployee : ${employees}" th:id="${'row-' + employee.id}">
+        <td class="bs-checkbox rowSelected">
+            <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                <input th:value="${employee.id}" type="checkbox"
+                       class="checkbox"/>
+                <span></span>
+            </label>
+        </td>
+        <input type="hidden" name="employeeIds[]" id="employeesIds"/>
+        <td style="text-align:left;" th:text="${iterEmployee.count}"></td>
+        <td style="text-align:left;">
+            <span th:text="${employee.docType.name}"></span>
+        </td>
+        <td style="text-align:left;">
+            <span th:text="${employee.docNumber}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.name}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.firstSurname}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.lastSurname}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.workEmail}"></span>
+        </td>
+        <td style="text-align:center;">
+            <span th:text="${@utilService.integerMoneyFormat(employee.fixedGrossIncome)}"
+                  style="display: block;max-width: 100px;"></span>
+        </td>
+        <td style="text-align:center;">
+            <span th:text="${@utilService.integerMoneyFormat(employee.monthlyDeduction)}"
+                  style="display: block;max-width: 100px;"></span>
+        </td>
+        <td>
+            <span style="display: block;width: 200px"></span>
+            <th:block th:if="${employee.bank != null and employee.accountNumber != null}">
+                <span><b th:text="${employee.bank}"></b></span>
+                <br/>
+                <span><b>Cta.:</b></span>
+                <span th:text="${employee.accountNumber}"></span>
+                <br/>
+            </th:block>
+            <th:block th:if="${employee.accountNumberCci != null}">
+                <span><b>CCI:</b></span>
+                <span th:text="${employee.accountNumberCci}"></span>
+            </th:block>
+        </td>
+        <!--
+        <td style="text-align:center;vertical-align: middle;">
+            <span class="label label-sm label-success"
+                  th:if="${employee.active}"> Activo </span>
+            <span class="label label-sm label-danger" th:if="${employee.active == false}"> Inactivo </span>
+        </td>
+        -->
+        <td style="text-align:center;vertical-align: middle;" id="col-status">
+            <th:block th:if="${employee.active}">
+                <a href="#" class="btn blue btn-sm editEmployee"
+                   th:attr="data-id=${employee.id}" style="margin-bottom: .5em;">
+                    <i class="fa fa-pencil"></i> Editar </a>
+            </th:block>
+
+            <th:block th:if="${employee.active == false}">
+                <a href="#" class="btn green-meadow btn-sm activateEmployeeButton"
+                   th:attr="data-id=${employee.id}">
+                    <i class="fa fa-check"></i> Activar </a>
+            </th:block>
+
+            <th:block th:if="${employerAssociated != null and employerAssociated and employee.agreementAssociated != null}"
+                      th:switch="${employee.agreementAssociatedValidated}">
+                <button type="button" th:case="false" class="btn btn-warning btn-sm associateEmployee" data-type="employee"
+                   th:attr="data-id=${employee.id},data-product=${T(com.affirm.common.model.catalog.Product).AGREEMENT}">
+                        <i class="fa fa-check"></i> Pendiente </button>
+                <span class="label label-success" th:case="true" style="font-size: .75em;width: 100px;display: block;margin: 0 auto;"> Asociado</span>
+            </th:block>
+
+            <th:block th:if="${employerAssociated != null and employerAssociated and employee.consolidationAssociated != null}"
+                      th:switch="${employee.consolidationAssociatedValidated}">
+                <button type="button" th:case="false" class="btn btn-warning btn-sm associateEmployee" data-type="employeePagare"
+                   th:attr="data-id=${employee.id},data-product=${T(com.affirm.common.model.catalog.Product).DEBT_CONSOLIDATION}">
+                    <i class="fa fa-check"></i> Pendiente </button>
+                <span class="label label-success" th:case="true" style="font-size: .75em;width: 100px;display: block;margin: 0 auto;"> Recibido pagar&eacute;</span>
+            </th:block>
+        </td>
+        <td style="text-align:center;vertical-align: middle;">
+            <th:block th:each="contractFile : ${employee.contractFile}">
+                <a target="_blank" th:title="${contractFile?.productCategory?.category}"
+                   th:href="@{/userFile/__${@fileService.generateUserFileEncrypt(employee.userId, contractFile?.fileName, contractFile?.id)}__/image.jpg}"
+                   class="btn red btn-sm" th:attr="data-id=${employee.id}">
+                    <i class="fa fa-file-pdf-o" style="font-size: 1.5em;margin-top: .25em;"></i>
+                </a>
+            </th:block>
+        </td>
+    </tr>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('.associateEmployee').on('click', function(e) {
+            e.preventDefault();
+
+            var employeeId = $(this).data('id');
+            var btn = $(this);
+            btn.loading('', 2);
+            defaultAjax({
+                url: /*[[@{/employee/associate}]]*/null,
+                type: 'POST',
+                data: {
+                    employeeId: employeeId,
+                    productId: $(this).data('product')
+                },
+                success: function (data) {
+                    resetTimer();
+                    if( btn.data('type')=='employeePagare' ){
+                        btn.closest('td').append('<span class="label label-success" style="font-size: .75em;width: 100px;display: block;margin: 0 auto;">Recibido pagaré</span>');
+                        btn.remove();
+                    }else{
+                        btn.closest('td').append('<span class="label label-success" style="font-size: .75em;width: 100px;display: block;margin: 0 auto;">Asociado</span>');
+                        btn.remove();
+
+                    }
+
+
+                }
+                , error: function (xhr, data) {
+                    btn.unloading();
+                    swal('Error', data);
+                }
+            });
+
+        });
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

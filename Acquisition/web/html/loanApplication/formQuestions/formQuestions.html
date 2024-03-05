@@ -1,0 +1,3552 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<meta charset="UTF-8"/>
+<head>
+
+    <title layout:title-pattern="$CONTENT_TITLE" th:text="${@brandingService.getMetaTittle(#httpServletRequest, #locale)} != null ?
+        ${@brandingService.getMetaTittle(#httpServletRequest, #locale, loanApplication)} :
+        (${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)} ? 'Efectivo al toqe | Compara bien, crédito rápido y fácil.' :
+            (${@brandingService.isBranded(#httpServletRequest)} ? ${@brandingService.getEntityBranding(#httpServletRequest)?.entity?.shortName} : 'Solven') + (${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? ' | Solicita aquí tu Tarjeta de Crédito' : ' | El crédito que mereces') )"></title>
+
+    <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+        <th:block th:if="${@brandingService.getMetaDescription(#httpServletRequest, #locale) != null}">
+            <meta name="description" th:attr="content=${@brandingService.getMetaDescription(#httpServletRequest, #locale, loanApplication)}" />
+        </th:block>
+    </th:block>
+
+    <script defer="defer"
+            th:src="${'https://maps.googleapis.com/maps/api/js?libraries=geometry,places&amp;key=' + (T(com.affirm.system.configuration.Configuration).GOOGLE_API_KEY)}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/face-api/face-api.js'}"></script>
+    <th:block th:replace="components/tracking :: all"/>
+    <th:block th:if="${showSelfEvaluationAleternate}">
+        <link rel="alternate" href="https://www.solven.pe/autoevaluacion" hreflang="es"/>
+        <link rel="alternate" href="https://www.solven.pe/autoevaluacion" hreflang="es-pe"/>
+        <link rel="alternate" href="https://www.solven.com.ar/autoevaluacion" hreflang="es-ar"/>
+        <link rel="alternate" href="https://www.solven.pe/autoevaluacion" hreflang="x-default"/>
+    </th:block>
+    <link id="favicon" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}" rel="icon" href="/img/banbif/favicon.ico" />
+    <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+        <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} != null" rel="icon" id="favicon" th:href="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)}" />
+    </th:block>
+    <script async="true" th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+    <script async="true" th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-masknumber/dist/jquery.masknumber.min.js'}"></script>
+    <script async="true" src="https://cdn.onesignal.com/sdks/OneSignalSDK.js"></script>
+    <th:block th:replace="this :: stylesFormQuestion"></th:block>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // if(navigator.userAgent.search("Firefox") > -1){
+        //     var styleFirefox = document.createElement('style');
+        //     styleFirefox.type = 'text/css';
+        //     styleFirefox.innerHTML = `
+        //             .banbif-class label > .div-button-radio-span {
+        //               width: 1em;
+        //               height: 1em;
+        //               margin-right: 0.25em;
+        //               padding: 0.125em;
+        //               display: inline-block;
+        //               position: relative;
+        //               top: -2px;
+        //               border: 1px solid #aaa;
+        //               border-radius: 100%;
+        //               vertical-align: middle;
+        //             }
+        //             .banbif-class label > .div-button-radio {
+        //               display: none;
+        //             }
+        //             .banbif-class label > input[type=radio].div-button-radio:checked + span:before {
+        //             width: 0.65em;
+        //             height: 0.58em;
+        //               display: block;
+        //               content: " ";
+        //               background-color: #20A6FF;
+        //               border-radius: 100%;
+        //             }
+        //             .banbif-class label > input[type=radio].div-button-radio:checked + span {
+        //               border-color: #20A6FF;
+        //             }`;
+        //     document.getElementsByTagName('head')[0].appendChild(styleFirefox);
+        // }
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        /*]]>*/
+    </script>
+</head>
+<body id="main" th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+
+<th:block th:fragment="stylesFormQuestion">
+    <style>
+
+       /* #documents .msg-block {
+            display: block!important;
+        }*/
+
+       #questionFormZeroMembership .cardDetailBanbifMobile{
+           display: none;
+       }
+
+       div.dflex-center-edit > div{
+            display: flex !important;
+           justify-content: center !important;
+       }
+
+       .w-50-important{
+           width: 50% !important;
+       }
+       
+        .fl-container-83{
+            display: flex;
+            flex: 1;
+        }
+
+        .form-q-11 .show-map{
+            margin-top: 2rem;
+        }
+
+        .form-q-11 .map-agencies{
+            margin-top: 2rem;
+        }
+
+        .custom-rb [type="radio"]:checked,
+        [type="radio"]:not(:checked) {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .custom-rb [type="radio"]:checked + label,
+        .custom-rb [type="radio"]:not(:checked) + label
+        {
+            position: relative;
+            padding-left: 23px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: normal;
+        }
+        .custom-rb [type="radio"]:checked + label:before,
+        .custom-rb [type="radio"]:not(:checked) + label:before {
+            content: '';
+            position: absolute;
+            left: 0px;
+            top: calc(50% - 9px);
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ddd;
+            border-radius: 100%;
+            background: #fff;
+        }
+        .custom-rb [type="radio"]:checked + label:after,
+        .custom-rb [type="radio"]:not(:checked) + label:after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--branding-loading-color);
+            position: absolute;
+            top: calc(50% - 9px + 4px);
+            left: 4px;
+            border-radius: 100%;
+            -webkit-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+        }
+        .custom-rb [type="radio"]:checked + label:before{
+            border-color: var(--branding-loading-color);
+        }
+        .custom-rb [type="radio"]:not(:checked) + label:after {
+            opacity: 0;
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        .custom-rb [type="radio"]:checked + label:after {
+            opacity: 1;
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+
+        .fw-normal{
+            font-weight: normal;
+        }
+        .fw-bold{
+            font-weight: bolder;
+        }
+        .fc-black{
+            color: black !important;
+        }
+        .w-100 {
+            width: 100%;
+        }
+        .w-50 {
+            width: 50%;
+        }
+        .w-70 {
+            width: 70%;
+        }
+        .d-flex{
+            display: flex;
+        }
+        .jc-center{
+            justify-content: center;
+        }
+        .footer-container-banbif > .bottom-footer{
+            display: block !important;
+        }
+
+        .footer-container-banbif .bottom-footer .bar {
+            background: #20A6FF;
+        }
+
+        .first-parallelogram {
+            width: 23%;
+            height: 1.5rem;
+            transform: skew(20deg);
+            background: #20A6FF;
+        }
+
+        .second-parallelogram {
+            width: 73%;
+            height: 1.5rem;
+            transform: skew(20deg);
+            background: #20A6FF;
+        }
+
+        .footer-container-banbif{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-159-description{
+            font-size: 14px;
+        }
+
+        .container-parallelogram{
+            display:flex;
+            flex-direction: row;
+            width: 50%;
+            justify-content: space-evenly;
+        }
+
+        .px-0{
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+        }
+
+        .py-0{
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+
+        .q156{
+            width: 100%;
+        }
+
+        .q164  form#questionForm{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .q164  form#questionForm div.field{
+            margin-bottom: 1.5em;
+        }
+
+        .q164 .errorContainer{
+            margin-left: auto !important;
+            text-align: center !important;
+        }
+
+        .q164 .errorContainer span {
+            text-align: center !important;
+        }
+        .q143 .residencia {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .q143 .residencia .select2 {
+            max-width: 100% !important;
+        }
+
+        .q143 .errorContainer {
+            margin-left: auto !important;
+        }
+
+        .q2 .tamanio-error{
+            font-size: 13px;
+        }
+
+        .centrado {
+            display: grid;
+            align-items: center;
+            justify-content: center;
+        }
+        .q-espacio{
+            margin-bottom: 1rem;
+            margin-top: -1rem;
+        }
+
+        .q167 .offer-selection-container{
+            display: none;
+        }
+
+        .q167 .offer-title {
+            font-size: 19px;
+        }
+
+        .q167 .fw-bold, .q173  .fw-bold {
+            font-weight: bolder;
+        }
+
+        .q167 .offers-container{
+            display: flex;
+            justify-content: center;
+            color: #34465d;
+            margin-bottom: 5rem;
+        }
+
+        .q173 .offers-container{
+            display: flex;
+            justify-content: space-evenly;
+            margin-bottom: 5rem;
+        }
+
+        .q173 .offer-card{
+            width: 100%;
+            max-width: 385px;
+            box-shadow: -1px 2px 11px 0px rgb(215, 215, 215);
+            border-radius: 10px;
+            padding: 2rem 1rem;
+            margin-top: 15px;
+            position: relative;
+            border: 1px solid #bec3c9;
+        }
+
+        .q173 .offer-detail{
+            background-color: #bec3c9;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            padding: 10px;
+        }
+
+        .q173 .offer-detail div{
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            justify-content: flex-start;
+            margin-bottom: 5px;
+            align-items: end;
+        }
+
+        .q173 .offer-detail div span{
+            text-align: left;
+        }
+
+        .q173 .offer-detail div span:first-child{
+            color: #e1e4e8;
+            font-size: 14px;
+        }
+
+        .q173 .offer-detail div span:nth-child(2){
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .q173 .offer-card .offer-title{
+            text-transform: uppercase;
+            margin-bottom: 7px;
+            word-wrap: break-word;
+        }
+
+        .q173 .interest-title{
+            margin-bottom: 10px !important;
+            font-size: 16px !important;
+        }
+
+        .q173 .interest-value{
+            color: #bec3c9;
+            font-weight: bolder;
+            margin-bottom: 2px !important;
+        }
+
+        .q173 .interest-value-qty{
+            font-size: 28px !important;
+            color: #bec3c9;
+        }
+
+        .q173 .interest-value-description{
+            font-size: 18px !important;
+            color: #bec3c9;
+        }
+
+        .divider-payment-header{
+            border-bottom: 2px solid var(--branding-loading-color);
+            width: 100%;
+            padding: 5px;
+        }
+
+        .q168 p.q-title{
+            line-height: 1.4;
+        }
+
+        .q167 .offer-legacy p,
+        .q168 .offer-legacy p,
+        .q169 .offer-legacy p
+        {
+            font-size: 12px !important;
+        }
+
+        .q167 .offer-card .offer-title{
+
+        }
+
+        .q167 .offer-card .offer-description span{
+            font-size: 13px;
+        }
+
+        .q167 .offer-card .offer-pay-now span{
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .q167 .offer-card .offer-amount{
+            font-size: 35px;
+            text-transform: uppercase;
+            font-weight: bolder;
+        }
+
+        .q167 .offer-card .offer-original-debt span:first-child{
+            font-size: 11px;
+        }
+
+        .q167 .offer-card .offer-original-debt span:nth-child(2){
+            font-size: 14px;
+            text-decoration: line-through;
+            font-weight: bold;
+        }
+
+        .q167 .offer-card .offer-title,
+        .q167 .offer-card .offer-description,
+        .q167 .offer-card .offer-original-debt,
+        .q167 .offer-card .offer-savings
+        {
+            margin-bottom: 3px;
+        }
+
+        .q167 .offer-card .offer-savings{
+            text-align: left;
+        }
+
+        .q167 .offer-card .offer-savings span{
+            font-size: 9px;
+        }
+
+        .q167 .offer-card .offer-savings span:nth-child(2){
+            font-weight: bolder;
+        }
+
+
+        .q167 .offer-card .offer-dont-want-it{
+            margin-top: 10px;
+        }
+        .q167 .offer-card .offer-dont-want-it a{
+            font-size: 12px;
+            color: #c7c7c7;
+        }
+
+        .q167 .offer-card .offer-pay-now,
+        .q167 .offer-card .offer-savings
+        {
+            margin-top: 12px;
+        }
+
+        .q167 .offer-card{
+            max-width: 400px;
+            box-shadow: -1px 2px 11px 0px rgb(215, 215, 215);
+            border-radius: 10px;
+            padding: 3rem 2rem;
+            margin-top: 30px;
+            position: relative;
+            width: 100%;
+        }
+
+        .q167 .offer-card button{
+            width: 100%;
+        }
+
+
+        .q167 .percentage-icon{
+            position: absolute;
+            height: 90px;
+            top: -59px;
+            left: calc(50% - 40px);
+        }
+
+        .q167 .saving-text{
+            color: #b7b7b7;
+        }
+
+        .q167 .saving-text-amount{
+            color: #898989;
+        }
+
+        .q168 .payment-methods-container{
+            display: flex;
+            justify-content: center;
+            color: #34465d;
+            margin-bottom: 5rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .q168 .payment-method-card{
+            max-width: 350px;
+            min-width: 290px;
+            min-height: 250px;
+            box-shadow: -1px 2px 11px 0px rgb(215, 215, 215);
+            border-radius: 10px;
+            margin-top: 10px;
+            position: relative;
+            margin-left: 10px;
+            margin-right: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+
+        .q168 .payment-method-card img{
+            max-height: 40px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20px;
+        }
+
+        .q168 label.error{
+            font-size: 10px;
+            font-weight: normal;
+            color: red;
+        }
+
+        .q168 .card-info-container{
+            display: flex;
+            flex-direction: column;
+            padding: 1rem 1rem 2rem;
+            flex: 1;
+        }
+
+        .q168 .card-info-container div{
+            margin-bottom: 10px !important;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .q168 .card-info-container p {
+            font-size: 16px !important;
+        }
+
+        .q168 .payment-method-card .header-card{
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            padding: 0px 10px;
+            background-color: var(--branding-loading-color);
+            color: white;
+
+        }
+
+        .q169 .pago-efectivo-card,
+        .q172 .western-union-card
+        {
+            max-width: 600px;
+            min-width: 550px;
+            min-height: 350px;
+            box-shadow: -1px 2px 11px 0px rgb(215, 215, 215);
+            border-radius: 10px;
+            margin-top: 10px;
+            position: relative;
+            margin-left: 10px;
+            margin-right: 10px;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 1.5rem;
+        }
+
+        .q171 form.pagolink-form-c button.modal-opener{
+            background: rgba(0, 0, 0, 0) linear-gradient(0deg, rgb(70, 91, 166) 32%, rgb(27, 45, 105) 100%) repeat scroll 0% 0% !important;
+            color: white;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+            width: 187px;
+            height: 40px;
+        }
+
+        .q171 .pagolink-card
+        {
+            max-width: 600px;
+            min-width: 550px;
+            min-height: 230px;
+            box-shadow: -1px 2px 11px 0px rgb(215, 215, 215);
+            border-radius: 10px;
+            margin-top: 10px;
+            position: relative;
+            margin-left: 10px;
+            margin-right: 10px;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 1.5rem;
+        }
+
+        .q171 .pagolink-card .pagolink-card-description p{
+            margin-top: 20px;
+        }
+
+        .q169 .pago-efectivo-card .pago-efectivo-card-header,
+        .q171 .pagolink-card .pagolink-card-header,
+        .q172 .western-union-card .western-union-card-header
+        {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            padding: 0px 10px;
+            box-shadow: -1px 2px 11px 0px rgb(215, 215, 215);
+        }
+
+        .q169 .pago-efectivo-card img,
+        .q171 .pagolink-card img,
+        .q172 .western-union-card img
+        {
+            max-height: 75px;
+            max-width: 80%;
+            margin: 7px 5px;
+        }
+
+        .q169 .card-container,
+        .q171 .card-container,
+        .q172 .card-container
+        {
+            display:flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .q171-error-message{
+            color: red !important;
+        }
+
+        .q169 .pago-efectivo-card-description,
+        .q171 .pagolink-card-description,
+        .q172 .western-union-card-description
+        {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .q171 .pagolink-card-description
+        {
+            display: flex;
+            flex-direction: column;
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .q171 .pagolink-card-description{
+            flex: 1;
+            justify-content: space-around;
+        }
+
+        .q169 .links,
+        .q172 .links
+        {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            justify-content: space-between;
+            display:flex;
+            align-items: center;
+        }
+
+        .q169 .links a,
+        .q172 .links a{
+            color: #34465d;
+            font-size: 13px;
+            cursor: pointer;
+            width: 48%;
+        }
+
+
+
+        .q169 .pago-efectivo-card-description .header-description,
+        .q172 .western-union-card-description .header-description{
+            background-color: #343434;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            margin-top: 18px;
+            padding: 1.2rem 1rem;
+            font-size: 13px;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description,
+        .q172 .western-union-card-description .body-description{
+            display: flex;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description .cip-code,
+        .q172 .western-union-card-description .body-description .cip-code{
+            background-color: #f4f4f4;
+            color: #343434;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description .descrp:nth-child(2),
+        .q172 .western-union-card-description .body-description .descrp:nth-child(2)
+        {
+            background-color: #f4f4f4;
+            color: #343434;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description span,
+        .q172 .western-union-card-description .body-description span{
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description .descrp,
+        .q172 .western-union-card-description .body-description .descrp{
+            padding: 1.2rem 1rem;
+            font-size: 13px;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description .descrp:first-child,
+        .q172 .western-union-card-description .body-description .descrp:first-child{
+            width: 50%;
+        }
+
+        .q169 .pago-efectivo-card-description .body-description .descrp:nth-child(2),
+        .q172 .western-union-card-description .body-description .descrp:nth-child(2){
+            flex: 1;
+        }
+
+        .q169 .button-options-pe:not(.links),
+        .q172 .button-options-pe:not(.links){
+            display:flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q169 .pago-efectivo-card .spinner > div,
+        .q172 .western-union-card .spinner > div {
+            background-color:var(--branding-loading-color) !important;
+        }
+
+        .q169 .button-options-pe button,
+        .q172 .button-options-pe button{
+            margin: 0px 10px;
+        }
+
+        .q169 #watchPaymentLocations,
+        .q172 #watchPaymentLocations
+        {
+            min-width: 200px;
+            margin: 0px;
+        }
+
+        .q169 .pago-efectivo-date,
+        .q172 .western-union-date{
+            font-weight: bolder;
+            text-transform: capitalize;
+        }
+
+        .q169 .payment-date,
+        .q172 .payment-date{
+            font-size: 1.4rem !important;
+        }
+
+        .q170 .download-link{
+            color: var(--branding-loading-color);
+            text-decoration: none;
+        }
+
+        .q170 .container-result{
+            max-width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .q170 .container-result img{
+            margin-bottom: 10px;
+        }
+
+        .q-my30{
+            margin: inherit;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        .q158 .card-height-size{
+            height: 228px;
+        }
+
+       .q158 .card-height-size-zero{
+           height: 215px;
+       }
+
+        .q158 .mt-card-button{
+            margin-top: 25px;
+        }
+
+       .q158 .card-separator-margin{
+           margin-left: 15px;
+       }
+
+        @media only screen and (max-width: 640px) {
+            .q-box-icon {
+                height: 38px !important;
+            }
+        }
+
+        .container-example-explain{
+            display: flex;
+        }
+
+        #compromise-img-mobile{
+            display: none;
+        }
+
+        .compromise-img{
+            width: 80px;
+            height: 80px;
+            background-size: 80px;
+            display: inline-block;
+            background-repeat: no-repeat;
+            float: left;
+            margin-left: 10px;
+        }
+
+        .rounded-button-fill-question{
+            border: 1px solid var(--branding-loading-color);
+            background-color: var(--branding-loading-color);
+            color: white;
+            min-width: 185px;
+            height: 55px;
+            margin-top: 12px;
+            margin-bottom: 10px;
+        }
+
+        .rounded-button-question{
+            border: 1px solid var(--branding-loading-color);
+            background-color: white;
+            color: var(--branding-loading-color);
+            min-width: 185px;
+            height: 55px;
+            margin-top: 12px;
+            margin-bottom: 10px;
+        }
+
+        .compromise-img-mobile{
+            width: auto;
+            height: 72px;
+            background-size: 80px;
+            background-repeat: no-repeat;
+            float: left;
+            margin-bottom: 20px;
+        }
+
+
+        .example-container {
+            width: 70%;
+            border-radius: 2rem;
+            border: 1px solid black;
+            margin-left: 7rem;
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .description-example {
+            padding-left: 7.5px;
+            padding-right: 7.5px;
+        }
+
+        .description-example > p {
+            text-align: justify;
+            font-size: 12px;
+        }
+
+        .group-example-first {
+            width: 33.33%;
+            padding-left: 3rem;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+
+        .group-example-last {
+            width: 33.33%;
+            padding: 1.5rem 1.5rem;
+        }
+
+        .number-example {
+            font-size: 1rem;
+        }
+
+        .group-example-middle {
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            width: 33.33%;
+            padding: 1.5rem 1.5rem;
+            position: relative;
+        }
+
+        .group-example-middle > .number-example {
+            font-size: 0.9rem;
+        }
+
+        .example-description-span{
+            margin-bottom: 5px;
+        }
+
+        .example-container > div {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+        }
+
+        .info-container {
+            background-color: #a7a9ac;
+            padding: 10px 1.5rem;
+            color: white;
+            font-weight: normal;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 16px;
+            margin-left: 7.5px;
+            margin-right: 7.5px;
+        }
+
+        section.section-footer-q158  > div.description-example > p {
+            margin-bottom: 0px !important;
+            text-align: justify !important;
+            font-size: 14px !important;
+        }
+
+        .title-color-banbif{
+            color: #20a6ff !important;
+            font-weight: bold;
+        }
+
+        .le-asbanc_ejemplo {
+            position: absolute;
+            top: 0;
+            background: #000;
+            color: #fff;
+            padding: 0 14px;
+            border-radius: 0 0 3px 3px;
+            font-size: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            width: 50%;
+            text-align: center;
+        }
+
+        .example-container > div > span {
+            font-size: 12px;
+        }
+
+        .bonus-title{
+            color: #04a8ff;
+            font-weight: bolder;
+            font-size: 17px;
+            text-align: start;
+        }
+
+        .banbif-class .select2-search__field{
+            border: 2px solid #D6D8DD;
+        }
+
+        .banbif-class label > .div-button-radio-span {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.25em;
+            padding: 0.125em;
+            display: inline-block;
+            position: relative;
+            top: -2px;
+            border: 1px solid #aaa;
+            border-radius: 100%;
+            vertical-align: middle;
+        }
+
+        .banbif-class label > .div-button-radio {
+            display: none;
+        }
+
+        .banbif-class label > input[type=radio].div-button-radio:checked + span:before {
+            width: 14px;
+            height: 14px;
+            display: block;
+            content: " ";
+            background-color: #20A6FF;
+            border-radius: 100%;
+        }
+
+        .banbif-class label > input[type=radio].div-button-radio:checked + span {
+            border-color: #20A6FF;
+        }
+
+        /*.adviser-section-azteca .before-offer .steps-question,*/
+        /*.adviser-section-azteca .after-offer .steps-question{*/
+        /*    margin-left: 0 !important;*/
+        /*    margin-right: 0 !important;*/
+        /*    width: 50%;*/
+        /*    min-width: 50%;*/
+        /*}*/
+
+        .mapContainer163{
+            width: 65%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .q165 .firstOption {
+            padding-right: 2rem;
+            padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            align-items: end;
+        }
+
+        .q165 .secondOption {
+            padding-left: 2rem;
+            padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: start;
+        }
+
+        .m-0{
+            margin: 0px !important;
+        }
+
+        .pl-0{
+            padding-left: 0px;
+        }
+
+        .q168 .rounded-button-fill-question,
+        .q169 .rounded-button-fill-question,
+        .q172 .rounded-button-fill-question
+        {
+            border: 1px solid var(--branding-loading-color);
+            background-color: var(--branding-loading-color);
+            color: white;
+            height: 40px;
+            margin-bottom: 0px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 5px;
+        }
+
+        .q169 .rounded-button-question,
+        .q172 .rounded-button-question
+        {
+            border: 1px solid var(--branding-loading-color);
+            background-color: white;
+            color: var(--branding-loading-color);
+            width: 100%;
+            height: 40px;
+        }
+
+        .q169 .rounded-button-fill-question-grey,
+        .q172 .rounded-button-fill-question-grey
+        {
+            border: 1px solid #f0f0f0;
+            background-color: #f0f0f0;
+            color: #f0f0f0;
+            height: 40px;
+            border-radius: 5px;
+        }
+
+        .q169 img.custom-icon-img,
+        .q172 img.custom-icon-img
+        {
+            margin: 0px;
+            max-width: 15px;
+        }
+
+        .q169 .container-des169,
+        .q172 .container-des172
+        {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        .q169 .vertical-divider,
+        .q172 .vertical-divider
+        {
+            height: 15px;
+            width: 2px;
+            margin-left: 1px;
+            margin-right: 1px;
+            border-left: 1px solid #b7b3b3;
+        }
+
+        .q169 .links button,
+        .q172 .links button
+        {
+            color: #34465d;
+            padding: 10px;
+            margin: unset !important;
+            min-width: unset;
+            min-height: unset;
+            background-color: #f0f0f0;
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+       .bonus-container-q158{
+           padding-right: 0;
+           padding-left: 0;
+       }
+
+        @media only screen and (min-width: 769px){
+            .q165 .firstOption p,
+            .q165 .secondOption p{
+                font-size: 15px !important;
+                min-width: 185px;
+            }
+        }
+
+        @media only screen and (min-width: 1024px) {
+
+            .q167 .percentage-icon{
+                position: absolute;
+                height: 90px;
+                top: -56px;
+                left: calc(100% - 55px);
+            }
+
+            .row-q166{
+                margin: 4.5rem auto 2rem auto;
+                max-width: 730px;
+            }
+
+            .row-q166         .d-flex-al-c{
+                align-items: center;
+                display: flex;
+            }
+
+            .row-q166 > div{
+                margin-bottom: 3rem;
+            }
+
+            .table-container-q166{
+                width: 60%;
+            }
+
+            .button-q155 {
+                margin: 1em auto 0 auto !important;
+            }
+
+            .container-title-address{
+                margin-top: 1.3rem;
+            }
+
+
+            .option-q155 {
+                width: auto !important;
+                margin: 0px !important;
+            }
+
+            .q158 .title-margin {
+                margin-top: 5vh;
+            }
+
+            .flex-container-loan-process {
+                display: flex;
+            }
+
+            .flex-container-loan-process .flew-grow-question-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .flew-grow-question-container > #question-replaceable {
+                flex: 1
+            }
+
+            .flew-grow-question-container > #question-replaceable > .questions-section{
+                height: 100%;
+            }
+
+            .flew-grow-question-container > #question-replaceable > .questions-section > .q158 {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .process-header-banbif .container {
+                max-width: 1170px !important;
+            }
+
+            .process-header-banbif .container > .row {
+                justify-content: flex-start !important;
+            }
+
+            .process-header-banbif .container .row h1{
+                justify-content: flex-start !important;
+            }
+
+            .adviser-section-banbif {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                width: 100%;
+                min-width: 100%;
+            }
+        }
+
+        @media only screen and (min-width: 1600px) {
+            .q158 .title-margin{
+                margin-top: 5vh;
+            }
+        }
+
+        @media only screen and (max-width: 1023px){
+
+            .q173 .offers-container{
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+            }
+
+            .q170 .container-result{
+                max-width: 65%;
+            }
+
+            .row-q166{
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .row-q166 div.col-sm-12{
+                margin-bottom: 2rem;
+            }
+
+            .table-container-q166{
+                width: 100%;
+            }
+
+            .hidden-element-mobile{
+                display: none !important;
+            }
+
+            .full-width-mobile {
+                width: 100% !important;
+            }
+
+            .container-parallelogram{
+                width: 100% !important;
+            }
+
+            .radio-button-q158 {
+                padding-top: 14px;
+            }
+
+            .footer-container-banbif > .bottom-footer{
+                display: none !important;
+            }
+
+            div.q54 > form#questionForm {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .q54 .errorContainer{
+                margin-left: auto !important;
+                text-align: center !important;
+            }
+
+            .q54 .errorContainer span.help-block {
+                text-align: center !important;
+            }
+
+            div.q54 > form#questionForm > div.field > input,
+            div.q54 > form#questionForm > div.field > button#sendButton{
+                width: 60%;
+            }
+
+            div.q54 > form#questionForm > small.input-help > a#resendToken{
+                color: #34465d !important;
+            }
+
+            div.q54 > form#questionForm > div#arentYou{
+                margin-top: 3rem;
+            }
+
+            .row-q161{
+                align-items: center;
+                flex-direction: column;
+            }
+
+            .q161 .field-button{
+                width: 100%;
+            }
+
+            .q161 .field-button > #sendButton{
+                width: 90%;
+            }
+
+            .buttonQ154{
+                width: 85%;
+            }
+
+            .text-description-address{
+                font-weight: bolder !important;
+                text-align: center !important;
+                font-size: 2rem !important;
+            }
+
+            .q156 {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                margin-right: auto;
+                margin-left: auto;
+                padding-left: 15px;
+                padding-right: 15px;
+                align-items: center;
+            }
+
+            .q154 .field_content .wrap-radios .input-radio:first-child, .q156 .field_content .wrap-radios .input-radio:first-child {
+                margin-right: 0px;
+            }
+
+            .q156 > div.field_content, .q156 > div.field_content > div.wrap-radios,
+            .q154 > div.field_content, .q154 > div.field_content > div.wrap-radios
+            {
+                width: 100%;
+            }
+
+            .q156 > div.field_content > div.wrap-radios > div.field > div.field_facta,
+            .q154 > div.field_content > div.wrap-radios > div.field > div.field_facta
+            {
+                flex-direction: column;
+            }
+
+            .q156 > div.field_content > div.wrap-radios > div.field > div.field_facta > label,
+            .q154 > div.field_content > div.wrap-radios > div.field > div.field_facta > label
+            {
+                width: 100% !important;
+            }
+
+
+
+            .q158-option{
+                /*height: 100% !important;*/
+            }
+
+            .amount-q158{
+                margin-left: 0px !important;
+            }
+
+            .separator-footer {
+                height: 1px;
+                border: 1px solid black;
+                width: 100%;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                padding-left: 15rem;
+                padding-right: 15rem;
+            }
+
+            .example-container, .compromise-img {
+                display: none !important;
+            }
+
+
+            .example-container > div {
+                text-align: start;
+            }
+
+            #compromise-img-mobile{
+                display: block;
+            }
+
+        }
+
+       @media only screen and (min-width: 769px) and (max-width: 1023px){
+           .q158-row{
+               display: flex !important;
+               margin-bottom: 20px !important;
+               justify-content: center;
+           }
+
+           .q158-row > div{
+               margin-bottom: 0px !important;
+           }
+       }
+
+        @media only screen and (max-width: 923px){
+            .mapContainer163{
+                width: 80%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+        }
+
+       @media only screen and (min-width: 768px) and (max-width: 898px){
+           .q158 #questionFormZeroMembership .first-due-date{
+               margin-left: 10px;
+               margin-right: 10px;
+               margin-bottom: 10px;
+           }
+       }
+
+       @media only screen and (min-width: 1024px) and (max-width: 1199px){
+           .q158 .card-separator-margin{
+               margin-left: 0px !important;
+           }
+       }
+
+        @media only screen and (max-width: 768px){
+
+            #questionForm .bonus-container-q158 {
+                margin-top: 15px;
+            }
+
+            #questionFormZeroMembership .cardDetailBanbif{
+                display: none;
+            }
+
+            #questionFormZeroMembership .cardDetailBanbifMobile{
+                display: block;
+            }
+
+            #questionFormZeroMembership .bonus-container-q158 div{
+                font-size: 15px !important;
+            }
+
+            .option-card-data-offer{
+                max-width: 50%;
+            }
+
+            .separator-q158{
+                display: none;
+            }
+
+            .bonus-container-q158{
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .q158 .card-bonus-detail{
+                height: auto !important;
+            }
+
+            .q158 .card-separator-margin{
+                margin-left: 0px;
+            }
+
+            .q158 .remove-position-absolute-mobile{
+                position: unset !important;
+            }
+
+            .q158 .compra-de-deuda-cero-membresia{
+                height: 215px;
+                box-shadow: none;
+                border: 1px solid var(--branding-loading-color);
+            }
+
+            .q158 .compra-de-deuda-cero-membresia div{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .q170 .container-result{
+                max-width: 90%;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 0rem 1.5rem;
+            }
+
+            .q165 #questionForm {
+                flex-direction: column;
+            }
+
+            .q165 .firstOption,
+            .q165 .secondOption {
+                align-items: center;
+                padding: 0px;
+            }
+
+            .q165 .firstOption{
+                margin-bottom: 1rem;
+            }
+
+            .q165 .firstOption button,
+            .q165 .secondOption button
+            {
+                margin-bottom: 5px;
+            }
+
+            .q165 .firstOption p,
+            .q165 .secondOption p
+            {
+                font-size: 15px !important;
+            }
+
+            .mapContainer163{
+                width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .row-q166 .field,
+            .row-q166 span.select2,
+            .row-q166 span.select2-container
+            {
+                width: 100% !important;
+            }
+
+            .q170 .container-result{
+                max-width: 80%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+        }
+
+        @media only screen and (max-width: 640px){
+            .q167 .offer-card{
+                min-width: 100%;
+            }
+
+            .q167 .offer-card button,
+            .q167 .offer-card .offer-dont-want-it{
+                display: none;
+            }
+
+            .q167 .offer-card .offer-savings{
+                text-align: center;
+            }
+
+            .q167 .offer-card .offer-savings span:first-child{
+                font-size: 11px;
+            }
+
+            .q167 .offer-card .offer-savings span:nth-child(2){
+                font-size: 13px;
+                font-weight: bold;
+            }
+
+            .q167 .offer-selection-container{
+                display: block;
+            }
+
+            .q167 .offers-container{
+                flex-direction: column;
+                margin-bottom: 1.5rem;
+            }
+
+            .q167 .offer-selection-container button,
+            .q167 .offer-selection-container a{
+                width: 100%;
+                text-align: center;
+                margin-top: 1.5rem;
+            }
+
+            .q167 .offer-selection-container button{
+                margin-bottom: 1rem;
+            }
+
+
+            .q167 .offer-selection-container a{
+                font-size: 12px;
+                color: #c7c7c7;
+            }
+
+        }
+
+
+        @media only screen and (min-width: 599px){
+
+            .q169 .cip-code{
+                border-right: 1px solid #f0f0f0;
+            }
+
+            .q169 .container-des169{
+                margin-top: 10px;
+            }
+
+            .q172 .cip-code{
+                border-right: 1px solid #f0f0f0;
+            }
+
+            .q172 .container-des172{
+                margin-top: 10px;
+            }
+
+
+        }
+
+        @media only screen and (max-width: 598px){
+
+            .q169 .container-des169,
+            .q172 .container-des172
+            {
+                display: flex;
+                flex-direction: column-reverse;
+            }
+
+            .q169 .payment-date,
+            .q172 .payment-date
+            {
+                margin-top: 12px;
+                font-size: 11px;
+            }
+
+            .q169 .links a,
+            .q172 .links a
+            {
+                padding: 0px;
+            }
+
+            .q170 .container-result{
+                max-width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 0rem 1.5rem;
+            }
+
+            div.q54 > form#questionForm > div.field > input,
+            div.q54 > form#questionForm > div.field > button#sendButton{
+                width: 80%;
+            }
+
+            .le-asbanc_ejemplo {
+                width: 80% !important;
+            }
+
+            .group-example-first{
+                padding-left: 1.2rem;
+            }
+
+            .q169 .pago-efectivo-card,
+            .q172 .western-union-card
+            {
+                min-width: 99%;
+            }
+
+            .q169 .pago-efectivo-card-description .body-description,
+            .q172 .western-union-card-description .body-description
+            {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .q169 .pago-efectivo-card-description .body-description .descrp,
+            .q172 .western-union-card-description .body-description .descrp{
+                min-width: 100%;
+                background-color: #343434;
+                color: white;
+            }
+
+            .q169 .vertical-divider,
+            .q172 .vertical-divider{
+                display: none
+            }
+
+            .q169 .pago-efectivo-card-description,
+            .q172 .western-union-card-description{
+                width: 100%;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .q169 .pago-efectivo-card-description > div,
+            .q169 .western-union-card-description > div{
+                width: 98%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .q169 .button-options-pe,
+            .q172 .button-options-pe,{
+                flex-direction: column;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .q169 .button-options-pe > a,
+            .q169 .button-options-pe > a > button,
+            .q169 .button-options-pe > button,
+            .q172 .button-options-pe > a,
+            .q172 .button-options-pe > a > button,
+            .q172 .button-options-pe > button
+            {
+                width: 100%;
+                max-width: 100%;
+                min-width: 100%;
+                margin-left: 0px;
+                margin-right: 0px;
+                margin-bottom: 5px;
+            }
+
+
+            .q169 .flex-r-i,
+            .q172 .flex-r-i
+            {
+                display:flex;
+                justify-content: center;
+            }
+
+            .q169 .pago-efectivo-card-description .header-description,
+            .q172 .western-union-card-description .header-description {
+                background-color: transparent;
+                color: #34465d;
+            }
+
+
+            .q169 .pago-efectivo-card-description .body-description span,
+            .q172 .western-union-card-description .body-description span{
+                font-size: 30px;
+            }
+
+            .q171 .pagolink-card{
+                min-width: 100%;
+            }
+
+            .q169 .links, .q172 .links{
+                flex-direction: column;
+            }
+        }
+
+        @media only screen and (max-width: 489px) {
+
+            .example-description-span,.number-example{
+                font-size: 0.6rem !important;
+            }
+
+            .q158 .container-options-mobile{
+                display: flex;
+                flex-direction: column;
+                margin-top: 10px !important;
+            }
+
+            .q158 .container-options-mobile a{
+                margin-top: 10px;
+            }
+
+        }
+
+        .errorContainerCustom {
+            margin-left: auto !important;
+            text-align: center !important;
+        }
+
+        .errorContainerCustom span.help-block{
+            text-align: center !important;
+        }
+
+        .agent-img{
+            background-size: 9rem 9rem;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+       @media only screen and (max-width: 767px){
+           .agent-img{
+               background-size: 5rem 5rem!important;
+           }
+       }
+    </style>
+</th:block>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: processHeader"></th:block>
+</th:block>
+<th:block layout:fragment="content">
+    <div class="process-loading-container circle-progress">
+        <div class="loading-content">
+            <div class="sk-circle">
+                <div class="sk-circle1 sk-child"></div>
+                <div class="sk-circle2 sk-child"></div>
+                <div class="sk-circle3 sk-child"></div>
+                <div class="sk-circle4 sk-child"></div>
+                <div class="sk-circle5 sk-child"></div>
+                <div class="sk-circle6 sk-child"></div>
+                <div class="sk-circle7 sk-child"></div>
+                <div class="sk-circle8 sk-child"></div>
+            </div>
+            <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+        </div>
+    </div>
+
+    <div id="sectionSidebar" class="sidebar-breadcrumb display-none" th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CAJASULLANA) ? 'sidebar-breadcrumb display-none sidebar-cajasullana' : 'sidebar-breadcrumb display-none'}">
+        <ul>
+            <li data-section="2">
+                <div class="circle"><i class="icon icon-person-info"></i></div>
+                <span>Datos Personales</span>
+                <span class="bullets"></span>
+            </li>
+            <li data-section="3">
+                <div class="circle"><i class="icon icon-dollar"></i></div>
+                <span>Ingresos</span>
+                <span class="bullets"></span>
+            </li>
+            <li data-section="4">
+                <div class="circle"><i class="icon icon-percent"></i></div>
+                <span>Oferta</span>
+                <span class="bullets"></span>
+            </li>
+            <li data-section="5">
+                <div class="circle"><i class="icon icon-check"></i></div>
+                <span>Verificaci&oacute;n</span>
+                <span class="bullets"></span>
+            </li>
+            <li data-section="6">
+                <div class="circle"><i class="icon icon-sign"></i></div>
+                <span>Contrato</span>
+                <span class="bullets"></span>
+            </li>
+        </ul>
+    </div>
+    <div id="preview" th:text="${questionId}"></div>
+    <section class="loan-process" th:if="${evaluationType == 'evaluation'}">
+        <div class="container" id="container-evaluation-div">
+            <div class="adviser-section animated fadeIn" style="display: none;" th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? 'adviser-section-banbif' : (${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)} ? 'adviser-section-azteca' : '')">
+                <th:block th:replace="this :: stepsSectionFormQuestion"></th:block>
+                <th:block
+                        th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest,
+                    T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER)}">
+                    <div id="pre-aproved-message" class="message" style="display: none;"></div>
+                    <div class="sello" style="display: none;">
+                        <span>Oferta exclusiva<br /> en Web</span>
+                        <img src="https://s3.amazonaws.com/solven-public/img/icons/medal.svg"
+                             alt="Oferta exclusiva solo en Web" />
+                    </div>
+                </th:block>
+            </div>
+            <div id="question-replaceable" th:class="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? banbif-class : other-class"></div>
+            <div id="error-content" class="display-none">
+                <div class="block text-center">
+                    <p class="text-black">Se produjo un error inesperado, <br/>por favor int&eacute;ntalo nuevamente o
+                        cont&aacute;ctanos.</p><br/>
+                    <div class="actions">
+                        <th:block th:switch="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+                            <a th:case="false" href="javascript:location.reload();" class="anchor-button bg-red icon">Reintentar</a>
+                            <a th:case="true" th:href="@{/}" class="anchor-button bg-red">Volver al inicio</a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+            <div id="error-content-reload" class="display-none">
+                <div class="block text-center">
+                    <p class="text-black">Se produjo un error inesperado, <br/>por favor int&eacute;ntalo nuevamente o
+                        cont&aacute;ctanos.</p><br/>
+                    <div class="actions">
+                        <a href="javascript:location.reload();" class="anchor-button bg-red icon icon-home">Reintentar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="loan-process autoevaluacion" th:if="${evaluationType == 'selfevaluation'}">
+        <div class="container">
+            <div class="adviser-section animated fadeIn" style="display:none">
+                <div id="progressQuestion" class="selfevaluation">
+                    <figure class="agent-img" th:style="'background-image: url('+${agent?.getProcessAvatar()}+');'">
+
+                    </figure>
+                    <ul class="list-question before-offer">
+                        <li class="steps-question category-1">
+                            <div class="base-line"><span class="progress-line"></span></div>
+                            <div class="w">
+                                <span class="num">1</span>
+                            </div>
+                            <span class="list-question-text">Calificaci&oacute;n</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="question-replaceable" th:class="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? banbif-class : other-class"></div>
+            <div id="error-content" class="display-none" style="margin-top: 20px;">
+                <div class="block text-center">
+                    <p class="text-black">Se produjo un error inesperado, <br/>por favor int&eacute;ntalo nuevamente o
+                        cont&aacute;ctanos.</p>
+                    <br/>
+                    <div class="actions">
+                        <th:block th:switch="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+                            <a th:case="false" th:href="@{/}" class="anchor-button bg-red icon icon-home">Ir al home</a>
+                            <a th:case="true" th:href="@{/}" class="anchor-button bg-red">Volver al inicio</a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var offset = $(".agent-img").offset();
+        let isAlfin = /*[[${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}]]*/false;
+
+        function validateIframe() {
+            if ( window.location !== window.parent.location && isAlfin)
+            {
+                $("body").addClass("is-iframe");
+                $("img.logo").hide();
+                $("a.logoLinkUrl").hide();
+                $("div.process-header div.logol").hide();
+                $("div#processHeaderAmount div.edit-amount-box").css("display","flex").css("justify-content","center");
+                $("div#processHeaderAmount").addClass("dflex-center-edit");
+                setClassToProcessHeaderAmount();
+                $("#main div.process-header").css("margin-bottom","5px").css("padding-bottom","0");
+            }
+        }
+
+        function setClassToProcessHeaderAmount(){
+            if(!$("div#processHeaderAmount").hasClass("dflex-center-edit")){
+                $("div#processHeaderAmount").addClass("dflex-center-edit");
+                setTimeout(()=>{
+                    return setClassToProcessHeaderAmount();
+                },2000)
+            }
+        }
+
+        validateIframe();
+
+        $(document).ready(function(){
+            validateIframe();
+        })
+
+        /*]]>*/
+
+    </script>
+    <p th:if="${evaluationType == 'selfevaluation'}" id="texto_legal">El servicio de autoevaluación provisto por Solven
+        es una herramienta destinada a que los usuarios puedan tener una idea orientativa acerca de las posibilidades de
+        obtener un crédito en empresas del sistema financiero. El análisis realizado se basa en información provista por
+        el usuario y en información de acceso público. De ninguna forma el proceso de autoevaluación genera para Solven
+        la obligación de otorgar un préstamo al usuario, ni implica que los financiadores que operan a través de la
+        plataforma lo hagan, dado que sus políticas de crédito utilizan información y/ o criterios adicionales a los
+        aplicados por Solven en el servicio de autoevaluación.</p>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        if ($('.loan-process').hasClass('autoevaluacion')) {
+            $('body').addClass('w-autoevaluacion');
+        }
+        /*]]>*/
+
+    </script>
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooterChooseAgentInner"></th:block>
+    </th:block>
+    <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="editModal"></div>
+    <div id="questionModals"></div>
+    <div id="offer_modal" class="modal fade " tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                            <h4 class="title-modal">¿Cómo elegimos la mejor oferta?</h4>
+                        </th:block>
+                        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                            <h4 class="title-modal">¿Cómo calculamos la mejor oferta para vos?</h4>
+                        </th:block>
+
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content text-center">
+                        <div>
+                            <div class="title-wrap">
+                                <span class="title-modals">Consultamos a todos los financiadores afiliados a nuestra plataforma, para saber quienes están dispuestos a prestarte.
+                                </span>
+                            </div>
+                            <ul>
+                                <li>
+                                    <span>1) En caso que te ofrezcan el monto solicitado (o más):</span>
+                                    Elegimos a quien te cobre la menor tasa de interés (<text th:text="#{static.offer.rate}"></text>), priorizando a quien desembolse el crédito en línea.
+                                </li>
+                                <li>
+                                    <span>2) En caso que no te ofrezcan el monto solicitado:</span>
+                                    Elegimos a quien te ofrezca el monto más alto posible y que te cobre la menor tasa
+                                    de interés (<text th:text="#{static.offer.rate}"></text>), priorizando también a quien desembolse el crédito en línea.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:replace="this :: scriptInitializerQuestionFramework"></th:block>
+</th:block>
+
+<th:block th:fragment="stepsSectionFormQuestion">
+    <th:block th:switch="${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+        <th:block th:case="true">
+            <div id="progressQuestion" class="selfevaluation">
+                <figure class="agent-img" th:style="'background-image: url('+${agent?.getProcessAvatar()}+');'">
+
+                </figure>
+                <ul class="list-question before-offer">
+                    <li class="steps-question category-1">
+                        <div class="base-line">
+                                        <span class="progress-line">
+                                        </span>
+                        </div>
+                        <div class="w">
+                            <span class="num">1</span>
+                        </div>
+                        <span class="list-question-text">Oferta</span>
+                    </li>
+                </ul>
+                <ul class="list-question after-offer">
+                    <li class="steps-question category-5">
+                        <div class="base-line"><span class="progress-line"></span></div>
+                        <div class="w">
+                            <span class="num">5</span>
+                        </div>
+                        <span class="list-question-text">Resultado</span>
+                    </li>
+                </ul>
+
+                <div class="estimated"></div>
+            </div>
+        </th:block>
+        <th:block th:case="false">
+            <th:block th:switch="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+                <th:block th:case="true">
+                    <div id="progressQuestion" class="progressBanBif">
+                        <figure class="agent-img" th:style="'background-image: url('+${agent?.getProcessAvatar()}+');'">
+
+                        </figure>
+                        <ul class="list-question">
+                            <li class="steps-question category-1">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <span class="num">1</span>
+                                </div>
+                                <span class="list-question-text">Verificaci&oacute;n</span>
+                            </li>
+                            <li class="steps-question category-4">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <span class="num">2</span>
+                                </div>
+                                <span class="list-question-text">Oferta</span>
+                            </li>
+                            <li class="steps-question category-9">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w"><span class="num">3</span>
+                                </div>
+                                <span class="list-question-text">Domicilio/ Cuenta abono</span>
+                            </li>
+                        </ul>
+                    </div>
+                </th:block>
+                <th:block th:case="false">
+                    <div id="progressQuestion">
+                        <figure class="agent-img" th:style="'background-image: url('+${agent?.getProcessAvatar()}+');'">
+
+                        </figure>
+                        <th:block th:if="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA}">
+                            <ul class="list-question before-offer" style="display: none;">
+                                <li class="steps-question category-1">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">1</span>
+                                    </div>
+                                    <span class="list-question-text">Datos Personales</span>
+                                </li>
+                                <th:block>
+                                    <li class="steps-question category-2">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                            <span class="num">2</span>
+                                        </div>
+                                        <span class="list-question-text">Ingresos</span>
+                                    </li>
+                                </th:block>
+                                <li class="steps-question category-3">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w"><span class="num">3</span>
+                                    </div>
+                                    <span class="list-question-text">Tu cuenta</span>
+                                </li>
+                            </ul>
+                            <ul class="list-question after-offer" style="display: none;">
+                                <li class="steps-question category-3">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">3</span>
+                                    </div>
+                                    <span class="list-question-text">Tu cuenta</span>
+                                </li>
+                                <li class="steps-question category-4">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">4</span>
+                                    </div>
+                                    <span class="list-question-text">Resumen</span>
+                                </li>
+                                <li class="steps-question category-5">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">5</span>
+                                    </div>
+                                    <span class="list-question-text">Contrato</span>
+                                </li>
+                            </ul>
+                        </th:block>
+                        <th:block th:unless="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA}">
+                            <ul class="list-question before-offer" style="display: none;">
+                                <li class="steps-question category-1">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">1</span>
+                                    </div>
+                                    <span class="list-question-text">Datos Personales</span>
+                                </li>
+                                <th:block>
+                                    <li class="steps-question category-2">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                            <span class="num">2</span>
+                                        </div>
+                                        <span class="list-question-text">Ingresos</span>
+                                    </li>
+                                </th:block>
+                                <li class="steps-question category-3">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w"><span class="num">
+                                                3
+                                        <!--                                                <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">2</th:block>-->
+                                        <!--                                                <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">3</th:block>-->
+                                            </span>
+                                    </div>
+                                    <span class="list-question-text">Oferta</span>
+                                </li>
+                            </ul>
+                            <ul class="list-question after-offer" style="display: none;">
+                                <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                    <li class="steps-question category-4">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                            <span class="num">3</span>
+                                        </div>
+                                        <span class="list-question-text">Oferta</span>
+                                    </li>
+                                    <li class="steps-question category-5">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                            <span class="num">4</span>
+                                        </div>
+                                        <span class="list-question-text">Verificación</span>
+                                    </li>
+                                    <li class="steps-question category-6">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                                <span class="num">
+                                                    5
+                                                </span>
+                                        </div>
+                                        <span class="list-question-text">
+                                                Contrato
+                                            </span>
+                                    </li>
+                                </th:block>
+                                <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                    <li class="steps-question category-3">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                            <span class="num">3</span>
+                                        </div>
+                                        <span class="list-question-text">Oferta</span>
+                                    </li>
+                                    <li class="steps-question category-4">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                            <span class="num">4</span>
+                                        </div>
+                                        <span class="list-question-text">Verificación</span>
+                                    </li>
+                                    <li class="steps-question category-5">
+                                        <div class="base-line"><span class="progress-line"></span></div>
+                                        <div class="w">
+                                                <span class="num">
+                                                    5
+                                                </span>
+                                        </div>
+                                        <span class="list-question-text">
+                                                Contrato
+                                            </span>
+                                    </li>
+                                </th:block>
+                            </ul>
+                        </th:block>
+                        <ul class="list-question custom-offer custom-steps-progress" style="display: none;">
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).GATEWAY}">
+                                <li class="steps-question category-1">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">1</span>
+                                    </div>
+                                    <span class="list-question-text">Registro</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).GATEWAY}">
+                                <li class="steps-question category-4">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">2</span>
+                                    </div>
+                                    <span class="list-question-text">Oferta</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).GATEWAY}">
+                                <li class="steps-question category-10">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">3</span>
+                                    </div>
+                                    <span class="list-question-text">Compromiso</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).GATEWAY}">
+                                <li class="steps-question category-11">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">4</span>
+                                    </div>
+                                    <span class="list-question-text">Completo</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}">
+                                <li class="steps-question category-1 w-50-important">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">1</span>
+                                    </div>
+                                    <span class="list-question-text">Datos personales</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}">
+                                <li class="steps-question category-5 w-50-important">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">2</span>
+                                    </div>
+                                    <span class="list-question-text">Verificación</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CONSEJ0}">
+                                <li class="steps-question category-1">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">1</span>
+                                    </div>
+                                    <span class="list-question-text">Datos personales</span>
+                                </li>
+                            </th:block>
+
+                            <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CONSEJ0}">
+                                <li class="steps-question category-6">
+                                    <div class="base-line"><span class="progress-line"></span></div>
+                                    <div class="w">
+                                        <span class="num">2</span>
+                                    </div>
+                                    <span class="list-question-text">Consejo</span>
+                                </li>
+                            </th:block>
+                        </ul>
+                        <div class="estimated"></div>
+                    </div>
+                </th:block>
+            </th:block>
+        </th:block>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="scriptInitializerQuestionFramework">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var showWelcome = /*[[${showWelcome}]]*/,
+            evaluationType = /*[[ ${evaluationType} ]]*/,
+            url_agent_image = /*[[ ${agent?.getProcessAvatar()} ]]*/,
+            question_id = /*[[${questionId}]]*/,
+            customDocumentTitle = /*[[${customDocumentTitle}]]*/;
+        isCustomDocumentTitle = /*[[${isCustomDocumentTitle}]]*/;
+        var questionFw;
+        var OneSignal = window.OneSignal || [];
+        var showHttpPrompt = false;
+
+        var evaluationType = /*[[${evaluationType}]]*/;
+        questionFw = new QuestionFramework($('#question-replaceable'));
+        questionFw.brandingPrimaryColor = $cadena_colorweb;
+        questionFw.brandingSecundaryColor = $cadena_colorwebsecond;
+        questionFw.branding = isBranded;
+        var questionFwType;
+        if (evaluationType == "selfevaluation")
+            questionFwType = questionFw.TYPE_SELFEVALUATION;
+        if (evaluationType == "evaluation")
+            questionFwType = questionFw.TYPE_EVALUATION;
+        if (evaluationType == "comparison")
+            questionFwType = questionFw.TYPE_COMPARISON;
+        questionFw.token = /*[[${token}]]*/;
+        questionFw.type = questionFwType;
+        questionFw.currentQuestion = /*[[${currentQuestion}]]*/;
+        questionFw.categoryUrl = /*[[${categoryUrl}]]*/;
+        questionFw.agent = /*[[${agent?.id}]]*/;
+        questionFw.externalParams = /*[[${externalParams}]]*/;
+        questionFw.errorContainer = $('#error-content');
+        questionFw.errorContainerRetry = $('#error-content-reload');
+        questionFw.init();
+        questionFw.resetUrl();
+        questionFw.loggable = /*[[${!@configuration.hostEnvIsProduction()}]]*/;
+
+        var size = 130;
+        var avatar = $('.avatar-advisor');
+        if ($(window).width() <= 1280 && $(window).width() > 768) {
+            size = 100;
+        } else if ($(window).width() <= 768) {
+            size = 60;
+        }
+        avatar.doOnce(function () {
+            avatar.imgProgress({
+                img_url: url_agent_image, // path to the image
+                size: size, // size in pixels
+                barSize: 10, // bar size
+                backgroundColor: $StrokeSolvenColor, // background color - brand
+                foregroundColor: $FillSolvenColor, // foreground color - brand
+                backgroundSize: 'cover', // CSS background-size property
+                percent: 1 // current percentage value
+            });
+        });
+        if (showWelcome) {
+            swal({
+                title: '',
+                text: /*[[${showWelcomeMessage}]]*/,
+                confirmButtonColor: "#F7323F",
+                timer: 5000,
+                showConfirmButton: false
+            });
+        }
+        if (isCustomDocumentTitle) {
+            document.title = customDocumentTitle;
+        }
+
+        $('#anchor-back').click(function () {
+            questionFw.backwards();
+        });
+
+        (function () {
+            //https://documentation.onesignal.com/docs/troubleshooting-web-push#section-3-check-if-you-are-subscribed
+
+            var httpPromptMessage = 'Entérate del estado de tu oferta hasta terminar la solicitud ...';
+            var httpPromptAcceptButtonText = 'Suscribirme';
+            var httpPromptCancelButtonText = 'Luego';
+
+            OneSignal.push(function () {
+                OneSignal.log.setLevel(questionFw.loggable ? 'trace' : 'warn');
+
+                var isPushSupported = OneSignal.isPushNotificationsSupported();
+                if (isPushSupported) {
+                    OneSignal.SERVICE_WORKER_PARAM = {scope: '/'};// SOLO CUANDO JS DE ONESIGNAL NO SE SIRVEN DESDE ROOT. ESTO DEBE COINCIDIR CON /Client/RootController#getOneSignalResource
+
+                    OneSignal.setDefaultNotificationUrl(window.location.origin + "/saca-tu-credito");
+                    OneSignal.setDefaultTitle(document.head.querySelector('title').text);
+
+                    OneSignal.getNotificationPermission(function (permission) {
+                        console.log('Notification API status: ' + permission);
+                    });
+
+                    window.onunload = window.onbeforeunload = function () {
+                        if (questionFw.isMobile.any() === null) {// DESKTOP ONLY. AVOID MOBILE ONLY EVENTS
+                            questionFw.sendBeaconPushNotification(questionFw.pushNotificationUserId);
+                        }
+                    };
+
+                    // ATM
+                    callOneSignalUserId();
+
+                    OneSignal.on('subscriptionChange', function (subscribed) {
+                        console.log('User subscription status is : ' + subscribed);
+                        if (subscribed) {
+                            callOneSignalUserId();
+                        } else {
+                            console.log('User is not subscribe or already unsubscribe');
+                        }
+                    });
+                    OneSignal.on('notificationPermissionChange', function (permissionChange) {
+                        var currentPermission = permissionChange.to;
+                        if (currentPermission === 'default') {
+                            console.log('User close notification prompt');
+                        } else if (currentPermission === 'granted') {
+                            console.log('User press allow');
+                        } else if (currentPermission === 'denied') {
+                            console.log('User press block or not now');
+                        } else {
+                            console.log('We will never know what happened: ' + permissionChange);
+                        }
+                    });
+
+                    var oneSignalAppId = /*[[ ${@configuration.getOneSignalAppId(@brandingService.getEntityBranding(#httpServletRequest)?.entity?.id, @countryContextService.getCountryParamsByRequest(#httpServletRequest)?.id)} ]]*/null;
+                    var initConfiguration = {
+                        appId: oneSignalAppId,
+                        autoRegister: false,
+                        notifyButton: {
+                            enable: false,
+                            "bottom-left": true
+                        },
+                        welcomeNotification: {
+                            disable: true
+                        },
+                        path: '/js/',// JS DE ONESIGNAL SE ENCUENTRAN EN ESTE FOLDER
+                        allowLocalhostAsSecureOrigin: true,
+                        persistNotification: true// VALOR POR DEFECTO. SI ES FALSO NOTIFICACION DESAPARECERA LUEGO DE ~20SEG
+                    };
+
+                    if (showHttpPrompt) {
+                        initConfiguration.promptOptions = {
+                            actionMessage: httpPromptMessage,
+                            acceptButtonText: httpPromptAcceptButtonText.toUpperCase(),
+                            cancelButtonText: httpPromptCancelButtonText.toUpperCase()
+                        }
+                    }
+
+                    OneSignal.init(initConfiguration);
+                } else {
+                    console.warn("Push API is not supported");
+                }
+            });
+
+            function callOneSignalUserId() {
+                OneSignal.getUserId(function (userId) {
+                    if (userId !== null && userId !== undefined) {
+                        questionFw.pushNotificationUserId = userId;
+                    }
+                });
+            }
+        })();
+
+        function calcHeight() {
+            var chv = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            document.getElementById("main").setAttribute("style", "min-height:" + chv + "px;");
+        }
+
+        window.onresize = function (event) {
+            calcHeight();
+        };
+
+        async function sendSelfNotification(title, message) {
+            let isPushSupported = await OneSignal.isPushNotificationsSupported();
+            let isNotificationEnable = await OneSignal.isPushNotificationsEnabled();
+
+            if (isPushSupported && isNotificationEnable) {
+                OneSignal.sendSelfNotification(
+                    title,
+                    message,
+                    window.location.href,
+                    'https://s3.amazonaws.com/solven-public/img/icons/logo_200x200-notifications.png'
+                ).then(function (sent) {
+                    console.log(sent);
+                    console.log('Self notification was sent')
+                }).catch(function (err) {
+                    console.error(err);
+                });
+            }
+        }
+
+        async function updateSubscription(unmute) {
+            var isPushSupported = await OneSignal.isPushNotificationsSupported();
+
+            if (isPushSupported) {
+                console.log('Subscription is ' + unmute.toString());
+                await OneSignal.setSubscription(unmute);
+            }
+        }
+
+        if($cadena_colorweb){
+            let styleDropdown = document.createElement('style');
+            styleDropdown.type = 'text/css';
+            styleDropdown.innerHTML = `
+            .select2-dropdown {
+                box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ${$cadena_colorweb} !important;
+            }
+            `;
+            document.getElementsByTagName('head')[0].appendChild(styleDropdown);
+        }
+
+
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block th:fragment="modal_edit_loan_application">
+    <div class="modal-dialog" role="edit">
+        <div class="modal-content">
+            <div class="modal-top">
+                <div class="title-wrap">
+                    <h4 class="title-modal" th:text="#{title.modal.edit.amount}"></h4>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-middle">
+                <div class="block-content text-center">
+                    <form id="updateForm" th:object="${updateLoanAppForm}" autocomplete="off">
+                        <div class="box-b">
+                            <div class="field field-amount inline">
+                                <div class="wrap-field">
+                                    <div class="box-icon prefix-box tiny-input">
+                                        <span class="prefix" th:text="${loanApplication?.currency?.symbol}"></span>
+                                    </div>
+                                    <input type="text" class="input-outline amount-input" th:field="*{amount}"/>
+                                    <small class="input-help">Monto</small>
+                                </div>
+                            </div>
+                            <div class="field inline">
+                                <input type="text" class="input-outline small-input" th:field="*{installments}"/>
+                                <small class="input-help">Meses</small>
+                            </div>
+                            <div class="field inline">
+                                <button type="button" class="button bg-red" id="updateButton">Guardar</button>
+                            </div>
+                        </div>
+                        <div class="display-block">
+                            <div class="errorContainer"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#updateForm'), JSON.parse(/*[[${updateLoanAppForm.validator.toJson(#locale)}]]*/));
+        $('#updateButton').click(function () {
+            if ($('#updateForm').valid()) {
+                questionFw.updateLoanApplication({
+                    type: "POST",
+                    form: $('#updateForm'),
+                    button: $('#updateButton'),
+                    data: $('#updateForm').serializeObject(),
+                    success: function () {
+                        $('#edit-modal').modal('hide');
+                        questionFw.refreshAmountAndInstallments();
+                    }
+                });
+            }
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<th:block th:fragment="modal_edit_loan_offer">
+    <div class="modal-dialog" role="edit">
+        <div class="modal-content" th:classappend="${fixedInstallments != null ? 'w-withfee' : 'w-nofee'}">
+            <div class="modal-top">
+                <div class="title-wrap">
+                    <h4 class="title-modal">Editar montos</h4>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-middle">
+                <div class="block-content text-center">
+                    <!-- marioccarloss -->
+                    <form id="updateForm" th:object="${updateLoanOfferForm}"
+                          th:classappend="${fixedInstallments != null ? 'withfee' : 'nofee'}" autocomplete="off">
+                        <div class="box-b">
+                            <div class="field field-amount inline">
+                                <div class="wrap-field">
+                                    <div class="box-icon prefix-box tiny-input">
+                                        <span class="prefix" th:text="${currencySymbol}"></span>
+                                    </div>
+                                    <input type="text" class="input-outline amount-input" th:field="*{amount}"/>
+                                    <small class="display-block text-left ">Monto</small>
+                                </div>
+                            </div>
+                            <th:block th:if="${fixedInstallments == null}">
+                                <div class="field inline">
+                                    <input type="text" class="input-outline small-input" th:field="*{installments}"/>
+                                    <small class="display-block text-left ">Cuotas</small>
+                                </div>
+                            </th:block>
+                            <th:block th:if="${fixedInstallments != null}">
+                                <div class="field inline w-inline">
+                                    <input type="text" name="installments" id="installments" style="display: none"/>
+                                    <label class="input-radio-modal" th:each="installment : ${fixedInstallments}"
+                                           th:attr="data-value=${installment}">
+                                        <span th:text="${installment + ' meses'}"></span>
+                                        <div class="radio"></div>
+                                    </label>
+                                    <small class="display-block text-left ">Cuotas</small>
+                                </div>
+                            </th:block>
+                            <div class="field inline w-button">
+                                <button type="button" class="button bg-red" id="updateButton">Guardar</button>
+                            </div>
+                        </div>
+                        <div class="display-block">
+                            <div class="errorContainer"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        questionFw.validateForm($('#updateForm'), JSON.parse(/*[[${updateLoanOfferForm.validator.toJson(#locale)}]]*/));
+
+        if ($('#updateForm').find('.input-radio-modal').length) {
+            $('#updateForm').find('.input-radio-modal').click(function () {
+                $('#updateForm').find('input[name=installments]').val($(this).data('value'));
+            });
+        }
+
+        $('#updateButton').click(function () {
+            if ($('#updateForm').valid()) {
+                questionFw.updateLoanOffer({
+                    type: "POST",
+                    form: $('#updateForm'),
+                    button: $('#updateButton'),
+                    data: $('#updateForm').serializeObject(),
+                    success: function () {
+                        $('#edit-modal').modal('hide');
+                        questionFw.refreshAmountAndInstallments();
+                        questionFw.refreshQuestion();
+                    }
+                });
+            }
+        });
+
+
+        $(".input-radio-modal").on('click', function() {
+            var o = $(this);
+            o.addClass('active').siblings().removeClass('active');
+        })
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<th:block th:fragment="modal_edit_loan_offer_vehicle">
+    <div class="modal-dialog" role="edit">
+        <div class="modal-content">
+            <div class="modal-top">
+                <div class="title-wrap">
+                    <h4 class="title-modal">Editar inicial</h4>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-middle">
+                <div class="block-content text-center">
+                    <form id="updateForm" th:object="${updateLoanOfferForm}" autocomplete="off">
+                        <div class="box-purple">
+                            <div class="box-b">
+                                <div class="field field-amount inline">
+                                    <div class="wrap-field">
+                                        <div class="box-icon prefix-box tiny-input">
+                                            <span class="prefix"
+                                                  th:text="${T(com.affirm.common.model.catalog.Currency).USD_CURRENCY}"></span>
+                                        </div>
+                                        <input type="text" class="input-outline amount-input"
+                                               th:field="*{downPayment}"/>
+                                        <small class="display-block text-left text-white">Cuota inicial</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions text-center">
+                            <div class="errorContainer"></div>
+                            <button type="button" class="button bg-red" id="updateButton">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#updateForm'), JSON.parse(/*[[${updateLoanOfferForm.validator.toJson(#locale)}]]*/));
+        $('#updateButton').click(function () {
+            //debugger;
+            if ($('#updateForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    form: $('#updateForm'),
+                    button: $('#updateButton'),
+                    data: $('#updateForm').serializeObject(),
+                    success: function () {
+                        $('#edit-modal').modal('hide');
+                        questionFw.refreshAmountAndInstallments();
+                        questionFw.refreshQuestion();
+                    }
+                }, "/edit");
+            }
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<th:block th:fragment="modal_edit_vehicle">
+    <div class="modal-dialog" role="edit">
+        <div class="modal-content">
+            <div class="modal-top">
+                <div class="title-wrap">
+                    <h4 class="title-modal">
+                        <span class="circle"></span>
+                        <span class="text"> Elige un auto</span>
+                    </h4>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-middle">
+                <div class="block-content text-center">
+                    <div class="edit-autos">
+                        <div class="block" id="brand-section">
+
+                            <ul class="brand-list">
+                                <li th:each="brand : ${@catalogService.getActiveVehicleBrands()}">
+                                    <a href="#" class="brandSelected" th:attr="data-id=${brand.id}">
+                                        <img th:src="${brand.image}"/>
+                                        <h3 th:text="${brand.brand}"></h3>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="actions">
+                                <button id="nextTo" class="button bg-red hidden" th:text="#{button.next}"></button>
+                            </div>
+                        </div>
+                        <div class="block block-hidden" id="car-section">
+                            <div class="results-car">
+
+                            </div>
+                            <div class="actions">
+                                <br/>
+                                <button type="button" class="button bg-red" id="savePreference">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function () {
+            var toSend = [];
+            $('.brandSelected').on('click', function (e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                if ($.inArray(id, toSend) != -1) {
+                    $(this).removeClass('brand-active');
+
+                    for (i = 0; i < toSend.length; i++) {
+                        if (toSend[i] == id) {
+                            toSend.remove(toSend[i]);
+                        }
+                    }
+                } else {
+                    toSend.push(id);
+                    $(this).addClass('brand-active');
+                }
+                (toSend.length > 0) ? $('#nextTo').removeClass('hidden') : $('#nextTo').addClass('hidden');
+            });
+
+            $('#nextTo').on('click', function (e) {
+                e.preventDefault();
+                defaultAjax({
+                    url: /*[[@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/__${@evaluationController.URL}__/__${token}__/updateLoanApplication/vehicleResults}]]*/,
+                    type: 'GET',
+                    data: {brands: JSON.stringify(toSend)},
+                    success: function (data) {
+                        $('#nextTo').closest('.block').addClass('block-hidden');
+                        $('#car-section').removeClass('block-hidden');
+                        $('.results-car').html(data);
+                        $('.real-radio').radio();
+                    }
+                });
+            });
+
+            function productStyles(selection) {
+                if (!selection.id) {
+                    return selection.text;
+                }
+                var thumb = $(selection.element).data('thumb');
+                if (!thumb) {
+                    return selection.text;
+                } else {
+                    var $selection = $('<img src=   "' + thumb + '" alt=""><span class="img-changer-text">' + $(selection.element).text() + '</span>');
+                    return $selection;
+                }
+            }
+
+            $('.real-radio').radio();
+
+            $('#savePreference').click(function () {
+                questionFw.updateLoanApplicationVehicle({
+                    type: "POST",
+                    form: $('#updateForm'),
+                    button: $('#savePreference'),
+                    data: {vehicleId: $('input[name=model]:checked').val()},
+                    success: function () {
+                        $('#edit-modal').modal('hide');
+                        questionFw.refreshAmountAndInstallments();
+                    }
+                });
+            });
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<th:block th:fragment="modal_edit_vehicle_results">
+    <div class="car" th:each="vehicle : ${results}">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col">
+                <label class="custom-input-radio">
+                    <input type="radio" name="model" th:value="${vehicle?.vehicleDetails[0]?.id}" class="real-radio"/>
+                </label>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col">
+                <img th:src="${vehicle?.image}" alt=""/>
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 col">
+                <div class="wrap">
+                    <div class="top">
+                        <h2 th:text="${vehicle.brand.brand+' '+vehicle.model}"></h2>
+                        <span th:text="${vehicle?.version}"></span>
+                    </div>
+                    <div class="price">
+                        <h4 class="text-red"
+                            th:text="${@utilService.integerMoneyFormat(vehicle.price, vehicle?.currency?.symbol)}"></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="question_config">
+    <div id="questionConfiguration"
+         th:attr="data-section=${section},data-show-application-update-modal=${showLoanApplicationUpdateModal},data-show-offer-update-modal=${showLoanOfferUpdateModal},data-show-agent=${showAgent},data-percentage=${progressPercentage},data-force-vehicle-modal-show=${forceVehicleModalShow},data-show-go-back=${showGoBack},data-show-name-email=${showNameEmail},data-user-email=${userEmail},data-user-name=${userFullName},data-hotjar-id=${hotjarId},data-show-pre-approved=${showPreApproved},data-show-offer-modal=${showOfferMedal},data-show-pre-approved-message=${showPreApprovedMessage},data-question-catgory=${questionCategory},data-show-zendesk-widget=${showZendeskWidget},data-is-banbif=${isBanBif},data-show-custom-offer=${showCustomOffer},data-show-label-information=${showLabelInformation}"></div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var pixelConversion = [[${pixelConversion}]];
+            pixelConversion = JSON.parse(pixelConversion);
+            if(pixelConversion != null){
+                for(var i=0; i<pixelConversion.length; i++){
+                    var pixel = pixelConversion[i];
+                    if(pixel.type != null){
+                        dataLayer.push({'event':pixel.type,'conversionValue':pixel.value});
+                    }
+                    if(pixel.categoryType != null){
+                        dataLayer.push({'event':pixel.categoryType,'conversionValue':pixel.categoryValue});
+                    }
+                }
+            }
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+
+
+
+<!-- NO HAY CLASE-->
+<th:block th:fragment="question_8">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <p th:text="#{questions.block.signUp}"></p>
+        <small class="input-help" style="text-align:center">¡No te confundas! Por tu seguridad, este correo se vinculará
+            a tu DNI.
+        </small>
+        <form action="" id="questionForm" th:object="${form}" autocomplete="off">
+            <div class="block" id="form-sign-up">
+                <div class="field field-username inline">
+                    <div class="wrap-field">
+                        <div class="box-icon"><i class="icon icon-user"></i></div>
+                        <input type="text" class="input-outline" th:field="*{email}" autocorrect="off"
+                               autocapitalize="none"/>
+                        <small class="input-help">Correo electr&oacute;nico</small>
+                    </div>
+                </div>
+                <div class="field inline">
+                    <button id="sendButton" type="button" class="button bg-red">Continuar</button>
+                </div>
+                <div class="display-block">
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+            <div class="block">
+                <hr class="or-divisor"/>
+            </div>
+            <div class="block" id="social-networks">
+                <!-- outline-box-active -->
+                <a id="facebook" class="outline-box" th:classappend="${facebook != null ? 'outline-box-active' : ''}"
+                   onclick="login('facebook')"><i class="icon icon-facebook"></i></a>
+                <a id="linkedin" class="outline-box" th:classappend="${linkedin != null ? 'outline-box-active' : ''}"
+                   onclick="login('linkedin')"><i class="icon icon-linkedin"></i></a>
+                <a id="google" class="outline-box" th:classappend="${google != null ? 'outline-box-active' : ''}"
+                   onclick="login('google')"><i class="icon icon-google-plus"></i></a>
+                <a id="windows" class="outline-box" th:classappend="${windows != null ? 'outline-box-active' : ''}"
+                   onclick="login('windows')"><i class="icon icon-outlook"></i></a>
+                <a id="yahoo" class="outline-box" th:classappend="${yahoo != null ? 'outline-box-active' : ''}"
+                   onclick="login('yahoo')"><i class="icon icon-yahoo"></i></a>
+            </div>
+            <br/>
+            <div class="note">
+                <small>Al crear tu cuenta declaras que aceptas los <a rel="noopener noreferrer"
+                                                                      th:href="@{/terminos-y-condiciones}"
+                                                                      target="_blank" class="text-lightblue">T&eacute;rminos
+                    y Condiciones</a> y la <a
+                        th:href="@{/politica-de-privacidad}" target="_blank" rel="noopener noreferrer"
+                        class="text-lightblue">Pol&iacute;tica de Privacidad</a>.
+                </small>
+            </div>
+        </form>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $('.input-outline').on("input", function () {
+            $(this).val($(this).val().replace(/ /g, ""));
+        });
+
+
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        oauthy.setupNetwork('google',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('windows',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('yahoo',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('facebook',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('linkedin',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getDefaultPermission()}]]*/null);
+
+        $('#show-block').on('click', function (e) {
+            e.preventDefault();
+
+            switch ($(this).attr('data-target')) {
+                case '#form-sign-up':
+                    $('#social-networks').addClass('block-hidden');
+                    $(this).html('Reg&iacute;strate con tu red social');
+                    if (/*[[${user?.email != null && user?.password != null}]]*/) {
+                        $('#emailExists').show();
+                    }
+                    $($(this).attr('data-target')).removeClass('block-hidden').addClass('fadeIn');
+                    $(this).attr('data-target', '#social-networks');
+                    break;
+                case '#social-networks':
+                    $('#form-sign-up').addClass('block-hidden');
+                    $(this).html('Reg&iacute;strate con tu correo electr&oacute;nico');
+                    $('#emailExists').hide();
+                    $($(this).attr('data-target')).removeClass('block-hidden').addClass('fadeIn');
+                    $(this).attr('data-target', '#form-sign-up');
+                    break;
+            }
+
+        });
+
+        $('#sendButton').click(function () {
+
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+
+        });
+
+
+        function login(network) {
+            oauthy.login(network, function (code) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: 'POST',
+                    data: {
+                        networkProvider: network == 'google' ? 'G' : network == 'windows' ? 'W' : network == 'yahoo' ? 'Y' : network == 'facebook' ? 'F' : network == 'linkedin' ? 'L' : null,
+                        authCode: code
+                    }
+                }, "");
+            }, function () {
+                showErrorModal('Se produjo un error al intentar vincular tus redes, <br/>por favor int&eacute;ntalo nuevamente o cont&aacute;ctanos.');
+            });
+        }
+
+
+        if ($('body').hasClass('w-autoevaluacion')) {
+            $('#texto_legal').css('margin-bottom', '40px');
+        }
+
+        /*]]>*/
+
+
+    </script>
+</th:block>
+
+<th:block th:fragment="question_1">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section animated fadeInRight"
+         th:classappend="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-arg' : ''}">
+        <p th:if="${isSelfEvaluation}" th:utext="#{questions.block.greeting.selfEvaluation(${agent.name})}"></p>
+        <p th:if="${isEvaluation}" th:text="'¿Cuál es tu email y tu número de documento?'"></p>
+        <form id="questionForm" th:object="${form}" class="forms q1" autocomplete="off">
+            <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+
+                <div class="centrado">
+                    <div>
+                        <div class="wrap-field">
+                            <div class="wsi">
+                                <svg version="1.1" id="icon-email" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                     width="22px" height="22px" viewBox="0 0 511.626 511.626" style="enable-background:new 0 0 511.626 511.626;"
+                                     xml:space="preserve">
+                            <g>
+                                <g>
+                                    <path d="M49.106,178.729c6.472,4.567,25.981,18.131,58.528,40.685c32.548,22.554,57.482,39.92,74.803,52.099
+                                        c1.903,1.335,5.946,4.237,12.131,8.71c6.186,4.476,11.326,8.093,15.416,10.852c4.093,2.758,9.041,5.852,14.849,9.277
+                                        c5.806,3.422,11.279,5.996,16.418,7.7c5.14,1.718,9.898,2.569,14.275,2.569h0.287h0.288c4.377,0,9.137-0.852,14.277-2.569
+                                        c5.137-1.704,10.615-4.281,16.416-7.7c5.804-3.429,10.752-6.52,14.845-9.277c4.093-2.759,9.229-6.376,15.417-10.852
+                                        c6.184-4.477,10.232-7.375,12.135-8.71c17.508-12.179,62.051-43.11,133.615-92.79c13.894-9.703,25.502-21.411,34.827-35.116
+                                        c9.332-13.699,13.993-28.07,13.993-43.105c0-12.564-4.523-23.319-13.565-32.264c-9.041-8.947-19.749-13.418-32.117-13.418H45.679
+                                        c-14.655,0-25.933,4.948-33.832,14.844C3.949,79.562,0,91.934,0,106.779c0,11.991,5.236,24.985,15.703,38.974
+                                        C26.169,159.743,37.307,170.736,49.106,178.729z"/>
+                                    <path d="M483.072,209.275c-62.424,42.251-109.824,75.087-142.177,98.501c-10.849,7.991-19.65,14.229-26.409,18.699
+                                        c-6.759,4.473-15.748,9.041-26.98,13.702c-11.228,4.668-21.692,6.995-31.401,6.995h-0.291h-0.287
+                                        c-9.707,0-20.177-2.327-31.405-6.995c-11.228-4.661-20.223-9.229-26.98-13.702c-6.755-4.47-15.559-10.708-26.407-18.699
+                                        c-25.697-18.842-72.995-51.68-141.896-98.501C17.987,202.047,8.375,193.762,0,184.437v226.685c0,12.57,4.471,23.319,13.418,32.265
+                                        c8.945,8.949,19.701,13.422,32.264,13.422h420.266c12.56,0,23.315-4.473,32.261-13.422c8.949-8.949,13.418-19.694,13.418-32.265
+                                        V184.437C503.441,193.569,493.927,201.854,483.072,209.275z"/>
+                                </g>
+                            </g>
+                            </svg>
+                            </div>
+                            <input type="text" class="input-outline" th:field="*{email}" autocorrect="off"
+                                   autocapitalize="none"/>
+                            <small class="input-help">Correo electr&oacute;nico</small>
+                        </div>
+                        <!-- Peru -->
+                        <div class="field inline">
+                            <select th:field="*{docType}" data-width="80">
+                                <option th:each="type : ${identityDocumentTypes}" th:value="${type.id}"
+                                        th:text="${type.name}"></option>
+                            </select>
+                        </div>
+                        <div class="field inline">
+                            <input id="docNumber" name="docNumber" type="text" class="input-outline document-input"
+                                   style="width:130px" th:value="*{docNumber}"/>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                        <!-- -->
+                        <div class="field display-block display-check">
+                            <input type="checkbox" class="real-check" id="acceptAgreement" name="acceptAgreement"/>
+                            <label for="acceptAgreement" class="acceptAgreement">
+                        <span class="check-default">He leído, comprendo y acepto los
+                            <a th:href="@{/terminos-y-condiciones}" target="_blank">Términos y Condiciones</a> y
+                            <a th:href="@{/politica-de-privacidad}" target="_blank">Política de Privacidad</a>
+                        </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <!-- -->
+                <div class="display-block">
+
+                </div>
+            </th:block>
+
+            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                <div class="wrap-arg">
+                    <div class="field inline field-cuit">
+                        <input id="docNumber" name="docNumber" type="text" class="input-outline document-input"
+                               th:value="*{docNumber}"/>
+                        <small class="input-help type-doc">CUIT / CUIL / CDI</small>
+                    </div>
+                    <div class="field field-email inline">
+                        <div class="wrap-field">
+                            <div class="wsi">
+                                <svg version="1.1" id="icon-email" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                     width="22px" height="22px" viewBox="0 0 511.626 511.626" style="enable-background:new 0 0 511.626 511.626;"
+                                     xml:space="preserve">
+                            <g>
+                                <g>
+                                    <path d="M49.106,178.729c6.472,4.567,25.981,18.131,58.528,40.685c32.548,22.554,57.482,39.92,74.803,52.099
+                                        c1.903,1.335,5.946,4.237,12.131,8.71c6.186,4.476,11.326,8.093,15.416,10.852c4.093,2.758,9.041,5.852,14.849,9.277
+                                        c5.806,3.422,11.279,5.996,16.418,7.7c5.14,1.718,9.898,2.569,14.275,2.569h0.287h0.288c4.377,0,9.137-0.852,14.277-2.569
+                                        c5.137-1.704,10.615-4.281,16.416-7.7c5.804-3.429,10.752-6.52,14.845-9.277c4.093-2.759,9.229-6.376,15.417-10.852
+                                        c6.184-4.477,10.232-7.375,12.135-8.71c17.508-12.179,62.051-43.11,133.615-92.79c13.894-9.703,25.502-21.411,34.827-35.116
+                                        c9.332-13.699,13.993-28.07,13.993-43.105c0-12.564-4.523-23.319-13.565-32.264c-9.041-8.947-19.749-13.418-32.117-13.418H45.679
+                                        c-14.655,0-25.933,4.948-33.832,14.844C3.949,79.562,0,91.934,0,106.779c0,11.991,5.236,24.985,15.703,38.974
+                                        C26.169,159.743,37.307,170.736,49.106,178.729z"/>
+                                    <path d="M483.072,209.275c-62.424,42.251-109.824,75.087-142.177,98.501c-10.849,7.991-19.65,14.229-26.409,18.699
+                                        c-6.759,4.473-15.748,9.041-26.98,13.702c-11.228,4.668-21.692,6.995-31.401,6.995h-0.291h-0.287
+                                        c-9.707,0-20.177-2.327-31.405-6.995c-11.228-4.661-20.223-9.229-26.98-13.702c-6.755-4.47-15.559-10.708-26.407-18.699
+                                        c-25.697-18.842-72.995-51.68-141.896-98.501C17.987,202.047,8.375,193.762,0,184.437v226.685c0,12.57,4.471,23.319,13.418,32.265
+                                        c8.945,8.949,19.701,13.422,32.264,13.422h420.266c12.56,0,23.315-4.473,32.261-13.422c8.949-8.949,13.418-19.694,13.418-32.265
+                                        V184.437C503.441,193.569,493.927,201.854,483.072,209.275z"/>
+                                </g>
+                            </g>
+                            </svg>
+                            </div>
+                            <input type="text" class="input-outline" th:field="*{email}" autocorrect="off"
+                                   autocapitalize="none"/>
+                            <small class="input-help">Correo electr&oacute;nico</small>
+                        </div>
+                    </div>
+                    <div class="field inline">
+                        <input type="text" class="input-outline" th:field="*{name}"/>
+                        <small class="input-help">Nombre</small>
+                    </div>
+                    <div class="field inline">
+                        <input type="text" class="input-outline" th:field="*{surName}"/>
+                        <small class="input-help">Apellido</small>
+                    </div>
+                    <div class="display-block display-check arg-block">
+                        <input type="checkbox" class="real-check" id="acceptAgreement" name="acceptAgreement"/>
+                        <label for="acceptAgreement" class="acceptAgreement">
+                        <span class="check-default">He leído, comprendo y acepto los
+                            <a th:href="@{/terminos-y-condiciones}" target="_blank">Términos y Condiciones</a> y
+                            <a th:href="@{/politica-de-privacidad}" target="_blank">Política de Privacidad</a>
+                        </span>
+                        </label>
+                    </div>
+                    <div class="field inline r-field">
+                        <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </th:block>
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var q1 = $('.q1');
+        q1.closest('body').addClass('body-q1');
+
+
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var docType = $('#docType'),
+            docNumber = $('#docNumber'),
+            email = $('#email');
+        var firstOnChange = true;
+        docType.on('change', function () {
+            if (!firstOnChange) {
+                docNumber.val('');
+            } else {
+                firstOnChange = false;
+            }
+            if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.IdentityDocumentType).CE}]]*/) {
+                $('#docNumber').removeClass('document-input').addClass('document-input-ce');
+                $('#questionForm').data('validatorJson').rules.docNumber.minlength = 8;
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 9;
+                $('')
+            } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.IdentityDocumentType).DNI}]]*/) {
+                $('#docNumber').removeClass('document-input-ce').addClass('document-input');
+                $('#questionForm').data('validatorJson').rules.docNumber.minlength = 8;
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 8;
+            } else {
+                $('#docNumber').removeClass('document-input-ce').addClass('document-input');
+                $('#questionForm').data('validatorJson').rules.docNumber.minlength = 11;
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 11;
+            }
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+        docType.change();
+        email.on('paste', function (event) {
+            $(this).val($.trim($(this).val()));
+        });
+
+        function readCookie(name) {
+            var n = name + "=";
+            var cookie = document.cookie.split(';');
+            for (var i = 0; i < cookie.length; i++) {
+                var c = cookie[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1, c.length);
+                }
+                if (c.indexOf(n) == 0) {
+                    return c.substring(n.length, c.length);
+                }
+            }
+            return null;
+        }
+
+        $('#sendButton').click(function () {
+            var $this = $('.acceptAgreement');
+            if ($this.hasClass('checked')) {
+                $this.find('.check-inner').removeClass('has-error');
+            }
+            else {
+                console.log('desmarcado');
+                $this.find('.check-inner').addClass('has-error');
+            }
+            $('#email').val($.trim($('#email').val()));
+            if ($('#questionForm').valid()) {
+                $('body').removeClass('body-q1');
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {
+                        agent: questionFw.agent,
+                        categoryUrl: questionFw.categoryUrl,
+                        source: readCookie("utm_source"),
+                        medium: readCookie("utm_medium"),
+                        campaign: readCookie("utm_campaign"),
+                        term: readCookie("utm_term"),
+                        content: readCookie("utm_content"),
+                        gclid: readCookie('gclid'),
+                        gaClientID: localStorage.getItem('ga:clientId')
+                    })
+                }, "");
+            }
+        });
+
+        $('#open-modal-question1').on('click', function (event) {
+            event.preventDefault();
+            self.openMsg1Modal();
+            $("#modal_msg_question1").modal('show');
+        });
+        this.openMsg1Modal = function () {
+            $("#modal_msg_question1").modal('show');
+        };
+        /*]]>*/
+
+    </script>
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            email = $('#email');
+            setTimeout(function () {
+                email.focus();
+            }, 300);
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            email = $('#docNumber');
+            setTimeout(function () {
+                email.focus();
+            }, 300);
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+    <div id="modal_msg_question1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="help">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <span class="circle"></span>
+                        <span class="text">Personas Expuestas Polícitamente (PEP)</span>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <p th:text="#{questions.pep.explanation}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+<!-- NO HAY CLASE-->
+<th:block th:fragment="question_69">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <h3 class="title-home" th:utext="#{questions.block.salaryAdvance.offer}"></h3>
+        <div class="forms">
+            <div class="offer-container">
+                <div class="salary-advance-offer box-a">
+                    <div class="box-b">
+                        <h4 class="amount"><span class="currency">S/ </span> <span class="amount-value">1 011.25</span>
+                        </h4>
+                        <small th:text="#{label.offer.totalAmount}"></small>
+                    </div>
+                    <div class="box-c">
+                        <div class="box-d">
+                            <div class="input-controls">
+                                <h3 class="input-outline"><span class="currency">S/ </span> 1 000</h3>
+                            </div>
+                            <input type="text" class="input-outline medium-input"/>
+                            <small th:text="#{label.offer.amount}"></small>
+                        </div>
+                        <div class="box-e">
+                            <span class="plus">+</span>
+                        </div>
+                        <div class="box-f">
+                            <div class="input-controls">
+                                <h3><span class="currency">S/ </span> <span class="amount">11.25</span></h3>
+                                <div class="controls">
+                                    <button class="up"></button>
+                                    <button class="down"></button>
+                                </div>
+                            </div>
+                            <small th:text="#{label.offer.commission}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="terms-block">
+                <label for="contract-check" class="custom-check">
+                    <span class="check-inner">
+                        <i class="icon icon-check"></i>
+                    </span>
+                    <span class="check-label" th:text="#{label.offer.contract}"></span>
+                    <input type="checkbox" class="real-check" id="contract-check"/>
+                </label>
+                <br/>
+                <label for="terms-check" class="custom-check">
+                            <span class="check-inner">
+                                <i class="icon icon-check"></i>
+                            </span>
+                    <span class="check-label" th:utext="#{label.terms}"></span>
+                    <input type="checkbox" class="real-check" id="terms-check"/>
+                </label>
+            </div>
+            <div class="actions-center">
+                <button class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+        </div>
+    </div>
+</th:block>
+<!-- NO HAY CLASE-->
+<th:block th:fragment="question_65">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <p th:utext="#{questions.block.amountAndInstallments}"></p>
+        <div class="forms">
+            <form action="" id="questionForm" autocomplete="off">
+                <div class="field inline">
+                    <select id="bank" data-width="245">
+                        <option value="1">Banco</option>
+                        <option value="2">CE</option>
+                    </select>
+                </div>
+                <div class="field inline">
+                    <input name="bankAccount" type="text" class="input-outline bankAccount-input"
+                           placeholder="Nro. cuenta bancaria" pattern="[0-9]*"/>
+                </div>
+                <div class="clear"><br/></div>
+                <div class="field inline">
+                    <select id="bankAccountType" data-width="245">
+                        <option value="1">Banco</option>
+                        <option value="2">CE</option>
+                    </select>
+                </div>
+                <div class="field inline">
+                    <select id="bankAccountPlace" data-width="245">
+                        <option value="1">Banco</option>
+                        <option value="2">CE</option>
+                    </select>
+                </div>
+                <div class="terms-block">
+                    <label for="contract-check" class="custom-check">
+                        <span class="check-inner">
+                            <i class="icon icon-check"></i>
+                        </span>
+                        <span class="check-label" th:text="#{label.offer.contract}"></span>
+                        <input type="checkbox" class="real-check" id="contract-check"/>
+                    </label>
+                    <br/>
+                    <label for="terms-check" class="custom-check">
+                        <span class="check-inner">
+                            <i class="icon icon-check"></i>
+                        </span>
+                        <span class="check-label" th:utext="#{label.terms}"></span>
+                        <input type="checkbox" class="real-check" id="terms-check"/>
+                    </label>
+                </div>
+                <div class="actions-center">
+                    <button type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<!-- NO HAY CLASE-->
+<th:block th:fragment="question_96">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section  fadeInRight">
+        <div class="wrap-note-wait">
+            <div class="cnt">
+                <figure>
+                    <img src="/img/icons/espera.jpg" alt=""/>
+                </figure>
+                <p> Estamos esperando una respuesta de <strong>Banco Sol</strong> para poder mostrarte la oferta que
+                    tienen para ti. ¡Te avisaremos muy pronto para que finalices el proceso!</p>
+            </div>
+            <a class="anchor-button bg-red" th:href="@{/blog}">Ir a Blog</a>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.ajaxToCurrentQuestionController({
+            type: "POST"
+        }, "");
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<!-- NO HAY CLASE-->
+<th:block th:fragment="question_114">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p>Elige un tipo de aplicaci&oacute;n de pago</p>
+            <div class="field inline">
+                <label class="h-input-radio">
+                    <input type="radio" name="type" value="A"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Pago Anticipado</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline">
+                <label class="h-input-radio">
+                    <input type="radio" name="type" value="D"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Adelanto de Cuotas</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=type]:radio').change(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {paymentApplicationType: $(this).val()}
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<!-- NO SE MUEVE-->
+<th:block th:fragment="question_134">
+    <th:block th:replace="this :: question_config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q134">
+            <p>En breve, un ejecutivo de Caja Sullana se pondr&aacute; en contacto contigo para finalizar el proceso.</p>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        /*]]>*/
+    </script>
+</th:block>
+
+
+</body>
+</html>

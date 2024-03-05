@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <title>Solven | El cr&eacute;dito que mereces</title>
+    <meta name="description" th:content="${T(com.affirm.system.configuration.Configuration).APP_NAME}"/>
+    <meta name="keywords" th:content="${T(com.affirm.system.configuration.Configuration).APP_NAME}"/>
+    <meta name="Resource-type" content="Document"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}"/>
+    <style th:inline="text">
+        @font-face {
+            font-family: "Solven Icons";
+            font-style: normal;
+            font-weight: normal;
+            src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")
+        }
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Variable globales
+        var system = {
+            contextPath: /*[[ ${#httpServletRequest.getContextPath()} ]]*/
+        };
+        /*]]>*/
+    </script>
+    <!-- Common scritps and css -->
+    <!-- Jquery -->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/dist/jquery.min.js'}"></script>-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/jquery.min.js'}" type="text/javascript"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/css/bootstrap.min.css'}"/>
+    <!-- Detect Mobile -->
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+    <!-- Own -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/mansory/masonry.pkgd.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/mansory/imagesloaded.pkgd.min.js'}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/application.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/animate/animate.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/unveil/jquery.unveil.min.js'}"></script>
+    <!-- /Common scritps and css -->
+    <th:block layout:fragment="head"/>
+
+    <noscript>
+        <div class="javascript-disabled" style="background: #34465d;color: white;padding: 1em;text-align: center;">
+            <p class="no-javascript">Ups! para poder navegar correctamente en nuestra plataforma necesitas activar
+                javascript. <a href="http://www.enable-javascript.com/es/" target="_blank" style="text-decoration: underline;"> Click aqu&iacute;</a></p>
+        </div>
+    </noscript>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+            browserUpdate();
+            // View if cookie policy is accepted
+            if (getCookie('acceptCookies') != 'true') {
+                $('.cookiesBar').slideDown();
+                $('#acceptCookies').on('click', function () {
+                    $('.cookiesBar').slideUp();
+                    createCookie('acceptCookies', 'true', 360);
+                });
+            }
+
+        });
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+<div class="fullpage">
+    <!-- Browser Outdate -->
+    <div class="browserOutdate" id="browserOutdate">
+        <div class="container">
+            <p>Te recomendamos que actualices tu navegador para poder aprovechar todas las funcionalidades de Solven. <a href="http://outdatedbrowser.com/es" rel="nofollow" target="_blank">Haz click aqu&iacute;</a>.</p>
+        </div>
+    </div>
+    <!-- / -->
+    <!-- Cookies -->
+    <div class="cookiesBar">
+        <div class="container">
+            <p>Utilizamos cookies para mejorar tu experiencia en Solven, conoce nuestra <a th:href="@{/politica-de-privacidad#cookiesSection}">Pol&iacute;tica de Privacidad</a>. Si contin&uacute;as navegando, asumimos tu aceptaci&oacute;n. <a href="#" id="acceptCookies">Ocultar</a>.</p>
+        </div>
+    </div>
+    <!-- / -->
+
+    <!-- header -->
+    <div th:replace="fragments/headers :: homePagesHeader"></div>
+    <!-- /header -->
+
+
+    <!-- content -->
+    <div layout:fragment="content"/>
+    <!-- /content -->
+
+    <!-- footer -->
+    <div th:replace="fragments/footers :: footerDefault"></div>
+    <!-- /footer -->
+
+
+    <!-- modals -->
+    <div layout:fragment="modals"/>
+    <!-- /modals -->
+</div>
+
+<!-- Jquery UI -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/jquery-ui.min.js'}"></script>
+<!--Jquery Validation-->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+<!-- Bootstrap -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/js/bootstrap.min.js'}"></script>
+<script th:href="${@urlService.externalUrl(#httpServletRequest) + '/modernizr/modernizr.js'}"></script>
+
+<!--Botstrap material-->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/js/material.min.js'}"></script>
+
+<!-- BootBox -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootbox/bootbox.min.js'}"></script>
+
+<!--Jquery Numeric-->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+<script th:src="@{/js/util.js}"></script>
+<!--Sweet Alerts -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.min.js'}"></script>
+<link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.css'}"/>
+<script>
+    $('#myModal').modal('toggle')
+</script>
+<th:block layout:fragment="scripts"/>
+</body>
+</html>

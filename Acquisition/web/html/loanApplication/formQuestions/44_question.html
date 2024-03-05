@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q44">
+            <p th:utext="#{questions.block.percentSales}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <div class="field field-percentage inline">
+                    <div class="wrap-field">
+                        <input type="text" class="input-outline medium-input" th:field="*{salesPercentage}"/>
+                        <div class="box-icon box-right prefix-box tiny-input q-box-icon">
+                            <span class="subfix"><i class="icon icon-percent"></i></span>
+                        </div>
+                        <small class="input-help">Porcentaje</small>
+                    </div>
+                </div>
+                <div class="field inline">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+
+                <div class="display-block">
+                    <div class="centrado">
+                        <div>
+                            <label class="h-input-radio">
+                                <input type="radio" name="businessType" class="businessType" value="minor"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <div class="radio inline"></div>
+                                        <h5 class="inline">Mi negocio es al por menor.</h5>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="h-input-radio">
+                                <input type="radio" name="businessType" class="businessType" value="fiveCustomers"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <div class="radio inline"></div>
+                                        <h5 class="inline">Tengo menos de 5 clientes.</h5>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="h-input-radio">
+                                <input type="radio" name="businessType" class="businessType" value="minusFiveteenCustomers"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <div class="radio inline"></div>
+                                        <h5 class="inline">Tengo menos de 15 clientes.</h5>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="h-input-radio">
+                                <input type="radio" name="businessType" class="businessType" value="moreFiveteenCustomers"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <div class="radio inline"></div>
+                                        <h5 class="inline">Tengo más de 15 clientes.</h5>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var $salesPercentage = $('#salesPercentage');
+
+        $('.businessType').on('change', function () {
+            $salesPercentage.attr('disabled', false);
+            $salesPercentage.parent().removeClass('input-disabled');
+            if ($(this).val() == 'minor') {
+                $salesPercentage.attr('disabled', true);
+                $salesPercentage.parent().addClass('input-disabled');
+            }
+        });
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

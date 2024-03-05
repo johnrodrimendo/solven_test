@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:utext="${post.title.rendered}"></title>
+
+    <link rel="canonical" th:href="'https://www.solven.pe/blog/'+${slug} "/>
+    <meta property="og:image" th:attr="content=${post.getFeaturedImageUrlNoHttps()}"/>
+    <meta property="og:image:secure_url" th:attr="content=${post.featuredImageUrl}" />
+    <meta property="og:image:type" content="image/jpg" />
+    <link rel="alternate" hreflang="es" th:href="'https://www.solven.pe/blog/'+${slug} "/>
+    <link rel="alternate" hreflang="es-pe" th:href="'https://www.solven.pe/blog/'+${slug} "/>
+    <link rel="alternate" hreflang="es-ar" th:href="'https://www.solven.com.ar/blog/'+${slug} "/>
+    <link rel="alternate" hreflang="x-default" th:href="'https://www.solven.pe/blog/'+${slug} "/>
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe main-arg' : 'main-pe'}">
+<th:block layout:fragment="content">
+    <section id="banner" class="main-banner bgbanner-inner bgblogdetail">
+        <article>
+            <h1 th:utext="${post.title.rendered}"></h1>
+            <ul class="list-categories">
+                <li th:each="category : ${post.categories}">
+                    <span th:text="${cat}"></span>
+                </li>
+            </ul>
+            <div class="avatar">
+                <span class="autor" th:text="${post.getAuthorFirstName()}"></span><br/>
+                <figure>
+                    <img th:attr="data-src=${post.author[1]}" alt="" class="lazy"/>
+                </figure>
+            </div>
+            <time th:text="${@utilService.datetimeShortFormat(post.getDateAsDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(post?.getDateAsDate())}"></time>
+        </article>
+        <img id="bannerPrincipal" th:attr="data-src=${post.featuredImageUrl}" alt="" class="lazy"/>
+        <img id="bannerResponsive" th:attr="data-src=${post.featuredImageUrl}" alt=""/>
+
+    </section>
+    <section class="w-list-news gwr">
+        <ul class="breadcrumbs" style="padding: 20px 0">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/blog}">Blog</a></li>
+            <li th:utext="${post.title.rendered}"></li>
+        </ul>
+        <div class="wrap">
+            <div class="content-post" th:utext="${post.content.rendered}"></div>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Pendientes de Desembolso</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css'}" rel="stylesheet"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        /*REGISTRAR DESEMBOLSO*/
+        function showRegisterDisbursementModal(creditId) {
+            var baseUrl = /*[[@{/credit/}]]*/;
+            swal({
+                title: "&iquest;Est&aacute;s seguro?",
+                text: "No podr&aacute;s revertir el cambio.",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#36c6d3",
+                confirmButtonText: "Si, Aprobar!",
+                closeOnConfirm: true
+            },
+            function(){
+
+                defaultAjax({
+                    url: baseUrl + creditId + "/registerDisbursement/",
+                    type: 'POST',
+                    success: function (data) {
+                        $('#registerDisbursementModal').modal('hide');
+                        refreshPendingDisbursements();
+                        swal("Aprobado.", "", "success");
+                    }
+                })
+            });
+        }
+
+        /*RECHAZAR DESEMBOLSO*/
+        function showRegisterDisbursementRejectionModal(creditId) {
+            $('#registerDisbursementRejectionModal').modal();
+            $('#registerDisbursementRejectionModal .loading').hide();
+            $('#registerDisbursementRejectionModal .content').show();
+            $('#registerRejectedDisbursementButton').click(function () {
+                registerDisbursementRejection(creditId, $('#creditRejectionReason').val(), $('#creditRejectionComment').val());
+            });
+        }
+
+        /*RECHAZAR DESEMBOLSO*/
+        function registerDisbursementRejection(creditId, creditRejectionReason, creditRejectionComment) {
+            var baseUrl = /*[[@{/credit/}]]*/;
+            swal({
+                title: "&iquest;Est&aacute;s seguro?",
+                text: "No podr&aacute;s revertir el cambio.",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#36c6d3",
+                confirmButtonText: "Si, Aprobar!",
+                closeOnConfirm: true
+            },
+            function(){
+                defaultAjax({
+                    url: baseUrl + creditId + "/registerDisbursementRejection/",
+                    type: 'POST',
+                    data: {
+                        creditRejectionReasonId: creditRejectionReason,
+                        creditRejectionComment: creditRejectionComment
+                    },
+                    success: function (data) {
+                        $('#registerDisbursementRejectionModal').modal('hide');
+                        refreshPendingDisbursements();
+                        swal("Aprobado.", "", "success");
+                    }
+                })
+            });
+        }
+
+        function getDefaultXEditableJson() {
+            return {
+                viewformat: 'DD/MM/YYYY',
+                format: 'DD/MM/YYYY',
+                showbuttons: 'bottom',
+                send: 'always',
+                emptytext: 'Sin Asignar',
+                params: {
+                    personId: null
+                },
+                ajaxOptions: {
+                    type: 'post',
+                    headers: addCsrfToJsonHeaders({'x-request-sender-type':'ajax'})
+                },
+                error: function (response, newValue) {
+                    console.log('error: ' + response);
+                    ajaxError(response, null);
+                }
+            }
+        }
+        function refreshPendingDisbursements() {
+            var baseUrl = /*[[@{/disbursement/pending2/list}]]*/;
+            $('#portletCreditsPendingDisbursement').defaultLoad(baseUrl, '#portletCreditsPendingDisbursement > *');
+        }
+        function setClickedRowColor(e) {
+            e = e || window.event;
+            var targ = e.target || e.srcElement;
+            if (targ.nodeType == 3) targ = targ.parentNode;
+            $(targ).closest('.rowCredits').css({'background' : '#f3f4f6'});
+        }
+        function setRowColorFromButton() {
+            $(".btn.btn-primary.btn-sm.editable-submit").on("click", function(){
+                $(this).closest('.rowCredits').css({'background' : '#ffffff'});
+            });
+            $(".btn.btn-default.btn-sm.editable-cancel").on("click", function(){
+                $(this).closest('.rowCredits').css({'background' : '#ffffff'});
+            });
+        }
+        /*]]>*/
+    </script>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Desembolsos</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Pendientes</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletCreditsPendingDisbursement" th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Pendientes de Desembolso</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}" th:href="@{/disbursement/pending/reportSeguripago}" target="_blank" onclick="setTimeout(refreshPendingDisbursements(), 2000)">
+                                        <i class="fa fa-table"></i> Reporte Prosegur</a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'"
+                                       href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button-clean'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Limpiar Filtros</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/disbursement/pending/list}">
+
+                                    <div class="form-row">
+                                        <!-- DNI -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>DNI</label>
+                                            <input name="document_number" type="text" class="form-control form-control-sm"/>
+                                        </div>
+
+                                        <!-- Producto -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>Producto</label>
+                                            <select name="product" class="form-control form-control-sm">
+                                                <option value="" hidden="hidden">Selecciona Producto</option>
+                                                <option th:each="product : ${@catalogService.getProducts()}"
+                                                        th:value="${product.id}"
+                                                        th:text="${product.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Financiador -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>Financiador</label>
+                                            <select name="entity" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona financiador</option>
+                                                <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Empleador -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>Empleador</label>
+                                            <select name="reason" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona Empleador</option>
+                                                <option th:each="employer : ${@catalogService.getEmployers()}" th:value="${employer.id}" th:text="${employer.name}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="portlet-body">
+                                <div id="creditsTable" class="tablefilter-table">
+                                    <div class="table-responsive" id="table">
+                                        <th:block th:replace="this :: list"></th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="registerDisbursementModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="registerDisbursementRejectionModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterDisbursementRejectionModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="creditRejectionReason">Razón de rechazo</label>
+                                    <select class="form-control" name="creditRejectionReason"
+                                            id="creditRejectionReason">
+                                        <option th:each="reason : ${@catalogService.getCreditRejectionReasons(true)}"
+                                                th:value="${reason.id}" th:text="${reason.reason}"></option>
+                                    </select>
+                                    <label class="control-label" for="creditRejectionComment">Comentarios</label>
+                                    <textarea class="form-control" name="creditRejectionComment" id="creditRejectionComment" maxlength="200"></textarea>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button id="registerRejectedDisbursementButton" type="button" class="btn btn-info">
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <th:block th:switch="${#lists.isEmpty(credits?.results)}">
+        <p th:case="true">No hay resultados</p>
+
+        <table th:case="false" id="tableResults" class="table table-bordered">
+            <thead>
+            <tr>
+                <!--en pendientes de desembolso... columnas: Cr&eacute;dito, Fecha de firma, Tipo y Nro de dcoouemnto, Banco, Cuenta, CCI-->
+                <th>#</th>
+                <th>País</th>
+                <th>Cr&eacute;dito</th>
+                <th>Fecha de Firma</th>
+                <th>Tipo Doc.</th>
+                <th>N&uacute;mero Doc.</th>
+                <th>Nombre Completo</th>
+                <th>Producto</th>
+                <th>Empleador</th>
+                <th>Créditos<br/>activos</th>
+                <th>Condiciones</th>
+                <th>Banco</th>
+                <th>Cuenta</th>
+                <th>CCI</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody th:attr="data-table-paginator-total=${credits?.meta?.total}">
+            <tr class="rowCredits" th:each="credit, iterCred : ${credits?.results}">
+                <td th:text="${iterCred.count}"></td>
+                <td>
+                    <div class="choose-country">
+                        <span th:class="'c-language c' + ${credit?.country?.id}"></span>
+                    </div>
+                </td>
+                <td><a th:href="@{/person(personId=${credit?.personId}, tab='credits', creditId=${credit?.id})}"
+                       th:text="${credit?.code}"></a></td>
+                <td th:text="${@utilService.datetimeShortFormat(credit?.signatureDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.signatureDate)}">
+                </td>
+                <td th:text="${credit?.personDocumentType?.name}"></td>
+                <td th:text="${credit?.personDocumentNumber}"></td>
+                <td th:text="${credit?.getFullName()}"></td>
+                <td th:text="${credit?.getProduct()?.getShortName()}"></td>
+                <td th:text="${credit?.getProduct()?.getId() == credit?.getProduct()?.SALARY_ADVANCE and credit?.employer != null ? credit?.employer?.name : ''}"></td>
+                <td th:text="${credit?.getActiveCredits()}"></td>
+                <td th:text="${credit?.getCreditDescription(@utilService)}"></td>
+                <td>
+                    <a href="#" th:id="'bankId_' + ${credit?.id}"
+                       th:text="${credit?.bank?.name}"
+                       onclick="setClickedRowColor(event)"></a>
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        (function() {
+                            var editableJson = getDefaultXEditableJson();
+                            editableJson.type = 'select';
+                            editableJson.url = /*[[ @{/person/bank} ]]*/;
+                            editableJson.value = /*[[ ${credit?.bank?.id} ]]*/;
+                            editableJson.title = 'Banco';
+                            editableJson.params.personId = /*[[ ${credit?.personId} ]]*/;
+                            editableJson.params.creditId = /*[[ ${credit?.id} ]]*/;
+                            editableJson.source = function () {
+                                var banks;
+                                $.ajax({
+                                    url: /*[[@{/catalog/banks/json}]]*/null,
+                                    type: 'GET',
+                                    async: false,
+                                    global: false,
+                                    success: function (data) {
+                                        var result = JSON.parse(data);
+                                        banks = [];
+
+                                        for (i = 0; i < result.length; i++) {
+                                            banks[i] = {
+                                                value: result[i].id,
+                                                text: result[i].name
+                                            };
+                                        }
+                                    }
+                                })
+                                return banks;
+                            };
+                            editableJson.success = function (response, newValue) {
+                                console.log('SUCCESS :D');
+                            };
+                            $('#bankId_[[ ${credit?.id} ]]').editable(editableJson);
+                            $(document).on('click', '#bankId_[[ ${credit?.id} ]]', function(event){
+                                event.preventDefault();
+                                if($(this).data('editable') == null){
+                                    $(this).editable(editableJson);
+                                    $(this).editable('show');
+                                }
+                            });
+                            $('#bankId_[[ ${credit?.id} ]]').on("shown", function(e, editable){
+                                setRowColorFromButton(editable);
+                            });
+                        })();
+                        /*]]>*/
+                    </script>
+                </td>
+                <td class="">
+                    <a href="#" th:id="'bankAccount' + ${credit?.id}"
+                       th:text="${credit?.bankAccount}"
+                       onclick="setClickedRowColor(event)"></a>
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        (function() {
+                            var editableJson = getDefaultXEditableJson();
+                            editableJson.type = 'text';
+                            editableJson.url = /*[[ @{/person/bankAccount} ]]*/;
+                            editableJson.title = 'Cuenta';
+                            editableJson.params.personId = /*[[ ${credit?.personId} ]]*/;
+                            editableJson.params.creditId = /*[[ ${credit?.id} ]]*/;
+                            editableJson.value = /*[[ ${credit?.bankAccount} ]]*/;
+                            editableJson.success = function (response, newValue) {
+                                console.log('SUCCESS :D');
+                            };
+                            $('#bankAccount[[ ${credit?.id} ]]').editable(editableJson);
+                            $(document).on('click', '#bankAccount[[ ${credit?.id} ]]', function(event){
+                                event.preventDefault();
+                                if($(this).data('editable') == null){
+                                    $(this).editable(editableJson);
+                                    $(this).editable('show');
+                                }
+                            });
+                            $('#bankAccount[[ ${credit?.id} ]]').on("shown", function(e, editable){
+                                setRowColorFromButton(editable);
+                            });
+                        })();
+                        /*]]>*/
+                    </script>
+                </td>
+                <td class="">
+                    <a href="#" th:id="'cciCode' + ${credit?.id}"
+                       th:text="${credit?.cciCode}"
+                       onclick="setClickedRowColor(event)"></a>
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        (function() {
+                            var editableJson = getDefaultXEditableJson();
+                            editableJson.type = 'text';
+                            editableJson.url = /*[[ @{/person/cciCode} ]]*/;
+                            editableJson.title = 'CCI';
+                            editableJson.params.personId = /*[[ ${credit?.personId} ]]*/;
+                            editableJson.params.creditId = /*[[ ${credit?.id} ]]*/;
+                            editableJson.value = /*[[ ${credit?.cciCode} ]]*/;
+                            editableJson.success = function (response, newValue) {
+                                $('.rowCredits').css({'background' : '#ffffff'});
+                                console.log('SUCCESS :D');
+                            };
+                            $('#cciCode[[ ${credit?.id} ]]').editable(editableJson);
+                            $(document).on('click', '#cciCode[[ ${credit?.id} ]]', function(event){
+                                event.preventDefault();
+                                if($(this).data('editable') == null){
+                                    $(this).editable(editableJson);
+                                    $(this).editable('show');
+                                }
+                            });
+                            $('#cciCode[[ ${credit?.id} ]]').on("shown", function(e, editable){
+                                setRowColorFromButton(editable);
+                            });
+                        })();
+                        /*]]>*/
+                    </script>
+                </td>
+                <td align="center">
+                    <th:block th:switch="${credit?.entityValidated != null and !credit?.entityValidated}">
+                        <th:block th:case="true">
+                            <span class="label label-danger">Pendiente Pagaré</span>
+                        </th:block>
+                        <th:block th:case="false">
+                            <a href="javascript:;" th:class="${@frontEndService.getDefaultInsidePortletRejectButtonClass()}"
+                               th:onclick="'showRegisterDisbursementRejectionModal('+${credit?.id}+')'">Rechazar
+                            </a>
+                            <a href="javascript:;" th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                               th:onclick="'showRegisterDisbursementModal('+${credit?.id}+')'">Registrar
+                            </a>
+                        </th:block>
+                    </th:block>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+            UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+    </th:block>
+</th:block>
+
+</body>
+
+</html>

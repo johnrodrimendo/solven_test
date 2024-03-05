@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="q122">
+        <div class="p">
+            <p><th:block th:text="${personFirstName}"/>, revisamos tus antecedentes y en este momento solo calificas para un crédito de consumo garantizado.</p>
+            <p>Si tienes un auto a tu nombre y tiene las siguientes <a id="call_modal_122" href="#">características</a>, podrás acceder a un crédito de hasta <th:block th:text="${@utilService.integerMoneyFormat(maxMinParameter?.maxAmount, loanApplication?.currency)}"/>, a tan solo <th:block th:text="${@utilService.percentFormat(maxMinParameter?.maxTea)}"/> y hasta 60 meses de plazo.</p>
+        </div>
+        <div class="w">
+            <a href="#" class="btn-link" onclick="notInterested()">No me interesa</a>
+            <a href="#" class="anchor-button bg-red" onclick="sendPost()">¡Me interesa saber más!</a>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function sendPost() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "");
+        }
+
+        function notInterested() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "notInterested");
+        }
+
+        $('#call_modal_122').on('click', function (event) {
+            event.preventDefault();
+            self.openOfferModal();
+        });
+        this.openOfferModal = function () {
+            $("#modal_122").modal('show');
+        };
+        /*]]>*/
+    </script>
+    <div id="modal_122" class="modal fade " tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">¿Qué características debe tener tu automóvil?</h4>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content text-center">
+                        <div>
+                            <ul>
+                                <li>
+                                    - Marcas seleccionadas (no marcas chinas - excepto BYD).
+                                </li>
+                                <li>
+                                    - El auto debe ser del año 2013 en adelante.
+                                </li>
+                                <li>
+                                    - Hasta un máximo de 90,000km de recorrido.
+                                </li>
+                                <li>
+                                    - Hasta un máximo de S/ 2 000 en papeletas impagas.
+                                </li>
+                                <li>
+                                    - Verificación técnica y SOAT vigentes.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

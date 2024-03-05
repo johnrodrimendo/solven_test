@@ -1,0 +1,339 @@
+html{
+    position: relative;
+    height: 100%;
+}
+body{
+    &.main-choose-agent{
+        //min-height: calc(100vh - 60px);
+        min-height: 100%;
+        height: 100%;
+        position: relative;
+        .choose-agent{
+            height: calc(100vh - 60px);
+            height: 100%;
+            min-height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+            &:after{
+                content: '';
+                background-color: #FFFFFF;
+                width: 130%;
+                height: 130%;
+                position: absolute;
+                top: -50%;
+                left: -15%;
+                right: 0;
+                z-index: -1;
+                border-radius: 100%;
+            }
+            &.brand{
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+        }
+        #seoTag{
+            position: absolute;
+            top: -200%;
+        }
+        .hero-content{
+            font-family: 'Lato Light', 'Helvetica', sans-serif;
+            margin-top: auto;
+            text-align: center;
+            width: 100%;
+            h1{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                //margin: 0 auto 1.5em auto;
+                margin: 0 auto 1em auto;
+                z-index: 9999;
+                a{
+                    color: $red-1;
+                    #logoSolven{
+
+                    }
+                    #logoSolvenResponsive{
+                        display: none;
+                    }
+                }
+                .icon-solven{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 50px;
+                    line-height: 50px;
+                    &:before{
+                        font-size: 5em;
+                        line-height: 50px;
+                        height: 50px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+                .icon-solven-iso{
+                    display: none;
+                }
+                span{
+                    display: none;
+                }
+                img{
+
+                }
+            }
+            p{
+                display: block;
+                font-size: 1.5em;
+                margin: .5em auto 1.5em auto;
+                color: #333333;
+                font-family: "Lato Light", Helvetica, sans-serif;
+            }
+            input{
+
+            }
+            ul{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                li{
+                    height: 135px;
+                    margin-right: 2em;
+                    .circle{
+                        figure{
+                            width: 117px;
+                            height: 117px;
+                            margin: 0;
+                            padding: 0;
+                            overflow: initial;
+                            border-radius: 100%;
+                            position: relative;
+                            img{
+                                border-radius: 100%;
+                                overflow: hidden;
+                                width: 100%;
+                                margin-bottom: 1em;
+                                position: absolute;
+                                //top: 50%;
+                                //left: 50%;
+
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                height: 100%;
+                                transition: transform .3s ease;
+                                //transform:  translate(-50%, -50%) scale(1);
+                                transform: scale(1);
+                                &.hidden{
+                                    opacity: 0;
+                                    z-index: -1;
+                                    visibility: hidden;
+                                }
+                            }
+                            img[data-src]{
+                                opacity: 0;
+                                box-shadow: none;
+                            }
+                            img[src]{
+                                opacity: 1;
+                                box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.56);
+                            }
+                        }
+                        h4{
+                            color: #000000;
+                            font-family: 'Lato Regular', 'Helvetica', sans-serif;
+                            z-index: 1;
+                            margin-top: .5em;
+                            @media screen and (max-width: 640px){
+                                font-size: 12px;
+                            }
+                        }
+                    }
+                    &:hover{
+                        .circle{
+                            figure{
+                                img{
+                                    //transform: translate(-50%, -50%);
+                                    transform: scale(1.05);
+                                }
+                            }
+                        }
+                    }
+                    &:last-child{
+                        margin-right: 0;
+                    }
+                }
+            }
+            .p-indication{
+                margin: 6rem auto -6rem auto;
+                padding: 0;
+                font-size: 16px;
+                font-family: 'Lato Regular', Helvetica, sans-serif;
+                @media screen and (max-width: 640px){
+                    font-size: 14px !important;
+                    margin: 0 auto !important;
+                }
+            }
+        }
+        .footer-agent{
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            width: 100%;
+            height: 45vh;
+            background-color: $red-1;
+            background-image: url('../img/patern.jpg');
+            background-repeat: repeat;
+            background-position: 0 0;
+            z-index: -2;
+            margin-top: 0;
+            p{
+                color: #FFFFFF;
+                margin-bottom: 2.25em;
+
+                font-family: "Lato Italic", sans-serif;
+                font-size: 2em;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+        }
+    }
+}
+
+
+@media only screen and (max-width: 1366px ) and ( max-height: 640px){
+    body{
+        &.main-choose-agent{
+            .footer-agent{
+                height: 340px;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1024px) and (max-height: 768px) {
+    body{
+        &.main-choose-agent{
+            .footer-agent{
+                height: 350px;
+            }
+        }
+    }
+}
+
+@media only screen and (max-height: 640px){
+    body{
+        &.main-choose-agent{
+            .choose-agent{
+                &:after{
+                    width: 150%;
+                    height: 150%;
+                    top: -70%;
+                    left: -25%;
+                }
+                .footer-agent{
+                    height: 240px;
+                    p{
+                        font-size: 1.5em;
+                        margin-bottom: 1.65em;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@media only screen and (max-width: 768px){
+    body{
+        &.main-choose-agent{
+            .hero-content{
+                ul{
+                    li{
+                        .circle{
+                            figure{
+                                width: 94px;
+                                height: 94px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 640px){
+    body{
+        &.main-choose-agent{
+            .hero-content{
+                p{
+                    font-size: 1em;
+                }
+                ul{
+                    li{
+                        margin-right: .25em;
+                        .circle{
+                            h4{
+                                font-size: 13px;
+                            }
+                            figure{
+                                height:60px;
+                                width: 60px;
+                                img{
+                                    height: 60px;
+                                    width: 60px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .choose-agent{
+                .footer-agent{
+                    p{
+                        font-size: 1em;
+                        margin-bottom: 3em;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 600px){
+    body{
+        &.main-choose-agent{
+            .choose-agent{
+                &:after{
+                    width: 200%;
+                    height: 150%;
+                    top: -66%;
+                    left: -50%;
+                }
+                .footer-agent{
+                    height: 180px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 480px){
+    body{
+        &.main-choose-agent{
+            .hero-content{
+                p{
+                    font-size: 18px !important;
+                    margin: 10px 0 20px 0 !important;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q5">
+            <p th:utext="#{questions.block.car.initialFee}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <div class="centrado">
+                    <div>
+                        <div class="field field-amount inline">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                                    <span class="prefix">$</span>
+                                </div>
+                                <input type="text" class="input-outline amount-input" name="initialAmount" id="initialAmount"/>
+                                <small class="input-help">Tu inicial</small>
+                            </div>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+
+        var initialAmount = $('#initialAmount');
+        setTimeout(function () {
+            initialAmount.focus();
+        }, 300);
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

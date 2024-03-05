@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet"
+          type="text/css"/>
+    <!-- Bootstrap DatePicker -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet"
+          type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.css'}"
+          rel="stylesheet"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/select2/css/select2.min.css'}" rel="stylesheet"
+          type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/select2/css/select2-bootstrap.min.css'}"
+          rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}"
+          rel="stylesheet"/>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker-4.17/bootstrap-datetimepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.resize.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.categories.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.pie.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/select2/js/select2.full.min.js'}"
+            type="text/javascript"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/css/bootstrap-datepicker3.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <script async="true"
+            th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+    <script async="true"
+            th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-masknumber/dist/jquery.masknumber.min.js'}"></script>
+
+    <script async="true"
+            th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+    <script async="true"
+            th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-masknumber/dist/jquery.masknumber.min.js'}"></script>
+
+    <script async="true"
+            th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-te/jquery-te-1.4.0.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/jquery-te/jquery-te-1.4.0.css'}"
+          rel="stylesheet"/>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <!--EMOJI-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/emoji-picker/fgEmojiPicker.js'}"></script>
+
+    <!--ckEditor-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ckeditor_full/ckeditor.js'}"></script>
+
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+
+    <script>
+        const editableInputFn = function editableInput(configuration) {
+            let element = this;
+            let fnAfterApply = async function (...args) {
+                console.log("Apply value", args);
+            }
+            let paramsToCall = [];
+            let sendValueParam = true;
+            if (configuration) {
+                if (configuration?.fn) fnAfterApply = configuration.fn;
+                if (configuration?.params) paramsToCall = configuration.params;
+                if (configuration.hasOwnProperty("sendValueParam")) sendValueParam = configuration?.sendValueParam;
+            }
+            if ((element.is("input") || element.is("select"))) {
+                if (!element.prop('disabled')) {
+                    $(`<span class="editable-input" style="color: #999da4;display:none;font-size: 11px !important;">Editar</span>`).insertAfter(this);
+                    let value = element.val();
+                    let templateToInsertOnEdit = `
+                    <span class="editable-input-action-group" style="display: none">
+                        <i class="fa fa-check apply-editing save" aria-hidden="true"></i>
+                        <i class="fa fa-times-circle-o cancel-editing cancel" aria-hidden="true"></i>
+                    </span>
+                `
+
+                    if (element.is("input")) {
+                        element.parent().append(templateToInsertOnEdit);
+                        element.on('input', function (e) {
+                            let closestElementSpan = element.parent().find(".editable-input");
+                            closestElementSpan.text("Editando");
+                            if (!closestElementSpan.hasClass("editable-input-custom-color")) closestElementSpan.addClass("editable-input-custom-color");
+                            if (!element.parent().hasClass("editing-input")) {
+                                element.parent().addClass("editing-input");
+                            }
+                        })
+
+                        element.parent().find(".editable-input-action-group .cancel-editing").click(function (e) {
+                            let currentTarget = $(e.currentTarget);
+                            let parentElement = currentTarget.parent().parent();
+                            parentElement.find("input").val(value || null);
+                            parentElement.removeClass("editable-input");
+                            parentElement.find("input").parent().removeClass("error");
+                            parentElement
+                                .find(".editable-input")
+                                .text("Editar").removeClass("editable-input-custom-color");
+                            parentElement.removeClass("editing-input");
+                        })
+
+                        element.parent().find(".editable-input-action-group .apply-editing").click(async function (e) {
+                            let currentTarget = $(e.currentTarget);
+                            let parentElement = currentTarget.parent().parent();
+                            try {
+                                if (value != parentElement.find("input").val()) {
+                                    if (sendValueParam) await fnAfterApply(parentElement.find("input").val(), ...paramsToCall);
+                                    else await fnAfterApply(...paramsToCall);
+                                }
+                                parentElement.removeClass("editable-input");
+                                parentElement.find("input").parent().removeClass("error");
+                                value = parentElement.find("input").val();
+                                parentElement
+                                    .find(".editable-input")
+                                    .text("Editar").removeClass("editable-input-custom-color");
+                                parentElement.removeClass("editing-input");
+                            } catch (error) {
+                                if (error) parentElement.find("input").parent().addClass("error");
+                                else {
+                                    parentElement.find("input").val(value || null);
+                                    parentElement
+                                        .find(".editable-input")
+                                        .text("Editar").removeClass("editable-input-custom-color");
+                                    parentElement.removeClass("editing-input");
+                                }
+                            }
+                        })
+                    }
+
+                }
+            }
+            return {
+                params: paramsToCall,
+                fn: fnAfterApply,
+                sendValueParam: sendValueParam
+            }
+        }
+        jQuery.fn.extend({
+            editableInputFn: editableInputFn
+        })
+    </script>
+
+    <!--  Custom Radio Button  and Checkbox -->
+    <style>
+
+        .cke_dialog_background_cover,.cke_editor_bodyEmail_dialog,#cke_24 > span:nth-child(3){
+            display: none !important;
+        }
+
+        #toolboxEmail .toolbox-container{
+            position: absolute;
+            bottom: 10px;
+            right: 18px;
+        }
+
+
+        .custom-checkbox-style {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .custom-checkbox-style + label {
+            position: relative;
+            cursor: pointer;
+            padding: 0;
+            font-weight: normal;
+        }
+
+        .custom-checkbox-style + label:before {
+            content: "";
+            margin-right: 6px;
+            display: inline-block;
+            vertical-align: text-top;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #eaecec;
+        }
+
+        .custom-checkbox-style:hover + label:before {
+            background: var(--secondary-page-color);
+        }
+
+        .custom-checkbox-style:focus + label:before {
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+        }
+
+        .custom-checkbox-style:checked + label:before {
+            background: var(--secondary-page-color);
+        }
+
+        .custom-checkbox-style:disabled + label {
+            /*color: #b8b8b8;*/
+            /*cursor: auto;*/
+        }
+
+        .custom-checkbox-style:disabled + label:before {
+            box-shadow: none;
+            /*background: #ddd;*/
+        }
+
+        .custom-checkbox-style:checked + label:after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 9px;
+            background: white;
+            width: 2px;
+            height: 2px;
+            box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+            transform: rotate(45deg);
+        }
+
+        .custom-rb [type="radio"]:checked,
+        [type="radio"]:not(:checked) {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .custom-rb [type="radio"]:checked + label,
+        .custom-rb [type="radio"]:not(:checked) + label {
+            position: relative;
+            padding-left: 23px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: normal;
+        }
+
+        .custom-rb [type="radio"]:checked + label:before,
+        .custom-rb [type="radio"]:not(:checked) + label:before {
+            content: '';
+            position: absolute;
+            left: 0px;
+            top: calc(50% - 9px);
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ddd;
+            border-radius: 100%;
+            background: #fff;
+        }
+
+        .custom-rb [type="radio"]:checked + label:after,
+        .custom-rb [type="radio"]:not(:checked) + label:after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--secondary-page-color);
+            position: absolute;
+            top: calc(50% - 9px + 4px);
+            left: 4px;
+            border-radius: 100%;
+            -webkit-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+        }
+
+        .custom-rb [type="radio"]:checked + label:before {
+            border-color: var(--secondary-page-color);
+        }
+
+        .custom-rb [type="radio"]:not(:checked) + label:after {
+            opacity: 0;
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+
+        .custom-rb [type="radio"]:checked + label:after {
+            opacity: 1;
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+
+
+    </style>
+
+    <style>
+
+        #configurationModal .modal-body {
+            padding: 0px;
+            padding-bottom: 15px;
+        }
+
+        .bg-gray {
+            background-color: #f7f7f7;
+        }
+
+        .pl-15 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .py-20 {
+            padding-top: 20px;
+        }
+
+        .pb-20 {
+            padding-bottom: 20px;
+        }
+
+        .card-sms-text {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            text-align: justify
+        }
+
+        #configurationModal .modal-header, #campaignModal .modal-header,
+        #destinationModal .modal-header {
+            background-color: #404040;
+            padding: 20px 15px;
+            display: flex;
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .template-field .input-material {
+            position: relative;
+        }
+
+        .template-field .input-material input {
+            padding-right: 25px;
+        }
+
+        .template-field .action-group {
+            position: absolute;
+            top: 8px;
+            right: 0px;
+        }
+
+        #configurationModal.in,
+        #destinationModal.in {
+            display: flex !important;
+            align-items: center;
+        }
+
+        .input-material-outline {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-material-outline input, .input-material-outline select {
+            border-radius: 7px;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            background-color: transparent !important;
+            min-height: 40px;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+            border: 1px solid;
+            margin-bottom: 5px;
+        }
+
+        #configurationModal .modal-footer,
+        #destinationModal .modal-footer,
+        #campaignModal .modal-footer {
+            border: none !important;
+            justify-content: flex-end;
+        }
+
+        #configurationModal .modal-footer button,
+        #campaignModal .modal-footer button,
+        #destinationModal .modal-footer button {
+            width: 260px;
+            margin-left: 0px !important;
+            margin-right: 0px !important;
+        }
+
+
+        .btn-validation {
+            margin: 0px !important;
+            min-height: 40px;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            background-color: white;
+            border: 1px solid #eaecec;
+            border-radius: 7px;
+        }
+
+        .btn-validation-disabled {
+            background-color: #f7f7f7;
+            color: #c3c3c3;
+        }
+
+        .email-validation {
+            width: 80%;
+        }
+
+        .request-validation {
+            flex: 1;
+            padding-left: 2px;
+        }
+
+        .validation-container {
+            display: flex !important;
+        }
+
+        .modal-backdrop.fade {
+            opacity: 0.4;
+        }
+
+        .email-validation div:not(.editing-input) > input {
+            padding-right: 40%;
+        }
+
+        .message-input {
+            display: none;
+        }
+
+        .email-validation div.message-container:not(.editing-input) {
+            position: relative;
+        }
+
+        .email-validation div.message-container:not(.editing-input) .message-input {
+            display: block !important;
+            position: absolute;
+            right: 0.5rem;
+            top: 1rem;
+        }
+
+        .message-input-failed {
+            border-color: #c68585;
+            color: #c68585;
+        }
+
+        .message-input-success {
+            border-color: #96d29d;
+            color: #96d29d;
+        }
+
+        .input-material input, .input-material select {
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+        }
+
+        .input-material textarea {
+            padding-bottom: 20px !important;
+        }
+
+        .radio-or-checkbox-description {
+            padding-left: 23px;
+            display: flex;
+        }
+
+        .input-material-checkbox {
+            display: flex;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-color: #eaecec !important;
+            border-bottom: 2px solid;
+            color: #767676;
+        }
+
+        .input-material-checkbox > span {
+            margin-right: 10px;
+        }
+
+        .input-material textarea {
+
+        }
+
+        .mb-5 {
+            margin-bottom: 5px;
+        }
+
+        #frmConfigurationModal label {
+            margin-bottom: 0px;
+        }
+
+        .description-color-text {
+            color: #b1b1b1;
+        }
+
+        .description-ft-sz {
+            font-size: 14px;
+        }
+
+        .font-w-800 {
+            font-weight: 800;
+        }
+
+        .text-secondary {
+            color: #a8a4a3;
+        }
+
+
+    </style>
+
+    <style>
+
+        .kpi-container {
+            width: 100%;
+            min-height: 60px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            background-color: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 9;
+            padding: 20px 5px;
+        }
+
+        .kpi-card {
+            display: flex;
+            padding: 10px 10px;
+            align-items: center;
+        }
+
+        .right-border {
+            border-right: 1px solid #d8d8d8;
+        }
+
+        .kpi-card-body-icon {
+            width: 20%;
+            text-align: center;
+        }
+
+        .kpi-card-body-icon i {
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .kpi-card-body-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-card-body-text h4 {
+            font-size: 22px;
+        }
+
+        .kpi-first-color {
+            background-color: #eaf8fd;
+            color: #70cef2;
+        }
+
+        .kpi-second-color {
+            background-color: #ebe9fe;
+            color: #7c6cf4;
+        }
+
+        .kpi-third-color {
+            background-color: #fce5e2;
+            color: #e64f40;
+        }
+
+        .kpi-fourth-color {
+            background-color: #fcf2dd;
+            color: #edbe55;
+        }
+
+
+        .bb-1 {
+            border-bottom: 1px solid #eeeeee;
+        }
+
+
+        .fg-emoji-picker {
+            z-index: 1000000000 !important;
+        }
+
+        .description-text {
+            bottom: 10px;
+            position: absolute;
+            right: 0px;
+        }
+
+        .dropzone {
+            background: #f8f8f8 !important;
+            border: none !important;
+        }
+
+        .toolbox-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .editing-input {
+            position: relative;
+        }
+
+        .editing-input > input {
+            padding-right: 32px;
+        }
+
+        .editing-input .editable-input-action-group {
+            display: block !important;
+            position: absolute;
+            right: 0.5rem;
+            top: 1rem;
+        }
+
+        .editable-input-action-group > i {
+            cursor: pointer;
+            border: 1px solid #dddfdf;
+            border-radius: 2px;
+            padding: 1px;
+            box-shadow: 1px 1px 4px 0px rgba(206, 203, 203, 0.82);
+            background-color: transparent;
+            min-width: 17px;
+            text-align: center;
+        }
+
+        .editable-input-action-group > i:hover {
+            transform: scale(1.2);
+        }
+
+        .editable-input-action-group > i.save {
+            border-color: #96d29d;
+            color: #96d29d;
+        }
+
+        .editable-input-action-group > i.cancel {
+            border-color: #c68585;
+            color: #c68585;
+        }
+
+        .row-field {
+            display: flex;
+            align-items: center;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .mr-5 {
+            margin-right: 10px;
+        }
+
+        .span-text {
+            color: #767676;
+        }
+
+        .button-input-field {
+            min-height: 40px;
+            margin-bottom: 5px;
+            background-color: white;
+            color: #333333;
+            border: 1px solid #eaecec;
+            border-radius: 5px;
+        }
+
+        .jqte {
+            margin: 8px 0px !important;
+            border: none;
+        }
+
+        .jqte_toolbar {
+            background: #f8f8f8;
+            border-bottom: #f8f8f8 1px solid;
+        }
+
+        .jqte_tool.jqte_tool_1 .jqte_tool_label {
+            padding: 0px;
+            height: 19px;
+        }
+
+        .jqte_focused {
+            box-shadow: none;
+            border: 1px solid var(--primary-page-color);
+        }
+
+        .bnt-icon {
+            background-color: transparent;
+            border: none;
+        }
+
+
+        .image-prv {
+            min-height: 150px;
+            width: 100%;
+            display: none;
+            /*max-height: 200px;*/
+        }
+
+        .image-prv img {
+            max-height: 100%;
+            height: 100%;
+            width: 100%;
+        }
+
+        .btn-ab-position {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            padding: 7px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+
+        .grid-2c {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .subject-input {
+            position: relative;
+        }
+
+        .subject-input input {
+            padding-right: 65px;
+        }
+
+        .toolbox-container-absolute {
+            position: absolute;
+            top: 8px;
+            right: 0px;
+            width: 60px;
+        }
+
+    </style>
+    <style>
+
+        .cke.cke_reset_all.cke_1.cke_panel{
+            z-index: 2147483647 !important;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+        Dropzone.prototype.defaultOptions.dictRemoveFile = "Elimnar archivo";
+        Dropzone.prototype.defaultOptions.dictCancelUpload = "Cancelar subida";
+        Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = "¿Estás seguro de cancelar el proceso?";
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var url = /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__} ]]*/null;
+        var totalCount = [[${totalCount}]];
+        var limitPaginator = [[${limitPaginator}]];
+
+        $(document).ready(function () {
+            enableTableOptions($("#tableResults"), url + "/list", url + "/count", true, "#downloadTrayReport");
+
+            $("#campaignConfiguration").click(function (e) {
+                openConfigurationModal();
+            })
+
+            $("#createCampaign").click(function (e) {
+                openCampaignModal(null);
+            })
+
+        })
+
+        function openConfigurationModal() {
+            $('#configurationModal').modal();
+            $('#configurationModal .loading').show();
+            $('#configurationModal .content').hide();
+            $('#configurationModal .content').defaultLoad(url + "/configuration", null, function () {
+                $('#configurationModal .loading').hide(300);
+                $('#configurationModal .content').show(300);
+            }, "GET", null, function () {
+
+            });
+        }
+
+        function openConfigurationModalAfterDestination() {
+            $('#destinationModal').modal('hide');
+            setTimeout(() => {
+                $('#campaignModal').modal();
+                $('#campaignModal .loading').hide();
+                $('#campaignModal .content').show();
+            }, 1000)
+        }
+
+        function openCampaignModal(campaignId) {
+            $('#campaignModal').modal();
+            $('#campaignModal .loading').show();
+            $('#campaignModal .content').hide();
+            $('#campaignModal .content').defaultLoad(url + "/campaign" + (campaignId != null ? `?campaignId=${campaignId}` : ""), null, function () {
+                $('#campaignModal .loading').hide(300);
+                $('#campaignModal .content').show(300);
+            }, "GET", null, function () {
+
+            });
+        }
+
+        async function openDestinationModal() {
+            try {
+                await validateForm(false, false);
+            } catch (error) {
+                return;
+            }
+            $('#campaignModal').modal('hide');
+            $('#destinationModal').modal();
+            $('#destinationModal .loading').show();
+            $('#destinationModal .content').hide();
+            let formData = $("#frmCampaignModal").serializeObject();
+            $('#destinationModal .content').defaultLoad(url + "/receivers?type=" + (formData.type || null), null, function () {
+                $('#destinationModal .loading').hide(300);
+                $('#destinationModal .content').show(300);
+            }, "GET", null, function () {
+
+            });
+        }
+
+        function openSuccessProcessNotification(msg, time) {
+            swal({
+                title: msg || "¡Operación exitosa!",
+                timer: time || 3000,
+                type: "success"
+            });
+        }
+
+        function openFailedProcessNotification(msg, time) {
+            swal({
+                title: "Oops...",
+                text: msg,
+                imageUrl: "/img/icon-modal-error.svg",
+                html: true,
+                timer: time || 3000,
+                confirmButtonColor: '#F7323F',
+                cancelButtonColor: '#3F3B3B',
+                imageSize: "66x66"
+            }, function (ok) {
+
+            });
+        }
+
+        function resendCampaign(marketingCampaignId) {
+            swal({
+                    title: "&iquest;Est&aacute;s seguro de reenviar la campa&ntilde;a?",
+                    text: "No podr&aacute;s revertir el cambio.",
+                    type: "warning",
+                    html: true,
+                    showCancelButton: true,
+                    confirmButtonColor: "#36c6d3",
+                    confirmButtonText: "Ok",
+                    cancelButtonText: "Cancelar",
+                    closeOnConfirm: true
+                },
+                function () {
+                    defaultAjax({
+                        url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/campaign/resend} ]]*/null,
+                        type: 'POST',
+                        data: {
+                            marketingCampaignId
+                        },
+                        success: function (data) {
+                            resetCustomTable($("#tableResults"))
+                        }
+                    })
+                });
+        }
+
+        /*]]>*/
+    </script>
+
+    <th:block th:replace="components/tracking :: social"/>
+
+
+    <!-- ESTILOS Y SCRIPT PARA NUEVO DROPDOWN-->
+
+    <style>
+        .dropdown-customized {
+            background-color: transparent;
+            border: none;
+            width: auto;
+            position: relative;
+        }
+
+        .dropdown-customized .dropdown-customized-options {
+            display: none;
+            max-width: 250px;
+            min-width: 250px;
+        }
+
+        .dropdown-customized:active .dropdown-customized-options,
+        .dropdown-customized:focus .dropdown-customized-options {
+            display: block;
+        }
+
+        .dropdown-customized-options {
+            position: absolute;
+            background-color: white;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+            z-index: 1;
+            top: -20px;
+            overflow-x: hidden;
+            box-shadow: -1px 2px 12px 0px rgba(219, 219, 219, 0.75);
+            right: 0;
+        }
+
+        .dropdown-customized-options li {
+            height: 22px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 3px;
+            border-bottom: 1px solid #f8f8f8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-customized-options ul {
+            padding-left: 3px;
+            padding-right: 3px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .dropdown-customized-options li:hover {
+            background-color: #f8f8f8;
+        }
+    </style>
+
+    <script>
+
+        const dropdownCustomized = function dropdownCustomized() {
+            let element = this;
+
+            $(this).click(function (e) {
+                setDropdownPosition(e.currentTarget);
+            })
+
+            function setDropdownPosition(element) {
+                let elementJ = $(element);
+                let height = elementJ.find(".dropdown-customized-options").outerHeight()
+                if (elementJ.hasClass("put-bottom")) elementJ.find(".dropdown-customized-options").css("top", elementJ.outerHeight());
+                else elementJ.find(".dropdown-customized-options").css("top", (height) * -1)
+
+            }
+
+            setDropdownPosition(this);
+
+        }
+        jQuery.fn.extend({
+            dropdownCustomized: dropdownCustomized
+        })
+
+
+    </script>
+</head>
+<body>
+<th:block layout:fragment="header">
+
+    <div class="clearfix"></div>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage=${page})"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row w-creditos-procesados">
+                <th:block th:replace="fragments/headers :: entityContentHeaderMarketingCampaign "></th:block>
+                <div class="col-xs-12">
+                    <th:block th:replace="this :: kpi"></th:block>
+                </div>
+                <div class="col-xs-12">
+                    <div id="creditsTable" class="tablefilter-table table-container">
+                        <div class="table-responsive"
+                             style="overflow: auto; display: flex; justify-content: center; flex-direction: column">
+                            <table id="tableResults"
+                                   class=" table table-striped table-bordered table-checkable order-column dataTable">
+                                <thead>
+                                <th:block th:replace="this :: header"></th:block>
+                                </thead>
+                                <tbody>
+                                <th:block th:replace="this :: list"></th:block>
+                                </tbody>
+                            </table>
+                            <th:block th:replace="fragments/footers :: paginatorFooter "></th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="configurationModal" class="modal modal-lg fade">
+        <div class="modal-dialog" style="width: 100% !important;">
+            <div class="modal-content">
+                <div class="loading pl-15 py-20">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="campaignModal" class="modal modal-lg fade">
+        <div class="modal-dialog" style="width: 100% !important;">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="destinationModal" class="modal modal-lg fade">
+        <div class="modal-dialog" style="width: 100% !important;">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</th:block>
+
+<th:block th:fragment="header">
+    <tr>
+        <!--        <th>Fecha</th>-->
+        <!--        <th>Registros<br/>en base</th>-->
+        <!--        <th>Compromisos</th>-->
+        <th>#</th>
+        <th>Fecha de envio</th>
+        <th>Nombre de Campa&ntilde;a</th>
+        <th>Tipo</th>
+        <th>Plantilla</th>
+        <th>Enviados</th>
+        <th>Abiertos</th>
+        <th>Click</th>
+        <th>Registrados</th>
+        <th>Pagados</th>
+        <th>Acciones</th>
+    </tr>
+</th:block>
+
+<th:block th:fragment="configurationModal">
+    <div class="modal-header">
+        <h4>Configuraciones</h4>
+        <span style="flex: 1">&nbsp;</span>
+        <span data-dismiss="modal" style="cursor: pointer">X</span>
+    </div>
+    <div class="modal-body">
+        <form role="form" action="#" method="post" th:object="${form}"
+              id="frmConfigurationModal">
+
+            <div class="row bg-gray pl-15">
+                <div class="col-xs-12 py-20 pb-20">
+                    <h4>Canales de Comunicación</h4>
+                </div>
+            </div>
+
+            <div class="row bg-gray pl-15 py-15">
+                <div class="col-xs-12">
+                    <h4 class="mb-5">
+                        <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/icon-sms.svg" alt=""
+                             class="custom-icono-svg"/>
+                        SMS
+                    </h4>
+                    <span class="description-color-text description-ft-sz">Servicio de envío de mensajes de texto a los números celulares de la base y/o el registro del cliente</span>
+                </div>
+                <div class="col-xs-12 grid-2c py-20 bb-1 pb-20">
+                    <div class="">
+                        <div class="custom-rb">
+                            <input type="radio" disabled="disabled" id="smsServiceTypeSolven"
+                                   th:checked="${form?.smsServiceType == T(com.affirm.common.model.catalog.EntityExtranetConfiguration.MarketingCampaignConfigurationAvailableType).SERVICE_TYPE_SOLVEN}"
+                                   th:value="${T(com.affirm.common.model.catalog.EntityExtranetConfiguration.MarketingCampaignConfigurationAvailableType).SERVICE_TYPE_SOLVEN}"
+                                   th:field="*{smsServiceType}"/>
+                            <label for="smsServiceTypeSolven">Servicio de envío SOLVEN</label>
+                        </div>
+                        <span class="radio-or-checkbox-description description-color-text description-ft-sz">(Costo por SMS $ <th:block
+                                th:text="${smsSolvenCost}"></th:block>)</span>
+                    </div>
+                    <div class="">
+                        <div class="custom-rb">
+                            <input type="radio" disabled="disabled" id="smsServiceTypeOwn" readonly="readonly"
+                                   th:checked="${form?.smsServiceType == T(com.affirm.common.model.catalog.EntityExtranetConfiguration.MarketingCampaignConfigurationAvailableType).SERVICE_TYPE_OWN}"
+                                   th:value="${T(com.affirm.common.model.catalog.EntityExtranetConfiguration.MarketingCampaignConfigurationAvailableType).SERVICE_TYPE_OWN}"
+                                   th:field="*{smsServiceType}"/>
+                            <label for="smsServiceTypeOwn">Servicio de envío propio</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 grid-2c py-20 pb-20 bb-1">
+                    <div class="">
+                        <div class="custom-checkbox">
+                            <input type="checkbox" disabled="disabled" class="custom-checkbox-style" id="smsOnDemand"
+                                   readonly="readonly" name="smsOnDemand" th:checked="${form?.smsOnDemand}"/>
+                            <label for="smsOnDemand">Envíos On-Demand</label>
+                        </div>
+                    </div>
+                    <div class="">
+                        <div class="custom-checkbox">
+                            <input type="checkbox" disabled="disabled" class="custom-checkbox-style" id="smsFollowUp"
+                                   readonly="readonly" name="smsFollowUp" th:checked="${form?.smsFollowUp}"/>
+                            <label for="smsFollowUp">Follow-Ups a compromisos</label>
+                        </div>
+                        <span class="radio-or-checkbox-description description-color-text description-ft-sz">Recomendado: Maximiza el resultado a través de FUPS a compromiso de pago activos.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pl-15 py-20">
+                <div class="col-xs-12">
+                    <h4 class="mb-5">
+                        <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/icon-mail.svg" alt=""
+                             class="custom-icono-svg"/>
+                        Correo electrónico
+                    </h4>
+                    <span class="description-color-text description-ft-sz">Servicio de envío de correos electrónicos a los registros de la base y/o registro del cliente.
+                        <br/>
+                        Costo por email enviado $ <th:block
+                                th:text="${#numbers.formatDecimal(emailSolvenCost, 1, 'COMMA', 5, 'POINT')}"></th:block>
+                    </span>
+                </div>
+                <div class="col-xs-12 grid-2c py-20 pb-20">
+                    <div class="">
+                        <div class="custom-checkbox">
+                            <input type="checkbox" disabled="disabled" class="custom-checkbox-style" readonly="readonly"
+                                   id="emailOnDemand" name="emailOnDemand" th:checked="${form?.emailOnDemand}"/>
+                            <label for="emailOnDemand">Envíos On-Demand</label>
+                        </div>
+                    </div>
+                    <div class="">
+                        <div class="custom-checkbox">
+                            <input type="checkbox" disabled="disabled" class="custom-checkbox-style" readonly="readonly"
+                                   id="emailFollowUp" name="emailFollowUp" th:checked="${form?.emailFollowUp}"/>
+                            <label for="emailFollowUp">Follow-Ups a compromisos</label>
+                        </div>
+                        <span class="radio-or-checkbox-description description-color-text description-ft-sz">Recomendado: Maximiza el resultado a través de FUPS a compromiso de pago activos.</span>
+                    </div>
+                </div>
+                <div class="col-xs-12 mb-5">
+                    <div class="field input-material-outline">
+                        <label>Nombre de remitente</label>
+                        <div>
+                            <input type="text" th:readonly="${!showEmailConfiguration}" th:field="*{senderName}" id="senderNameField"/>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 validation-container">
+                    <div class="email-validation">
+                        <div class="field input-material-outline">
+                            <label>Correo remitente</label>
+                            <div class="message-container">
+                                <input type="text" th:readonly="${!showEmailConfiguration}" th:field="*{senderEmail}" id="senderEmailField"/>
+                                <th:block th:if="${form.status != null}">
+                                    <span class="message-input message-input-success"
+                                          th:if="${form?.status == 'Success'}">✓ Verificado</span>
+                                    <span class="message-input message-input-failed"
+                                          th:if="${form?.status == 'Pending'}">x Pendiente de Verificación</span>
+                                    <span class="message-input message-input-failed"
+                                          th:if="${form?.status == 'Failed'}">x Correo no verificado</span>
+                                </th:block>
+                            </div>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                    <div class="request-validation">
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn btn-outline btn-validation" id="sendValidationBtn"
+                                th:classappend="${form?.status == 'Success' or !showEmailConfiguration} ? btn-validation-disabled : '' "
+                                th:disabled="${form?.status == 'Success' or !showEmailConfiguration}">Solicitar validación
+                        </button>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <span class="description-color-text description-ft-sz">Al solicitar validación se enviará un correo desde AWS a la diracción indicada solicitando aprobación para utilizar el correo electrónico como remitente de las comunicaciones salientes.</span>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default secondary-button" data-dismiss="modal">Cancelar</button>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var configurationFormValidatorJson = /*[[${form.validator.toJson(#locale)}]]*/null;
+        if (configurationFormValidatorJson != null) {
+            jsonFormValidation = createFormValidationJson(JSON.parse(configurationFormValidatorJson), $('#frmConfigurationModal'));
+            $('#frmConfigurationModal').validateForm(jsonFormValidation);
+        }
+
+        $(document).ready(function () {
+            let urlBaseMarketing = /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/}]]*/null;
+
+            $("#senderNameField").editableInputFn({
+                fn: updateFields,
+                params: ['senderName'],
+            });
+
+            $("#senderEmailField").editableInputFn({
+                fn: updateFields,
+                params: ['senderEmail'],
+            });
+
+            function updateFields(field, value) {
+                defaultAjax({
+                    url: urlBaseMarketing + "configuration",
+                    type: 'POST',
+                    formValidation: $(`#frmConfigurationModal`).data('validator'),
+                    data: $.extend($('#frmConfigurationModal').serializeObject(), {field}),
+                    success: function (data) {
+                        $(`#configurationModal`).modal('hide');
+                        openSuccessProcessNotification(null, null);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+
+            function sendValidation() {
+                defaultAjax({
+                    url: urlBaseMarketing + "send_verification",
+                    type: 'POST',
+                    data: {},
+                    success: function (data) {
+                        openSuccessProcessNotification(null, null);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+
+            $("#saveButtonModal").click(function (e) {
+                updateFields();
+            })
+
+            $("#sendValidationBtn").click(function (e) {
+                sendValidation();
+            })
+
+
+        })
+
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block th:fragment="destinationModal">
+    <div class="modal-header">
+        <h4>Enviar campa&ntilde;a</h4>
+        <span style="flex: 1">&nbsp;</span>
+        <span data-dismiss="modal" style="cursor: pointer">X</span>
+    </div>
+    <div class="modal-body">
+        <form role="form" action="#" method="post"
+              id="frmDestinationModal">
+            <div class="row">
+                <div class="col-xs-12" style="margin-bottom: 10px">Destinatarios</div>
+                <div class="col-xs-12">
+                    <ul>
+                        <li>
+                            <div class="custom-rb mb-5">
+                                <input type="radio" id="allDataTrue" onclick="showCount('A')" name="receiverType"
+                                       th:value="${T(com.affirm.marketingCampaign.model.MarketingCampaign).RECEIVER_TYPE_ALL}"/>
+                                <label for="allDataTrue">Toda la base activa</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="custom-rb mb-5">
+                                <input type="radio" id="allExludeActive" onclick="showCount('E')" name="receiverType"
+                                       th:value="${T(com.affirm.marketingCampaign.model.MarketingCampaign).RECEIVER_TYPE_ALL_EXCLUDE_ACTIVE}"/>
+                                <label for="allExludeActive">Base activa excluyendo a registros con compromiso
+                                    activo</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="custom-rb mb-5">
+                                <input type="radio" id="onlyActive" name="receiverType" onclick="showCount('O')"
+                                       th:value="${T(com.affirm.marketingCampaign.model.MarketingCampaign).RECEIVER_TYPE_ONLY_ACTIVE}"/>
+                                <label for="onlyActive">Solo a registros con compromiso activo</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12">
+                    Se enviará un
+                    <th:block th:if="${type == T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}">Correo
+                    </th:block>
+                    <th:block th:if="${type == T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}">SMS
+                    </th:block>
+                    a
+
+                    <span class="count-label option-A" th:text="${baseCount?.totalCountBaseToSend}"></span>
+                    <span class="count-label option-E" th:text="${baseCount?.totalCountNotActiveToSend}"></span>
+                    <span class="count-label option-O" th:text="${baseCount?.totalCountActiveToSend}"></span>
+
+                    <th:block th:if="${type == T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}">correos
+                        electrónicos
+                    </th:block>
+                    <th:block th:if="${type == T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}">teléfonos
+                        celulares
+                    </th:block>
+
+                    de
+
+                    <span class="count-label option-A" th:text="${baseCount?.totalCountBase}"></span>
+                    <span class="count-label option-E" th:text="${baseCount?.totalCountNotActive}"></span>
+                    <span class="count-label option-O" th:text="${baseCount?.totalCountActive}"></span>
+
+                    usuarios únicos.
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default secondary-button"
+                th:onclick="${'openConfigurationModalAfterDestination()'}" data-dismiss="modal">Cancelar
+        </button>
+        &nbsp;&nbsp;
+        <button type="button" class="btn btn-info" id="saveButtonModal" th:onclick="${'sendCreateCampaign()'}">Enviar
+        </button>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(".count-label").hide();
+
+        function sendCreateCampaign() {
+            let formData = $("#frmDestinationModal").serializeObject();
+            if (!formData.receiverType || !formData.receiverType.length) return openFailedProcessNotification("Debe seleccionar una opción", 4000);
+            let data = getFormDataCampaign();
+            data.receiverType = formData.receiverType;
+            defaultAjax({
+                url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/campaign/create} ]]*/null,
+                type: 'POST',
+                data: data,
+                success: function (data) {
+                    openSuccessProcessNotification("Campaña creada exitosamente", 3000);
+                    $('#destinationModal').modal('hide');
+                    resetCustomTable($("#tableResults"));
+                }
+            });
+
+        }
+
+        function showCount(option) {
+            $(".count-label").hide();
+            $(".option-" + option).show();
+        }
+
+        $(document).ready(function () {
+            $("#frmDestinationModal ul li:first-child .custom-rb input").click();
+        })
+        /*]]>*/
+    </script>
+</th:block>
+
+
+<th:block th:fragment="campaignModal">
+    <div class="modal-header">
+        <h4>Crear nueva campa&ntilde;a</h4>
+        <span style="flex: 1">&nbsp;</span>
+        <span data-dismiss="modal" style="cursor: pointer">X</span>
+    </div>
+    <div class="modal-body">
+        <form role="form" action="#" method="post"
+              id="frmCampaignModal">
+            <input type="hidden" name="parentTemplateId"/>
+            <input type="hidden" name="parentCampaignId"/>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="field input-material">
+                        <input type="text" name="campaignName" placeholder="Nombre de la campaña"/>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 field">
+                    <div class="template-field">
+                        <div class="input-material">
+                            <input type="text" name="templateName" placeholder="Nombre de la plantilla"
+                                   autofocus="autofocus"/>
+                            <div class="action-group">
+                                <button type="button" href="javascript:;" class="dropdown-customized put-bottom"
+                                        id="chooseTemplateOption">
+                                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/select_arrow.svg"
+                                         alt="" class="custom-icono-svg"/>
+                                    <div class="dropdown-customized-options">
+                                        <ul>
+                                            <li th:each="data,iter : ${templateList}"
+                                                th:onclick="${'getTemplateById('+data?.campaignTemplateId+')'}"
+                                                th:text="${data?.name}"></li>
+                                        </ul>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <div class="template-field-select">-->
+                    <!--                        <div class="field input-material input-material-checkbox">-->
+                    <!--                            <span>Seleccione una opción</span>-->
+                    <!--                            <div style="display: flex;justify-content: flex-end;flex: 1;">-->
+                    <!--                                <button type="button" href="javascript:;" class="dropdown-customized put-bottom" id="chooseTemplateOption">-->
+                    <!--&lt;!&ndash;                                    <i class="fa fa-tag" aria-hidden="true"></i>&ndash;&gt;-->
+                    <!--                                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/select_arrow.svg" alt="" class="custom-icono-svg"/>-->
+                    <!--                                    <div class="dropdown-customized-options">-->
+                    <!--                                        <ul>-->
+                    <!--                                            <li th:onclick="${'registerNewTemplate()'}">Registrar nueva plantilla</li>-->
+                    <!--                                            <li th:each="data,iter : ${templateList}"  th:onclick="${'getTemplateById('+data?.campaignTemplateId+')'}" th:text="${data?.name}"></li>-->
+                    <!--                                        </ul>-->
+                    <!--                                    </div>-->
+                    <!--                                </button>-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="field input-material input-material-checkbox campaign-type">
+                        <span>Método de envío</span>
+                        <div style="display: flex">
+                            <div class="custom-rb" th:if="${showSMSOption}">
+                                <input type="radio" id="isSmsTrue" name="type"
+                                       th:value="${T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}"/>
+                                <label for="isSmsTrue">SMS</label>
+                            </div>
+                            <div class="custom-rb" th:if="${showEmailOption}" style="margin-left: 2.5rem">
+                                <input type="radio" id="isEmailTrue" name="type"
+                                       th:value="${T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}"/>
+                                <label for="isEmailTrue">Correo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 email-fields">
+                    <div class="field input-material subject-input" style="position: relative;">
+                        <input type="text" placeholder="Asunto" name="subject"/>
+                        <div class="toolbox-container-absolute">
+                            <th:block th:replace="this :: toolbox(bodyField=${false})"></th:block>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 email-fields">
+                    <div class="field input-material input-material-checkbox" style="flex-direction: column;">
+                        <span>Imagen Cabecera</span>
+                        <div id="uploadFileDiv" class=""
+                             style="display: none;flex-direction: column">
+                            <div id="uploadFileElement" class="dropzone"></div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <div>Formatos aceptados: .jpg, .png, .jpeg</div>
+                                <div>Resolución: 768x270</div>
+                            </div>
+                        </div>
+                        <div class="image-prv">
+                            <img src="" alt=""/>
+                            <button type="button" class="bnt-icon btn-ab-position"
+                                    th:onclick="${'showOrHideDropzone(true)'}">
+                                <i class="fa fa-tag" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" name="headerImg"/>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 email-fields" id="toolboxEmail">
+                    <div class="field input-material input-material-checkbox" style="flex-direction: column;">
+                        <span>Contenido del correo</span>
+                        <textarea name="bodyEmail" class="html-editor" rows="6"></textarea>
+                        <div class="errorContainer"></div>
+                        <th:block th:replace="this :: toolbox(bodyField=${true})"></th:block>
+                    </div>
+                </div>
+                <div class="col-xs-12 sms-fields">
+                    <div class="field input-material input-material-checkbox"
+                         style="flex-direction: column;border: none;position: relative;">
+                        <div style="position: relative">
+                            <textarea placeholder="Escribe un mensaje" name="bodySms" rows="6" id="bodySms" maxlength="140"></textarea>
+                            <div class="description-text">
+                                <th:block
+                                        th:replace="this :: toolbox(bodyField=${true},hideEmojies=${true})"></th:block>
+                            </div>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 sms-fields">
+                    <div class="row-field">
+                        <span class="mr-5 span-text">Envío de prueba</span>
+                        <div style="display: flex;flex: 1;">
+                            <div class="field input-material-outline" style="width: 75%">
+                                <input type="text" placeholder="Ingresar número telefónico"
+                                       name="destinationPhoneNumber" class="mr-5"/>
+                                <div class="errorContainer"></div>
+                            </div>
+                            <div style="flex: 1;text-align: center;">
+                                <button class="button-input-field" style="width: 95%" type="button"
+                                        onclick="sendCampaignTest()">Enviar prueba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 email-fields">
+                    <div class="row-field">
+                        <span class="mr-5 span-text">Envío de prueba</span>
+                        <div style="display: flex;flex: 1;">
+                            <div class="field input-material-outline" style="width: 75%">
+                                <input type="text" name="destinationEmail" placeholder="Ingresar correo electrónico"
+                                       class="mr-5"/>
+                                <div class="errorContainer"></div>
+                            </div>
+                            <div style="flex: 1;text-align: center;">
+                                <button class="button-input-field" style="width: 95%" onclick="sendCampaignTest()"
+                                        type="button">Enviar prueba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default secondary-button" th:onclick="${'sendCreateTemplate()'}">Guardar
+            Plantilla
+        </button>
+        &nbsp;&nbsp;
+        <button type="button" class="btn btn-info" th:onclick="${'openDestinationModal()'}" id="saveButtonModal">Enviar
+            Campa&ntilde;a
+        </button>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var campaignFormValidatorJson = /*[[${form.validator.toJson(#locale)}]]*/null;
+        if (campaignFormValidatorJson != null) {
+            jsonCampaignFormValidation = createFormValidationJson(JSON.parse(campaignFormValidatorJson), $('#frmCampaignModal'));
+            $('#frmCampaignModal').validateForm(jsonCampaignFormValidation);
+        }
+
+        $(".sms-fields").hide();
+        $(".email-fields").hide();
+        // $(".template-field").hide();
+
+        var uploadedCallSuccess = false;
+        var uploadStarted = false;
+
+        var templateBase = null;
+        var automaticShowDropzone = true;
+
+        function showImageUploaded(url) {
+            $(".image-prv img").attr("src", url);
+            $(".image-prv").show()
+            $("#uploadFileDiv").hide();
+
+        }
+
+        function changeType(type) {
+            if (type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}]]*/'S') {
+                $(".sms-fields").show();
+                $(".email-fields").hide();
+            } else if (type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}]]*/'E') {
+                $(".sms-fields").hide();
+                $(".email-fields").show();
+            }
+        }
+
+        function registerNewTemplate() {
+            $(".template-field").show();
+            $(".template-field-select").hide();
+            $(".template-field input").focus();
+        }
+
+        function addTagText(value, htmlTemplate) {
+            let formData = $("#frmCampaignModal").serializeObject();
+            let type = formData.type || null;
+            if (type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}]]*/'S') {
+                $("#bodySms").val($("#bodySms").val() + " " + value);
+            } else if (type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}]]*/'E') {
+
+                let editorTxt = $(".cke_wysiwyg_frame").contents().find(".cke_editable");
+                let msgBody = "";
+                //console.log(editorTxt.html())
+                //console.log(editorTxt.html().trim().substr(editorTxt.html().length - 4,4));
+                //borrar <br> que agrega la libraria ckEditor 4
+                if(editorTxt.html().trim().substr(editorTxt.html().trim().length - 4,4) == "<br>"){
+                    msgBody= editorTxt.html().trim().substr(0,editorTxt.html().trim().length - 4);
+                    editorTxt.html(msgBody + " " + (htmlTemplate || value));
+                }else{
+                    editorTxt.html(editorTxt.html().trim() + " " + (htmlTemplate || value));
+                }
+
+
+
+            }
+        }
+
+
+
+        function addTagTextSubject(value) {
+            $("input[name='subject']").val($("input[name='subject']").val() + " " + value);
+        }
+
+        function getTemplateById(templateId) {
+            defaultAjax({
+                url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/template} ]]*/null,
+                type: 'GET',
+                data: {
+                    templateId
+                },
+                success: function (data) {
+                    if (data != null) data = JSON.parse(data);
+                    fillTemplateFields(data);
+                }
+            });
+        }
+
+        function fillCampaignFields(campaignData) {
+            if (campaignData == null) return null;
+            let formElement = $("#frmCampaignModal");
+            formElement.find("input[name=parentCampaignId]").val(campaignData.marketingCampaignId);
+            formElement.find("input[name=campaignName]").val(campaignData.name);
+            fillTemplateFields(campaignData.jsTemplate)
+
+        }
+
+        function fillTemplateFields(templateData) {
+            if (templateData == null) return null;
+            templateBase = Object.assign({}, templateData);
+            let formElement = $("#frmCampaignModal");
+            changeType(templateData.type);
+            formElement.find("input[name=parentTemplateId]").val(templateData.campaignTemplateId);
+            formElement.find("input[name=templateName]").val(templateData.name);
+            if (templateData.type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}]]*/'S') {
+                formElement.find("#bodySms").text(templateData.body);
+                $("label[for=isSmsTrue]").click()
+            } else if (templateData.type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}]]*/'E') {
+                formElement.find("textarea[name=bodyEmail]").val(templateData.body);
+                $(".cke_wysiwyg_frame").contents().find(".cke_editable").html(templateData.body)
+                formElement.find("input[name=subject]").val(templateData.subject);
+                $("label[for=isEmailTrue]").click();
+                if (templateData.headerImg) {
+                    $(".image-prv img").attr("src", templateData.headerImg);
+                    showOrHideDropzone(false);
+                    formElement.find("input[name=headerImg]").val(templateData.headerImg);
+                }
+            }
+            registerNewTemplate()
+        }
+
+        function hasChangedTemplateVerification() {
+            if (templateBase != null) {
+                let actualFormData = getFormDataCampaign();
+                if ((actualFormData.type != templateBase.type ||
+                    actualFormData.body != templateBase.body ||
+                    actualFormData.subject != templateBase.subject) &&
+                    actualFormData.templateName == templateBase.name) {
+                    swal({
+                        title: "Oops...",
+                        text: "Ha realizado cambios a la plantilla. Por favor indique un nuevo nombre.",
+                        imageUrl: "/img/icon-modal-error.svg",
+                        html: true,
+                        timer: 3000,
+                        confirmButtonColor: '#F7323F',
+                        cancelButtonColor: '#3F3B3B',
+                        imageSize: "66x66"
+                    }, function (ok) {
+                        $(".template-field input").focus();
+                    });
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function showErrorTemplateHasChanged() {
+
+        }
+
+        function getFormDataCampaign() {
+            let formElement = $("#frmCampaignModal");
+            let formElementJson = $("#frmCampaignModal").serializeObject();
+            let data = {};
+            let keys = ["headerImg", "body", "subject", "type", "parentTemplateId", "parentCampaignId", "templateName", "campaignName"];
+            keys.map(x => data[x] = null);
+            data.parentTemplateId = formElementJson.parentTemplateId;
+            data.parentCampaignId = formElementJson.parentCampaignId;
+            data.type = formElementJson.type;
+            data.campaignName = formElementJson.campaignName;
+            data.templateName = formElementJson.templateName;
+            if (formElementJson.type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}]]*/'S') {
+                data.body = formElementJson.bodySms;
+                data.destination = formElementJson.destinationPhoneNumber;
+                data.destinationPhoneNumber = formElementJson.destinationPhoneNumber;
+                data.bodySms = formElementJson.bodySms;
+            } else if (formElementJson.type == /*[[${T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}]]*/'E') {
+                data.body = $(".cke_wysiwyg_frame").contents().find(".cke_editable").html();
+                data.bodyEmail = $(".cke_wysiwyg_frame").contents().find(".cke_editable").html();
+                data.subject = formElementJson.subject;
+                data.headerImg = formElementJson.headerImg;
+                data.destination = formElementJson.destinationEmail;
+                data.destinationEmail = formElementJson.destinationEmail;
+            }
+            return data;
+        }
+
+        async function sendCampaignTest() {
+            try {
+                await validateForm(true, false);
+            } catch (error) {
+                return;
+            }
+            let formData = getFormDataCampaign();
+            defaultAjax({
+                url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/send-test-campaign} ]]*/null,
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    openSuccessProcessNotification("Se ha enviado la prueba al destino indicado", 3000);
+                }
+            });
+        }
+
+        async function sendCreateTemplate() {
+            try {
+                await validateForm(false, true);
+            } catch (error) {
+                return;
+            }
+            let isInvalid = hasChangedTemplateVerification();
+            if (isInvalid) return;
+            let formData = getFormDataCampaign();
+            formData.name = formData.templateName
+            defaultAjax({
+                url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/create-template} ]]*/null,
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    openSuccessProcessNotification('Se ha guardado la plantilla exitosamente.', 3000);
+                    // $('#campaignModal').modal('hide');
+                }
+            });
+
+        }
+
+        async function validateForm(isTest, isCreateTemplate) {
+            let formData = getFormDataCampaign();
+            formData.sendTest = isTest;
+            formData.isCreateTemplate = isCreateTemplate;
+            return new Promise((resolve, reject) => {
+                defaultAjax({
+                    url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/validate/form} ]]*/null,
+                    type: 'POST',
+                    form: $('#frmCampaignModal'),
+                    data: formData,
+                    success: function (data) {
+                        resolve(true)
+                    },
+                    error: function (data) {
+                        reject(true)
+                    }
+                });
+            })
+
+        }
+
+        function showOrHideDropzone(canShow) {
+            if (canShow) {
+                $("#uploadFileDiv").show();
+                $(".image-prv").hide();
+            } else {
+                automaticShowDropzone = false;
+                $(".image-prv").show();
+                $("#uploadFileDiv").hide();
+            }
+        }
+
+        $(document).ready(function () {
+
+            var campaignData = [[${marketingCampaign}]];
+
+            fillCampaignFields(campaignData);
+
+            $('input[type=radio][name=type]').change(function () {
+                changeType(this.value);
+            });
+
+            if (campaignData == null) {
+                $("#frmCampaignModal .campaign-type .custom-rb:first-child input").click();
+            }
+
+            //ckeditor bodyEmail initial
+            CKEDITOR.replace( 'bodyEmail' , {
+                enterMode: CKEDITOR.ENTER_BR,
+                shiftEnterMode : CKEDITOR.ENTER_BR
+            });
+
+            CKEDITOR.editorConfig = function( config ) {
+                config.linkShowAdvancedTab = false
+                config.linkShowTargetTab = false
+            };
+
+            CKEDITOR.on('instanceReady', function (ck) { ck.editor.removeMenuItem('Link'); });
+
+            $(".dropdown-customized").dropdownCustomized();
+
+            //FILE
+            $("#submitUploadFile").click(function (e) {
+                e.preventDefault();
+                var dZone = Dropzone.forElement("#uploadFileElement");
+                setTimeout(function () {
+                    dZone.processQueue();
+                }, 1000);
+            })
+
+            $("#uploadFileElement").dropzone({
+                url: /*[[ @{/__${@entityExtranetMarketingCampaignController.URL}__/upload-image}]]*/null,
+                paramName: 'file',
+                maxFilesize: /*[[${@configuration.MAX_UPLOAD_FILE_SIZE_MB()}]]*/, // MB
+                maxFiles: 1,
+                addRemoveLinks: true,
+                dictDefaultMessage: 'Arrastra un archivo aqu&#237; para subirlo, o haz click para seleccionar uno.',
+                dictInvalidFileType: 'No es posible subir este tipo de archivo',
+                acceptedFiles: 'image/*',
+                headers: addCsrfToJsonHeaders({
+                    'x-request-sender-type': 'ajax'
+                }),
+                maxfilesexceeded: function (file) {
+                    this.removeAllFiles();
+                    this.addFile(file);
+                },
+                init: function () {
+                    /*HU1 Begin*/
+                    this.on("addedfile", function (file) {
+                    });
+                    /*HU1 End*/
+                    this.on("success", function (data, response) {
+                        uploadedCallSuccess = true;
+                        $("#frmCampaignModal input[name=headerImg]").val(response.fileUrl);
+                        showImageUploaded(response.fileUrl);
+
+                    });
+                    this.on('error', function (error) {
+                        swal({
+                            title: '',
+                            text: error.message,
+                            type: "warning",
+                            confirmButtonText: "Entendido",
+                            closeOnConfirm: false
+                        });
+                    })
+                }
+            });
+
+            if (automaticShowDropzone) $('#uploadFileDiv').show(300);
+
+            $("#baseVars ul > li").click(function (e) {
+                addTagText($(e.currentTarget).data("key"), $(e.currentTarget).data("template"))
+            })
+
+            $("#subjectBaseVars ul > li").click(function (e) {
+                addTagTextSubject($(e.currentTarget).data("key"))
+            })
+
+            $(".fg-emoji-picker").remove();
+
+            const emojiPickerSubject = new FgEmojiPicker({
+                trigger: ['#subjectEmojiPicker'],
+                validatorTrigger: "subjectEmojiPickerBinded",
+                removeOnSelection: false,
+                closeButton: true,
+                position: ['bottom', 'left'],
+                preFetch: true,
+                emit(obj, triggerElement) {
+                    addTagTextSubject(obj.emoji)
+                }
+            });
+
+            const emojiPicker = new FgEmojiPicker({
+                trigger: ['.emojiPickerBtn'],
+                validatorTrigger: "emojiPickerBinded",
+                removeOnSelection: false,
+                closeButton: true,
+                position: ['top', 'left'],
+                preFetch: true,
+                emit(obj, triggerElement) {
+                    addTagText(obj.emoji, null)
+                }
+            });
+        })
+
+
+        /*]]>*/
+    </script>
+
+</th:block>
+
+<th:block th:fragment="list">
+    <th:block th:if="${#lists.isEmpty(data)}">
+        <tr>
+            <td colspan="14">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(data)}">
+        <tr th:each="data, iter : ${data}">
+            <!--            <td></td>-->
+            <!--            <td></td>-->
+            <!--            <td></td>-->
+            <td th:text="${iter.count + (offset != null ? offset : 0)}"></td>
+            <td th:text="${@utilService.datetimeShortFormat(data?.registerDate)}"></td>
+            <td th:text="${data?.name}"></td>
+            <td>
+                <th:block th:switch="${data?.type}">
+                    <th:block th:case="${T(com.affirm.marketingCampaign.model.MarketingCampaign).EMAIL}">Correo
+                    </th:block>
+                    <th:block th:case="${T(com.affirm.marketingCampaign.model.MarketingCampaign).SMS}">SMS</th:block>
+                </th:block>
+            </td>
+            <td th:text="${data?.campaignTemplateName}"></td>
+            <td th:text="${data?.jsTotalTrackingEvents?.interactionSent}"></td>
+            <td th:text="${data?.jsTotalTrackingEvents?.interactionOpened}"></td>
+            <td th:text="${data?.jsTotalTrackingEvents?.interactionClicked}"></td>
+            <td th:text="${data?.jsTotalTrackingEvents?.registered}"></td>
+            <td th:text="${data?.jsTotalTrackingEvents?.paid}"></td>
+            <td>
+
+                <button type="button" class="bnt-icon" th:onclick="${'resendCampaign('+data?.marketingCampaignId+')'}">
+                    <!--                    <i class="fa fa-tag" aria-hidden="true"></i>-->
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/icon-reenviar-campana.svg"
+                         alt="" class="custom-icono-svg"/>
+                </button>
+
+                <button type="button" class="bnt-icon"
+                        th:onclick="${'openCampaignModal('+data?.marketingCampaignId+')'}">
+                    <!--                    <i class="fa fa-tag" aria-hidden="true"></i>-->
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/icon-copiar-campana.svg" alt=""
+                         class="custom-icono-svg"/>
+                </button>
+
+            </td>
+        </tr>
+        <script>
+
+            replaceImgSvgToSvgElement();
+        </script>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="toolbox">
+    <div class="toolbox-container">
+        <button type="button" href="javascript:;" class="dropdown-customized"
+                th:classappend="${!bodyField} ? 'put-bottom' : ''" th:id="${bodyField ? 'baseVars' : 'subjectBaseVars'}"
+                th:unless="${#lists.isEmpty(baseFields)}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14.625" height="24.659" viewBox="0 0 14.625 24.659">
+                <g id="bookmark" transform="translate(-75.203 1)">
+                    <g id="Grupo_10779" data-name="Grupo 10779" transform="translate(76.203)">
+                        <path id="Trazado_9938" data-name="Trazado 9938"
+                              d="M87.187,0H77.844A1.646,1.646,0,0,0,76.2,1.641V21.289c0,1.381,1.383,2.052,2.465.329l3.848-6.134,3.848,6.134c1.081,1.723,2.464,1.049,2.464-.329V1.641A1.646,1.646,0,0,0,87.187,0Z"
+                              transform="translate(-76.203)" fill="none" stroke="#414141" stroke-width="2"/>
+                    </g>
+                </g>
+            </svg>
+            <div class="dropdown-customized-options">
+                <ul>
+                    <li th:each="data, iter : ${baseFields}"
+                        th:attr="data-key=${data.key},data-template=${data.htmlTemplate}" th:text="${data.value}"></li>
+                </ul>
+            </div>
+        </button>
+        <button type="button" th:unless="${hideEmojies}" href="javascript:;" class="dropdown-customized"
+                th:classappend="${bodyField} ? 'emojiPickerBtn' : ''"
+                th:id="${bodyField ? 'emojiPicker' : 'subjectEmojiPicker'}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24.911" height="24.911" viewBox="0 0 24.911 24.911">
+                <g id="Icon_feather-smile" data-name="Icon feather-smile" transform="translate(-1.75 -1.75)">
+                    <path id="Trazado_9934" data-name="Trazado 9934"
+                          d="M25.411,14.206A11.206,11.206,0,1,1,14.206,3,11.206,11.206,0,0,1,25.411,14.206Z"
+                          transform="translate(0 0)" fill="none" stroke="#414141" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.5"/>
+                    <path id="Trazado_9935" data-name="Trazado 9935"
+                          d="M12,21a6.05,6.05,0,0,0,4.482,2.241A6.05,6.05,0,0,0,20.964,21"
+                          transform="translate(-2.277 -4.553)" fill="none" stroke="#414141" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.5"/>
+                    <path id="Trazado_9936" data-name="Trazado 9936" d="M13.5,13.5h.011"
+                          transform="translate(-2.656 -2.656)" fill="none" stroke="#414141" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.5"/>
+                    <path id="Trazado_9937" data-name="Trazado 9937" d="M22.5,13.5h.011"
+                          transform="translate(-4.933 -2.656)" fill="none" stroke="#414141" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.5"/>
+                </g>
+            </svg>
+        </button>
+
+    </div>
+</th:block>
+
+<th:block th:fragment="kpi">
+
+    <div class="kpi-container">
+        <div class="kpi-card right-border">
+            <div class="kpi-card-body-icon">
+                <div>
+                    <i class="fa fa-database kpi-first-color" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="kpi-card-body-text py-20">
+                <h4 class="font-w-800"
+                    th:text="${@utilService.datetimeCustomFormat(baseDetail?.registerDateBase, 'dd/MM/yyyy')}"></h4>
+                <span class="text-secondary">Fecha de Carga </span>
+                <span class="text-secondary">Base Activa</span>
+            </div>
+        </div>
+        <div class="kpi-card right-border">
+            <div class="kpi-card-body-icon">
+                <div>
+                    <i class="fa fa-database kpi-second-color" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="kpi-card-body-text py-20">
+                <h4 class="font-w-800" th:text="${@utilService.integerFormatWithoutSpaces(baseDetail?.countBase)}"></h4>
+                <span class="text-secondary">Registros</span>
+                <span class="text-secondary">Base Activa</span>
+            </div>
+        </div>
+        <div class="kpi-card right-border">
+            <div class="kpi-card-body-icon">
+                <div>
+                    <i class="fa fa-database kpi-third-color" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="kpi-card-body-text py-20">
+                <h4 class="font-w-800"
+                    th:text="${@utilService.integerFormatWithoutSpaces(baseDetail?.countActive)}"></h4>
+                <span class="text-secondary">Compromisos</span>
+                <span class="text-secondary">Activos</span>
+            </div>
+        </div>
+        <div class="kpi-card right-border">
+            <div class="kpi-card-body-icon">
+                <div>
+                    <i class="fa fa-database kpi-fourth-color" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="kpi-card-body-text">
+                <h4 class="font-w-800"
+                    th:text="${@utilService.integerFormatWithoutSpaces(baseDetail?.countPayed)}"></h4>
+                <span class="text-secondary">Pagados</span>
+            </div>
+        </div>
+        <div class="kpi-card right-border">
+            <div class="kpi-card-body-icon">
+                <div>
+                    <i class="fa fa-database kpi-first-color" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="kpi-card-body-text py-20">
+                <h4 class="font-w-800"
+                    th:text="${@utilService.integerFormatWithoutSpaces(baseDetail?.sentMonthSms)}"></h4>
+                <span class="text-secondary">SMS enviados</span>
+                <span class="text-secondary" th:text="${@utilService.datetimeCustomFormat(date, 'MMMM yyyy')} "> </span>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card-body-icon">
+                <div>
+                    <i class="fa fa-database kpi-second-color" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="kpi-card-body-text py-20">
+                <h4 class="font-w-800"
+                    th:text="${@utilService.integerFormatWithoutSpaces(baseDetail?.sentMonthEmail)}"></h4>
+                <span class="text-secondary">  Correos enviados</span>
+                <span class="text-secondary" th:text="${@utilService.datetimeCustomFormat(date, 'MMMM yyyy')} "> </span>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+
+</body>
+</html>

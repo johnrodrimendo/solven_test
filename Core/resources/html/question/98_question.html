@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.pensionerIncomes}"></p>
+            <div class="form-group">
+                <small>Neto</small>
+                <div class="input-group">
+                    <span class="input-group-addon" th:text="${loanApplication.country.currency.symbol}"></span>
+                    <input class="form-control" type="text" th:field="*{income}"/>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group">
+                <small>Fecha de jubilaci&oacute;n</small>
+                <div class="input-group">
+                    <input type="text" th:field="*{retirementMonth}" class="form-control" placeholder="mm"
+                           pattern="[0-9]*" />
+                    <input type="text" th:field="*{retirementYear}" class="form-control" placeholder="yyyy"
+                           pattern="[0-9]*" />
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group" th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                <small>Regimen de jubilaci&oacute;n</small>
+                <select th:field="*{scheme}" class="form-control">
+                    <option value="">Seleccion</option>
+                    <option th:each="retirement : ${@catalogService.getRetirementSchemes()}"
+                            th:value="${retirement.id}" th:text="${retirement.scheme}">
+                    </option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

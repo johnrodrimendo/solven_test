@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/loanApplicationTemplate">
+
+<head>
+
+    <title layout:title-pattern="$CONTENT_TITLE"
+        th:text="${@brandingService.getMetaTittle(#httpServletRequest, #locale)} != null ?
+        ${@brandingService.getMetaTittle(#httpServletRequest, #locale)} :
+        (${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)} ? 'Efectivo al toqe | Compara bien, crédito rápido y fácil.' :
+            (${@brandingService.isBranded(#httpServletRequest)} ? ${@brandingService.getEntityBranding(#httpServletRequest)?.entity?.shortName} : 'Solven') + (${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? ' | Solicita aquí tu Tarjeta de Crédito' : ' | El crédito que mereces') )">
+    </title>
+
+    <script defer="defer"
+            th:src="${'https://maps.googleapis.com/maps/api/js?libraries=geometry,places&amp;key=' + (T(com.affirm.system.configuration.Configuration).GOOGLE_API_KEY)}"></script>
+
+    <th:block th:if="${@brandingService.getMetaDescription(#httpServletRequest, #locale) != null}">
+        <meta name="description"
+            th:attr="content=${@brandingService.getMetaDescription(#httpServletRequest, #locale)}" />
+    </th:block>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ ${loanApplication.agent != null ? loanApplication.agent.avatarUrl : @catalogService.getHiddenAssistant().avatarUrl} ]]*/;
+        updateBranding();
+        /* Branding */
+        var $cadena_colorweb = /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#CA005D')}]]*/;
+
+        function validateIframe() {
+            if ( window.location !== window.parent.location )
+            {
+                $("img.logo").hide();
+                $("a.logoLinkUrl").hide();
+                $("div.logo a.logo").hide();
+                $("div.process-header").css("height","0").css("padding","0");
+            }
+        }
+
+        validateIframe();
+
+        $(document).on('ready', function () {
+
+            validateIframe();
+
+            var $cadena_colorwebsecond = /*[[${@brandingService.getEntityBrandingSecundaryColor(#httpServletRequest, '#FFA100')}]]*/;
+            var $cadena_colorweblight = '#EA99BF'; //BD
+            var $StrokeSolvenColor = '#BEEFF2'; //Solven Default Color
+            var $FillSolvenColor = '#26CAD3'; //Solven Default Color
+            var $backgroundColorAgent = /*[[${@brandingService.getEntityBrandingAgentBackgroundColor(#httpServletRequest, '#FFA100')}]]*/;
+            var $textColorAgent = /*[[${@brandingService.getEntityBrandingAgentBackgroundColor(#httpServletRequest, '#FFA100')}]]*/;
+            var $cadena_colorwhite = '#FFFFFF'; //Solven Default Color
+            var isBranded = /*[[${@brandingService.isBranded(#httpServletRequest)}]]*/;
+            var $cadena_colorgris = '#D6D8DD'; // Solven Default Color
+
+            let isAzteca = /*[[${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA}]]*/false;
+            let isFinansol = /*[[${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO}]]*/false;
+            let isFinansolConsumo = /*[[${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}]]*/false;
+
+            $("div.box-content").css({
+                'border-color': $cadena_colorweb
+            });
+            $("div.box-header").css({
+                'background': $cadena_colorweb
+            });
+
+            if (!isAzteca && !isFinansol && !isFinansolConsumo) updateBrandingSignature();
+            else updateBranding();
+
+            function updateBrandingSignature() {
+                if (!isBranded) {
+                    return;
+                }
+                $('#noDebtsButton').css({
+                    'color': $cadena_colorweb,
+                    'border-color': $cadena_colorweb
+                });
+                $('#noDebtsButton').hover(function () {
+                    $(this).css("background-color", $cadena_colorweb);
+                    $(this).css('color', '#FFFFFF');
+                }, function () {
+                    $(this).css({
+                        'background-color': '#FFFFFF',
+                        'color': $cadena_colorweb,
+                        'border-color': $cadena_colorweb
+                    });
+                });
+                $('.item-consolidation-detail .no-consolidate-button').css("background-color", $cadena_colorwebsecond);
+                $('.item-consolidation-detail form .w-buttons .close-button').css("background-color", $cadena_colorwebsecond);
+                $('.item-consolidation-detail form .w-buttons .close-button').hover(function () {
+                    $(this).css("background-color", $cadena_colorwebsecond);
+                }, function () {
+                    $(this).css("background-color", $cadena_colorwebsecond);
+                });
+                $('.modal .wrap-form .button.bg-transparent').css({
+                    'color': $cadena_colorweb,
+                    'border-color': $cadena_colorweb
+                });
+                $('.modal .wrap-form .wrap-field .input-outline').css("border-color", $cadena_colorgris);
+                $('.modal .wrap-form .wrap-field .input-outline').hover(function () {
+                    $(this).css("border-color", $cadena_colorweb);
+                }, function () {
+                    $(this).css("border-color", $cadena_colorgris);
+                });
+                $('.modal .wrap-form .wrap-field .input-outline').delegate("*", "focus", function () {
+                    $(this).css("border-color", $cadena_colorweb);
+                });
+                $('.brand-txt-colorweb').css("color", $cadena_colorweb);
+                $('.text-red.text-bold').css("color", $cadena_colorweb);
+                $('.brand-txt-white').css("color", $cadena_colorwhite);
+                $('.choose-agent .underline').css("background", "#e8e8e8");
+                $('body.brand .brand-footer .underline').css("background", $cadena_colorweb);
+                $('.imgProgress-svg').css("background", $cadena_colorgris);
+                $('.imgProgress-svg').css("border-color", $cadena_colorgris);
+                $('.imgProgress-svg .imgProgress-circle').css("fill", $cadena_colorgris);
+                $('.imgProgress-svg .imgProgress-circle').css("stroke", $cadena_colorweb);
+                $('.brand .divisor-bottom').css("color", $cadena_colorweb);
+                $('.bg-black').css("background", $cadena_colorwebsecond);
+                $('.bg-red').css("background", $cadena_colorweb);
+                $('.bg-lightblue').css("background", $cadena_colorweb);
+                $('.divisor-bottom').css('background', $cadena_colorweb);
+                $('body.brand .modal .modal-dialog .modal-content .modal-top .corner-close  ').css("background", $cadena_colorweb);
+                $('body').find('.sweet-alert button').css("background", $cadena_colorweb);
+                $('body').find('.car-model').css("color", $cadena_colorweb);
+                $('body').find('.currency').css("color", $cadena_colorweb);
+                $('body').find('.text-lightblue').css("color", $cadena_colorweb);
+                $('small a').css("color", $cadena_colorweb);
+                $('#open-modal-question1').css("color", $cadena_colorweb);
+                $('.modal .icon-close').css("background", $cadena_colorweb);
+                //$('body').find('.select2-selection:focus').css("border-color", $cadena_colorweb);
+                $('body').find('b[role=presentation]').css("border-color", $cadena_colorweb + ' transparent transparent transparent');
+                $('#documents .tp-wrap .msg-block span').css("background", $cadena_colorweb);
+                $('.sidebar-breadcrumb ul li .circle').css("background", "#e2e2e2");
+                $('.sidebar-breadcrumb ul li span').css("color", "#e2e2e2");
+                $('.sidebar-breadcrumb ul li .bullets').css("background", "#e2e2e2");
+                $('.sidebar-breadcrumb ul li.active .circle').css("background", $cadena_colorwebsecond);
+                $('.sidebar-breadcrumb ul li.active span').css("color", $cadena_colorwebsecond);
+                $('.sidebar-breadcrumb ul li.active .bullets').css("background", $cadena_colorwebsecond);
+                $('body').find('.progressBar .bar').css("background", $cadena_colorweb);
+                $('body').find('#nprogress .peg').css("box-shadow", `0 0 10px ${$cadena_colorweb}, 0 0 5px ${$cadena_colorweb}`);
+                let styleBranding = document.createElement('style');
+                styleBranding.type = 'text/css';
+                styleBranding.innerHTML = `#nprogress .peg{
+                box-shadow : 0 0 10px ${$cadena_colorweb}, 0 0 5px ${$cadena_colorweb} !important;
+            }`;
+                document.getElementsByTagName('head')[0].appendChild(styleBranding);
+                $('body').find('#question-replaceable').find('.positive').css("color", $cadena_colorwebsecond);
+                $('body').find('#question-replaceable').find('.icon-star').css("color", $cadena_colorwebsecond);
+                $('.brand .bottom-footer.brand-footer ul li span').css("color", "#7A808D");
+                $('.brand .bottom-footer.brand-footer ul li a').css("color", $cadena_colorweb);
+                $('body').find('.icon-edit').css("color", $cadena_colorweb);
+                $('#edit-loan').css("color", $cadena_colorweb);
+                $('.brand .datepicker table tr td.day').css("background-color", "#e2e2e2");
+                $('.brand .loan-process .datepicker table tr td.disabled, .loan-process .datepicker table tr td.new, .loan-process .datepicker table tr td.old').css("background-color", "#FFFFFF");
+                $('.brand .datepicker table tr td.day.active').css("background-color", $cadena_colorweb);
+                $('#datetimepicker12').on('click', function () {
+                    $('.brand .datepicker table tr td.day').css("background-color", "#e2e2e2");
+                    $('.brand .loan-process .datepicker table tr td.disabled, .loan-process .datepicker table tr td.new, .loan-process .datepicker table tr td.old').css("background-color", "#FFFFFF");
+                    $('.brand .datepicker table tr td.day.active').css("background-color", $cadena_colorweb);
+                });
+                $('#datetimepicker12').delegate("*", "focus", function () {
+                    $('.brand .datepicker table tr td.day').css("background-color", "#e2e2e2");
+                    $('.brand .loan-process .datepicker table tr td.disabled, .loan-process .datepicker table tr td.new, .loan-process .datepicker table tr td.old').css("background-color", "#FFFFFF");
+                    $('.brand .datepicker table tr td.day.active').css("background-color", $cadena_colorweb);
+                });
+                $('.brand .loan-process .datepicker table tr td').on('click', function () {
+                    $('#datetimepicker12').focus();
+                    $('#datetimepicker12').trigger('click');
+                });
+                $('body').find('.bootstrap-datetimepicker-widget .list-unstyled li .datepicker .datepicker-days .table-condensed tr td.day.active').on('click', function () {
+                    $('body').find('.bootstrap-datetimepicker-widget .list-unstyled li .datepicker .datepicker-days .table-condensed tr td.day.active').css("background-color", $cadena_colorweb);
+                });
+                $('#edit-loan').on('click', function () {
+                    console.log('open modal');
+                    $('.modal .icon-close').css("background", $cadena_colorweb);
+                    $('.bg-red').css("background", $cadena_colorweb);
+                });
+                $(".input-radio").delegate("*", "focus", function () {
+                    var elem = $(this);
+                    elem.addClass('hover-input');
+                    elem.css("border-color", $cadena_colorweb);
+                    $('body').find('b[role=presentation]').css("border-color", $cadena_colorweb + ' transparent');
+                    $('body').find('li[aria-selected=true]').css("background", $cadena_colorweb);
+                });
+                $(".input-radio").delegate("*", "blur", function () {
+                    var elem = $(this);
+                    elem.removeClass('hover-input');
+                    elem.css("border-color", $cadena_colorgris);
+                });
+                $(".field").delegate("*", "focus", function () {
+                    var elem = $(this);
+                    elem.css("border-color", $cadena_colorweb);
+                    $('body').find('b[role=presentation]').css("border-color", $cadena_colorweb + ' transparent');
+                    $('body').find('li[aria-selected=true]').css("background", $cadena_colorweb);
+                });
+                $(".field").delegate("*", "blur", function () {
+                    var elem = $(this);
+                    elem.css("border-color", $cadena_colorgris);
+                });
+                $('body').find('.custom-check').on('click', function () {
+                    if (!$(this).hasClass('checked')) {
+                        $(this).find('.check-inner').css({
+                            'background': $cadena_colorweb,
+                            'border-color': $cadena_colorweb
+                        });
+                    }
+                    else {
+                        $(this).find('.check-inner').css({
+                            'background': 'inherit',
+                            'border-color': $cadena_colorgris
+                        });
+                    }
+                });
+                $('.help-block-error').css("color", $cadena_colorweb);
+                $('.offer-title .line').css("background", $cadena_colorweb);
+                $('body').find('.select2').on('click', function () {
+                    //$('body').find('.select2-container').find('.select2-results__group').css("color", $cadena_colorweb);
+                    $('body').find('.select2-results__option').css({
+                        //'background' : $cadena_colorwhite,
+                        //'color' : '#34465d'
+                    });
+                    $('body').find('.select2-results__option.select2-results__option--highlighted').css({
+                        //'background' : $cadena_colorweb,
+                        //'color' : $cadena_colorwhite,
+                        //'border-color': $cadena_colorweb
+                    });
+                });
+                $('.horizontal-line .circle').css({
+                    'border': '3px solid ' + $cadena_colorweb,
+                    'color': $cadena_colorweb
+                });
+
+                $('.offer-container ul .best-offer').eq(0).hover(function () {
+                    offer_color_hover($(this), $cadena_colorweb);
+                }, function () {
+                    offer_color_hover($(this), "#D6D8DD");
+                });
+
+                $('.offer-container ul .best-offer').eq(1).hover(function () {
+                    offer_color_hover($(this), gradientOfHexaColors(questionFw.brandingPrimaryColor, '#FFFFFF', 0.7));
+                }, function () {
+                    offer_color_hover($(this), "#D6D8DD");
+                });
+                $('.offer-container ul .best-offer').eq(2).hover(function () {
+                    offer_color_hover($(this), gradientOfHexaColors(questionFw.brandingPrimaryColor, '#FFFFFF', 0.4));
+                }, function () {
+                    offer_color_hover($(this), "#D6D8DD");
+                });
+                function offer_color_hover(e, c) {
+                    e.find('.bar-offer').css("background", c);
+                    e.find('.box-c').css("background", c);
+                    e.find('.btn-offer').css("border-color", c);
+                    e.find('.btn-offer').find('.circle-inner').css("color", c);
+                    e.find('.box-b').find("p").find("span").css("color", c);
+                    e.find('.icon-check').css({
+                        'background-color': c,
+                        'border-color': c
+                    });
+                }
+                $(".input-radio, .h-input-radio").hover(function () {
+                    var $this = $(this);
+                    if ($this.hasClass('click')) {
+                        if (!$this.hasClass('hover')) {
+                        } else {
+                            $this.css({ 'background': '#F9F9FB', 'border-color': $cadena_colorweb });
+                            $this.find('.radio').css({ 'border': '5px solid white', 'background': $cadena_colorweb });
+                            $(".input-radio, .h-input-radio").removeClass('hover');
+                            $this.addClass('hover');
+                        }
+                        $(".input-radio, .h-input-radio").removeClass('hover');
+                        $this.addClass('click').siblings().removeClass('hover');
+                    } else {
+                        if (!$this.hasClass('hover')) {
+                            $this.css({ 'background': '#F9F9FB', 'border-color': $cadena_colorweb });
+                            $this.find('.radio').css({ 'border': '5px solid white', 'background': $cadena_colorweb });
+                            $this.addClass('hover').siblings().removeClass('hover');
+                        }
+                    }
+                }, function () {
+                    var $this = $(this);
+                    if ($this.hasClass('click')) {
+                        if ($this.hasClass('hover')) {
+                            $this.css({ 'background': '#F9F9FB', 'border-color': $cadena_colorweb });
+                            $this.find('.radio').css({ 'border': '5px solid white', 'background': $cadena_colorweb });
+                            $(".input-radio, .h-input-radio").removeClass('hover');
+                            $this.removeClass('hover');
+                            $this.addClass('click');
+                        } else {
+                            $this.css({ 'background': '#F9F9FB', 'border-color': $cadena_colorweb });
+                            $this.find('.radio').css({ 'border': '5px solid white', 'background': $cadena_colorweb });
+
+                            $(".input-radio, .h-input-radio").removeClass('hover');
+                            $this.removeClass('hover');
+                            $this.addClass('click');
+                        }
+                    } else {
+                        if (!$this.hasClass('hover')) {
+                            $this.css({ 'background': '#FFFFFF', 'border-color': '#d6d8dd' });
+                            $this.find('.radio').css({ 'border': '2px solid #D6D8DD', 'background': "#FFFFFF" });
+                        }
+                        else {
+                            $this.removeClass('hover');
+                        }
+                    }
+                    console.log('remove hover');
+                });
+                $(".input-radio, .h-input-radio").on('change', function () {
+                    var $this = $(this);
+                    var status = true;
+                    $this.addClass('click').siblings().removeClass('click');
+                    $(".input-radio, .h-input-radio").css({
+                        'background': '#FFFFFF',
+                        'border-color': '#d6d8dd'
+                    });
+                    $(".input-radio, .h-input-radio").find('.radio').css({
+                        'border': '2px solid #D6D8DD',
+                        'background': "#FFFFFF"
+                    });
+                    if ($this.hasClass('click')) {
+                        console.log('has class click');
+                        $this.css({
+                            'background': '#F9F9FB',
+                            'border-color': $cadena_colorweb
+                        });
+                        $this.find('.radio').css({
+                            'border': '5px solid white',
+                            'background': $cadena_colorweb
+                        });
+                    } else {
+                        console.log('no class click');
+                    }
+                    $(".input-radio, .h-input-radio").removeClass('hover');
+                });
+                $(window).load(function () {
+                    $('#edit-loan').css("color", $cadena_colorweb);
+                    $('.car-model').css("color", $cadena_colorweb);
+                    $('body').find('.corner-close').each(function (i) {
+                        $('.corner-close').css("background", $cadena_colorweb);
+                    });
+                    $('body').find('.brandSelected').each(function (i) {
+                        $(this).on('click', function () {
+                            $(this).addClass('test');
+                            $('body').find('.bg-red').css("background", $cadena_colorweb);
+                            console.log('click');
+                        });
+                    });
+                    $('body').find('#edit-loan').on('click', function () {
+                        $('#edit-modal').find('.bg-red').css("background", $cadena_colorweb);
+                        $('#edit-modal').find('.corner-close').css("color", $cadena_colorweb);
+                        console.log('open modal');
+                    });
+                });
+                if ($('.choose-agent').hasClass('brand')) {
+                    $('.choose-agent').find('.brand-footer').find('span').css("color", "#e8e8e8");
+                    $('.choose-agent').find('.brand-footer').find('a').css("color", "#e8e8e8");
+                }
+                $('.offer-container .offer-title .call-offer-modal a').css("color", $cadena_colorweb);
+                $('.offer-container .sponsored-by .box-sponsor small').eq(0).css("color", $cadena_colorweb);
+                $('#take-photo').css("background", $cadena_colorweb);
+
+                $('.main-buttons .bg-t').css({ 'background': '#FFFFFF', 'border-color': $cadena_colorweb, 'color': $cadena_colorweb });
+                $('.main-buttons .bg-t').hover(function () {
+                    $(this).css({ 'background': $cadena_colorweb, 'border-color': $cadena_colorweb, 'color': '#FFFFFF' });
+                }, function () {
+                    $(this).css({ 'background': '#FFFFFF', 'border-color': $cadena_colorweb, 'color': $cadena_colorweb });
+                });
+
+                $('body').find('.sweet-alert button').css("background-color", $cadena_colorweb);
+                $('#open-modal-question60').css("color", $cadena_colorweb);
+                $('.loan-process .container .adviser-section .horizontal-line .line').css("background-color", $cadena_colorweb);
+                $('.main-choose-agent').css("background", $backgroundColorAgent);
+                $('.brand-bg-colorweb').css("background", $backgroundColorAgent);
+                $('body.main-choose-agent .hero-content p').css("color", $textColorAgent);
+                $('body.main-choose-agent .hero-content ul li .circle h4').css("color", $textColorAgent);
+                $('.choose-agent.brand .bottom-footer.brand-footer ul li a, .choose-agent.brand .bottom-footer.brand-footer ul li span').css("color", $textColorAgent);
+                $('.loading-red .sk-fading-circle .sk-circle span').css("background", $backgroundColorAgent);
+                $("body").get(0).style.setProperty("--branding-loading-color", $backgroundColorAgent);
+                $('.loan-process .msg-loaded span .sk-fading-circle .sk-circle span').css("background", $cadena_colorweb);
+                $('.sk-fading-circle .sk-circle span').css("background", $cadena_colorweb);
+                $('.sk-circle span').css("background", $cadena_colorweb);
+                $('.pdfViewer .pdf-bar').css("background", $cadena_colorweb);
+                $('body .brand .pdfViewer.bg-black').css('background', '#34465d');
+            }
+            var size = 100;
+            if ($(window).width() <= 1280 && $(window).width() > 768) {
+                size = 80;
+            } else if ($(window).width() <= 768) {
+                size = 60;
+            }
+            $('.avatar-advisor').doOnce(function () {
+                $(".avatar-advisor").imgProgress({
+                    img_url: url,
+                    size: size,
+                    barSize: 10,
+                    backgroundColor: '#BEEFF2',
+                    foregroundColor: '#26CAD3',
+                    backgroundSize: 'cover',
+                    percent: 100
+                });
+            });
+
+
+            var questionFw = new QuestionFramework();
+            questionFw.type = questionFw.TYPE_EVALUATION;
+            questionFw.paintProgress(6, 100);
+            questionFw.updateETAmessage(62, 6);
+
+            $('#helpSign').on('click', function (event) {
+                event.preventDefault();
+                $('#hlp-modal').modal({ backdrop: 'static', keyboard: false, show: true });
+            });
+
+            if(isFinansol || isFinansolConsumo){
+                setTimeout(() => {
+                    updateBranding();
+                }, 100)
+            }
+
+        });
+
+        /*]]>*/
+    </script>
+
+    <style>
+         .box-content {
+            border-radius: 5px;
+            border: 2px solid #26CAD3;
+            box-shadow: -8px 3px 8px 0 rgba(0, 0, 0, 0.12),
+            0 0px 11px 0 rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: repeat(1, 2fr);
+            margin: 0 auto;
+             max-width: 470px;
+        }
+
+         .box-content .box-header {
+            background: #26CAD3;
+            padding: 1rem 2.5rem;
+            text-align: left;
+        }
+
+
+         .box-content .box-header p {
+            color: white !important;
+            font-family: 'Lato Light', sans-serif;
+            font-weight: bolder;
+            margin: 0 auto;
+            max-width: 316.19px;
+        }
+
+         .box-content .box-body {
+            display: grid;
+            padding: 2rem 2.5rem;
+            text-align: left;
+        }
+
+         .box-content .box-body .box-body_text {
+             display: flex;
+             flex-direction: row;
+             align-items: center;
+             justify-content: flex-start;
+        }
+
+         .box-body .box-body_text span:first-child{
+            max-width: 50%;
+             width: 50%;
+         }
+
+         .box-body .box-body_text span:nth-child(2){
+             flex: 1;
+         }
+
+         .box-body .box-body_text span {
+            align-self: flex-start;
+            font-family: 'Lato Light', sans-serif;
+            font-size: 1.5rem;
+            margin: 0 !important;
+            padding: 0.25rem 0;
+        }
+
+         .box-body .box-body_tea_tcea span span {
+            padding-left: 0.5rem;
+        }
+
+         .content-button button {
+            font-size: 1.4rem;
+            height: 45px;
+        }
+
+         .go-to-agencies{
+             border: 1px solid var(--branding-loading-color);
+             background-color: white;
+             color : var(--branding-loading-color);
+             min-width: 120px;
+             height: 35px;
+             margin-top: 12px;
+         }
+
+    </style>
+
+    <script th:inline="javascript" th:if="${entityProductParams?.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA}">
+        /*<![CDATA[*/
+        var agencies = /*[[ ${agencies} ]]*/[];
+        var navLatitude = /*[[ ${navLatitude} ]]*/null;
+        var navLongitude = /*[[ ${navLongitude} ]]*/null;
+        var closestAgency = /*[[ ${closestAgency} ]]*/null;
+        var markers = [];
+        var selectedAgency =/*[[ ${selectedAgency} ]]*/null;
+        var prevInfoWindow = false;
+        var agencyObject = null;
+
+        function showAgencyData(agency){
+            agencyObject = agency;
+            $("#sendButtonNext").removeClass("disabled-option");
+            $("h5 > span#agencyName").text(agency.agency);
+            $("h5 > span#agencyAddress").text(agency.address);
+            $("h5 > span#agencyDistrict").text(agency.district);
+            $("#selectedAgency").show();
+        }
+
+        function selectAgency(codAgency){
+            for (let marker of markers) {
+                if(marker.codAgency == codAgency){
+                    marker.setIcon("https://solven-public.s3.amazonaws.com/img/markers/marker_alfin.png");
+                    selectedAgency = codAgency;
+                    let agency = agencies.find(x => x.codAgency == codAgency);
+                    if(agency) showAgencyData(agency);
+                }
+                else marker.setIcon(null);
+            }
+        }
+
+        $(document).ready(function () {
+            // Mapa
+            if (agencies) {
+
+                var loanApplicationMap = new google.maps.Map(document.getElementById('loanApplicationMap163'), {
+                    center: { lat: navLatitude, lng: navLongitude },
+                    zoom: 11.75
+                });
+                var bounds = new google.maps.LatLngBounds();
+
+                // Marker IP
+                for (let agency of agencies) {
+                    if (!agency.geolocation) continue;
+                    let agencyLocationMaper = new google.maps.Marker({
+                        map: loanApplicationMap,
+                        draggable: false,
+                        animation: google.maps.Animation.DROP,
+                        position: { lat: agency.geolocation.latitude, lng: agency.geolocation.longitude },
+                        title: agency.agency,
+                        codAgency : agency.codAgency,
+                        icon : agency.codAgency == selectedAgency ? "https://solven-public.s3.amazonaws.com/img/markers/marker_alfin.png" : null
+                    });
+
+                    if(agency.codAgency == selectedAgency) showAgencyData(agency);
+
+                    let link = createLinkGoogleMaps(agency.geolocation.latitude, agency.geolocation.longitude)
+                    let infowindow = new google.maps.InfoWindow({
+                        content: `${agency.agency} <br> ${agency.address || ''} <br> ${link}`
+                    });
+
+                    // <br> <a href='#' data='${agency.codAgency}' className="select-agency">Seleccionar agencia</a>
+
+                    google.maps.event.addListener(agencyLocationMaper, 'click', function () {
+                        infowindow.open(loanApplicationMap, agencyLocationMaper);
+                        if(prevInfoWindow && prevInfoWindow.content != infowindow.content) prevInfoWindow.close();
+                        prevInfoWindow = infowindow;
+                        if(agencyLocationMaper.codAgency) selectAgency(agencyLocationMaper.codAgency);
+                    });
+
+                    google.maps.event.addListener(infowindow, 'domready', function(){
+                        $("a.select-agency").click(function(e){
+                            let codAgency = $(this).attr("data");
+                            selectAgency(codAgency);
+                        })
+                    });
+
+                    markers.push(agencyLocationMaper);
+                }
+
+                var showError = function (e) {
+                    console.log(e);
+                };
+
+                function createLinkGoogleMaps(lat, lng) {
+                    return `<a target="_blank" href='https://www.google.com/maps/search/?api=1&query=${lat},${lng}'><span>Ver en Google Maps</span> </a>`
+                }
+
+                function findClosestMarker(lat, lng) {
+                    var distances = [];
+                    var closest = -1;
+                    for (i = 0; i < markers.length; i++) {
+                        var d = google.maps.geometry.spherical.computeDistanceBetween(markers[i].position, new google.maps.LatLng(lat, lng));
+                        distances.push({
+                            distance: d,
+                            marker: markers[i]
+                        })
+                        if (closest == -1 || d < distances[closest]["distance"]) {
+                            closest = i;
+                        }
+                    }
+                    let closest_markers = distances.sort((a, b) => { return a.distance - b.distance }).slice(0, 2)
+                    return closest_markers.map((item) => { return item.marker })
+                }
+
+                function showPosition(lat, long) {
+                    var latlng = new google.maps.LatLng(lat, long);
+                    let closestMarker = findClosestMarker(lat, long);
+                    if (closestMarker.length) {
+                        loanApplicationMap.setCenter(closestMarker[0].position);
+                        bounds.extend(closestMarker[0].position);
+                        loanApplicationMap.fitBounds(bounds);
+                        loanApplicationMap.setZoom(11.75);
+                    }
+                    else loanApplicationMap.setCenter(latlng);
+                }
+
+
+                $("#allBranches").click(function () {
+                    bounds = new google.maps.LatLngBounds();
+                    for (let marker of markers) {
+                        bounds.extend(marker.position);
+                    }
+                    loanApplicationMap.fitBounds(bounds);
+                })
+
+                // DIspara el Resize del mapa despues de 1000ms
+                setTimeout(function () {
+                    google.maps.event.trigger(loanApplicationMap, "resize");
+                    // Centrar mapa con puntos
+                    if(agencyObject != null){
+                        showPosition(agencyObject.geolocation.latitude, agencyObject.geolocation.longitude);
+                    }
+                }, 1000);
+            }
+            
+            $(".show-map").click(function(e){
+                $(".offer-detail").hide();
+                $(".map-agencies").show();
+                if(agencyObject != null){
+                    showPosition(agencyObject.geolocation.latitude, agencyObject.geolocation.longitude);
+                }
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        showPosition(position.coords.latitude, position.coords.longitude);
+                    }, showError);
+                }
+            })
+        })
+
+        /*]]>*/
+    </script>
+
+</head>
+
+<body th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+
+    <th:block layout:fragment="header">
+        <th:block th:replace="fragments/headers :: processHeader"></th:block>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <section class="loan-process">
+            <div class="container">
+                <div class="adviser-section animated fadeIn" th:if="true">
+                    <div id="progressQuestion">
+                        <figure class="agent-img">
+                            <img th:src="${agent?.getProcessAvatar()}" />
+                        </figure>
+                        <ul class="list-question before-offer">
+                            <li class="steps-question category-1">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <i class="icon icon-person-info"></i>
+                                </div>
+                                <span>Datos Personales</span>
+                            </li>
+                            <li class="steps-question category-2">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <i class="icon icon-dollar"></i>
+                                </div>
+                                <span>Ingresos</span>
+                            </li>
+                            <li class="steps-question category-3">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <i class="icon icon-percent"></i>
+                                </div>
+                                <span>Oferta</span>
+                            </li>
+                        </ul>
+                        <ul class="list-question after-offer"
+                            th:unless="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA}">
+                            <li class="steps-question category-3">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <th:block th:if="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                                        3
+                                    </th:block>
+                                    <th:block th:unless="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                                        <i class="icon icon-percent"></i>
+                                    </th:block>
+
+                                </div>
+                                <span>Oferta</span>
+                            </li>
+                            <li class="steps-question category-4">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <th:block th:if="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                                        4
+                                    </th:block>
+                                    <th:block th:unless="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                                        <i class="icon icon-check"></i>
+                                    </th:block>
+                                </div>
+                                <span>Verificación</span>
+                            </li>
+                            <li class="steps-question category-5">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <th:block th:if="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                                        5
+                                    </th:block>
+                                    <th:block th:unless="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                                        <i class="icon icon-sign"></i>
+                                    </th:block>
+
+                                </div>
+                                <span>Contrato</span>
+                            </li>
+                        </ul>
+                        <ul class="list-question after-offer"
+                            th:if="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA}">
+                            <li class="steps-question category-3" style="width: 50%">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <span class="num">3</span>
+                                </div>
+                                <span>Oferta</span>
+                            </li>
+                            <li class="steps-question category-5" style="width: 50%">
+                                <div class="base-line"><span class="progress-line"></span></div>
+                                <div class="w">
+                                    <span class="num">4</span>
+                                </div>
+                                <span>Verificación</span>
+                            </li>
+                        </ul>
+                        <div class="estimated">Estimado<br />3 min.</div>
+                    </div>
+                    <div id="pre-aproved-message" class="message" style="display: none;"></div>
+                    <div class="sello" style="display: none;">
+                        <span>Oferta exclusiva<br /> en Web</span>
+                        <img src="https://s3.amazonaws.com/solven-public/img/icons/medal.svg"
+                            alt="Oferta exlusiva solo en Web" />
+                    </div>
+                </div>
+                <div class="questions-section animated fadeInRight">
+                    <th:block
+                            th:if="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA}">
+                        <p>
+<!--                            <span>¡<th:block th:utext="${person.getFirstName()}"></th:block>, tu crédito está listo! </span>-->
+<!--                            <br/>-->
+<!--                            <th:block th:if="${idCampania} != null">-->
+<!--                                <br/>-->
+<!--                                <span th:if="${idCampania} == 29">Te llamaremos para que puedas retirar tu crédito solo con tu DNI.</span>-->
+<!--                                <span th:if="${idCampania} == 49">Retira tu crédito en nuestra agencia. Acércate solo con tu DNI.</span>-->
+<!--                                <span th:if="${idCampania} == 50">Retira tu crédito en nuestra agencia. Acércate con tu DNI y recibo de servicios.</span>-->
+<!--                            </th:block>-->
+                                <span>¡Excelente <th:block th:utext="${person.getFirstName()}"></th:block>! Estás a un paso de obtener tu crédito.</span>
+                                <br/>
+                                <span>Acércate hoy mismo a la agencia más cercana donde se te brindará condiciones y detalles para finalizar tu proceso.</span>
+                        </p>
+                        <div class="offer-detail" th:if="${offer != null}">
+
+                            <div class="box-content">
+                                <div class="box-header">
+                                    <p style="margin: 0px">Resumen</p>
+                                </div>
+                                <div class="box-body">
+                                    <div class="box-body_text">
+                                        <span><strong>Importe:</strong></span>
+                                        <span th:text="${@utilService.integerMoneyFormat(offer?.ammount)}"></span>
+                                    </div>
+                                    <div class="box-body_text">
+                                        <span><strong>Plazo:</strong></span>
+                                        <span th:text="${offer?.installments + ' meses'}"></span>
+                                    </div>
+                                    <div class="box-body_text">
+                                        <span><strong>TCEA:</strong></span>
+                                        <span th:text="${@utilService.percentFormat(offer?.effectiveAnnualCostRate)}"></span>
+                                    </div>
+                                    <div class="box-body_text" th:if="${address} != null">
+                                        <span><strong>Agencia:</strong></span>
+                                        <span> <span th:text="${address}"></span>
+                                        </span>
+                                    </div>
+                                    <div class="box-body_text">
+                                        <span></span>
+                                        <button class="show-map button go-to-agencies">
+                                            Ver agencias
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                        </div>
+                        <div class="map-agencies" style="display:none;">
+                            <div id="loanApplicationMap163" style="height: 300px;width: 70%;margin-left: auto;margin-right: auto;"></div>
+                            <div id="selectedAgency" style="display: none; margin-top: 10px;margin-bottom: 10px;">
+                                <h5 style="margin-bottom: 5px;">Agencia: <span id="agencyName"></span></h5>
+                                <h5 style="margin-bottom: 5px;">Dirección: <span id="agencyAddress"></span></h5>
+                                <h5>Distrito: <span id="agencyDistrict"></span></h5>
+                            </div>
+                        </div>
+<!--                        <a href="/"  class="anchor-button bg-red" style="padding: 1.2rem 3.5rem;min-width: 200px;">Regresar</a>-->
+
+                        <script>
+                            $(document).on('ready', function () {
+                                setTimeout(() => {
+                                    updateBranding();
+                                }, 100)
+                            })
+                        </script>
+                    </th:block>
+                    <th:block th:if="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE}">
+                        <p style="white-space: pre-line;"
+                           th:utext="#{questions.62.thanks.tittle.verified(${'Finansol'})}"></p>
+                    </th:block>
+                    <th:block
+                        th:unless="${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA} or (${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO} or ${entityProductParams.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FINANSOL_CONSUMO_BASE})">
+                        <th:block
+                            th:switch="${entityProductParams.signatureType == entityProductParams.CONTRACT_TYPE_MIXTO and associated != null and !associated.validated}">
+                            <div class="block" th:case="true">
+                                <p th:text="#{questions.block.downloadSheet}"></p>
+                                <div class="note">
+                                    (Fírmalo y entrégalo a Recursos Humanos, apenas la activen en el sistema podremos
+                                    desembolsarte el crédito)
+                                </div>
+                                <a th:href="${associatedUrl}" download="" class="anchor-button bg-red"><i
+                                        class="icon icon-download"></i> Descargar</a>
+                            </div>
+                            <div class="block extra" th:case="false">
+                                <th:block th:if="${bankAccountInformation != null}" class="note">
+                                    <small class="countdownSooner"
+                                        th:utext="${entityProductParams.getPostSignatureMessageReplaced(bankAccountInformation?.getBankAccountEncrypted(), bankAccountInformation?.getCciCodeEncrypted(), person.getFirstName())}"></small>
+                                </th:block>
+
+                                <div class="note"
+                                    th:if="${entityProductParams.getShowPostSignatureDownloadContractButton()}">
+                                    <a target="_blank" th:utext="#{downloadContract.button}"
+                                        th:href="@{/__${loanApplication.productCategory.GET_URL_BY_ID(loanApplication.productCategory.id)}__/__${@evaluationController.URL}__/__${token}__/contract}"
+                                        class="anchor-button bg-red"></a>
+                                </div>
+
+                                <th:block
+                                    th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                                    <small class="sub-text">Contanos tu experiencia <a rel="noopener noreferrer"
+                                            href="https://www.facebook.com/pg/SolvenLatam/reviews/" target="_blank"
+                                            class="text-lightblue">aqu&iacute;</a>.</small>
+                                </th:block>
+                                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                                    <small class="sub-text">Cu&eacute;ntanos tu experiencia <a rel="noopener noreferrer"
+                                            href="https://www.facebook.com/pg/SolvenLatam/reviews/" target="_blank"
+                                            class="text-lightblue">aqu&iacute;</a>.</small>
+                                </th:block>
+                                <th:block
+                                    th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <p style="white-space: pre-line;"
+                                        th:utext="#{question.branding.postsignature.message(${person?.name}, ${@utilService.integerMoneyFormat(offerSelected?.ammount, offerSelected.currency?.symbol, '.')}, ${offerSelected?.installments})}">
+                                    </p>
+                                </th:block>
+                                <div class="note" th:if="${entityProductParams.postSignatureLegalFooter != null}">
+                                    <small
+                                        th:utext="${entityProductParams.getPostSignatureLegalFooterReplaced()}"></small>
+                                </div>
+
+                            </div>
+                            <script th:inline="javascript">
+                                /*
+                                <![CDATA[*/
+                                if ($(".block").hasClass("extra")) {
+                                    console.log("pregunta 62 categoria 6")
+                                    $(".block").parent().addClass("q62-cat6")
+                                    $(".note").eq(0).addClass("note1")
+                                    $(".note").eq(1).addClass("note2")
+                                    $(".note").eq(2).addClass("note3")
+
+                                } else {
+                                    $(".block").removeClass("q62-cat6")
+                                }
+                            /*]]>*/
+                            </script>
+                        </th:block>
+                    </th:block>
+                </div>
+            </div>
+            <hr class="divisor-bottom" />
+        </section>
+        <th:block layout:fragment="footers">
+            <th:block th:replace="fragments/footers :: processFooter"></th:block>
+        </th:block>
+        <th:block layout:fragment="footers">
+            <th:block th:replace="fragments/footers :: processFooterChooseAgent"></th:block>
+        </th:block>
+    </th:block>
+
+</body>
+
+</html>

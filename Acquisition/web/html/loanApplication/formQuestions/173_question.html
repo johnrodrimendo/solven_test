@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q173">
+        <div class="form q173">
+            <p class="offer-title" style="margin-bottom: 5px">Elige la cuenta de ahorro que prefieras.</p>
+            <p class="offer-subtitle fw-bold">Tenemos las mejores condiciones para tí</p>
+            <br />
+            <div class="offers-container">
+                <th:block th:each="offer : ${offers}">
+                    <div class="offer-card">
+                        <div class="offer-title">
+                            <p class="fw-bold" style="margin-bottom: 14px;">
+                                <th:block
+                                    th:if="${offer?.getBankAccountOfferData()?.type == T(com.affirm.common.model.BankAccountOfferData).TRADITIONAL_TYPE}"
+                                    th:text="#{bankAccountOffer.traditional.name}"></th:block>
+                                <th:block
+                                    th:if="${offer?.getBankAccountOfferData()?.type == T(com.affirm.common.model.BankAccountOfferData).HIGH_PROFITABILITY_TYPE}"
+                                    th:text="#{bankAccountOffer.highProfitability.name}"></th:block>
+                            </p>
+                        </div>
+                        <div class="offer-description">
+                            <p class="interest-value">
+                                <span class="interest-value-description">TREA </span>
+                                <span class="interest-value-qty">
+                                    <th:block th:if="${offer?.getBankAccountOfferData()?.type == T(com.affirm.common.model.BankAccountOfferData).TRADITIONAL_TYPE}">
+                                        <th:block th:utext="${@utilService.doubleToIntegerFormat(offer?.getBankAccountOfferData()?.annualInterest)}"></th:block>%
+                                    </th:block>
+                                    <th:block th:if="${offer?.getBankAccountOfferData()?.type == T(com.affirm.common.model.BankAccountOfferData).HIGH_PROFITABILITY_TYPE}">
+                                        <th:block th:utext="${@utilService.customDoubleFormat(offer?.getBankAccountOfferData()?.annualInterest,1)}"></th:block>%
+                                    </th:block>
+                                </span>
+                            </p>
+                            <p class="interest-title">Tasa de Rendimiento Efectivo Anual</p>
+                        </div>
+                        <div class="offer-detail">
+
+<!--                            <div><span>N° OPER. PERMITIDAS: </span>
+                                <span>
+                                    <th:block th:if="${offer?.getBankAccountOfferData()?.allowedOperations == -1}">
+                                        Ilimitado</th:block>
+                                    <th:block th:unless="${offer?.getBankAccountOfferData()?.allowedOperations == -1}">
+                                        <th:block th:text="${offer?.getBankAccountOfferData()?.allowedOperations}">
+                                        </th:block> mensuales
+                                    </th:block>
+
+                                </span>
+                            </div>-->
+                            <div><span>N° oper. ventanilla: </span>
+                                <span>
+                                    <th:block
+                                        th:if="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency == -1}">
+                                        Ilimitado</th:block>
+                                    <th:block
+                                        th:unless="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency == -1}"
+                                        th:text="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency}">
+                                    </th:block>
+                                    <th:block th:unless="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency == -1}">al mes</th:block>
+                                </span>
+                            </div>
+
+                            <div>
+                                <span>Tipo de moneda: </span>
+                                <span>
+                                    <th:block th:text="${offer?.getBankAccountOfferData()?.currency}"></th:block>
+                                </span>
+                            </div>
+
+                            <th:block th:if="${false}">
+
+                                <div><span>TIPO DE CUENTA: </span> <span>Física:
+                                        <th:block th:if="${offer?.getBankAccountOfferData()?.physicalAccountType}">Si
+                                        </th:block>
+                                        <th:block th:unless="${offer?.getBankAccountOfferData()?.physicalAccountType}">
+                                            No</th:block>
+                                        Virtual:
+                                        <th:block th:if="${offer?.getBankAccountOfferData()?.virtualAccountType}">Si
+                                        </th:block>
+                                        <th:block th:unless="${offer?.getBankAccountOfferData()?.virtualAccountType}">No
+                                        </th:block>
+                                    </span> </div>
+
+                                <div><span>RETIROS CAJEROS: </span> <span>
+
+                                        <th:block
+                                            th:if="${offer?.getBankAccountOfferData()?.monthlyWithdrawalATM == -1}">
+                                            Ilimitado</th:block>
+                                        <th:block
+                                            th:unless="${offer?.getBankAccountOfferData()?.monthlyWithdrawalATM == -1}">
+                                            <th:block
+                                                th:text="${offer?.getBankAccountOfferData()?.monthlyWithdrawalATM}">
+                                            </th:block> mensuales
+                                        </th:block>
+
+                                    </span></div>
+
+                                <div><span>MANTENIMIENTO: </span> <span>
+                                        <th:block
+                                            th:text="${@utilService.integerMoneyFormatWithoutSpaces(offer?.getBankAccountOfferData()?.monthlyMaintenanceAmount,'S/')}">
+                                        </th:block>
+                                        mensuales
+                                    </span></div>
+                            </th:block>
+
+                        </div>
+                        <button type="button" class="button bg-red" th:onclick="'selectOffer('+${offer?.id}+')'"
+                            style="width: 100%">¡Abrir Cuenta!</button>
+                    </div>
+                </th:block>
+            </div>
+
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function selectOffer(id) {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST",
+                form: $('#questionForm'),
+                data: { offerId: id }
+            }, "");
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+
+</html>

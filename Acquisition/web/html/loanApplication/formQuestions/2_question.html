@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q2">
+            <p th:utext="#{questions.block.birthdate}"></p>
+
+            <div class="centrado">
+                <div>
+                    <div class="field field-birthdate inline">
+                        <div class="wrap-field">
+                            <div class="box-icon tiny-input"><i class="icon icon-cake"></i></div>
+                            <input type="text" id="birthDay" class="input-outline tiny-input" placeholder="dd"
+                                   pattern="[0-9]*"/>
+                            <input type="text" id="birthMonth" class="input-outline tiny-input" placeholder="mm"
+                                   pattern="[0-9]*"/>
+                            <input type="text" id="birthYear" class="input-outline small-input" placeholder="aaaa"
+                                   pattern="[0-9]*"/>
+                        </div>
+                        <div class="errorContainer error-text tamanio-error"></div>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                </div>
+                <div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var yearFrom = /*[[${yearFrom}]]*/;
+        var yearTo = /*[[${yearTo}]]*/;
+        var dateFromServer = /*[[${form.birthday}]]*/;
+
+        if (dateFromServer != null) {
+            var serverDate = moment(dateFromServer, "DD/MM/YYYY");
+
+            $('#birthDay').val(serverDate.format("DD"));
+            $('#birthMonth').val(serverDate.format("MM"));
+            $('#birthYear').val(serverDate.format("YYYY"));
+        }
+
+        $('#birthDay').forceIntegerOnly(true, 1, 31);
+        $('#birthMonth').forceIntegerOnly(true, 1, 12);
+        $('#birthYear').forceIntegerOnly(true, yearFrom, yearTo);
+
+        $('#birthDay').keyup(function (event) {
+            if ($(this).val().length == 2) {
+                $('#birthMonth').focus();
+            }
+        });
+        $('#birthMonth').keyup(function (event) {
+            if ($(this).val().length == 2) {
+                $('#birthYear').focus();
+            }
+        });
+
+        $('#sendButton').click(function () {
+            $('.errorContainer').html("");
+
+            var date = moment($('#birthDay').val() + "/" + $('#birthMonth').val() + "/" + $('#birthYear').val(), "DD/MM/YYYY");
+            if (!date.isValid() || date.get('years') > yearTo || date.get('years') < yearFrom) {
+                $('.errorContainer').html("La fecha es incorrecta");
+            } else {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    data: {
+                        birthday: date.format("DD/MM/YYYY")
+                    }
+                }, "");
+            }
+        });
+
+        var birthDay = $('#birthDay');
+        setTimeout(function () {
+            birthDay.focus();
+        }, 300);
+
+        /*]]>*/
+
+    </script>
+</th:block>
+</html>

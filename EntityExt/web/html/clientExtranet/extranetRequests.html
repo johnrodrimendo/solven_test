@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate">
+<head>
+
+    <title>Solicitudes</title>
+
+    <!-- Jquery Validation -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+    <!-- / CounterUp -->
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+    <!-- / Drop Zone-->
+
+    <!--Ekko Lightbox For Images-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.css'}"
+          rel="stylesheet"/>
+    <!-- / Ekko Lightbox For Images-->
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+
+    <script>
+        /*<![CDATA[*/
+
+        $(document).on('ready', function () {
+
+            <!-- CounterUp -->
+            $('.counter').counterUp({
+                delay: 10,
+                time: 1000
+            });
+            <!-- / CounterUp -->
+
+        });
+
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: dashboardHeader "></th:block>
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetSidebar(currentPage='requests')"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="portlet light bg-inverse" th:if="${loanApplications == null}">
+                <div class="portlet-title">
+                    <div class="caption font-purple-plum">
+                        <i class="icon-speech font-purple-plum"></i>
+                        <span class="caption-subject bold uppercase"> A&uacute;n no tienes solicitudes de cr&eacute;ditos</span>
+                    </div>
+                    <div class="actions">
+                        <a th:href="@{/}" class="btn btn-circle red-sunglo btn-sm">
+                            <i class="fa fa-plus"></i> Nuevo cr&eacute;dito </a>
+                    </div>
+                </div>
+            </div>
+            <!-- / No results -->
+
+            <div class="portlet box" th:if="${loanApplications != null}" th:each="loanApplication : ${loanApplications}"
+                 th:classappend="${loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED_AUTOMATIC or loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED ? 'red': 'green'}">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-tag"></i>Tu solicitud<span
+                            th:text="${loanApplication.reason != null ? ' para ' + loanApplication.reason.mailingReplacement2 : ''}"></span>
+                        <small style="font-size: .65em;"
+                               th:if="${loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED_AUTOMATIC or loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED}">
+                            (Solicitud rechazada)
+                        </small>
+                    </div>
+                    <div class="actions">
+                        <i class="fa fa-calendar"></i>
+                        <time th:text="${@utilService.humanDateFormat(loanApplication.registerDate, #locale)}"></time>
+                    </div>
+                </div>
+                <div class="portlet-body">
+
+                    <!-- Notification -->
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                             th:if="${loanApplication != null and (loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).PRE_EVAL_APPROVED or loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).EVAL_APPROVED)}">
+                            <div class="note note-success">
+                                <h4 class="block">Finaliza tu solicitud de cr&eacute;dito para <span
+                                        th:text="${loanApplication.reason.mailingReplacement2}"></span> haciendo click
+                                    <a target="_blank"
+                                       rel="noopener noreferrer"
+                                       th:href="${@utilService.createLoanApplicationClientUrl(loanApplication?.userId, loanApplication?.id, loanApplication?.personId)}"
+                                       class="btn btn-outline red">aqu&iacute;</a></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / Notification -->
+
+                    <!-- Notification -->
+                    <div class="row" th:if="${loanApplication != null}">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                             th:if="${loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).APPROVED}">
+                            <div class="note note-success">
+                                <h4 class="block">Est&aacute;s a un paso de <span
+                                        th:text="${loanApplication.reason.mailingReplacement2}"/>,
+                                    firma tu solicitud de cr&eacute;dito digitalmente haciendo click <a rel="noopener noreferrer" target="_blank"
+                                                                                                        th:href="${@utilService.createLoanApplicationClientUrl(loanApplication?.userId, loanApplication?.id, loanApplication?.personId)}"
+                                                                                                        class="btn btn-outline red">aqu&iacute;</a>.
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / Notification -->
+
+                    <!-- Top summary -->
+                    <div class="row">
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <th:block th:if="${loanApplication.waitingForApproval}">
+                                <th:block th:replace="fragments/extranetFragment :: documentationContainer"></th:block>
+                            </th:block>
+                        </div>
+
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-green-sharp">
+                                            <small style="font-size: 24px;" class="font-green-sharp">S/</small>
+                                            <span style="font-size: 24px;" data-counter="counterup" th:attr="data-value=${@utilService.integerToDoubleFormat(loanApplication.amount)}">0</span>
+                                            <small style="font-size: .5em;">(TEA <span>18.22%</span>)</small>
+                                        </h3>
+                                        <small>Monto Solicitado</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-red-haze">
+                                            <span style="font-size: 24px;" data-counter="counterup" th:if="${loanApplication.loanDays == null}"
+                                                  th:attr="data-value=${loanApplication.installments}">0</span>
+                                            <span style="font-size: 24px;" data-counter="counterup" th:if="${loanApplication.loanDays != null}"
+                                                  th:attr="data-value=${loanApplication.loanDays}">0</span>
+
+                                            <small class="font-red-haze" th:if="${loanApplication.loanDays == null}"
+                                                   th:text="${loanApplication.product?.paymentType?.pluralName}"></small>
+                                            <small class="font-red-haze" th:if="${loanApplication.loanDays != null}">d&iacute;as</small>
+                                        </h3>
+
+                                        <small>Cuotas</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-calculator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" th:if="${loanApplication.rejectedMessage != null}">
+                            <div class="note note-danger">
+                                <h4 class="block">Motivo de Rechazo</h4>
+                                <p th:text="${loanApplication.rejectedMessage}"></p>
+                                <p>Podr&aacute;s solicitar un cr&eacute;dito despues del <b th:text="${@utilService.humanDateFormat(loanApplication.rejectedExpirationDate, #locale)}"></b></p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / Top summary -->
+
+                </div>
+            </div>
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+    <div id="uploadUserFileModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="smaller">Tama&ntilde;o m&aacute;ximo <span th:text="${@configuration.MAX_UPLOAD_FILE_SIZE_MB() + 'mb'}"></span></div>
+                </div>
+                <div class="modal-body">
+                    <div id="uploadUserFile" class="dropzone"></div>
+                    <br/>
+                    <div class="actions">
+                        <button type="button" class="button black-button" onclick="closeUploadUserFileModal()">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

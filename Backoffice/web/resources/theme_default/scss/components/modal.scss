@@ -1,0 +1,207 @@
+.modal{
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    z-index: -9;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    visibility: hidden;
+    
+    .w{
+        position: absolute;
+        top: 1rem;
+        left: 0;
+        right: 0;
+        max-width: 350px;
+        width: 80%;
+        margin: 0 auto;
+        background:#FFFFFF;
+        z-index: 2;
+        transition: all .45s ease;
+        opacity: 0;
+        visibility: hidden;
+        margin: 0 auto;
+        border-radius: 2px;
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+        border-radius: 4px;
+        overflow-x: hidden;
+    }
+    
+    .slider{
+        min-width: 300%;
+        width: 300%;
+        overflow-x: auto;
+    }
+    .frmLogin, .recoveryPass, .pass{
+        width: 33.333%;
+    }
+
+    .frmLostPassword{
+        position: relative;
+    }
+
+    h1{
+        background-color: #e0e0e0;
+        width: 100%;
+        font-size: 1rem;
+        padding: .75rem 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        text-transform: none;
+    }
+    .line{
+        width: 100%;
+        &:before,&:after{
+            content: '';
+            width: 30%;
+            height: 1px;
+            background-color: #eaeaea;
+            margin: .75rem 1rem;
+        }
+        
+    }
+    p{
+        width: 80%;
+        margin: 0 auto 1rem auto;
+        font-size: .75rem;
+    }
+    .c-i{
+        max-width: 80%;
+        width: 100%;
+        margin: .25rem auto;
+    }
+    .icon-calendar{
+        position: relative;
+        &:before{
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            z-index: -1;
+        }
+    }
+    input{
+        width: 100%;
+    }
+    .select2{
+        margin-bottom: 0;
+    }
+
+    .btn-close,.btn-back{
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 46px;
+        height: 46px;
+        font-size: 0;
+        background-color: transparent;
+        z-index: 1;
+        &:before{
+            font-size: 24px;
+        }
+    }
+    .btn-back{
+        left: 0;
+        right: inherit;
+        display: flex;
+        align-items: center;
+        &:before{
+            font-size: 30px;
+        }
+    }
+    .btn{
+        max-width: 80%;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: .5rem;
+    }
+    .btn-s{
+        width: 39%;
+        margin: 0 .25rem;
+    }
+    .btnBack{
+        margin-right: auto;
+
+    }
+    .link{  
+       font-size: .8rem;
+       margin: 1.75rem auto;
+       color: #007bff;
+       font-weight: 600;
+       text-decoration: underline;
+       &:first-child{
+            width: 40%;
+            padding-left: 2.25rem;
+       }
+       &:last-child{
+            width: 60%; 
+            padding-right: 2.25rem;
+            text-align: right;
+       }
+    }
+    #idSignin{
+        width: 40%;
+        padding-left: 2.25rem;
+    }
+    #idLostPass{
+        width: 60%; 
+        padding-right: 2.25rem;
+        text-align: right;
+    }
+    .overlay{
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1;
+    }
+    &.open-modal{
+        opacity: 1;
+        visibility: visible;
+        z-index: 9;
+        transition: all .3s ease;
+        .w{
+            animation: bounceInDown 0.65s 1 0.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards;
+        }
+    }
+    &.close-modal{
+        .w{
+            animation: bounceOutUp 0.65s 1 0.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards;
+        }
+    }
+}
+#idGetZone{
+    .w{
+        padding-bottom: 2rem;
+    }
+}
+
+@media screen and (min-width: 769px){
+    .modal{
+        .w{
+            top: 6rem;
+        }
+        h1{
+            padding: .75rem 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .line{
+            &:before, &:after{
+                margin: 1.25rem 1rem;
+            }
+        }
+        .btn-s{
+            margin: .45rem auto;
+            width: 100%;
+        }
+    }
+}

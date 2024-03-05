@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Créditos</title>
+    <script>window.datetimepickerFilters = true;</script>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.filters = [];
+        $(document).ready(function () {
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var baseUrl = /*[[ @{/credits/filter} ]]*/;
+                $('.tablefilter').data('tablefilter').closeFilters();
+                $("#table").defaultLoad(baseUrl, null, function(data){
+                    $('.tablefilter').data('tablefilter').refreshInfo();
+                }, 'POST', {
+                    tabId: $(e.target).data("tab")
+                });
+            });
+        })
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <input type="hidden" name="offset" id="offset"/>
+    <input type="hidden" name="limit" id="limit"/>
+    <input type="hidden" name="total" id="total"/>
+
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a><i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Créditos</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Créditos</span>
+                                </div>
+                                <ul class="nav nav-tabs pull-left" id="credits-tab">
+                                    <li class="active">
+                                        <a href="#" data-tab="1" data-toggle="tab">Con gestión</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" data-tab="2" data-toggle="tab">Sin gestión</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" data-tab="3" data-toggle="tab">Adelantos de sueldo</a>
+                                    </li>
+                                </ul>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button-clean'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Limpiar Filtros</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/credits/filter}">
+
+
+                                    <div class="form-row">
+                                        <!-- Fecha de registro -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Fecha Activación</b><br />Desde</label>
+                                                <input id="creationFromFilter" name="creationFrom" type="text" class="form-control form-control-sm" placeholder="Desde" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationToFilter" name="creationTo" type="text" class="form-control form-control-sm" placeholder="Hasta" />
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var creationFromFilter = $('#creationFromFilter');
+                                                var creationToFilter = $('#creationToFilter');
+                                                datepicker(creationFromFilter);
+                                                datepicker(creationToFilter);
+                                                function datepicker( obj ){
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+                                                creationFromFilter.on('change', function () {
+                                                    creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+
+                                        <!-- Producto -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Producto</label>
+                                            <select name="product" class="form-control form-control-sm">
+                                                <option value="" hidden="hidden">Selecciona un producto</option>
+                                                <option th:each="product : ${@catalogService.getActiveProducts()}" th:value="${product.id}" th:text="${product.name}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Analista -->
+                                        <div class="form-group col-md-1">
+                                            <label class="control-label"><b></b><br/>Analista</label>
+                                            <input name="analyst" type="text" class="form-control form-control-sm" />
+                                        </div>
+
+                                        <!-- Financiador -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Financiador</label>
+                                            <select name="entity" class="form-control form-control-sm">
+                                                <option value="" hidden="hidden">Selecciona financiador</option>
+                                                <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Empleador -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Empleador</label>
+                                            <select name="employer" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona Empleador</option>
+                                                <option th:each="employer : ${@catalogService.getEmployers()}" th:value="${employer.id}" th:text="${employer.name}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Brandeado -->
+                                        <div class="form-group col-md-1">
+                                            <label class="control-label"><b></b><br/>Brandeado</label>
+                                            <select name="welcomeCall" class="form-control form-control-sm">
+                                                <option value="" hidden="hidden">¿Brandeado?</option>
+                                                <option value="true">Brandeado</option>
+                                                <option value="false">Marketplace</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Welcome Call -->
+                                        <div class="form-group col-md-1">
+                                            <label class="control-label"><b></b><br/>Welcome Call</label>
+                                            <select name="welcomeCall" class="form-control form-control-sm">
+                                                <option value="" hidden="hidden">¿Welcome Call?</option>
+                                                <option value="true">Ok</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="portlet-body">
+                                <div id="creditsTable" class="tablefilter-table">
+                                    <div class="table-responsive" id="table">
+                                        <th:block th:replace="this :: list"></th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <th:block th:switch="${#lists.isEmpty(credits?.results)}">
+        <p th:case="true">No hay resultados</p>
+
+        <table th:case="false" id="tableResults" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>País</th>
+                    <th>Fecha Activación</th>
+                    <th th:if="${tabId == 2}">Fecha de envío al financiador</th>
+                    <th>Crédito</th>
+                    <th>Tipo Doc.</th>
+                    <th>Número Doc.</th>
+                    <th>Nombre Completo</th>
+                    <th>Financiador</th>
+                    <th>Empresa</th>
+                    <th>Producto</th>
+                    <th>Condiciones del credito</th>
+                    <th>Analista</th>
+                    <th>Marketplace/Brandeada</th>
+                    <th>Welcome Call</th>
+                    <th>Status</th>
+                    <th th:if="${tabId != 1 and tabId != 2}">Situación</th>
+                    <th th:if="${tabId == 1 or tabId == 2}">Sub Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody th:attr="data-table-paginator-total=${credits?.meta?.total}">
+                <tr th:each="credit, iterCredit : ${credits?.results}" th:style="'background-color:'+${credit?.observedHexColor}">
+                    <td th:text="${iterCredit.count + offset}"></td>
+                    <td>
+                        <div class="choose-country">
+                            <span th:class="'c-language c' + ${credit?.country?.id}"></span>
+                        </div>
+                    </td>
+                    <td th:text="${@utilService.datetimeShortFormat(credit?.activeDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.activeDate)}"></td>
+                    <td th:if="${tabId == 2}" th:text="${@utilService.datetimeShortFormat(credit?.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.registerDate)}"></td>
+                    <td><a th:href="@{/person(personId=${credit?.personId}, tab='credits', creditId=${credit?.id})}" th:text="${credit?.code}"></a></td>
+                    <td th:text="${credit?.personDocumentType?.name}"></td>
+                    <td th:text="${credit?.personDocumentNumber}"></td>
+                    <td th:text="${credit?.getFullName()}"></td>
+                    <td th:text="${credit?.entity?.getFullName()}"></td>
+                    <td th:text="${credit?.employer?.name}"></td>
+                    <td th:text="${credit?.product?.name}"></td>
+                    <td th:text="${credit?.getCreditDescription(@utilService,  credit?.country?.currency?.symbol, credit?.country?.separator)}"></td>
+                    <td th:text="${credit?.backofficeAnalyst}"></td>
+                    <td th:text="${credit.isBranded()}"></td>
+                    <th:block th:if="${credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).EFL}">
+                        <td th:if="${!credit?.hasWelcomeCall()}"><span class="label label-sm label-danger">NO</span></td>
+                        <td th:if="${credit?.hasWelcomeCall()}"><span class="label label-sm label-success">OK</span></td>
+                    </th:block>
+                    <th:block th:unless="${credit?.entity?.id == T(com.affirm.common.model.catalog.Entity).EFL}">
+                        <td></td>
+                    </th:block>
+                    <td th:text="${credit.status.status}"></td>
+                    <td th:if="${tabId != 1 and tabId != 2}" th:switch="${credit?.getSituation()}">
+                        <span th:case="${credit?.SITUATION_FINALIZADO}" class="label label-sm label-info">Finalizado</span>
+                        <span th:case="${credit?.SITUATION_NA}" class="label label-sm label-default">N/A</span>
+                        <span th:case="${credit?.SITUATION_AL_DIA} " class="label label-sm label-success">Al día</span>
+                        <span th:case="${credit?.SITUATION_POR_VENCER}" class="label label-sm label-warning">Por vencer</span>
+                        <span th:case="${credit?.SITUATION_VENCIDO}" class="label label-sm label-danger" th:text="${credit?.getDaysInArrears()} + ' días vencido'"></span>
+                    </td>
+                    <td th:if="${tabId == 1 or tabId == 2}" th:text="${credit?.subStatus?.subStatus}"></td>
+                    <td><a target="_blank" th:href="@{/loanApplication/viewasclient(loanApplicationId=${credit?.loanApplicationId},userId=${credit?.userId},personId=${credit?.personId})}">Ver como cliente</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+            UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+    </th:block>
+</th:block>
+</body>
+
+</html>

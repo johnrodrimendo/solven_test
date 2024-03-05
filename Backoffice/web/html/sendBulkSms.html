@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Cola de Procesos</title>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment-with-locales.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker/bootstrap-datetimepicker.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function sendUploadBaseToProcess() {
+            defaultAjax({
+                url: /*[[@{/sendBulkSms}]]*/,
+                type: 'POST',
+                data: $('#frmUploadBase').serializeObject(),
+                success: function (data) {
+                    reloadResults();
+                }
+            })
+        }
+
+        function reloadResults(){
+            defaultAjax({
+                url: /*[[@{/sendBulkSms/list}]]*/,
+                type: 'GET',
+                showLoading: false,
+                success: function (data) {
+                    $('#resultTable').html(data);
+                }
+            });
+            setTimeout(reloadResults, 10000);
+        }
+        reloadResults();
+        /*]]>*/
+    </script>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <!-- Home, Cola de Procesos.-->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Envio de SMS por CSV</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Cargar Base</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <form id="frmUploadBase">
+
+                                    <div class="form-row">
+                                        <!-- URL en CSV -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>URL en CSV</label>
+                                            <input id="fileName" name="fileName" type="text" class="form-control form-control-sm"/>
+                                        </div>
+
+                                        <!--Hora de procesamiento -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Hora de procesamiento</label>
+
+                                            <input id="scheduled" name="scheduled" type="text" class="form-control form-control-sm"/>
+                                            <script>
+                                                $('#scheduled').datetimepicker({
+                                                    format: 'DD/MM/YYYY HH:mm'
+                                                })
+                                            </script>
+                                        </div>
+
+                                        <!-- País -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>País</label>
+                                            <select id="country" name="country" class="form-control form-control-sm">
+                                                <option value=""></option>
+                                                <option th:each="country : ${@catalogService.getCountryParams()}" th:value="${country.id}" th:text="${country.name}"></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-12 row">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Mensaje</label>
+                                                <textarea cols="2" id="message" name="message" class="form-control"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-md-12">
+                                            <a href="javascript:;" onclick="sendUploadBaseToProcess()" class="btn blue btn-outline pull-right">Enviar</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Últimas cargas</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-responsive" id="resultTable">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+<th:block th:fragment="results">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Fec. Registro</th>
+            <th>Fec. Programada</th>
+            <th>Fec. Inicio</th>
+            <th>Fec. Fin</th>
+            <th>Estatus</th>
+            <th>Parametros</th>
+            <th>Fallidos</th>
+            <th>Exitosos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="pair : ${pairs}">
+            <tr th:with="queryBot=${pair.getLeft()},smsLog=${pair.getRight()}">
+                <td th:text="${@utilService.datetimeShortFormat(queryBot.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(queryBot?.registerDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(queryBot.scheduledDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(queryBot?.scheduledDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(queryBot.startTime)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(queryBot?.startTime)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(queryBot.finishTime)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(queryBot?.finishTime)}"></td>
+                <th:block th:switch="${queryBot.statusId}">
+                    <td th:case="${queryBot.STATUS_QUEUE}"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="${queryBot.STATUS_RUNNING}"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="${queryBot.STATUS_FAIL}"><span class="label label-xs label-danger">Fallido</span></td>
+                    <td th:case="${queryBot.STATUS_SUCCESS}"><span class="label label-xs label-success">Procesada</span></td>
+                </th:block>
+                <td th:text="${queryBot.parameters != null ? queryBot.parameters.toString() : ''}"></td>
+                <td>
+                    <span th:if="${smsLog != null}" th:text="${smsLog.failed}"></span>
+                </td>
+                <td>
+                    <span th:if="${smsLog != null}" th:text="${smsLog.success}"></span>
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</th:block>
+</body>
+
+</html>

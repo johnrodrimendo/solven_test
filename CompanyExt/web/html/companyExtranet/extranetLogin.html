@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <title>Iniciar Sesi&oacute;n</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        system.unloadAlert = false;
+
+        $(document).on('ready', function () {
+            $('#loginButton').click(function (evt) {
+                evt.preventDefault();
+                $(this).loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/login}]]*/null,
+                    type: 'POST',
+                    data: $('#loginForm').serializeObject(),
+                    success: function (data) {
+                        $('#loginButton').unloading();
+                    },
+                    error: function() {
+                        $('#loginButton').unloading();
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <section class="login-page">
+        <div class="hero-content">
+            <h1>
+                <a th:href="@{/}">
+                    <i class="icon icon-solven"></i>
+                    <i class="icon icon-solven-iso"></i>
+                    <span class="hidden">Solven</span>
+                </a>
+            </h1>
+            <div class="form-wrap">
+                <div class="login-username">
+                    <form action="#" id="loginForm" autocomplete="off">
+                        <div class="field">
+                            <input type="text" id="exampleInputEmail22" name="email" class="input-landing" placeholder="Correo electr&oacute;nico"/>
+                        </div>
+                        <div class="field">
+                            <input autocorrect="off" autocapitalize="none" type="password" id="exampleInputPassword42" name="password" class="input-landing" placeholder="Contrase&ntilde;a" autocomplete="off"/>
+                        </div>
+                        <div class="actions">
+                            <button id="loginButton" class="button bg-red">Ingresar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>
+
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

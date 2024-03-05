@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+
+
+        <p th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}"
+           th:utext="#{questions.block.rejectionTittle.bds(${personFirstName ?: 'el cliente'})}"></p>
+
+        <p th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}"
+           th:utext="#{questions.block.rejectionTittle(${personFirstName ?: 'Hola'})}"></p>
+
+        <p th:if="${preEvaluation != null}" th:utext="${preEvaluation.hardFilterMessage}"></p>
+        <p th:if="${evaluation != null}" th:utext="${evaluation.policyMessage}"></p>
+
+        <div th:if="${preEvaluation?.helpMessage != null || evaluation?.helpMessage != null}">
+            <p th:text="#{questions.block.needTips}"></p>
+            <button type="button" class="btn default btn-xs send-button" data-advices="false">No</button>
+            <button type="button" class="btn default btn-xs send-button" data-advices="true">Si</button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            var advices;
+
+            questionFlow.find('.send-button').on('click', function () {
+                advices = $(this).data("advices");
+                questionFlow.loadNextQuestions();
+            });
+
+            questionFlow.getFormValuesJson = function(){
+                return {advices: advices};
+            };
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

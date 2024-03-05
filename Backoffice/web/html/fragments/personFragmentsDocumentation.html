@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<div th:fragment="tab-documentation" th:remove="tag">
+    <div id="tabLoading" style="display: none">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de Documentos
+            </li>
+        </ul>
+    </div>
+    <div th:if="${firstCall == null or !firstCall}" id="tabData" th:attr="data-userid=${person?.userId}"
+         data-accordion="documentation">
+
+        <div class="portlet box green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <div th:remove="tag" th:text="Documentación"/>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="reload" data-original-title="" title="Actualizar"> </a>
+                    <a href="javascript:;" class="expand" data-original-title="" title=""> </a>
+                </div>
+            </div>
+            <div class="portlet-body" style="display: none">
+                <ul class="fa-ul">
+                    <li>
+                        <i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de Documentación
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:fragment="tab-documentation-body" th:remove="tag">
+    <div class="tab-content">
+        <div th:if="${personPrincipalOcupationalInfo == null and loanApplication.selectedEntityId != T(com.affirm.common.model.catalog.Entity).RIPLEY}">
+            La persona no tiene Actividad Principal
+        </div>
+        <div th:if="${personPrincipalOcupationalInfo != null or loanApplication.selectedEntityId == T(com.affirm.common.model.catalog.Entity).RIPLEY}"
+             th:with="requiredDocuments = ${@loanApplicationService.getRequiredDocumentsIdsByLoanApplication(loanApplication)}"
+             class="row">
+
+            <div class="col-md-12" th:if="${userFilesObject.filesUploaded == false}">
+                <div class="alert alert-danger">
+                    <div class="row">
+                        <div class="col-md-12">
+                            Documentación pendiente
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12"
+                 th:if="${!userFilesObject.filesValidated and userFilesObject.filesUploaded}">
+                <div class="alert" style="background: #FFF;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            Documentación pendiente de validación
+                            <a href="javascript:;"
+                               th:onclick="'validateAllUserFiles('+${userFilesObject.loanApplicationId}+')'"
+                               th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                               th:classappend="'pull-right'">
+                                Validar todos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 request-docs-to-user">
+                <div class="alert" style="background: #FFF;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a th:if="${showMissingDocumentationButton}" href="javascript:;"
+                               th:onclick="'requestMissingDocumentation('+${userFilesObject.loanApplicationId}+')'"
+                               th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                               th:classappend="'pull-right'">
+                                Solicitar documentación faltante
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Required Files portlet -->
+            <div th:each="userFileType : ${@catalogService.getUserFileTypes()}" th:remove="tag">
+                <div th:with="userFiles = ${@userService.getUserFileByType(userFilesObject.userFileList, userFileType.id)}"
+                     th:remove="tag">
+                    <div class="col-md-4" th:if="${#lists.contains(requiredDocuments, userFileType.id)}">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"
+                                          th:text="${userFileType.type}"></span>
+                                </div>
+                                <div class="actions">
+                                    <a href="javascript:;"
+                                       th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                                       th:onclick="'openUserFileUploadModal('+${userFileType.id}+', '+
+                                                       ${userFilesObject.loanApplicationId}+', '+${person.userId}+',' +
+                                                       ${#lists.size(userFiles)} + ',' + ${T(com.affirm.common.model.catalog.UserFileType).DNI_MERGED} + ')'">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(userFiles)}">
+                                <div th:case="true"> No se ha subido ningún archivo <!--[MIH] Typo error--> </div>
+                                <div th:case="false" th:remove="tag">
+                                    <div class="fileContent" th:each="file : ${userFiles}" th:id="'file_'+${file?.id}"
+                                         style="position: relative; width: 100px; height: 100px; display: inline-block;">
+                                        <div class="fileHoverDiv"
+                                             style="width: 100%; height: 100%; position: absolute; display: none; pointer-events: none">
+                                            <div class="buttons-wrap"
+                                                 style="position: absolute;left: 0;right: 0;text-align: center;margin: auto; top: 0;bottom: 0; height: 45px">
+                                                <a th:if="${file?.validated == null or !file?.validated}"
+                                                   href="javascript:;" class="btn btn-icon-only default"
+                                                   style="pointer-events: auto"
+                                                   th:onclick="'validateUserFile('+${file?.id}+',true)'"
+                                                   title="Validar archivo">
+                                                    <i class="fa fa-check"></i>
+                                                </a>
+                                                <a th:if="${file?.validated == null or file?.validated}"
+                                                   href="javascript:;" class="btn btn-icon-only default"
+                                                   style="pointer-events: auto"
+                                                   th:onclick="'invalidateUserFile('+${file?.id}+',false,'+${loanApplication?.id}+')'"
+                                                   title="Invalidar archivo">
+                                                    <i class="fa fa-times"></i>
+                                                </a>
+                                                <a href="javascript:;" class="btn btn-icon-only default"
+                                                   th:style="${file?.validated == null} ? 'pointer-events: auto; margin-top: 3px;' : 'pointer-events: auto;'"
+                                                   th:onclick="'downloadUserFile(' + ${file?.id} + ', \'' + ${file?.fileName} + '\')'"
+                                                   title="Descargar archivo">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                                <div class="btn-group" style="width: auto !important; margin-top: 3px;">
+                                                    <a th:if="${file?.validated == null or file?.validated}"
+                                                       href="javascript:;"
+                                                       class="btn btn-icon-only default"
+                                                       style="pointer-events: auto"
+                                                       title="Más opciones" data-toggle="dropdown">
+                                                        <i class="fa fa-ellipsis-v"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu"
+                                                        style="pointer-events: auto">
+                                                        <th:block th:each="uft : ${@catalogService.getUserFileTypes()}">
+                                                            <li th:if="${userFileType.id != uft.id and #lists.contains(requiredDocuments, uft.id)}">
+                                                                <a href="javascript:;"
+                                                                   th:text="'Mover a ' + ${uft.type}"
+                                                                   th:onclick="'updateUserFileType('+${file?.id}+','+${uft.id}+')'"></a>
+                                                            </li>
+                                                        </th:block>
+                                                        <li>
+                                                            <a href="javascript:;"
+                                                               th:onclick="'updateUserFileType('+${file?.id}+','+${T(com.affirm.common.model.catalog.UserFileType).OTROS}+')'">Mover a Otros</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:;"
+                                                               th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'R\')'"><i class="fa fa-rotate-right"></i> Rotar a la derecha</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:;"
+                                                               th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'L\')'"><i class="fa fa-rotate-left"></i> Rotar a la izquierda</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a class="fileImage" data-gallery="multiimages"
+                                           data-parent=".portlet-body"
+                                           th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                           th:href="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, false)}"
+                                           th:target="_blank">
+                                            <img th:src="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, true)}"
+                                                 class="img-thumbnail" th:id="'file-' + ${file.id}"
+                                                 th:style="'height: 100%;' + (${file?.validated != null} ? 'border-color: ' + (${file?.validated} ? '#26C281' : '#ed6b75'))"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Contratos portlet -->
+            <div th:with="userFiles = ${@userService.getUserFileByType(userFilesObject.userFileList, T(com.affirm.common.model.catalog.UserFileType).CONTRATO_FIRMA, T(com.affirm.common.model.catalog.UserFileType).CONTRATO_FIRMA_ADELANTO_SUELDO)}"
+                 th:remove="tag">
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Contrato Firmado</span>
+                            </div>
+                            <div class="actions"></div>
+                        </div>
+                        <div class="portlet-body" th:switch="${#lists.isEmpty(userFiles)}">
+                            <div th:case="true">No hay Contratos</div>
+                            <div th:case="false" th:remove="tag">
+                                <div class="fileContent"
+                                     style="position: relative; width: 100px; height: 100px; display: inline-block;"
+                                     th:each="file : ${userFiles}"
+                                     th:id="'file_'+${file?.id}">
+
+                                    <div class="fileHoverDiv"
+                                         style="width: 100%; height: 100%; position: absolute; display: none; pointer-events: none">
+                                        <div class="buttons-wrap"
+                                             style="position: absolute;left: 0;right: 0;text-align: center;margin: auto;height: 45px;top: 0;bottom: 0;">
+                                            <a th:if="${file?.validated == null or !file?.validated}"
+                                               href="javascript:;"
+                                               th:onclick="'validateUserFile('+${file?.id}+',true)'"
+                                               class="btn btn-icon-only default"
+                                               style="pointer-events: auto"
+                                               title="Validar archivo">
+                                                <i class="fa fa-check"></i>
+                                            </a>
+                                            <a th:if="${file?.validated == null or file?.validated}"
+                                               href="javascript:;" class="btn btn-icon-only default"
+                                               style="pointer-events: auto"
+                                               th:onclick="'invalidateUserFile('+${file?.id}+',false,'+${loanApplication?.id}+')'"
+                                               title="Invalidar archivo">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                            <a href="javascript:;" class="btn btn-icon-only default"
+                                               th:style="${file?.validated == null or !file?.validated} ? 'pointer-events: auto; margin-top: 3px;' : 'pointer-events: auto;'"
+                                               th:onclick="'downloadUserFile(' + ${file?.id} + ', \'' + ${file?.fileName} + '\')'"
+                                               title="Descargar archivo">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                            <th:block th:if="${T(com.affirm.common.model.catalog.Entity).ACCESO == loanApplication.selectedEntityId}">
+                                                <a href="javascript:;" class="btn btn-icon-only default"
+                                                   style="pointer-events: auto; margin-top: 3px;"
+                                                   th:onclick="'downloadSplitUserFile(' + ${file?.id} + ', \'' + ${file?.fileName} + '\')'"
+                                                   title="Descargar ZIP de contrato en archivos separados">
+                                                    <i class="fa fa-file-zip-o"></i>
+                                                </a>
+                                            </th:block>
+                                        </div>
+                                    </div>
+                                    <a class="fileImage" data-gallery="multiimages"
+                                       data-parent=".portlet-body"
+                                       rel="noopener noreferrer" target="_blank"
+                                       th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                       th:href="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, false)}">
+                                        <img th:src="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, true)}"
+                                             th:attr="data-url-split-file=${@fileService.generateSplitUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, false)}"
+                                             class="img-thumbnail" th:id="'file-' + ${file.id}"
+                                             th:style="'height: 100%;' + ${file?.validated != null} ? 'border-color: '+(${file?.validated}?'#26C281':'#ed6b75')"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Otros portlet -->
+            <div th:with="userFiles = ${@userService.getUserFileByType(userFilesObject.userFileList, T(com.affirm.common.model.catalog.UserFileType).OTROS)}"
+                 th:remove="tag">
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Otros</span>
+                            </div>
+                            <div class="actions">
+                                <a href="javascript:;"
+                                   th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                                   th:onclick="'openUserFileUploadModal('+${T(com.affirm.common.model.catalog.UserFileType).OTROS}+', '+${userFilesObject.loanApplicationId}+','+${person.userId}+',' + ${#lists.size(userFiles)} + ', ' + ${T(com.affirm.common.model.catalog.UserFileType).DNI_MERGED} + ')'">
+                                    <i class="fa fa-plus"></i></a>
+                            </div>
+                        </div>
+                        <div class="portlet-body" th:switch="${#lists.isEmpty(userFiles)}">
+                            <div th:case="true">
+                                No se ha subido ningún archivo <!--[MIH] Typo error-->
+                            </div>
+                            <div th:case="false" th:remove="tag">
+                                <div class="fileContent"
+                                     style="position: relative; width: 100px; height: 100px; display: inline-block;"
+                                     th:each="file : ${userFiles}"
+                                     th:id="'file_'+${file?.id}">
+                                    <div class="fileHoverDiv"
+                                         style="width: 100%; height: 100%; position: absolute; display: none; pointer-events: none">
+                                        <div class="buttons-wrap"
+                                             style="position: absolute;left: 0;right: 0;text-align: center;margin: auto;height: 45px;top: 0;bottom: 0;">
+                                            <a th:if="${file?.validated == null or !file?.validated}"
+                                               href="javascript:;"
+                                               th:onclick="'validateUserFile('+${file?.id}+',true)'"
+                                               class="btn btn-icon-only default"
+                                               style="pointer-events: auto"
+                                               title="Validar archivo">
+                                                <i class="fa fa-check"></i>
+                                            </a>
+                                            <a th:if="${file?.validated == null or file?.validated}"
+                                               href="javascript:;"
+                                               th:onclick="'invalidateUserFile('+${file?.id}+',false,'+${loanApplication?.id}+')'"
+                                               class="btn btn-icon-only default"
+                                               style="pointer-events: auto"
+                                               title="Invalidar archivo">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                            <a href="javascript:;" class="btn btn-icon-only default"
+                                               th:style="${file?.validated == null or !file?.validated} ? 'pointer-events: auto; margin-top: 3px;' : 'pointer-events: auto;'"
+                                               th:onclick="'downloadUserFile(' + ${file?.id} + ', \'' + ${file?.fileName} + '\')'"
+                                               title="Descargar archivo">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                            <div class="btn-group" style="width: auto !important; margin-top: 3px;">
+                                                <a th:if="${file?.validated == null or file?.validated}"
+                                                   href="javascript:;" class="btn btn-icon-only default"
+                                                   style="pointer-events: auto"
+                                                   title="Más opciones" data-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
+                                                </a>
+                                                <ul class="dropdown-menu" style="pointer-events: auto">
+                                                    <th:block th:each="uft : ${@catalogService.getUserFileTypes()}">
+                                                        <li th:if="${#lists.contains(requiredDocuments, uft.id)}">
+                                                            <a href="javascript:;" th:text="'Mover a ' + ${uft.type}"
+                                                               th:onclick="'updateUserFileType('+${file?.id}+','+${uft.id}+')'"></a>
+                                                        </li>
+                                                    </th:block>
+                                                    <li>
+                                                        <a href="javascript:;"
+                                                           th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'R\')'">
+                                                            <i class="fa fa-rotate-right"></i> Rotar a la derecha</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;"
+                                                           th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'L\')'">
+                                                            <i class="fa fa-rotate-left"></i> Rotar a la izquierda</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="fileImage" data-gallery="multiimages"
+                                       data-parent=".portlet-body"
+                                       th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                       th:href="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, false)}">
+                                        <img th:src="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, true)}"
+                                             class="img-thumbnail" th:id="'file-' + ${file.id}"
+                                             th:style="'height: 100%;' + ${file?.validated != null} ? 'border-color: '+(${file?.validated}?'#26C281':'#ed6b75')"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- DNI Merged -->
+            <div th:with="userFiles = ${@userService.getUserFileByType(userFilesObject.userFileList, T(com.affirm.common.model.catalog.UserFileType).DNI_MERGED)}"
+                 th:remove="tag">
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">DNI juntos</span>
+                            </div>
+                            <div class="actions">
+                                <a href="javascript:;"
+                                   th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                                   th:onclick="'openUserFileUploadModal('+${T(com.affirm.common.model.catalog.UserFileType).DNI_MERGED}+', '+${userFilesObject.loanApplicationId}+','+${person.userId}+',' + ${#lists.size(userFiles)} + ', ' + ${T(com.affirm.common.model.catalog.UserFileType).DNI_MERGED} + ')'">
+                                    <i class="fa fa-plus"></i></a>
+                            </div>
+                        </div>
+                        <div class="portlet-body" th:switch="${#lists.isEmpty(userFiles)}">
+                            <div th:case="true">
+                                No se ha subido ningún archivo <!--[MIH] Typo error-->
+                            </div>
+                            <div th:case="false" th:remove="tag">
+                                <div class="fileContent"
+                                     style="position: relative; width: 100px; height: 100px; display: inline-block;"
+                                     th:each="file : ${userFiles}"
+                                     th:id="'file_'+${file?.id}">
+                                    <div class="fileHoverDiv"
+                                         style="width: 100%; height: 100%; position: absolute; display: none; pointer-events: none">
+                                        <div class="buttons-wrap"
+                                             style="position: absolute;left: 0;right: 0;text-align: center;margin: auto;height: 45px;top: 0;bottom: 0;">
+                                            <a th:if="${file?.validated == null or !file?.validated}"
+                                               href="javascript:;"
+                                               th:onclick="'validateUserFile('+${file?.id}+',true)'"
+                                               class="btn btn-icon-only default"
+                                               style="pointer-events: auto"
+                                               title="Validar archivo">
+                                                <i class="fa fa-check"></i>
+                                            </a>
+                                            <a th:if="${file?.validated == null or file?.validated}"
+                                               href="javascript:;"
+                                               th:onclick="'invalidateUserFile('+${file?.id}+',false,'+${loanApplication?.id}+')'"
+                                               class="btn btn-icon-only default"
+                                               style="pointer-events: auto"
+                                               title="Invalidar archivo">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                            <a href="javascript:;" class="btn btn-icon-only default"
+                                               th:style="${file?.validated == null or !file?.validated} ? 'pointer-events: auto; margin-top: 3px;' : 'pointer-events: auto;'"
+                                               th:onclick="'downloadUserFile(' + ${file?.id} + ', \'' + ${file?.fileName} + '\')'"
+                                               title="Descargar archivo">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                            <div class="btn-group" style="width: auto !important; margin-top: 3px;">
+                                                <a th:if="${file?.validated == null or file?.validated}"
+                                                   href="javascript:;" class="btn btn-icon-only default"
+                                                   style="pointer-events: auto"
+                                                   title="Más opciones" data-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
+                                                </a>
+                                                <ul class="dropdown-menu" style="pointer-events: auto">
+                                                    <th:block th:each="uft : ${@catalogService.getUserFileTypes()}">
+                                                        <li th:if="${#lists.contains(requiredDocuments, uft.id)}">
+                                                            <a href="javascript:;" th:text="'Mover a ' + ${uft.type}"
+                                                               th:onclick="'updateUserFileType('+${file?.id}+','+${uft.id}+')'"></a>
+                                                        </li>
+                                                    </th:block>
+                                                    <li>
+                                                        <a href="javascript:;"
+                                                           th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'R\')'">
+                                                            <i class="fa fa-rotate-right"></i> Rotar a la derecha</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;"
+                                                           th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'L\')'">
+                                                            <i class="fa fa-rotate-left"></i> Rotar a la izquierda</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="fileImage" data-gallery="multiimages"
+                                       data-parent=".portlet-body"
+                                       th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                       th:href="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, false)}">
+                                        <img th:src="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, true)}"
+                                             class="img-thumbnail" th:id="'file-' + ${file.id}"
+                                             th:style="'height: 100%;' + ${file?.validated != null} ? 'border-color: '+(${file?.validated}?'#26C281':'#ed6b75')"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Eliminados portlet -->
+            <div th:with="userFiles = ${@userService.getUserFileByType(userFilesObject.userFileList, T(com.affirm.common.model.catalog.UserFileType).ELIMINADOS)}"
+                 th:remove="tag">
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Eliminados</span>
+                            </div>
+                            <div class="actions">
+                            </div>
+                        </div>
+                        <div class="portlet-body" id="deletedFiles" th:switch="${#lists.isEmpty(userFiles)}">
+                            <div th:case="true">
+                                No hay eliminados
+                            </div>
+                            <div th:case="false" th:remove="tag">
+                                <div class="fileContent"
+                                     style="position: relative; width: 100px; height: 100px; display: inline-block;"
+                                     th:each="file : ${userFiles}"
+                                     th:id="'file_'+${file?.id}">
+                                    <div class="fileHoverDiv"
+                                         style="width: 100%; height: 100%; position: absolute; display: none; pointer-events: none">
+                                        <div class="buttons-wrap" style="position: absolute;left: 0;right: 0;text-align: center;margin: auto;height: 34px;top: 0;bottom: 0;">
+                                            <a href="javascript:;" class="btn btn-icon-only default"
+                                               th:style="${file?.validated == null or !file?.validated} ? 'pointer-events: auto; margin-top: 3px;' : 'pointer-events: auto;'"
+                                               th:onclick="'downloadUserFile(' + ${file?.id} + ', \'' + ${file?.fileName} + '\')'"
+                                               title="Descargar archivo">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                            <div class="btn-group" style="width: auto !important;">
+                                                <a href="javascript:;" class="btn btn-icon-only default"
+                                                   style="pointer-events: auto"
+                                                   title="Más opciones" data-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
+                                                </a>
+                                                <ul class="dropdown-menu" style="pointer-events: auto; width: auto !important;">
+                                                    <th:block
+                                                            th:each="uft : ${@catalogService.getUserFileTypes()}">
+                                                        <li th:if="${#lists.contains(requiredDocuments, uft.id)}">
+                                                            <a href="javascript:;" th:text="'Mover a ' + ${uft.type}"
+                                                               th:onclick="'updateUserFileType('+${file?.id}+','+${uft.id}+')'"></a>
+                                                        </li>
+                                                    </th:block>
+                                                    <li>
+                                                        <a href="javascript:;"
+                                                           th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'R\')'">
+                                                            <i class="fa fa-rotate-right"></i> Rotar a la derecha</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;"
+                                                           th:onclick="'rotateImage(\'' + ${@fileService.generateUserFileEncrypt(file?.userId, file?.fileName, file?.id)} + '\', \'L\')'">
+                                                            <i class="fa fa-rotate-left"></i> Rotar a la izquierda</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a class="fileImage" data-gallery="multiimages"
+                                       data-parent=".portlet-body"
+                                       th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                       th:href="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, false)}">
+                                        <img th:src="${@fileService.generateUserFileUrl(file.userId, file.id, file.fileName, #httpServletRequest, true)}"
+                                             class="img-thumbnail" th:id="'file-' + ${file.id}"
+                                             th:style="'height: 100%;' + ${file?.validated != null} ? 'border-color: '+(${file?.validated}?'#26C281':'#ed6b75')"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal for upload -->
+            <div id="uploadUserFileModal" class="modal fade" th:classappend="'upload-modal-' + ${loanApplication?.id}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="smaller">Tama&ntilde;o m&aacute;ximo <span
+                                    th:text="${@configuration.MAX_UPLOAD_FILE_SIZE_MB() + 'mb'}"></span>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <div id="uploadUserFile" class="dropzone"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    onclick="closeUserFileUploadModal(this)">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                $(document).on('mouseenter', '.fileImage, .fileHoverDiv, .img-thumbnail', function () {
+                    $(this).closest('.fileContent').find('.fileHoverDiv').show();
+                });
+                $(document).on('mouseleave', '.fileImage, .fileHoverDiv, .img-thumbnail', function () {
+                    $(this).closest('.fileContent').find('.fileHoverDiv').hide();
+                });
+                /*]]>*/
+            </script>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var uploadedSuccess = false;
+
+                function openUserFileUploadModal(userFileType, loanApplicationId, userId, numberFiles) {
+                    var url = /*[[ @{/file/userFile} ]]*/;
+                    uploadedSuccess = false;
+
+                    var $uploadUserFileModal = $('.upload-modal-' + loanApplicationId);
+
+                    $uploadUserFileModal.find('.modal-body').html('');
+                    $uploadUserFileModal.find('.modal-body').append("<div id=\"uploadUserFile\" class=\"dropzone\"></div>")
+
+                    var dropzone = $uploadUserFileModal.find(".dropzone").dropzone({
+                        url: url,
+                        params: {
+                            userId: userId,
+                            loanApplicationId: loanApplicationId,
+                            userFileType: userFileType,
+                            numberFiles: numberFiles
+                        },
+                        paramName: 'file',
+                        maxFilesize: 10, // MB
+                        maxFiles: 2, //HU1
+                        dictDefaultMessage: 'Arrastra una imagen aquí para subirla, o haz click para seleccionar una.',
+                        acceptedFiles: 'image/*,application/pdf',
+                        headers: addCsrfToJsonHeaders({
+                            'x-request-sender-type': 'ajax'
+                        }),
+                        init: function () {
+                            /*HU1 Begin*/
+                            this.on("addedfile", function (file) {
+                            });
+                            /*HU1 End*/
+                            this.on("success", function () {
+                                uploadedSuccess = true;
+                            });
+                            this.on('error', function (error) {
+                                swal({
+                                    title: '',
+                                    text: error.message,
+                                    type: "warning",
+                                    confirmButtonText: "Entendido",
+                                    closeOnConfirm: false
+                                });
+                            })
+                        }
+                    });
+
+                    $uploadUserFileModal.modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                }
+
+                function closeUserFileUploadModal(button) {
+                    $(button).closest('.modal').modal('hide');
+                    if (uploadedSuccess) {
+                        setTimeout(function () {
+                            var closestParent = $(button).closest('#tabData:not([data-accordion])');
+                            var parentDivChildrenId = $(closestParent).children().attr('id');
+                            console.log(parentDivChildrenId);
+                            $('[id=' + parentDivChildrenId + '] [data-accordion=documentation] > .portlet > .portlet-title').find('.tools a.reload').click();
+                        }, 300)
+                    }
+                }
+
+                // Initialize the Image Visualizator
+                $('*[data-toggle="lightbox"]').unbind().click(function (event) {
+                    event.preventDefault();
+
+                    $(this).ekkoLightbox({
+                        onShown: function () {
+                            console.log('Checking our the events huh?');
+                        },
+                        onHidden: function () {
+
+                        }
+                    });
+                });
+
+                function downloadUserFile(fileId, fileName) {
+                    var src = $('#file-' + fileId).attr('src');
+                    var origin = window.location.origin;
+
+                    var href = origin + src;
+                    href = href.substr(0, href.indexOf('?thumbnail=true'));
+
+                    var a = $("<a>")
+                        .attr("href", href)
+                        .attr("download", fileName)
+                        .appendTo("body");
+
+                    a[0].click();
+                    a.remove();
+                }
+
+                function downloadSplitUserFile(fileId, fileName) {
+                    debugger;
+                    var src = $('#file-' + fileId).attr('data-url-split-file');
+                    var origin = window.location.origin;
+
+                    var href = origin + src;
+                    href = href.replace('?thumbnail=false', '');
+
+                    var a = $("<a>")
+                        .attr("href", href)
+                        .attr("download", fileName)
+                        .appendTo("body");
+
+                    a[0].click();
+                    a.remove();
+                }
+
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

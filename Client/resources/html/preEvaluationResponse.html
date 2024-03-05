@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/privatePagesTemplate">
+
+<head>
+</head>
+<body>
+<th:block layout:fragment="head">
+
+    <!--Bootstrap-->
+    <!--<link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/css/bootstrap.min.css'}"/>-->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/js/bootstrap.min.js'}"></script>-->
+
+    <!-- Own -->
+    <script th:src="@{/js/util.js}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var status = /*[[${status}]]*/null;
+        var loanAplicationToken = /*[[${loanAplicationToken}]]*/null;
+        var statusRequestTimeout;
+        var redirectTimeout = 5;
+
+        var statusJson;
+        if (status != null) {
+            statusJson = JSON.parse(status);
+        }
+
+        $(window).load(function () {
+            //paitn initial data
+            if (statusJson != null) {
+                paintStatus();
+                if (statusJson.status == 'R') {
+                    setRequestTimeout();
+                }
+            } else {
+                setRequestTimeout();
+            }
+        });
+
+        function paintStatus() {
+            if (statusJson.status == 'R') {
+                $('#runningDiv').show(500);
+                $('#successDiv').hide(500);
+                $('#failDiv').hide(500);
+            } else if (statusJson.status == 'S') {
+                if (statusJson.approved) {
+                    $('#runningDiv').hide(500);
+                    $('#successDiv').show(500);
+                    $('#failDiv').hide(500);
+
+                    $('#successRedirectionTime').html(redirectTimeout);
+                    setSuccessRedirectTimeout(statusJson.url);
+                } else {
+                    $('#runningDiv').hide(500);
+                    $('#successDiv').hide(500);
+                    $('#errorMessage').html(statusJson.message);
+
+                    if (statusJson.messageId == 9 || statusJson.messageId == 10 || statusJson.messageId == 11 || statusJson.messageId == 15) {
+                        $('.failReason1').show();
+                        $('.failReason2').hide();
+                        $('.failReason3').hide();
+                        $('.failReason4').hide();
+                        $('.failReason5').hide();
+                    } else if (statusJson.messageId == 12 || statusJson.messageId == 13 || statusJson.messageId == 14) {
+                        $('.failReason1').hide();
+                        $('.failReason2').show();
+                        $('.failReason3').hide();
+                        $('.failReason4').hide();
+                        $('.failReason5').hide();
+                    } else if (statusJson.messageId == 7 || statusJson.messageId == 8) {
+                        $('.failReason1').hide();
+                        $('.failReason2').hide();
+                        $('.failReason3').show();
+                        $('.failReason4').hide();
+                        $('.failReason5').hide();
+                    } else if (statusJson.messageId == 16) {
+                        $('.failReason1').hide();
+                        $('.failReason2').hide();
+                        $('.failReason3').hide();
+                        $('.failReason4').show();
+                        $('.failReason5').hide();
+                    } else if (statusJson.messageId == 17) {
+                        $('.failReason1').hide();
+                        $('.failReason2').hide();
+                        $('.failReason3').hide();
+                        $('.failReason4').hide();
+                        $('.failReason5').show();
+                    } else {
+                        $('.failReason1').hide();
+                        $('.failReason2').hide();
+                        $('.failReason3').hide();
+                        $('.failReason4').hide();
+                        $('.failReason5').hide();
+                    }
+                    $('#failDiv').show(500);
+                }
+            } else {
+                $('#runningDiv').hide(500);
+                $('#successDiv').hide(500);
+                $('#failDiv').show(500);
+                $('#errorMessage').html(/*[[#{system.error.default}]]*/);
+            }
+        }
+
+        function setRequestTimeout() {
+            statusRequestTimeout = setTimeout(function () {
+                console.log("Corriendo timer");
+                getStatusData();
+            }, 2000);
+        }
+
+        function setSuccessRedirectTimeout(urlToRedirect) {
+            console.log("url: " + urlToRedirect)
+            setTimeout(function () {
+                redirectTimeout = redirectTimeout - 1;
+                $('#successRedirectionTime').html(redirectTimeout);
+                if (redirectTimeout == 1) {
+                    var form = document.forms['frmSuccess'];
+                    form.action = urlToRedirect;
+                    form.submit();
+                } else {
+                    setSuccessRedirectTimeout(urlToRedirect);
+                }
+            }, 1000);
+        }
+
+        function getStatusData() {
+            $.ajax({
+                url: /*[[@{/loanapplication/__${loanAplicationToken}__/preEvauation/json}]]*/null,
+                success: function (result) {
+                    statusJson = JSON.parse(result);
+                    if (statusJson.status == 'R') {
+                        setRequestTimeout();
+                    }
+                    paintStatus();
+                },
+                error: function (result) {
+                    //TODO Invocar modal de error
+                    alert("Error");
+                }
+
+            })
+        }
+
+        function preventBack() {
+            window.history.forward();
+        }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () {
+            null
+        };
+        $(document).on('ready', function(){
+            /* Accordion */
+            var acc = document.getElementsByClassName("accordion");
+            var i;
+
+            for (i = 0; i < acc.length; i++) {
+                acc[i].onclick = function(){
+                    this.classList.toggle("active");
+                    this.nextElementSibling.classList.toggle("show");
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+
+</th:block>
+<th:block layout:fragment="content">
+    <section class="pre-evaluation">
+
+        <div class="container" id="preEvaluationResponse">
+
+            <div id="runningDiv" style="display:none">
+                <div class="message-container">
+                    <div class="gif-solven-container">
+                        <div class="sk-cube-grid">
+                            <div class="sk-cube sk-cube1"></div>
+                            <div class="sk-cube sk-cube2"></div>
+                            <div class="sk-cube sk-cube3"></div>
+                            <div class="sk-cube sk-cube4"></div>
+                            <div class="sk-cube sk-cube5"></div>
+                            <div class="sk-cube sk-cube6"></div>
+                            <div class="sk-cube sk-cube7"></div>
+                            <div class="sk-cube sk-cube8"></div>
+                            <div class="sk-cube sk-cube9"></div>
+                        </div>
+                    </div>
+                    <h2 th:utext="#{preEvaluationResponse.state.running.tittle}"></h2>
+                    <p th:utext="#{preEvaluationResponse.state.running.message}"></p>
+                </div>
+            </div>
+            <div id="successDiv" style="display:none">
+                <div class="message-container">
+                    <div class="gif-solven-container">
+                        <div class="sk-cube-grid">
+                            <div class="sk-cube sk-cube1"></div>
+                            <div class="sk-cube sk-cube2"></div>
+                            <div class="sk-cube sk-cube3"></div>
+                            <div class="sk-cube sk-cube4"></div>
+                            <div class="sk-cube sk-cube5"></div>
+                            <div class="sk-cube sk-cube6"></div>
+                            <div class="sk-cube sk-cube7"></div>
+                            <div class="sk-cube sk-cube8"></div>
+                            <div class="sk-cube sk-cube9"></div>
+                        </div>
+                    </div>
+                    <h2 th:utext="#{preEvaluationResponse.state.success.tittle}"></h2>
+                    <p th:utext="#{preEvaluationResponse.state.success.message}"></p>
+                </div>
+                <form role="form" action="#" method="get" id="frmSuccess" autocomplete="off">
+                </form>
+            </div>
+            <div id="failDiv" style="display:none">
+                <div class="well">
+                    <h2 th:utext="#{preEvaluationResponse.state.fail.tittle}"></h2>
+                    <div class="message-area">
+                        <p id="errorMessage"></p>
+                        <p th:utext="#{preEvaluationResponse.state.fail.subtittle1}"></p>
+                    </div>
+
+                    <div class="accordion-container">
+                        <button class="accordion failReason1" th:utext="#{preEvaluationResponse.state.fail.reason1.tittle}"></button>
+                        <div class="panel-ac failReason1">
+                            <p th:utext="#{preEvaluationResponse.state.fail.reason1.body}">asdasdasdas</p>
+                        </div>
+                        <button class="accordion failReason2" th:utext="#{preEvaluationResponse.state.fail.reason2.tittle}"></button>
+                        <div class="panel-ac failReason2">
+                            <p th:utext="#{preEvaluationResponse.state.fail.reason2.body}"></p>
+                        </div>
+                        <button class="accordion failReason3" th:utext="#{preEvaluationResponse.state.fail.reason3.tittle}"></button>
+                        <div class="panel-ac failReason3">
+                            <p th:utext="#{preEvaluationResponse.state.fail.reason3.body}"></p>
+                        </div>
+                        <button class="accordion failReason4" th:utext="#{preEvaluationResponse.state.fail.reason4.tittle}"></button>
+                        <div class="panel-ac failReason4">
+                            <p th:utext="#{preEvaluationResponse.state.fail.reason4.body}"></p>
+                        </div>
+                        <button class="accordion failReason5" th:utext="#{preEvaluationResponse.state.fail.reason5.tittle}"></button>
+                        <div class="panel-ac failReason5">
+                            <p th:utext="#{preEvaluationResponse.state.fail.reason5.body}"></p>
+                        </div>
+                    </div>
+
+                    <div class="aff-thanks">
+                        <p th:utext="#{preEvaluationResponse.state.fail.final.message1}"></p>
+                        <p th:utext="#{preEvaluationResponse.state.fail.final.message2(${@configuration.APP_NAME})}"></p>
+                        <a th:href="@{/}">
+                            <i class="fa fa-home" aria-hidden="true"></i> Ir al inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</th:block>
+</body>
+</html>

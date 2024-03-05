@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>El cr&eacute;dito que mereces</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+            $('.agent-button').click(function () {
+                defaultAjax({
+                    url: /*[[@{__${urlToPOst}__}]]*/,
+                    type: "POST",
+                    data: {
+                        agentSelected: $(this).data('agent-id'),
+                        externalParams: /*[[${externalParams}]]*/null
+                    }
+                });
+            });
+            $(".lazy").unveil(200, function() {
+                $(this).load(function() {
+                    this.style.opacity = 1;
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+    <link rel="alternate" hreflang="es" th:href="'https://www.solven.pe/'+${categoryUrl} + '/evaluacion'"/>
+    <link rel="alternate" hreflang="es-pe" th:href="'https://www.solven.pe/'+${categoryUrl} + '/evaluacion'"/>
+    <link rel="alternate" hreflang="es-ar" th:href="'https://www.solven.com.ar/'+${categoryUrl} + '/evaluacion'"/>
+    <link rel="alternate" hreflang="x-default" th:href="'https://www.solven.pe/'+${categoryUrl} + '/evaluacion'"/>
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-choose-agent main-arg' : 'main-choose-agent'}" th:classappend="${@brandingService.isNinja(#httpServletRequest) ? 'main-ninja' : ''}" >
+
+<th:block layout:fragment="content">
+    <main class="choose-agent" th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'brand brand-bg-colorweb' : ''}">
+        <article id="seoTag">
+            <h1 th:utext="#{static.landing.personalLoan.heroTitle}"></h1>
+            <p th:utext="#{static.landing.personalLoan.heroPharagraph}"></p>
+        </article>
+        <div class="hero-content">
+            <h1 th:classappend="${@brandingService.isNinja(#httpServletRequest) ? 'ninja' : ''}">
+                <a th:href="@{/}" class="logo">
+                    <svg version="1.1" id="logoSolven" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     viewBox="0 0 295 95" style="enable-background:new 0 0 295 95;width: 160px;fill: #F7323F;" xml:space="preserve">
+                        <g id="XMLID_1_">
+                            <path id="XMLID_16_" class="st0" d="M4.099,89.699v-12.1c4,1.7,10.4,3.2,15.6,3.2c5.7,0,7.8-1.6,7.8-4.6c0-3.5-5-3.9-11.6-6.1c-6.9-2.2-12.3-6.7-12.3-16c0-11.7,8.8-16.7,21.7-16.7c5.3,0,11.1,1.1,14.2,2.1v12.2c-3.5-1.1-8-2.3-13.3-2.3c-5.1,0-7,1.3-7,3.7c0,2.7,2.3,3.4,9.4,5.3c7.5,2.2,14.8,6.2,14.8,17c0,11.3-8.6,17.3-21.4,17.3C13.899,92.799,8.199,91.599,4.099,89.699z"/>
+                            <path id="XMLID_13_" class="st0" d="M46.599,65.099c0-14.4,8.7-27.7,26.8-27.7c18,0,26.6,12.1,26.6,27.7c0,14.4-8.7,27.7-26.7,27.7S46.599,80.699,46.599,65.099z M82.799,65.099c0-9.6-2.6-15.5-9.5-15.5c-6.8,0-9.4,5.9-9.4,15.5c0,9.7,2.6,15.4,9.5,15.4C80.199,80.399,82.799,74.799,82.799,65.099z"/>
+                            <path id="XMLID_11_" class="st0" d="M128.299,3.199h16.1l-32.3,89.5h-16.1L128.299,3.199z"/>
+                            <path id="XMLID_9_" class="st0" d="M135.199,38.199h17.6l7.6,28.7c0.9,3.3,1.7,8.4,2,9.2h0.2c0.2-0.9,1.2-6.1,2-9.2l7.5-28.7h17.1l-17.7,53.6h-18.9L135.199,38.199z"/>
+                            <path id="XMLID_6_" class="st0" d="M188.199,65.099c0-14.8,8.7-27.7,26.1-27.7c18,0,23.8,12.1,23.8,25.4c0,1.7-0.1,3.6-0.3,5.5h-32.4c0.2,7.5,3.1,12.2,12.6,12.2c6.7,0,12.3-1.5,16.2-3.3v12.5c-4.8,1.9-10.8,3.1-17.4,3.1C196.399,92.799,188.199,81.299,188.199,65.099z M221.699,58.799v-0.7c0-4.5-2.3-8.8-7.4-8.8c-5.2,0-8.1,3.8-8.6,9.5H221.699z"/>
+                            <path id="XMLID_4_" class="st0" d="M243.699,38.199h16.3v4.3c2.9-2.2,7.5-5.1,14.7-5.1c13.2,0,17.7,8.1,17.7,18.9v35.6h-16.6v-33.1c0-5.8-2-8.4-7.4-8.4c-3.1,0-5.9,1.5-8,3.1v38.5h-16.7V38.199z"/>
+                            <path id="XMLID_2_" class="st0" d="M121.999,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C126.199,92.799,121.999,88.299,121.999,83.099z"/>
+                        </g>
+                    </svg>
+                    <img th:src="${@brandingService.getEntityBrandingAgentPageLogoUrl(#httpServletRequest, '')}" alt=""/>
+                    <img th:if="${@brandingService.isNinja(#httpServletRequest)}" th:src="${@brandingService.getEntityBrandingAgentPageLogoUrl(#httpServletRequest, null)}" alt="" class="img-ninja"/>
+                </a>
+            </h1>
+            <p class="brand-txt-white" th:text="#{questions.block.chooseAgent}">
+                Elije a la persona que quieres que te ayude durante el proceso.
+            </p>
+            <input type="hidden" name="agentSelected"/>
+            <ul id="chooseAgentList">
+                <li th:each="agent : ${@catalogService.getFormAssistantsAgents(@brandingService.getEntityBranding(#httpServletRequest)?.entity?.id)}">
+                    <a href="#" class="circle agent-button" th:attr="data-agent-id=${agent.id}">
+                        <figure>
+                            <img th:attr="src=${agent.avatarUrl}" th:alt="${agent.name}" class="lazy agentImg" />
+                            <img th:attr="src=${agent.avatarUrl2}" class="hidden lazy hoverImg" />
+                        </figure>
+                        <h4 class="brand-txt-white" th:text="${agent.name}"></h4>
+                    </a>
+                </li>
+            </ul>
+            <!--
+            <block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                <p>Elige a uno de nuestros agentes</p>
+            </block>
+            <block th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                <p>Elige a uno de nuestros agentes</p>
+            </block>
+            -->
+            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                <p class="p-indication">¡Elegí un agente!</p>
+            </th:block>
+            <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                <p class="p-indication">¡Elige un agente!</p>
+            </th:block>
+
+        </div>
+        <th:block layout:fragment="footers">
+            <th:block th:replace="fragments/footers :: processFooterChooseAgent"></th:block>
+        </th:block>
+
+        <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).RIPLEY)}">
+            <ul class="w-lines">
+                <li class="color-one"></li>
+                <li class="color-two"></li>
+                <li class="color-three"></li>
+            </ul>
+        </th:block>
+
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <!--<img class="lazy" data-src="/img/fondoar.jpg" alt=""/>-->
+            <footer class="footer-agent">
+                <div class="circle-footer-agent"></div>
+                <p>El crédito que merecés</p>
+            </footer>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <!--<img class="lazy" data-src="/img/fondo.jpg" alt=""/>-->
+            <footer class="footer-agent">
+                <div class="circle-footer-agent"></div>
+                <p>El crédito que mereces</p>
+            </footer>
+        </th:block>
+    </main>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var $chooseAgentList = $('.brand #chooseAgentList');
+        var $img = $chooseAgentList.find('.lazy');
+        var $agentImg = $chooseAgentList.find('.agentImg');
+        var $hovertImg = $chooseAgentList.find('.hoverImg');
+        var $agentImgAttr = $agentImg.attr('src');
+        var $hoverImgAttr = $hovertImg.attr('src');
+
+        if($hoverImgAttr != undefined ){
+            $img.hover(function() {
+                $this = $(this);
+                $this.addClass('hidden');
+                $this.parent().find('.hoverImg').removeClass('hidden');
+            }, function() {
+
+                $agentImg.removeClass('hidden');
+                $hovertImg.addClass('hidden');
+            });
+        }else{
+            console.log('');
+        }
+        /*]]>*/
+    </script>
+    <th:block th:replace="components/tracking :: all">
+    </th:block>
+</th:block>
+</body>
+</html>

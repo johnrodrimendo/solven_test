@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.whatDoYouDo}"></p>
+            <div class="form-group col-md-12">
+                <select class="form-control" th:field="*{subActivity}">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option th:each="type : ${subActivities}" th:text="${type.type}" th:value="${type.id}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('select[name=subActivity]').on('change', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

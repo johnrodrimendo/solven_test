@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var name = /*[[${name}]]*/null;
+        /*]]>*/
+    </script>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q159 banbif">
+            <form id="questionForm" th:object="${form}">
+                <div class="row row-message-container">
+                    <div class="col-xs-12 col-sm-12 col-md-8">
+                        <div style="font-size: 18px;">
+                            <span th:text="'Estimado '+${name}+', por el momento no cuentas con este producto aprobado mediante este canal, acércate a nuestras oficinas para que nuestros ejecutivos te orienten sobre otras opciones que podamos tener para ti.'"></span>
+                        </div>
+                    </div>
+
+                    <div th:if="${showBoxOffer}" class="col-xs-12 col-sm-12 col-md-8" style="margin-top: 15px">
+                        <span style="margin-bottom: 15px;display: block"><b>PRODUCTO RECOMENDADO</b></span>
+                        <a th:if="${showImgOffer}"
+                           href="https://www.banbif.com.pe/personas/Cuenta-Digital-moneda?utm_source=Solven&amp;utm_medium=solven_banner&amp;utm_campaign=PLD">
+                            <img src="https://solven-public.s3.amazonaws.com/img/banbif/crosselling/pld_aprobado.jpg" alt="" style="max-width: 500px;width: 100%"/>
+                        </a>
+                        <a th:unless="${showImgOffer}"
+                           href="https://www.banbif.com.pe/personas/Cuenta-Digital-moneda?utm_source=Solven&amp;utm_medium=solven_banner&amp;utm_campaign=Tasa3">
+                            <img src="https://solven-public.s3.amazonaws.com/img/banbif/crosselling/pld_desaprobado.png" alt="" style="max-width: 500px;width: 100%"/>
+                        </a>
+                    </div>
+
+                    <div th:unless="${ loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).BANBIF}" class="col-xs-12 col-sm-12 col-md-8" style="margin-top: 2rem;">
+                        <a class="return-link" href="https://www.banbif.com.pe/Personas"><button type="button" class="button">Volver al inicio</button></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <style>
+        .return-link, .return-link:hover{
+            color: inherit;
+            text-decoration: none;
+        }
+        .row-message-container{
+            display: flex;justify-content: center;flex-direction: column;align-items: center;
+        }
+
+        a.return-link .button {
+            background-color: #20A6FF;
+            color: #ffffff;
+            border-radius: 5px;
+            line-height: 1em;
+            text-decoration: none;
+            border: 0;
+            height: 45px;
+            min-width: 160px;
+            padding: 0 1em;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

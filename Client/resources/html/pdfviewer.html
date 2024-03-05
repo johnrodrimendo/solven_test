@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <script th:src="@{/js/appear.js}"></script>
+
+    <!-- Take Picture -->
+    <link rel="stylesheet" th:href="@{/css/take-picture.min.css}"/>
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+    <script th:src="@{/js/take-picture/take-picture.js}"></script>
+    <!-- / Take Picture -->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var step = 1,
+            toSend = [null];
+
+        $(document).on('ready', function(){
+
+            if ( /*[[ ${signatureLoaded} ]]*/ ) {
+                hideContract();
+                $('.arrowGuide').hide();
+                $('#bankAccountBlock').fadeIn();
+                $("html, body").animate({scrollTop: $("#bankAccountBlock").offset().top}, 1000);
+            }
+
+            $('#downloadContract').on('click', function(){
+
+                hideContract();
+
+            });
+
+            // Check if mobile
+            var md = new MobileDetect(window.navigator.userAgent),
+                    is_mobile = false;
+
+            if (md.mobile()) {
+                is_mobile = (md.os().toLowerCase() === 'androidos' || md.os().toLowerCase() === 'ios') ? true : false;
+            }
+
+            if (is_mobile) {
+
+                $('.tp-container').hide();
+                $('.tp-mobile').css({'display' : 'block'});
+
+                $('.imageFromMobile').on('change', function(){
+
+                    var  data = new FormData();
+                    data.append("file", $(this)[0].files[0]);
+
+                    $('#step-1').children('p').hide();
+                    $('#step-1').children('.loading').removeClass('loading-ajax-invisible');
+
+                    sendImageToServerMobile(data);
+                    $('.imageFromMobile').parent('.upload-file').removeClass('active-upload');
+                    return false;
+
+                });
+
+
+            } else {
+
+                var tp = new takePicture();
+                var photo = [];
+
+                $('#start-camera').on('click', function(e){
+                    e.preventDefault();
+
+                    if (tp.checkCompatibility()) {
+                        $(this).hide();
+                        tp.startCamera();
+                    } else {
+                        showErrorModal('Lo sentimos tu navegador no es compatible con el componente intente con otro navegador.');
+                    }
+
+                    $('#take-photo').on('click', function(e){
+                        e.preventDefault();
+
+                        switch (step) {
+                            case 1:
+                                if (toSend[0] != null) {
+                                    step = 2;
+                                    photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                    $('#close_' + step).fadeIn();
+                                } else {
+                                    photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                    $('#close_' + step).fadeIn();
+
+                                    $('#msg').fadeIn().html('Genial, ahora haz click en el boton subir.');
+                                    $('#step-' + step).children('p').hide();
+
+                                    photo['image_' + step ]['filename'] = "contract_signed.jpg";
+                                    photo['image_' + step ]['fileType'] = /*[[${T(com.affirm.common.model.catalog.UserFileType).DNI}]]*/;
+                                    toSend[0] = photo['image_' + step];
+                                    tp.deletePhoto();
+                                    step ++;
+                                    paintCurrentStep();
+                                    if(isComplete()) {
+                                        $('#uploadImage').trigger('click');
+                                    }
+                                    break;
+                                }
+                        }
+                    });
+
+                });
+
+                $('.closeRoundButtonThumb').on('click', function(e){
+                    e.preventDefault();
+
+                    $('#uploadImage').hide();
+
+                    var src = $(this);
+                    toSend[src.data('id')] = null;
+
+                    $('#step-' + (src.data('id') + 1)).addClass('disabled').removeClass('active');
+                    $('#step-input-' + (src.data('id') + 1)).parent('.upload-file').removeClass('active-upload');
+                    $('#close_' + (src.data('id') + 1)).hide();
+                    src.closest('.thumb').children('#thumb_' + (src.data('id') + 1)).removeAttr('src');
+                    step = 1;
+                    console.log(toSend);
+                    return false;
+
+                });
+
+                $('#uploadImage').on('click', function (e) {
+                    e.preventDefault();
+
+                    if (isComplete()) {
+
+                        var data1 = new FormData();
+                        data1.append("file", toSend[0]['file'], toSend[0]['filename']);
+                        data1.append("userFileType", toSend[0]['fileType']);
+                        tp.stopStream();
+                        sendImageToServer(data1);
+                    }
+
+                });
+
+                $('#delete-photo').on('click', function(e){
+                    e.preventDefault();
+                    tp.deletePhoto();
+                });
+
+            }
+
+        });
+
+        function isComplete() {
+            return (toSend[0] != null) ? true: false;
+        }
+
+        function hideContract() {
+            $('#contratContent, #pdfControls').hide();
+            $('#manualLoanSignature').fadeIn();
+            $('.pdfViewer').removeClass('bg-black').removeClass('bg-white');
+        }
+
+        function paintCurrentStep() {
+            $('#step-' + (step - 1)).children('.loading').addClass('loading-ajax-invisible');
+            $('#step-' + (step - 1)).children('p').fadeIn();
+            $('#step-' + (step - 1)).removeClass('disabled').addClass('active');
+            $('#step-input-' + step).parent('.upload-file').addClass('active-upload');
+
+        }
+
+        function sendImageToServerMobile(data) {
+            var imageUrl = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/contract} ]]*/;
+
+            if (step < 6) {
+                defaultAjax({
+                    url: imageUrl,
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function (message) {
+                        console.log(message);
+                        step = step + 1;
+                        if (step > 1) {
+                            $('.tp-container, #msg').hide();
+                            $('#bankAccountBlock').fadeIn();
+                            $("html, body").animate({scrollTop: $("#bankAccountBlock").offset().top}, 1000);
+                        }
+                        paintCurrentStep();
+                    }
+                });
+            } else {
+                console.log('Limit');
+            }
+
+        }
+
+        function sendImageToServer(data) {
+            var imageUrl = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/contract} ]]*/;
+
+
+            defaultAjax({
+                url: imageUrl,
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function (message) {
+                    if (step > 1) {
+                        $('.tp-container, #msg, .closeRoundButton').hide();
+                        $('#bankAccountBlock').fadeIn();
+                        $("html, body").animate({scrollTop: $("#bankAccountBlock").offset().top}, 1000);
+                    }
+                    paintCurrentStep();
+                }
+            });
+
+        }
+
+
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: loanPdfViewerHeader(is_fixed=true)"></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="pdfViewer bg-black">
+        <div class="container">
+
+            <div class="pdfWrapper">
+                <!-- Go to Sign -->
+                <div class="goButtonWrap" th:if="${entityParams.signatureType == T(com.affirm.common.model.catalog.EntityProductParams).CONTRACT_TYPE_DIGITAL}">
+                    <a class="goButton" id="goBottom">Ir a firma <i class="icon down-arrow-icon"></i></a>
+                </div>
+                <!-- /Go to Sign -->
+
+                <!-- Contract -->
+                <div id="contratContent">
+                    <div th:if="${entityParams.signatureType == T(com.affirm.common.model.catalog.EntityProductParams).CONTRACT_TYPE_DIGITAL}"
+                         th:utext="${@creditService.renderContract(credit.id, #locale, true, null)}"></div>
+                    <div th:if="${entityParams.signatureType == T(com.affirm.common.model.catalog.EntityProductParams).CONTRACT_TYPE_MANUAL}"
+                         th:utext="${@creditService.renderContract(credit.id, #locale, false, person.getFirstName() + ' ' + person.getFirstSurname()+' '+person.getLastSurname())}"></div>
+                </div>
+                <!-- /Contract -->
+
+            </div>
+            <div id="manualLoanSignature" th:if="${entityParams.signatureType == T(com.affirm.common.model.catalog.EntityProductParams).CONTRACT_TYPE_MANUAL}" style="display: none">
+                <div class="container">
+
+
+                    <div class="widget-tp">
+                        <div class="top">
+                            <h3 th:text="${signatureLoaded ?  'Contrato firmado' : 'Genial, ahora toma foto el contrato firmado'}"></h3>
+                            <small>(tomando las fotos paso a paso)</small>
+                        </div>
+                        <div class="tp-container" th:if="${!signatureLoaded}">
+                            <div class="tp-app">
+
+                                <div class="focus-t"></div>
+                                <div class="focus-b"></div>
+
+                                <button id="start-camera" class="visible button lightblue-button">Activa tu c&aacute;mara</button>
+
+                                <video id="camera-stream"></video>
+
+                                <img id="snap"/>
+
+                                <p id="error-message"></p>
+
+                                <div class="controls">
+                                    <!--<a href="#" id="delete-photo" title="Volver a tomarla" class="disabled"><i class="material-icons">delete</i></a>-->
+                                    <a href="#" id="take-photo" title="Tomar la foto"><i class="material-icons">camera_alt</i></a>
+                                    <!--<a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled"><i class="material-icons">file_download</i></a>-->
+                                    <!--<a href="#" id="save-photo" title="Listo" class="disabled"><i class="material-icons"><i class="material-icons">done</i></i></a>-->
+                                </div>
+                                <!-- Hidden canvas element. Used for taking snapshot of video. -->
+                                <canvas></canvas>
+                            </div>
+                        </div>
+                        <div class="steps-tp">
+                            <small id="msg" class="successMessage" th:if="${!signatureLoaded}">Toma una foto del contrato firmado.</small>
+                            <br/>
+                            <br/>
+                            <ul class="row">
+
+                                <li class="col-lg-4 col-md-4 col-lg-offset-4 col-md-offset-4 column" th:switch="${contractFiles != null and contractFiles.size() > 0}">
+
+                                    <th:block th:case="${true}">
+                                        <div class="thumb" th:each="file : ${contractFiles}">
+                                            <button type="button" id="close_1" class="closeRoundButtonThumb" data-id="0"><i
+                                                    class="icon close-icon"></i></button>
+                                            <img th:src="@{/__${productUrl}__/__${loanAplicationToken}__/userFile/__${@fileService.generateUserFileEncrypt(file.userId, file.fileName, file.id)}__/image.jpg(thumbnail=true)}"/>
+                                        </div>
+                                    </th:block>
+                                    <th:block th:case="${false}">
+                                        <div class="thumb">
+                                            <button type="button" id="close_1" class="closeRoundButtonThumb" data-id="0"><i
+                                                    class="icon close-icon"></i></button>
+                                            <img id="thumb_1"/>
+                                        </div>
+                                    </th:block>
+                                    <div id="step-1" class="square" th:classappend="${signatureLoaded ? 'active' : 'disabled'}">
+                                        <div class="loading loading-ajax-invisible">
+                                            <div class="sk-circle">
+                                                <div class="sk-circle1 sk-child"></div>
+                                                <div class="sk-circle2 sk-child"></div>
+                                                <div class="sk-circle3 sk-child"></div>
+                                                <div class="sk-circle4 sk-child"></div>
+                                                <div class="sk-circle5 sk-child"></div>
+                                                <div class="sk-circle6 sk-child"></div>
+                                                <div class="sk-circle7 sk-child"></div>
+                                                <div class="sk-circle8 sk-child"></div>
+                                            </div>
+                                            <span
+                                                class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                                        </div>
+                                        <p>Contrato Firmado</p>
+                                    </div>
+                                    <div class="tp-mobile">
+                                        <label for="step-input-1" class="upload-file active-upload">
+                                            Haz click para tomar foto al contrato (firmado)
+                                            <input type="file" accept="image/*" capture="camera" id="step-input-1" class="imageFromMobile" data-step="1" multiple="true"/>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="actions">
+                                <button class="button red-button" id="uploadImage" style="display: none;">Subir</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bankAccount" id="bankAccountBlock">
+                <div class="container">
+                    <form id="loanApplicationBankForm" role="form" action="#" th:object="${loanApplicationBankForm}" autocomplete="off">
+                        <h3>&iquest;A qu&eacute; cuenta te enviamos tu dinero?</h3>
+                        <span class="subtitle">(Recuerda que debes ser titular de la misma, caso contrario no podremos realizar la transferencia)</span>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="field form-group label-floating">
+                                    <label style="margin: 0;" class="control-label" for="bankAccountName" th:text="#{form.field.bank}"></label>
+                                    <select th:value="*{bankId}" name="bankId" id="bankId" class="form-control">
+                                        <option value="" hidden="hidden"></option>
+                                        <option th:each="bank : ${@catalogService.getBanks(false)}" th:value="${bank.id}" th:text="${bank.name}"></option>
+                                    </select>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message" th:if="*{validator.bankId.hasErrors}" th:text="*{validator.bankId.errors}"></span>
+                                    </div>
+                                </div>
+
+                                <div class="field form-group label-floating">
+                                    <label style="margin: 0;" class="control-label" for="bankAccountType" th:text="#{form.field.bankAccountType}"></label>
+                                    <select th:value="*{bankAccountType}" name="bankAccountType" id="bankAccountType" class="form-control">
+                                        <option value="" hidden="hidden"></option>
+                                        <option value="S" th:text="#{form.field.bankAccountType.saving}"></option>
+                                        <option value="C" th:text="#{form.field.bankAccountType.current}"></option>
+                                    </select>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message" th:if="*{validator.bankAccountType.hasErrors}" th:text="*{validator.bankAccountType.errors}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="field form-group label-floating">
+                                    <label style="margin: 0;" class="control-label" for="bankAccountNumber" th:text="#{form.field.bankAccountNumber}"></label>
+                                    <input type="text" th:value="*{bankAccountNumber}" name="bankAccountNumber" id="bankAccountNumber" class="form-control" />
+                                </div>
+
+                                <div class="field form-group label-floating">
+                                    <label style="margin: 0;" class="control-label" for="bankAccountDepartment" th:text="#{loanApplicationSignature.bankAccountDepartment}"></label>
+                                    <select th:value="*{bankAccountDepartment}" id="bankAccountDepartment" name="bankAccountDepartment" class="form-control">
+                                        <option value="" hidden="hidden"></option>
+                                        <option th:each="department : ${@catalogService.getDepartments()}" th:value="${department.id}" th:text="${department.name}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="checks" style="margin: 2em 0;text-align: left;">
+                                <p>
+                                    <input type="checkbox" id="terms1" style="display: inline-block;vertical-align: top;"/>
+                                    <label for="terms1" style="font-size: .85em;">Acepto todas las condiciones del cr&eacute;dito descritas en el presente contrato.</label>
+                                </p>
+                                <p>
+                                    <input type="checkbox" id="terms2" style="display: inline-block;vertical-align: top;" />
+                                    <label for="terms2" style="font-size: .85em;width: 90%">He le&iacute;do y manifiesto mi consentimiento expreso con los <a
+                                            th:href="@{/terminos-y-condiciones}" rel="noopener noreferrer" target="_blank">T&eacute;rminos y Condiciones</a> y con la <a th:href="@{/politica-de-privacidad}" rel="noopener noreferrer" target="_blank">Pol&iacute;tica de Privacidad</a>. Dichos consentimientos tienen la validez y eficacia que le confiere el art&iacute;culo 141 del C&oacute;digo Civil peruano.</label>
+                                </p>
+                                <div id="error-response" class="generalError"></div>
+                            </div>
+                            <div class="field">
+                                <button id="sendButton" class="button red-button">Aceptar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="bottomBar"  id="pdfControls">
+            <div class="container">
+                <div class="widgetContainer">
+                    <div class="widget">
+                        <ul>
+                            <li>
+                                <input type="text" id="currentPage" value="1" maxlength="3"/> / <span id="totalPage"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature modal -->
+
+    <div class="modal fade" id="signatureModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-lightblue-header">
+                    <h2>Hoja de Firma</h2>
+                    <button type="button" class="closeRoundButton" data-dismiss="modal" aria-label="Close"><i class="icon close-icon"></i></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <form class="form" role="form" id="formSignatureModal" th:object="${loanApplicationSignatureForm}" autocomplete="off">
+                        <div id="signature-section">
+                            <div class="form-group">
+                                <input type="text" placeholder="Escribe tu nombre aqu&iacute;" th:field="*{loanApplicationSign}"/>
+                                <div class="errorContainer"></div>
+                            </div>
+                            <div class="realSign">
+                                <h3 id="liveSignature" class="liveSignature defaultFont">Firma</h3>
+                            </div>
+                            <div id="response-block"></div>
+                            <div class="actions">
+                                <button class="button red-button" id="signButton">Firmar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Help modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-lightblue-header">
+                    <h2>Acerca del contrato</h2>
+                    <button type="button" class="closeRoundButton" data-dismiss="modal" aria-label="Close"><i class="icon close-icon"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="signContent">
+                        <ul style="text-align: left">
+                            <li style="margin: 1em 0;">
+                                <p><b>1.-</b> Lee atentamente el contrato, contiene las condiciones del cr&eacute;dito que tenemos para ti.</p>
+                            </li>
+                            <li style="margin: 1em 0;">
+                                <p><b>2.-</b> Podr&aacute;s dar tu consentimiento de manera electr&oacute;nica, indicando tu nombre completo al final del mismo (dicho consentimiento tienen la validez y eficacia que le confiere el art&iacute;culo 141 del C&oacute;digo Civil peruano - es equivalente a tu firma en un documento f&iacute;sico).</p>
+                            </li>
+                            <li style="margin: 1em 0;">
+                                <p><b>3.-</b> Ingresa los datos de la cuenta bancaria donde te depositaremos el dinero (al momento de realizar la transferencia validaremos que se encuentre a tu nombre, caso contrario detendremos el proceso).</p>
+                            </li>
+                            <li style="margin: 1em 0;">
+                                <p><b>4.-</b> Recibir&aacute;s un correo electr&oacute;nico con la copia del contrato y el cronograma preliminar. El cronograma final te lo enviaremos una vez que hayamos validado la acreditaci&oacute;n del dinero en tu cuenta bancaria.</p>
+                            </li>
+                            <li style="margin: 1em 0;">
+                                <p><b>5.-</b> El dinero se acreditar&aacute; en tu cuenta de acuerdo al tiempo que pueda tomar una transferencia interbancaria (habitualmente hasta 24hs h&aacute;biles como m&aacute;ximo).
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function(){
+            // Material Init
+            $.material.init({
+                validate: false
+            });
+
+            // Set the validations
+            var validator = /*[[${loanApplicationBankForm.validator.toJson(#locale)}]]*/null;
+            $('#loanApplicationBankForm').validateForm(createFormValidationJson(JSON.parse(validator), $('#loanApplicationBankForm')));
+
+            var validatorSign = /*[[${loanApplicationSignatureForm.validator.toJson(#locale)}]]*/null;
+            $('#formSignatureModal').validateForm(createFormValidationJson(JSON.parse(validatorSign), $('#formSignatureModal')));
+
+            // Help Modal
+
+            var helpSign = $('#helpSign'),
+                    helpModal = $('#helpModal');
+
+            helpSign.on('touchstart click', function(event){
+                event.preventDefault();
+                helpModal.modal({backdrop: 'static', keyboard: false, show: true});
+            });
+
+            // Arrows (bottom, blink)
+            var toBottom = $('#goBottom'),
+                    sigBottom = $('#signatureText'),
+                    shakeArrow = $('#signShakeArrow');
+
+            toBottom.on('touchstart click', function(){
+                $('html, body').animate({
+                    scrollTop: sigBottom.offset().top - 60
+                }, 'slow');
+            });
+
+            // Live Signature
+            var signModal = $('#signatureModal'),
+                    liveBox = $('#loanApplicationSign'),
+                    liveSign = $('#liveSignature'),
+                    signText = $('#signatureText'),
+                    signInput = $('#signatureInput'),
+                    signButton = $('#signButton'),
+                    sendButton = $('#sendButton'),
+                    bankAccountBlock = $('#bankAccountBlock');
+
+            signText.on('touchstart click', function(e){
+                signModal.modal({backdrop: 'static', keyboard: false, show: true});
+
+                signModal.on('shown.bs.modal', function() {
+                    liveBox.focus();
+                });
+            });
+
+            liveBox.forceLettersOnly(/^[a-zA-ZñÑáÁéÉíÍóÓúÚ ]+$/, true, 5, 35);
+
+            liveBox.on('keyup', function(e){
+                if ( $(this).val() != '' && !isNumber($(this).val()) ) {
+                    signInput.val($(this).val());
+                    liveSign.text($(this).val()).removeClass('defaultFont');
+                } else {
+
+                    signInput.val($(this).val());
+                    liveSign.text('Firma').addClass('defaultFont');
+                }
+            });
+
+            //AJax
+            signButton.on('touchstar click', function(e){
+                e.preventDefault();
+                if($('#formSignatureModal').valid()) {
+                    $('#response-block').html('');
+                    signButton.loading();
+                    defaultAjax({
+                        url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/signature/validateSignature}]]*/null,
+                        type: 'POST',
+                        data: $('#formSignatureModal').serializeObject(),
+                        success: function (data) {
+                            signButton.unloading();
+
+                            signModal.modal('hide');
+                            $('html, body').animate({
+                                scrollTop: $('.bottomBar').offset().top - 100
+                            }, 'slow');
+                            signText.removeClass('clickable').text(liveBox.val());
+                            $('.arrowGuide').hide();
+                            bankAccountBlock.toggle();
+                        }, error: function (xhr, errorJson) {
+                            signButton.unloading();
+                            $('#response-block').html(errorAjaxMessage(errorJson.message));
+                            return false;
+                        }
+                    });
+                }
+            });
+            sendButton.on('touchstar click', function(e){
+                e.preventDefault();
+                var terms1 = $('#terms1').prop('checked'),
+                        terms2 = $('#terms2').prop('checked');
+                if (terms1 == false){
+                    $('#error-response').html('Debe aceptar los t&eacute;rminos del contrato.');
+                } else if (terms2 == false) {
+                    $('#error-response').html('Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.');
+                } else {
+                    if($('#loanApplicationBankForm').valid()) {
+                        $('#error-response').html('');
+                        sendButton.loading();
+                        defaultAjax({
+                            url: /*[[@{/__${productUrl}__/__${loanAplicationToken}__/signature}]]*/null,
+                            type: 'POST',
+                            form: $('#formSignatureModal'),
+                            data: $.extend({}, $('#formSignatureModal').serializeObject(), $('#loanApplicationBankForm').serializeObject()),
+                            success: function (data) {
+//                            unloadAlertEnabled = true;
+                                sendButton.unloading();
+                            }, error: function (xhr, errorJson) {
+//                            unloadAlertEnabled = true;
+                                sendButton.unloading();
+                            }
+                        });
+                    }
+                }
+
+            });
+
+        });
+        /*]]>*/
+    </script>
+    <script>
+        /*<![CDATA[*/
+        $(document).on('ready', function(){
+
+            // Pagination
+            var currentPag = $('#currentPage'),
+                    pages = $('div.pdfContainer'),
+                    totalPages = pages.length,
+                    totalPage = $('#totalPage'),
+                    element;
+
+            totalPage.text(totalPages);
+
+
+            pages.bind('inview', function (event, visible) {
+                if (visible) {
+                    $('#currentPage').val($(this).attr('data-page'));
+                    if ($(this).attr('data-page') > 1) {
+                        $('#goBottom').fadeOut();
+                    } else {
+                        $('#goBottom').fadeIn();
+                    }
+                }
+            });
+
+            currentPag.on('change', function() {
+                if (isNumber($(this).val())) {
+                    if ( $(this).val() <= 0 ) {
+                        $(this).val(1);
+                        $('html, body').animate({
+                            scrollTop: $('#page1').offset().top - 60
+                        }, 'slow');
+                    }   else if ( $(this).val() > totalPages ) {
+                        $(this).val(totalPages);
+                        $('html, body').animate({
+                            scrollTop: $('#page' + totalPages).offset().top - 60
+                        }, 'slow');
+                    } else {
+                        $('html, body').animate({
+                            scrollTop: $('#page' + $(this).val()).offset().top - 60
+                        }, 'slow');
+                    }
+                } else {
+                    $(this).val(1);
+                    $('html, body').animate({
+                        scrollTop: $('#page1').offset().top - 60
+                    }, 'slow');
+                }
+
+
+            });
+
+        });
+
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        /*]]>*/
+    </script>
+    <script>
+//        var unloadAlertEnabled = true;
+//
+//        window.addEventListener("beforeunload", function (e) {
+//
+//            var confirmationMessage = '¿Est&aacute;s seguro qe deseas salir de la página?';
+//
+//            if (unloadAlertEnabled) {
+//                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+//                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.*/
+//            }
+//        });
+    </script>
+</th:block>
+</body>
+</html>

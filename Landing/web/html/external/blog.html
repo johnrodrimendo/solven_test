@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>Noticias Recientes</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function(){
+            $('#subscribe').on('click', function(e){
+                e.preventDefault();
+                var responseBlock = $('#response-block'),
+                        btn = $(this);
+                if(!isEmail($('#email').val())){
+                    responseBlock.html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+                } else {
+                    responseBlock.html('');
+                    btn.loading('', 2);
+                    defaultAjax({
+                        url: /*[[@{/subscribe}]]*/null,
+                        type: 'POST',
+                        data: {
+                            email: $('#email').val(),
+                        },
+                        success: function (data) {
+                            btn.unloading();
+                            $('#email-block').addClass('block-hidden');
+                            responseBlock.html(successAjaxMessage('Gracias por suscribirte, te enviaremos novedades.'));
+
+                        },
+                        error: function (xhr, data) {
+                            btn.unloading();
+                            responseBlock.html(errorAjaxMessage(data.message));
+                            return false;
+                        }
+                    });
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: landingHome"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<th:block layout:fragment="content">
+
+    <section class="landing-wfs blog">
+        <div class="hero-content">
+            <div class="container">
+                <div class="wrap">
+                    <div class="hero-text">
+                        <h2 class="landing-title">Blog</h2>
+                    </div>
+                    <div class="divisor-bar"></div>
+                    <div class="hero-pharagraph">
+                        <p>Encuentra aquí todo lo que necesitas saber acerca de tus finanzas personales.</p>
+                    </div>
+                    <div class="form-container">
+                        <div class="block" id="email-block">
+                            <div class="field inline">
+                                <input type="text" class="input-landing input-email" placeholder="Correo electr&oacute;nico" id="email"/>
+                            </div>
+                            <div class="field inline">
+                                <button class="button bg-red" id="subscribe">Suscríbete</button>
+                            </div>
+                        </div>
+                        <div id="response-block"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="blog-lists">
+        <div class="container">
+                <article class="blog-item" th:each="post : ${posts}">
+                    <figure>
+                        <img th:src="${post.featuredImageUrl}" th:alt="${post.title.rendered}"/>
+                        <figcaption>
+                            <div class="top">
+                                <h2><a th:href="'/blog/' + ${post.slug}" class="text-black" th:utext="${post.title.rendered}"></a></h2>
+                                <div class="avatar-wrap">
+                                    <div class="avatar" th:style="'background: url(' + ${post.author[1]} + ');background-size: 100%;'"></div>
+                                    <h3 th:text="${post.author[0]}"></h3>
+                                </div>
+                            </div>
+                            <div class="middle">
+                                <div class="pharagraph" th:utext="${post.excerpt.rendered}"></div>
+                            </div>
+                            <div class="bottom">
+                                <ul class="tags">
+                                    <ul>
+                                        <li th:each="category : ${post.categories}">
+                                            <span class="tag bg-lightblue" th:text="${category}"></span>
+                                        </li>
+                                    </ul>
+                                </ul>
+                            </div>
+                        </figcaption>
+                    </figure>
+                </article>
+        </div>
+    </section>
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings(itemSelected='blog')"></th:block>
+</th:block>
+
+</body>
+</html>

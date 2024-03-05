@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:text="#{static.title.vehicular}"></title>
+    <meta name="description" th:attr="content=#{static.description.vehicular}" />
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe  credito-vehicular main-arg' : 'main-pe credito-vehicular'}">
+<th:block layout:fragment="content">
+    <main id="main" class="main-banner toload  main-adelanto-sueldo main-credito-consumo main-credito-vehicular">
+        <article>
+            <h1 class="animated" th:utext="#{static.landing.carFinancing.heroTitle}"></h1>
+            <p class="animated" th:utext="#{static.landing.carFinancing.heroPharagraph}"></p>
+            <div class="actions">
+                <a th:href="${productCategory.active} ? @{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/busqueda} : 'javascript:;'" id="chooseBrand" class="g-btn bg-red" th:classappend="${productCategory.active ? '' : 'sooner'}" th:text="#{static.landing.carFinancing.calltoaction}"></a>
+                <small class="display-block">
+                    <a th:if="${productCategory.active}" th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/__${T(com.affirm.system.configuration.Configuration).EVALUATION_CONTROLLER_URL}__(agentSelected=1)}" th:text="#{button.applicationInProcess}"></a>
+                </small>
+            </div>
+        </article>
+        <ul class="list-benefits">
+            <li>
+                <span th:text="'Hasta ' + ${@utilService.integerMoneyFormat(60000)}"></span>
+            </li>
+            <li>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <span th:text="'Tasas desde ' + ${@utilService.percentFormat(15.00, 'AR')}"></span>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <span th:text="'Tasas desde ' + ${@utilService.percentFormat(16.99)}"></span>
+                </th:block>
+            </li>
+            <li>
+                <span>Hasta 72 cuotas</span>
+            </li>
+            <li>
+                <span>Sin costos ocultos</span>
+            </li>
+        </ul>
+        <img id="bannerPrincipal" th:attr="data-src=@{/img/landing-autos.jpg}" alt="" class="lazy"/>
+        <img id="bannerResponsive" th:attr="data-src=@{/img/bgperu_responsive.jpg}" alt=""/>
+        <button id="down" class="icon-bottom">Abajo</button>
+    </main>
+    <section class="sec-press toload gwr">
+        <ul class="slider-press owl-carousel " id="slidePress">
+            <li th:each="noticia,stat : ${news}" th:unless="${stat.index >= 4}">
+                <a th:href="${noticia?.link}" target="_blank" rel="noopener noreferrer">
+                    <img th:attr="data-src=@{'https://s3.amazonaws.com/solven-public/img/' + ${noticia?.logo}}"
+                         class="owl-lazy lazy" th:alt="${noticia?.pressMedium}" th:title="${noticia.getDateFormatted(#locale)}" />
+                </a>
+            </li>
+        </ul>
+        <a th:href="@{/noticias}" class="view vflex" title="Ver más noticias" >
+            <span></span>
+            <span class="wsi">
+                <svg version="1.1" id="viewmore" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 width="36px" height="36px" viewBox="0 0 438.533 438.533" style="enable-background:new 0 0 438.533 438.533;"
+                 xml:space="preserve">
+                    <g>
+                        <path d="M409.133,109.203c-19.608-33.592-46.205-60.189-79.798-79.796C295.736,9.801,259.058,0,219.273,0
+                            c-39.781,0-76.47,9.801-110.063,29.407c-33.595,19.604-60.192,46.201-79.8,79.796C9.801,142.8,0,179.489,0,219.267
+                            c0,39.78,9.804,76.463,29.407,110.062c19.607,33.592,46.204,60.189,79.799,79.798c33.597,19.605,70.283,29.407,110.063,29.407
+                            s76.47-9.802,110.065-29.407c33.593-19.602,60.189-46.206,79.795-79.798c19.603-33.596,29.403-70.284,29.403-110.062
+                            C438.533,179.485,428.732,142.795,409.133,109.203z M334.332,232.111L204.71,361.736c-3.617,3.613-7.896,5.428-12.847,5.428
+                            c-4.952,0-9.235-1.814-12.85-5.428l-29.121-29.13c-3.617-3.613-5.426-7.898-5.426-12.847c0-4.941,1.809-9.232,5.426-12.847
+                            l87.653-87.646l-87.657-87.65c-3.617-3.612-5.426-7.898-5.426-12.845c0-4.949,1.809-9.231,5.426-12.847l29.121-29.13
+                            c3.619-3.615,7.898-5.424,12.85-5.424c4.95,0,9.233,1.809,12.85,5.424l129.622,129.621c3.613,3.614,5.42,7.898,5.42,12.847
+                            C339.752,224.213,337.945,228.498,334.332,232.111z"/>
+                    </g>
+                </svg>
+            </span>
+        </a>
+    </section>
+    <section class="sec-benefits carFinancing toload">
+        <article>
+            <h2 th:utext="#{static.landing.carFinancing.stepTitle}"></h2>
+            <p th:utext="#{static.landing.carFinancing.stepTitle2}"></p>
+            <img class="lazy solven01" data-src="/img/solven-05.jpg" alt=""/>
+            <img class="lazy solven02" data-src="/img/solven-04.jpg" alt=""/>
+        </article>
+        <ul class="list-steps">
+            <li>
+                <article>
+                    <h3 th:text="#{static.landing.carFinancing.step1}"></h3>
+                    <p th:text="#{static.landing.carFinancing.step1.desc}"></p>
+                    <span class="steps icon-step-1">1</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3 th:text="#{static.landing.carFinancing.step2}"></h3>
+                    <p th:text="#{static.landing.carFinancing.step2.desc}"></p>
+                    <span class="steps icon-step-2">2</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3 th:text="#{static.landing.carFinancing.step3}"></h3>
+                    <p th:text="#{static.landing.carFinancing.step3.desc}"></p>
+                    <span class="steps icon-step-3">3</span>
+                </article>
+            </li>
+            <img class="lazy solven03" data-src="/ img/solven-03.png" alt=""/>
+        </ul>
+    </section>
+    <div class="sec-entities toload">
+        <div class="gwr">
+            <h3>Ellos trabajan con nosotros</h3>
+            <ul>
+                <li><a href="http://www.abaco.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/abaco.png" alt="" /></a></li>
+                <li><a href="https://acceso.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/acceso.png" alt="" /></a></li>
+                <li><a href="http://www.bancoripley.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/ripley/logo/solven_banco_ripley.png" alt="" /></a></li>
+                <li><a href="http://cajarurallosandes.com/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/cajalosandes.png" alt="" /></a></li>
+                <li><a href="http://www.cajasullana.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/cajasullana.png" alt="" /></a></li>
+                <li><a href="https://www.compartamos.com.pe" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/compartamos.png" alt="" /></a></li>
+                <li><a href="https://www.efectiva.com.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/efectiva.png" alt="" /></a></li>
+                <li><a href="https://www.eflglobal.com/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/efl.png" alt="" /></a></li>
+                <li><a href="http://www.qapaq.pe/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/qapaq.png" alt="" /></a></li>
+                <li><a href="http://www.multifinanzas.com.ar/" target="_blank"><img class="lazy" data-src="https://s3.amazonaws.com/solven-public/img/solven/entities/trasatlantica.png" alt="" /></a></li>
+            </ul>
+            <img class="lazy solven01" data-src="/img/solven-05.jpg" />
+            <img class="lazy solven02" data-src="/img/solven-03.png" />
+        </div>
+    </div>
+    <section class="sec-youneedhelp toload">
+        <div class="gwr">
+            <article>
+                <span class="h2" th:text="#{static.landing.home.needHelp}"></span>
+                <p th:text="#{static.landing.home.stepSpan2}"><span th:text="#{static.landing.home.stepSpan3}"  ></span></p>
+                <ul class="info-contact">
+                    <li th:text="#{static.landing.hr}"></li>
+                </ul>
+                <span class="info-message">No tomamos solicitudes de crédito por teléfono. Las llamadas pueden ser monitoreadas o grabadas.</span>
+                <a th:href="@{/centro-de-ayuda}" class="g-btn bg-skyeblue">Centro de ayuda</a>
+            </article>
+            <img data-src="/img/ahorro-solven.jpg" class="lazy" alt=""/>
+        </div>
+
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <div class="locate gwr" style="padding:15px;"><svg viewBox="0 0 512 512" style="width:30px;" xml:space="preserve"><g><path style="fill:#82AFFF;" d="M473.655,88.276H38.345C17.167,88.276,0,105.443,0,126.621v73.471h512v-73.471C512,105.443,494.833,88.276,473.655,88.276z"></path><path style="fill:#82AFFF;" d="M0,385.379c0,21.177,17.167,38.345,38.345,38.345h435.31c21.177,0,38.345-17.167,38.345-38.345v-73.471H0V385.379z"></path></g><rect y="200.09" style="fill:#F5F5F5;" width="512" height="111.81"></rect><path style="fill:#F09146;" d="M300.138,253.793h-31.784c0.593-0.45,1.062-0.893,1.486-1.311c0.776-0.759,1.393-1.362,3.03-2.035c1.646-0.69,2.508-0.698,3.599-0.715c1.314-0.009,2.802-0.034,5.233-1.035c2.427-1.009,3.487-2.044,4.423-2.957c0.776-0.759,1.393-1.362,3.034-2.044c1.633-0.681,2.492-0.69,3.577-0.698c1.311-0.018,2.797-0.034,5.228-1.043l-1.698-4.07c-1.633,0.681-2.492,0.69-3.577,0.698c-1.311,0.018-2.797,0.034-5.224,1.035c-2.426,1.009-3.487,2.044-4.423,2.957c-0.776,0.759-1.393,1.362-3.03,2.035c-1.646,0.69-2.508,0.698-3.599,0.715c-1.314,0.009-2.802,0.034-5.233,1.043c-2.426,1-3.487,2.044-4.423,2.957c-0.764,0.743-1.395,1.338-2.967,2.002l24.98-24.977l-3.121-3.121l-22.485,22.482c0.099-0.735,0.126-1.389,0.132-1.982c0.013-1.095,0.022-1.949,0.703-3.595s1.284-2.259,2.044-3.034c0.922-0.94,1.961-2.008,2.969-4.439c1.004-2.431,1.022-3.914,1.035-5.224c0.013-1.086,0.022-1.949,0.698-3.586c0.681-1.638,1.28-2.25,2.039-3.026c0.918-0.94,1.956-2.001,2.962-4.423l-4.077-1.689c-0.681,1.637-1.28,2.25-2.039,3.026c-0.918,0.94-1.956,2.001-2.962,4.423c-1.004,2.431-1.022,3.914-1.035,5.224c-0.013,1.086-0.022,1.949-0.698,3.586c-0.681,1.646-1.284,2.259-2.044,3.034c-0.922,0.94-1.961,2.008-2.969,4.439c-1.004,2.431-1.022,3.923-1.038,5.233c-0.009,1.063-0.039,1.922-0.676,3.5v-35.317h-4.414v31.783c-0.45-0.589-0.892-1.057-1.306-1.481c-0.762-0.776-1.362-1.397-2.044-3.034c-0.681-1.646-0.694-2.508-0.707-3.604c-0.013-1.311-0.03-2.802-1.038-5.233c-1.004-2.422-2.044-3.482-2.962-4.423c-0.759-0.776-1.357-1.388-2.039-3.026c-0.676-1.638-0.685-2.5-0.698-3.586c-0.013-1.311-0.03-2.793-1.035-5.216l-4.077,1.689c0.676,1.638,0.685,2.492,0.698,3.577c0.013,1.311,0.03,2.793,1.035,5.224c1.004,2.422,2.044,3.482,2.962,4.423c0.759,0.776,1.357,1.388,2.039,3.026c0.681,1.646,0.694,2.508,0.707,3.604c0.013,1.311,0.03,2.802,1.038,5.233c1.004,2.431,2.044,3.491,2.962,4.431c0.748,0.76,1.34,1.395,2.004,2.962l-24.982-24.979l-3.121,3.121l24.943,24.94c-1.368-0.621-2.028-1.192-2.745-1.888c-0.943-0.922-2.008-1.965-4.448-2.974c-2.431-1-3.918-1.026-5.233-1.043c-1.095-0.009-1.956-0.025-3.616-0.715c-1.66-0.681-2.28-1.284-3.069-2.051c-0.943-0.914-2.013-1.956-4.457-2.974c-2.44-1.009-3.932-1.026-5.25-1.043c-1.099-0.018-1.965-0.034-3.625-0.724l-1.689,4.086c2.44,1.009,3.932,1.026,5.25,1.043c1.099,0.018,1.965,0.034,3.625,0.724c1.664,0.681,2.284,1.284,3.073,2.051c0.943,0.922,2.013,1.956,4.452,2.966c2.44,1.017,3.932,1.035,5.246,1.052c1.095,0.018,1.956,0.025,3.608,0.715c1.651,0.681,2.268,1.284,3.048,2.044c0.401,0.394,0.849,0.809,1.391,1.233H211.86v4.414h35.254c-1.393,0.53-2.264,0.597-3.262,0.612c-1.314,0.009-2.802,0.034-5.237,1.035c-2.435,1.009-3.505,2.051-4.448,2.966c-0.785,0.767-1.401,1.37-3.052,2.051c-1.66,0.69-2.526,0.707-3.625,0.724c-1.319,0.018-2.81,0.034-5.25,1.043c-2.444,1.017-3.513,2.051-4.457,2.974c-0.789,0.767-1.409,1.37-3.069,2.051l1.689,4.086c2.44-1.017,3.509-2.051,4.452-2.974c0.789-0.767,1.409-1.37,3.073-2.051c1.66-0.69,2.526-0.707,3.625-0.724c1.319-0.018,2.81-0.034,5.255-1.052c2.431-1.009,3.496-2.044,4.439-2.966c0.78-0.759,1.401-1.362,3.057-2.044c1.646-0.69,2.513-0.698,3.604-0.715c0.558-0.003,1.187-0.04,1.868-0.124l-22.549,22.546l3.121,3.121l24.931-24.927c-0.614,1.362-1.181,2.019-1.879,2.738c-0.918,0.94-1.956,2.008-2.966,4.439c-1.009,2.431-1.031,3.932-1.043,5.241c-0.018,1.095-0.025,1.956-0.712,3.612c-0.685,1.664-1.293,2.284-2.056,3.069c-0.922,0.94-1.961,2.017-2.974,4.457s-1.031,3.932-1.047,5.25c-0.018,1.095-0.03,1.965-0.715,3.62l4.077,1.689c1.013-2.44,1.031-3.932,1.047-5.25c0.018-1.095,0.03-1.965,0.715-3.62c0.685-1.664,1.293-2.284,2.056-3.069c0.922-0.94,1.961-2.017,2.974-4.457c1.009-2.431,1.031-3.932,1.043-5.241c0.018-1.095,0.025-1.956,0.712-3.612c0.681-1.655,1.284-2.268,2.047-3.052c0.392-0.402,0.809-0.85,1.233-1.395v31.878h4.414v-35.252c0.526,1.39,0.593,2.259,0.608,3.261c0.013,1.311,0.034,2.802,1.043,5.233c1.004,2.44,2.047,3.509,2.966,4.448c0.762,0.785,1.366,1.405,2.051,3.06s0.698,2.526,0.715,3.62c0.018,1.319,0.034,2.81,1.047,5.25s2.051,3.518,2.974,4.457c0.762,0.785,1.37,1.405,2.056,3.069l4.077-1.689c-1.013-2.44-2.051-3.518-2.974-4.457c-0.762-0.785-1.371-1.405-2.056-3.069c-0.685-1.655-0.698-2.526-0.715-3.62c-0.018-1.319-0.034-2.81-1.047-5.25c-1.009-2.44-2.047-3.509-2.966-4.448c-0.762-0.785-1.366-1.405-2.051-3.06c-0.685-1.646-0.694-2.508-0.712-3.604c-0.006-0.557-0.042-1.187-0.126-1.868l22.552,22.55l3.121-3.121l-22.482-22.478c0.73,0.097,1.384,0.126,1.973,0.134c1.09,0.009,1.949,0.018,3.595,0.698c1.646,0.69,2.263,1.284,3.043,2.051c0.94,0.914,2.004,1.956,4.436,2.966c2.426,1,3.914,1.017,5.224,1.026c1.086,0.018,1.944,0.025,3.582,0.707c1.638,0.672,2.25,1.276,3.026,2.035c0.94,0.914,2.001,1.956,4.427,2.966l1.689-4.086c-1.638-0.672-2.25-1.276-3.026-2.035c-0.94-0.914-2.001-1.956-4.427-2.966c-2.427-1-3.914-1.017-5.224-1.026c-1.086-0.018-1.944-0.025-3.582-0.707c-1.646-0.681-2.263-1.276-3.043-2.044c-0.94-0.914-2.004-1.956-4.436-2.957c-2.431-1.017-3.918-1.035-5.233-1.043c-1.07-0.018-1.937-0.038-3.524-0.681h35.349v-4.414H300.138z"></path><circle style="fill:#FFE15A;" cx="256" cy="256" r="22.07"></circle></svg><span style="margin-left: 45px;position: absolute">AR</span></div>
+        </th:block>
+
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <div class="locate gwr" style="padding:15px;"><svg x="0px" y="0px" viewBox="0 0 512 512" style="width: 30px;" xml:space="preserve"><path style="fill:#FF4B55;" d="M38.345,88.273C17.167,88.273,0,105.44,0,126.618v258.759c0,21.177,17.167,38.345,38.345,38.345h132.322V88.273H38.345z"></path><rect x="170.67" y="88.277" style="fill:#FFFFFF;" width="170.67" height="335.45"></rect><path style="fill:#FF4B55;" d="M473.655,88.273H341.333v335.448h132.322c21.177,0,38.345-17.167,38.345-38.345V126.618C512,105.44,494.833,88.273,473.655,88.273z"></path></svg><span style="margin-left: 45px;position: absolute">PE</span></div>
+        </th:block>
+    </section>
+</th:block>
+<div class="modal" id="confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+    <div class="modal-dialog" role="confirmation">
+        <div class="modal-content">
+            <div class="modal-top">
+                <div class="title-wrap">
+                    <h4 class="title-modal" th:text="#{modal.confirmationCode.title}"></h4>
+                </div>
+                <div class="corner-close">
+                    <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-middle">
+                <div class="block-content">
+                    <p th:text="#{modal.confirmationCode.subTitle}"></p>
+                    <form action="">
+                        <div class="field inline">
+                            <small class="input-help">C&oacute;digo de confirmaci&oacute;n</small>
+                            <input type="text" class="input-outline" id="cofirmCodePromo" />
+                        </div>
+                        <div class="field inline">
+                            <small class="input-help">&nbsp;</small>
+                            <button type="button" class="button bg-red" th:text="#{button.confirm}"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay"></div>
+</div>
+<script th:inline="javascript" async="async">
+    /*<![CDATA[*/
+    (function() {
+
+        $('#cofirmCodePromo').forceLettersOnly('', true, 10, 10);
+
+        var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+        if (validator != null) {
+            var jsonValidator = JSON.parse(validator);
+            $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+        }
+        $('#sendMessage').on('click', function(event){
+            event.preventDefault();
+            validate();
+        });
+        function validate() {
+            if ($('#contactForm').valid()) {
+                grecaptcha.reset();
+                grecaptcha.execute();
+            }
+        }
+        function submit(){
+            $('#sendMessage').loading('', 2);
+            defaultAjax({
+                url: /*[[@{/contact}]]*/,
+                type: 'POST',
+                formValidation: $('#contactForm').data('validator'),
+                data: $('#contactForm').serializeObject(),
+                success: function (data) {
+                    $('#sendMessage').unloading();
+                    $('#contactForm').data('validator').resetForm();
+                    $('#contactForm')[0].reset();
+                    $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                },
+                error: function () {
+                    $('#sendMessage').unloading();
+                }
+            });
+        }
+    }());
+    /*]]>*/
+</script>
+</body>
+</html>

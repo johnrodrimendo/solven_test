@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" th:object="${form}" class="forms q119" autocomplete="off">
+            <p th:text="#{question.129.title}"></p>
+            <p style="font-size: 15px;" th:if="${(loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA)}" >(Recuerda: Tus datos deben coincidir con los que aparecen en tu DNI)</p>
+            <div class="forms">
+                <div class="field inline">
+                    <input type="text" class="input-outline" th:field="*{name}"/>
+                    <small class="input-help" th:text="#{question.129.name}"></small>
+                </div>
+                <div class="field inline">
+                    <input type="text" class="input-outline" th:field="*{firstSurname}"/>
+                    <small class="input-help" th:text="#{question.129.firstSurname}"></small>
+                </div>
+                <div class="field inline">
+                    <input type="text" class="input-outline" th:field="*{lastSurname}"/>
+                    <small class="input-help" th:text="#{question.129.lastSurname}"></small>
+                </div>
+                <div class="field field-birthdate inline">
+                    <div class="wrap-field">
+                        <div class="box-icon tiny-input"><i class="icon icon-cake"></i></div>
+                        <input type="text" id="birthDay" class="input-outline tiny-input" placeholder="dd"
+                               pattern="[0-9]*"/>
+                        <input type="text" id="birthMonth" class="input-outline tiny-input" placeholder="mm"
+                               pattern="[0-9]*"/>
+                        <input type="text" id="birthYear" class="input-outline small-input" placeholder="aaaa"
+                               pattern="[0-9]*"/>
+                    </div>
+                    <small class="input-help" th:text="#{question.129.birthdate}"></small>
+                </div>
+                <th:block
+                        th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                    <div class="field">
+                        <select th:field="*{loanOrigin}" data-width="300" data-placeholder="Procedencia de solicitud">
+                            <option value="" hidden="hidden"></option>
+                            <option th:each="origin : ${@question119Service.getFDLMLoanOrigins()}"
+                                    th:value="${origin.key}" th:text="${origin.value}"></option>
+                        </select>
+                    </div>
+                </th:block>
+                <div class="field inline r-field">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <div class="display-block">
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var yearFrom = /*[[${yearFrom}]]*/;
+        var yearTo = /*[[${yearTo}]]*/;
+        var dateFromServer = /*[[${form.birthday}]]*/;
+
+        if (dateFromServer != null) {
+            var serverDate = moment(dateFromServer, "DD/MM/YYYY");
+            $('#birthDay').val(serverDate.format("DD"));
+            $('#birthMonth').val(serverDate.format("MM"));
+            $('#birthYear').val(serverDate.format("YYYY"));
+        }
+        $('#birthDay').forceIntegerOnly(true, 1, 31);
+        $('#birthMonth').forceIntegerOnly(true, 1, 12);
+        $('#birthYear').forceIntegerOnly(true, yearFrom, yearTo);
+        $('#birthDay').keyup(function (event) {
+            if ($(this).val().length == 2) {
+                $('#birthMonth').focus();
+            }
+        });
+        $('#birthMonth').keyup(function (event) {
+            if ($(this).val().length == 2) {
+                $('#birthYear').focus();
+            }
+        });
+        $('#sendButton').click(function () {
+            $('.errorContainer').html('');
+            var date = moment($('#birthDay').val() + "/" + $('#birthMonth').val() + "/" + $('#birthYear').val(), "DD/MM/YYYY");
+            var isValid = $('#questionForm').valid();
+
+            if (!date.isValid() || date.get('years') > yearTo || date.get('years') < yearFrom) {
+                if (isValid) {
+                    $('.errorContainer').html('<span id="birthdate-error" class="help-block help-block-error">La fecha es incorrecta</span>');
+                } else {
+                    $('.errorContainer').append('<span id="birthdate-error" class="help-block help-block-error">La fecha es incorrecta</span>');
+                }
+            } else {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {
+                        birthday: date.format("DD/MM/YYYY")
+                    })
+                }, "");
+            }
+        });
+        var $inputname = $('#name');
+        setTimeout(function () {
+            $inputname.focus();
+        }, 300);
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

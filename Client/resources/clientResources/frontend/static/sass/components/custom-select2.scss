@@ -1,0 +1,90 @@
+
+body{
+    >.select2-container{
+        &.select2-container--default{
+            .select2-results{
+                margin-top: 4px;
+                overflow: hidden;
+                border-radius: .25rem;
+                border: 1px solid #ccc;
+                >.select2-results__options{
+                    max-height: 200px;
+                    overflow-y: auto;
+                    width: 100%;
+                    margin: 0 auto;
+                }
+            }
+        }
+        &.select2-container--open{
+            .select2-dropdown{
+                .select2-search{
+                    border-top: 1px solid #ccc;
+                    border-left: 1px solid #ccc;
+                    border-bottom: 1px solid #ccc;
+                    border-radius: .25rem 0 0 .25rem;
+                    position: absolute;
+                    width: 90%;
+                    overflow: hidden;
+                    height: 30px;
+                    .select2-search__field{
+                        background-color: #FFF;
+                        border: none;
+                        border-left: 0;
+                        border-right: 0;
+                        padding: 6px 12px;
+                        height: 30px;
+                    }
+                }
+                &.select2-dropdown--above{
+                    .select2-search{
+                        bottom: -30px;
+                        @media screen and (max-width: 640px){
+                            bottom: -30px;
+                        }
+                    }
+                }
+                &.select2-dropdown--below{
+                    .select2-search{
+                        top: -30px;
+                        @media screen and (max-width: 640px){
+                            top: -30px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.select2{
+    border-radius: .25rem;
+    height: 30px;
+    width: 100% !important;
+    span{
+        height: 30px;
+        width: 100%;
+        display: flex;
+    }
+    .dropdown-wrapper{
+        display: none;
+    }
+}
+
+@media screen and (min-width: 960px){
+    .select2{
+        height: 38px;
+        span{
+            height: 38px;
+        }
+    }
+    .select2-container{
+        .select2-selection--single{
+            .select2-selection__rendered{
+                line-height: 2.5;
+            }
+        }
+    }
+    .select2-results__option{
+        font-size: .96rem;
+    }
+}

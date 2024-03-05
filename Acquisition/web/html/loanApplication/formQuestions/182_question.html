@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <style >
+    .select2.select2-container--disabled .select2-selection__arrow{
+        background-color: #f4f4f4 !important;
+        cursor: no-drop;
+        border: 2px solid #D6D8DD;
+    }
+    </style>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q182">
+            <form id="questionForm" th:object="${form}" class="flex-form-map container px-0 py-0" style="max-width: 100%;">
+
+
+                <div class="third">
+                    <div class="field inline field-col-3 col-xs-12" style="text-align: left;">
+                        <div class="" style="margin-top: 10px;">
+                            <div class="row">
+                                <div class="col-lg-offset-2 col-lg-8">
+                                    <p style="text-align: left;"> <b>Elige como retirar el efectivo de tu Tarjeta de crédito +Efectivo:</b> </p>
+                                </div>
+
+                                <div class="col-lg-offset-2 col-lg-8">
+                                    <div class="row">
+                                        <div class="col-md-12" id="btnDeposit">
+                                            <div style="margin-left: 10px" class="div-button">
+                                                <table>
+                                                    <tr>
+                                                        <td style="padding: 10px;padding-left: 0px">
+                                                            <label style="margin-bottom: 0px"><input type="radio" class="div-button-radio" value="true" name="deposit" checked="checked"/><span class="div-button-radio-span"></span></label>
+                                                        </td>
+                                                        <td>
+                                                            <div style="text-align: left;">
+                                                                <div>
+                                                                    <span class="font-div-button">Indícanos la cuenta donde deseas que te depositemos el retiro de tu Tarjeta de crédito +Efectivo:</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-1 field"></div>
+                                        <div class="col-md-5 field">
+                                            <small class="input-help" th:utext="'Entidad Financiera'" ></small>
+                                            <select data-width="230" th:attr="data-placeholder='Seleccione'" th:value="*{bankId}" name="bankId" id="bankId">
+                                                <option value="" hidden="hidden"></option>
+                                                <th:block th:each="bank : ${banks}">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option th:value="${bank.id}" th:text="${bank.name}"></option>
+                                                </th:block>
+                                            </select>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                        <div class="col-md-5 field">
+                                            <small class="input-help" th:utext="'Numero de cuenta**'" ></small>
+                                            <input type="text" class="input-outline"  th:value="*{bankAccountCci}" name="bankAccountCci" id="bankAccountCci"/>
+                                            <small class="input-help" th:utext="'(**) Código de cuenta interbancario de 20 dígitos para Entidades Financieras distintas a BanBif.'" ></small>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div style="margin-left: 10px" class="col-md-12">
+                                            <div class="div-button" id="btnNotDeposit">
+                                                <table>
+                                                    <tr>
+                                                        <td style="padding: 10px;padding-left: 0px">
+                                                            <label style="margin-bottom: 0px"><input type="radio" class="div-button-radio" value="false" name="deposit"/><span class="div-button-radio-span"></span></label>
+                                                        </td>
+                                                        <td>
+                                                            <div style="text-align: left;">
+                                                                <div>
+                                                                    <span class="font-div-button">Retira el dinero  acercándote a cualquiera de nuestras oficinas BanBif con tu número de tarjeta.</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="third">
+                    <div class="field inline field-col-3 col-xs-12" style="text-align: left;">
+                        <div class="" style="margin-top: 10px;">
+                            <div class="row">
+                                <div class="col-lg-offset-2 col-lg-8">
+                                    <p style="text-align: left;"><b>Elige la dirección de entrega de tu tarjeta virtual:</b></p>
+                                </div>
+                                <div class="col-lg-offset-2 col-lg-8">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div id="btnHome" class="div-button">
+                                                <table>
+                                                    <tr>
+                                                        <td style="padding: 10px">
+                                                            <label style="margin-bottom: 0px"><input type="radio" name="addressToSend" class="div-button-radio" value="H" checked="checked"/><span class="div-button-radio-span"></span></label>
+                                                        </td>
+                                                        <td>
+                                                            <div style="text-align: left;">
+                                                                <div>
+                                                                    <span class="font-div-button">Enviar a dirección vivienda</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="btnWorkplace" class="div-button">
+                                                <table>
+                                                    <tr>
+                                                        <td style="padding: 10px">
+                                                            <label style="margin-bottom: 0px"><input type="radio" name="addressToSend" class="div-button-radio" value="J"/><span class="div-button-radio-span"></span></label>
+                                                        </td>
+                                                        <td>
+                                                            <div style="text-align: left;">
+                                                                <div>
+                                                                    <span class="font-div-button">Enviar a dirección laboral</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="third">
+                    <div class="field inline field-col-3 col-xs-12" style="text-align: left;">
+                        <div class="" style="margin-top: 10px;">
+                            <div class="row">
+                                <div class="col-lg-offset-2 col-lg-8">
+                                    <label for="acceptedTyC" class="custom-check" style="display: block; margin-top: 10px; margin-bottom: 5px">
+                                        <span class="check-inner"><i class="icon icon-check"></i></span>
+                                        <span class="check-label">Declaro haber leído las condiciones contenidas en los siguientes documentos:</span>
+                                        <input type="checkbox" class="real-check" id="acceptedTyC" th:field="*{acceptedTyC}"/>
+                                    </label>
+                                    <div class="errorContainer" style="text-align: left;margin-left: 0;"></div>
+
+                                    <div style="text-align: left; margin-left: 25px;">
+                                        <p style="margin-top: 0;margin-bottom: 0">
+                                            <small>
+                                                <a href="https://www.banbif.com.pe/Portals/0/HojaResumen/Resumen-tarjeta-de-credito-masefectivo.pdf" target="_blank"
+                                                   th:text="'- Hoja Resumen del producto'" id="seeProductSummary" style="color: #26CAD3;font-weight: bold;"></a>
+                                            </small>
+                                        </p>
+                                    </div>
+
+                                    <div style="text-align: left; margin-left: 25px;">
+                                        <p style="margin-top: 0;margin-bottom: 0">
+                                            <small>
+                                                <a href="https://www.banbif.com.pe/Personas/Tarjeta-de-Credito/Mas-Efectivo" target="_blank"
+                                                   th:text="'- Información del producto'" id="seeProductInfo" style="color: #26CAD3;font-weight: bold;"></a>
+                                            </small>
+                                        </p>
+                                    </div>
+
+                                    <div style="text-align: left; margin-left: 25px;">
+                                        <p style="margin-top: 0;margin-bottom: 0">
+                                            <small>
+                                                <a href="https://www.banbif.com.pe/Portals/0/PDF/Formularios%20Contractuales/Nuevo_contrato/Contrato-cuenta-corriente-especial-tarjeta-de-credito.pdf" target="_blank"
+                                                   th:text="'- Contrato Cuenta Corriente Especial Tarjeta de Crédito'" id="seeContractInfo" style="color: #26CAD3;font-weight: bold;"></a>
+                                            </small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="third">
+                    <div class="field inline field-col-3 col-xs-12" style="text-align: left;">
+                        <div class="" style="margin-top: 10px;">
+                            <div class="row">
+                                <div class="col-lg-offset-2 col-lg-8">
+                                    <p>
+                                        Le recordamos que para que la Tarjeta de Crédito +Efectivo se active y pueda retirar efectivo, deberá firmar el Contrato de Cuenta Corriente Especial Tarjeta de Crédito, su Hoja
+                                        Resumen y demás documentos contractuales, así como la solicitud de disposición de efectivo y transferencia a la cuenta de ahorro indicada líneas arriba, al momento de la
+                                        entrega de la tarjeta de crédito, caso contrario, no podrá hacer uso de la Tarjeta.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field inline field-button">
+                    <button id="sendButton" type="button" class="button bg-red buttonQ154" th:text="#{button.next}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#btnHome').click(function() {
+            $('input:radio[name="addressToSend"]').filter('[value="H"]').prop('checked', true);
+        });
+
+        $('#btnWorkplace').click(function() {
+            $('input:radio[name="addressToSend"]').filter('[value="J"]').prop('checked', true);
+        });
+
+        $('#btnDeposit').click(function() {
+            $('input:radio[name="deposit"]').filter('[value=true]').prop('checked', true);
+            $("#bankAccountCci").prop('disabled', false);
+            $('#bankAccountCci').val("").removeClass("disabled");
+            $("#bankId").prop('disabled', false);
+        });
+
+        $('#btnNotDeposit').click(function() {
+            $('input:radio[name="deposit"]').filter('[value=false]').prop('checked', true);
+            $('#bankAccountCci').val("").addClass("disabled");
+            $("#bankAccountCci").prop('disabled', true);
+            $('#bankId').val("").change();
+            $("#bankId").prop('disabled', true);
+        });
+
+        questionFw.initializeFormInputs();
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').on('click', function(){
+            sendForm();
+        });
+
+        function sendForm(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(),
+                        {
+
+                        })
+                }, "");
+            }
+        }
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

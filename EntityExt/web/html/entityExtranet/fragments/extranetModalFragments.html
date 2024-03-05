@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modalCreditActions">
+    <!-- Modals -->
+    <div id="setCreditObservationModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmSetCreditObservationModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="creditObservationReason">Razón de
+                                        observación</label>
+                                    <select class="form-control" name="creditObservationReason"
+                                            id="creditObservationReason"></select>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeCreditObservationReasonButton" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="creditObservationReasonButton" type="button" class="btn btn-danger">Observar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="registerCreditRejectionModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterCreditRejectionModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="creditRejectionReason">Razón de rechazo</label>
+                                    <select class="form-control" name="creditRejectionReason" id="creditRejectionReason"></select>
+                                    <label class="control-label" for="creditRejectionComment">Comentarios</label>
+                                    <textarea class="form-control" name="creditRejectionComment" id="creditRejectionComment" maxlength="200"></textarea>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="registerCreditRejectionButton" type="button" class="btn btn-danger">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerCreditUploadModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterCreditUploadModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12" th:if="${@entityExtranetService.shouldRegisterEntityApplicationCode()}">
+                                <div class="form-group">
+                                    <label class="control-label">Código de Solicitud</label>
+                                    <input type="text" class="form-control" name="loanUploadReferenceNumber" id="loanUploadReferenceNumber" />
+                                    <label for="loan_complete_info" class="custom-check">
+                                        <span class="check-inner"><i class="icon icon-check"></i></span>
+                                        <span class="check-label">Omitir</span>
+                                        <input type="checkbox" class="real-check" id="loan_complete_info"/>
+                                    </label>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        $('#loan_complete_info').click(function () {
+                                            if (this.checked) {
+                                                $('#loanUploadReferenceNumber').val('');
+                                                $('#loanUploadReferenceNumber').prop('disabled', true);
+                                                $('#loan_complete_info').prop('checked', true);
+                                                $('#loan_complete_info').checked();
+                                            }else{
+                                                $('#loanUploadReferenceNumber').prop('disabled', false);
+                                                $('#loan_complete_info').prop('checked', false);
+                                                $('#loan_complete_info').checked();
+                                            }
+                                        });
+                                        /*]]>*/
+                                    </script>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Código de Crédito</label>
+                                    <input type="text" class="form-control" name="creditUploadReferenceNumber" id="creditUploadReferenceNumber" />
+                                    <label for="complete_info" class="custom-check">
+                                        <span class="check-inner"><i class="icon icon-check"></i></span>
+                                        <span class="check-label">Omitir</span>
+                                        <input type="checkbox" class="real-check" id="complete_info"/>
+                                    </label>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        $('#complete_info').click(function () {
+                                            if (this.checked) {
+                                                $('#creditUploadReferenceNumber').val('');
+                                                $('#creditUploadReferenceNumber').prop('disabled', true);
+                                                $('#complete_info').prop('checked', true);
+                                                $('#complete_info').checked();
+                                            }else{
+                                                $('#creditUploadReferenceNumber').prop('disabled', false);
+                                                $('#complete_info').prop('checked', false);
+                                                $('#complete_info').checked();
+                                            }
+                                        });
+                                        /*]]>*/
+                                    </script>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="registerCreditUploadModalButton" type="button" class="btn btn-danger">Cargar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerCreditDisbursementModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Activar</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <form id="frmRegisterCreditDisbursementModal" method="post" class="modal-body">
+                    <div class="col-md-6 field">
+                        <label >Fecha de Desembolso</label>
+                        <input type="text" class="form-control" name="disbursementDate" id="disbursementDate" />
+                        <div class="errorContainer">
+                            <span class="help-block form-field-error-message"></span>
+                        </div>
+                        <div id="datetimepicker12"></div>
+                    </div>
+                    <div class="col-md-6 field">
+                        <label>Monto</label>
+                        <input id="amount" name="amount" type="text" class="form-control" />
+                        <div class="errorContainer">
+                            <span class="help-block form-field-error-message"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 field">
+                        <label>Plazo</label>
+                        <input id="installments" name="installments" type="text" class="form-control" />
+                        <div class="errorContainer">
+                            <span class="help-block form-field-error-message"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 field">
+                        <label>Tasa</label>
+                        <input id="tea" name="tea" type="text" class="form-control" />
+                        <div class="errorContainer">
+                            <span class="help-block form-field-error-message"></span>
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="registerCreditDisbursementModalButton" type="button" class="btn btn-danger">Activar</button>
+                </div>
+            </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                function showCalendar(){
+                    if($('#registerCreditDisbursementModal').data("minDate")){
+                        year = $('#registerCreditDisbursementModal').data("minDate")[0];
+                        month = $('#registerCreditDisbursementModal').data("minDate")[1];
+                        day = $('#registerCreditDisbursementModal').data("minDate")[2];
+                    }
+                    var jsonDatePicker = {
+                        format:'DD/MM/YYYY',
+                        inline: false,
+                        sideBySide: true,
+                        maxDate: new Date(),
+                        minDate: new Date(year,month,day)
+                    };
+                    $('#disbursementDate').datetimepicker(jsonDatePicker);
+                    $('#datetimepicker12').on('dp.change', function(event) {
+                        var formatted_date = event.date.format("DD/MM/YYYY");
+                        $('#disbursementDate').val(formatted_date);
+                        $('#form_date .offer-title h2').text('Haz seleccionado');
+                        if(event.date){console.log('Date chosen: ' + event.date.format() );}
+                    });
+
+
+                    var $table = $('#tableResults');
+                    // dataTable($table, true, false, true, true);
+                }
+                /*]]>*/
+            </script>
+            <script th:inline="javascript" th:if="${registerDisbursementForm != null}">
+                /*<![CDATA[*/
+                var validator = /*[[${registerDisbursementForm.validator.toJson(#locale)}]]*/null;
+                if (validator != null) {
+                    var jsonValidator = JSON.parse(validator);
+                    $('#frmRegisterCreditDisbursementModal').validateForm(createFormValidationJson(jsonValidator, $('#frmRegisterCreditDisbursementModal')));
+                }
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+
+    <div id="registerGeneratedCreditRejectionModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterGeneratedCreditRejectionModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="creditGeneratedRejectionReason">Razón de rechazo</label>
+                                    <select class="form-control" name="creditGeneratedRejectionReason" id="creditGeneratedRejectionReason"></select>
+                                    <select class="form-control" name="creditGeneratedRejectionReason" id="creditDisbursementRejectionReason"></select>
+                                    <label class="control-label" for="creditGeneratedRejectionComment">Comentarios</label>
+                                    <textarea class="form-control" name="creditGeneratedRejectionComment" id="creditGeneratedRejectionComment" maxlength="200"></textarea>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button id="registerGeneratedCreditRejectionButton" type="button" class="btn btn-danger">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block shiro:hasPermission="credit:generated:uploadRipleyFinalSchedule">
+        <div id="uploadFinalShceduleModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function openUploadFinalScheduleModal(creditId) {
+                var url = /*[[ @{/uploadRipleyFinalSchedule} ]]*/;
+                $('#uploadFinalShceduleModal').find('.modal-body').html('');
+                $('#uploadFinalShceduleModal').find('.modal-body').append("<div id=\"uploadFile\" class=\"dropzone\"></div>")
+                var dropzone = $("#uploadFile").dropzone({
+                    url: url,
+                    params: {
+                        creditId: creditId
+                    },
+                    paramName: 'file',
+                    maxFilesize: 10, // MB
+                    maxFiles: 1, //HU1
+                    dictDefaultMessage: 'Arrastra el archivo aquí para subirlo, o haz click para seleccionar uno.',
+                    acceptedFiles: 'image/*,application/pdf',
+                    headers: addCsrfToJsonHeaders({
+                        'x-request-sender-type': 'ajax'
+                    }),
+                    init: function () {
+                        this.on("success", function () {
+                            location.reload();
+                        });
+                        this.on('error', function (file, response) {
+                            this.removeFile(file);
+                            if (response.constructor == Object) {
+                                if (response.type == "message")
+                                    showErrorModal(response.message);
+                            } else {
+                                if (response != null && response != '')
+                                    showErrorModal(response);
+                                else
+                                    showErrorModal('Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.');
+                            }
+                        });
+                    }
+                });
+                $('#uploadFinalShceduleModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+
+    <th:block shiro:hasPermission="credit:generated:deleteRipleyFinalSchedule">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function removeFinalSchedule(creditId, button){
+                var self = $(button);
+                self.loading();
+                defaultAjax({
+                    url: /*[[ @{/removeRipleyFinalSchedule} ]]*/,
+                    type: 'POST',
+                    data:{
+                        creditId: self.data('id')
+                    },
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function(){
+                        self.unloading();
+                    }
+                });
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+
+    <th:block th:if="${showAccesoScheduleAppointmentModal}">
+        <div id="registerScheduleAppointmentModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal">Seleccionar horario para agendar cita con el Procurador</h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmRegisterScheduleAppointmentModal" method="post" class="modal-body">
+                            <div class="col-md-6 field">
+                                <label>Fecha</label>
+                                <div class='input-group' id='datetimepicker2'>
+                                    <input type='text' class="form-control" name="appointmentDate" id="appointmentDate"/>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                <div class="errorContainer">
+                                    <span class="help-block form-field-error-message"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 field">
+                                <label>Horario</label>
+                                <select name="appointmentScheduleId" id="appointmentScheduleId" data-placeholder="Horario">
+                                    <option value="" disabled="true">Horario</option>
+                                </select>
+                                <div class="errorContainer">
+                                    <span class="help-block form-field-error-message"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 field">
+                                <label>Lugar</label>
+                                <textarea id="appointmentPlace" name="appointmentPlace" rows="2" cols="30" class="form-control"></textarea>
+                                <div class="errorContainer">
+                                    <span class="help-block form-field-error-message"></span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button id="registerScheduleAppointmentButton" type="button" class="btn btn-danger">Agendar cita</button>
+                    </div>
+                </div>
+            </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                $(function () {
+                    var hour = $('#appointmentScheduleId');
+                    hour.select2();
+
+                    var scheduleJson = JSON.parse(/*[[${jsonSchedulesMap}]]*/);
+                    function renderHours(date) {
+                        var options = "<option value=''>Horario</option>";
+                        try {
+                            for (i = 0; i < scheduleJson[date].length; i++) {
+                                options += '<option value="' + scheduleJson[date][i].appointmentScheduleId + '">' + scheduleJson[date][i].appointmentSchedule + '</option>';
+                            }
+                            hour.html(options);
+                        } catch (e) {
+                            hour.html(options);
+                        }
+                    }
+
+                    $('input[name=appointmentDate]').on('blur', function (e) {
+                        renderHours($(this).val());
+                        $('#appointmentScheduleId').select2('open');
+                    });
+
+                    $(function () {
+                        $('#datetimepicker2').datetimepicker({
+                            format: 'DD/MM/YYYY',
+                            minDate: moment(Object.keys(scheduleJson)[0], ["DD/MM/YYYY"]).toDate(),
+                            enabledDates: /*[[${availableDates}]]*/
+                        });
+                    });
+
+                    $('document').ready(function () {
+                        renderHours($('input[name=appointmentDate]').val());
+                        $('#appointmentScheduleId').select2('open');
+                        console.log($('input[name=appointmentDate]').val());
+                    });
+                });
+
+                function showScheduleAppointmentModal(creditId){
+                    $('#registerScheduleAppointmentModal').modal();
+                    $('#registerScheduleAppointmentModal .loading').hide();
+                    $('#registerScheduleAppointmentModal .content').show();
+                    $('#registerScheduleAppointmentModal #registerScheduleAppointmentButton').data('id', creditId);
+                    $('#registerScheduleAppointmentModal #registerScheduleAppointmentButton').click(function () {
+                        scheduleAppointment($(this).data('id'));
+                    });
+                }
+
+                $('#registerScheduleAppointmentModal').on('hidden.bs.modal', function (e) {
+                    //RESET LIST OF HOURS
+                    $('#appointmentScheduleId').html("<option value=''>Horario</option>");
+                });
+
+                function scheduleAppointment(creditId) {
+                    console.log(creditId);
+                    var form = $('#frmRegisterScheduleAppointmentModal').serializeObject();
+
+                    if(Object.keys(form).length && form.appointmentDate && form.appointmentPlace && form.appointmentPlace !== '' && form.appointmentScheduleId && form.appointmentScheduleId !== '') {
+                        swal({
+                                title: "¿Está seguro de agendar la cita para la fecha y lugar indicados?",
+                                type: "warning",
+                                html: true,
+                                showCancelButton: true,
+                                confirmButtonColor: "#36c6d3",
+                                confirmButtonText: "¡Sí, seguro!",
+                                cancelButtonText: "Cancelar"
+                            },
+                            function (proceed) {
+                                if(proceed){
+                                    $('#registerScheduleAppointmentButton').loading('', 2);
+                                    defaultAjax({
+                                        url: /*[[@{/updateStatus/appointment}]]*/null,
+                                        type: 'POST',
+                                        data: $.extend($('#frmRegisterScheduleAppointmentModal').serializeObject(), {
+                                            creditId: creditId
+                                        }),
+                                        success: function (data) {
+                                            location.reload();
+                                        },
+                                        error: function (data) {
+                                            $('#registerScheduleAppointmentButton').unloading();
+                                        }
+                                    });
+                                }
+                            });
+                    } else {
+                        if($('input[name=appointmentDate]').val() == '') {
+                            $('#appointmentDate').parent().next().children().html("<span>Seleccione la fecha.</span>");
+                        } else {
+                            $('#appointmentDate').parent().next().children().html("");
+                        }
+                        if($('#appointmentScheduleId').val() == '') {
+                            $('#appointmentScheduleId').parent().find('.errorContainer').children().html("<span>Seleccione el horario.</span>");
+                        } else {
+                            $('#appointmentScheduleId').parent().find('.errorContainer').children().html("");
+                        }
+                        if($('#appointmentPlace').val() == '') {
+                            $('#appointmentPlace').next().children().html("<span>Ingrese el lugar.</span>");
+                        } else {
+                            $('#appointmentPlace').next().children().html("");
+                        }
+                    }
+                }
+                /*]]>*/
+            </script>
+        </div>
+    </th:block>
+
+    <th:block th:if="${showFinalDocumentationModal}">
+        <div id="uploadFinalDocumentationModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal">Subir Documentaci&oacute;n Final</h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <p>Debes subir un archivo comprimido que contenga toda la documentaci&oacute;n final. Solo podr&aacute;s hacer este proceso una vez.</p>
+                        <br/>
+                        <div class="uploader-container"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function showUploadFinalDocumentationModal(creditId) {
+                var url = /*[[ @{/uploadFinalDocumentation} ]]*/;
+                $('#uploadFinalDocumentationModal').find('.uploader-container').html('');
+                $('#uploadFinalDocumentationModal').find('.uploader-container').append("<div id=\"uploadFile\" class=\"dropzone\"></div>")
+                var dropzone = $("#uploadFile").dropzone({
+                    url: url,
+                    params: {
+                        creditId: creditId
+                    },
+                    paramName: 'file',
+                    maxFilesize: 10, // MB
+                    maxFiles: 1, //HU1
+                    dictDefaultMessage: 'Arrastra el archivo aquí para subirlo, o haz click para seleccionar uno.',
+                    //acceptedFiles: 'image/*,application/pdf',
+                    autoProcessQueue:false,
+                    headers: addCsrfToJsonHeaders({
+                        'x-request-sender-type': 'ajax'
+                    }),
+                    init: function () {
+                        this.on("addedfile", function (file) {
+                            var dZone = Dropzone.forElement("#uploadFile");
+                            if(true || dZone.options.acceptedFiles.search(file.type) > -1) {
+                                swal({
+                                        title: "¿Estás seguro que es la documentación final del crédito?",
+                                        text: "No la podrás volver a subir",
+                                        type: "warning",
+                                        html: true,
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#36c6d3",
+                                        confirmButtonText: "Si, seguro", cancelButtonText: "Cancelar",
+                                        closeOnConfirm: true
+                                    },
+                                    function(agree) {
+                                        if(!agree) {
+                                            dZone.removeFile(file);
+                                        } else {
+                                            dZone.processQueue();
+                                        }
+                                    });
+                            }
+                        });
+                        this.on("success", function () {
+                            location.reload();
+                        });
+                        this.on('error', function (file, response) {
+                            this.removeFile(file);
+                            if (response.constructor == Object) {
+                                if (response.type == "message")
+                                    showErrorModal(response.message);
+                            } else {
+                                if (response != null && response != '')
+                                    showErrorModal(response);
+                                else
+                                    showErrorModal('Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.');
+                            }
+                        });
+                    }
+                });
+                $('#uploadFinalDocumentationModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+
+    <th:block th:if="${showAeluInternalDisbursementModal}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function askInternalDisbursement(creditId) {
+                swal({
+                        title: "&iquest;Est&aacute;s seguro de registrar el desembolso interno?",
+                        text: "No podr&aacute;s revertir el cambio.",
+                        type: "warning",
+                        html: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#36c6d3",
+                        confirmButtonText: "¡Si, registrar!",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        defaultAjax({
+                            url: /*[[@{/registerCreditInternalDisbursement}]]*/null,
+                            type: 'POST',
+                            data: {
+                                creditId: creditId
+                            },
+                            success: function (data) {
+                                swal("Registrado", "El desembolso interno se ha registrado correctamente.", "success");
+                                window.location.reload();
+                            }
+                        })
+                    });
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="modalCreditActionsScripts">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function updateInternalStatus(selectElement){
+            defaultAjax({
+                url: /*[[@{/updateInternalStatus}]]*/null,
+                type: 'POST',
+                data: {
+                    creditId: $(selectElement).data('credit-id'),
+                    internalStatus: $(selectElement).val()
+                },
+                success: function (data) {
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+
+        function validateCredit(creditId, button) {
+            var btn = $(button);
+            btn.loading('', 2);
+            defaultAjax({
+                url: /*[[@{/updateStatus/__${page}__}]]*/null,
+                type: 'POST',
+                data: {
+                    creditId: creditId
+                },
+                success: function (data) {
+                    resetTimer();
+                    // $('#tableResults > tbody').html(data);
+                    //
+                    // var $table = $('.table');
+                    // dataTable($table, true, false, true, true);
+                    let requestData = $('#form-termitated-list').serializeObject();
+                    resetCustomTable($("#tableResults"));
+                },
+                error: function (data) {
+                    console.log('entro');
+                    $('#validateCredit').unloading();
+                }
+            });
+        }
+
+        $('.waitingCredit').on('click', function(event) {
+            event.preventDefault();
+            var creditId = $(this).data('id');
+            var btn = $(this);
+            btn.loading('', 2);
+            defaultAjax({
+                url: /*[[@{/updateStatus/__${page}__}]]*/null,
+                type: 'POST',
+                data: {
+                    creditId: creditId
+                },
+                success: function (data) {
+                    resetTimer();
+                    // $('#tableResults > tbody').html(data);
+                    //
+                    // var $table = $('.table');
+                    // dataTable($table, true, false, true, true);
+                    let requestData = $('#form-termitated-list').serializeObject();
+                    resetCustomTable($("#tableResults"))
+                }
+            });
+        });
+
+        $('.generateCredit').on('click', function(event) {
+            event.preventDefault();
+            var creditId = $(this).data('id');
+            var btn = $(this);
+            btn.loading('', 2);
+            defaultAjax({
+                url: /*[[@{/updateStatus/__${page}__}]]*/null,
+                type: 'POST',
+                data: {
+                    creditId: creditId
+                },
+                success: function (data) {
+                    resetTimer();
+                    // $('#tableResults > tbody').html(data);
+                    //
+                    // var $table = $('.table');
+                    // dataTable($table, true, false, true, true);
+                    let requestData = $('#form-termitated-list').serializeObject();
+                    resetCustomTable($("#tableResults"))
+                }
+            });
+        });
+
+
+        function showCreditObservationsModal(creditId) {
+
+            $('#setCreditObservationModal').modal();
+            $('#setCreditObservationModal .loading').hide();
+            $('#setCreditObservationModal .content').show();
+            $('#setCreditObservationModal').find('option').remove();
+            defaultAjax({
+                url: /*[[@{/observationReasons}]]*/null,
+                type: 'GET',
+                data: {
+                    creditId: creditId
+                },
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var len = arr.length;
+                    if(len==0){
+                        $('#creditObservationReason').append($('<option>', {
+                            value: -1,
+                            text: 'No se encontraron motivos de observación'
+                        }));
+
+                        $('#creditObservationReasonButton').disableButton();
+                    }else{
+                        $('#creditObservationReasonButton').enableButton();
+                    }
+                    for (var i = 0; i < len; i++) {
+                        $('#creditObservationReason').append($('<option>', {
+                            value: arr[i].id,
+                            text: arr[i].reason
+                        }));
+                    }
+                }
+            });
+            $('#creditObservationReasonButton').click(function () {
+                promptObserveCredit(creditId, $('#creditObservationReason').val());
+            });
+        }
+        function promptObserveCredit(creditId, observationReasonId){
+
+            swal({
+                    title: "&iquest;Est&aacute;s seguro de observar el cr&eacute;dito?",
+                    text: "No podr&aacute;s revertir el cambio.",
+                    html: true,
+                    showCancelButton: true,
+                    confirmButtonColor: "#36c6d3",
+                    confirmButtonText: "¡Si, Observar!",
+                    closeOnConfirm: true
+                },
+                function () {
+                    defaultAjax({
+                        url: /*[[@{/observationReason/}]]*/null,
+                        type: 'POST',
+                        data: {
+                            creditId: creditId,
+                            observationReasonId: observationReasonId
+                        },
+                        success: function (data) {
+                            swal("Observado", "El crédito ha sido observado correctamente.", "success");
+                            $('#setCreditObservationModal').modal('toggle');
+                            resetTimer();
+                            // $('#tableResults > tbody').html(data);
+                            // var $table = $('.table');
+                            // dataTable($table, true, false, true, true);
+                            let requestData = $('#form-termitated-list').serializeObject();
+                            resetCustomTable($("#tableResults"))
+                        }
+                    })
+                });
+        }
+
+        function showRegisterCreditRejectionModal(creditId) {
+            $('#registerCreditRejectionModal').modal();
+            $('#registerCreditRejectionModal .loading').hide();
+            $('#registerCreditRejectionModal .content').show();
+            $('#creditRejectionReason').find('option').remove();
+            defaultAjax({
+                url: /*[[@{/rejectionReasons}]]*/null,
+                type: 'GET',
+                data: {
+                    creditId: creditId,
+                    rejectionReasonlistTypeId:/*[[${T(com.affirm.common.model.catalog.CreditRejectionReason).ONLY_VERIFICATION_LIST_TYPE}]]*/null
+                },
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var len = arr.length;
+                    if(len==0){
+                        $('#creditRejectionReason').append($('<option>', {
+                            value: -1,
+                            text: 'No se encontraron motivos de rechazo'
+                        }));
+
+                        $('#registerCreditRejectionButton').disableButton();
+                    }else{
+                        $('#registerCreditRejectionButton').enableButton();
+                    }
+                    for (var i = 0; i < len; i++) {
+                        $('#creditRejectionReason').append($('<option>', {
+                            value: arr[i].id,
+                            text: arr[i].reason
+                        }));
+                    }
+                }
+            });
+            $('#registerCreditRejectionButton').click(function () {
+                askRejectCredit(creditId, $('#creditRejectionReason').val(), $('#creditRejectionComment').val());
+            });
+        }
+
+        function askRejectCredit(creditId, creditRejectionReason, creditRejectionComment) {
+            swal({
+                    title: "&iquest;Est&aacute;s seguro de rechazar el cr&eacute;dito?",
+                    text: "No podr&aacute;s revertir el cambio.",
+                    type: "warning",
+                    html: true,
+                    showCancelButton: true,
+                    confirmButtonColor: "#36c6d3",
+                    confirmButtonText: "¡Si, Rechazar!",
+                    closeOnConfirm: true
+                },
+                function () {
+                    defaultAjax({
+                        url: /*[[@{/rejectCredit/__${page}__}]]*/null,
+                        type: 'POST',
+                        data: {
+                            creditId: creditId,
+                            creditRejectionReasonId: creditRejectionReason,
+                            creditRejectionReasonComment: creditRejectionComment,
+                        },
+                        success: function (data) {
+                            resetTimer();
+                            // $('#tableResults > tbody').html(data);
+                            swal("Eliminada", "El crédito ha sido eliminado correctamente.", "success");
+                            $('#registerCreditRejectionModal').modal('toggle');
+                            $('#creditRejectionComment').val(null);
+
+                            // var $table = $('.table');
+                            // dataTable($table, true, false, true, true);
+                            let requestData = $('#form-termitated-list').serializeObject();
+                            resetCustomTable($("#tableResults"))
+                        }
+                    })
+                });
+        }
+
+        function showRegisterGeneratedCreditRejectionModal(creditId) {
+            $('#registerGeneratedCreditRejectionModal').modal();
+            $('#registerGeneratedCreditRejectionModal .loading').hide();
+            $('#registerGeneratedCreditRejectionModal .content').show();
+
+            $('#creditGeneratedRejectionReason').show();
+            $('#creditDisbursementRejectionReason').hide();
+            $('#creditGeneratedRejectionReason').find('option').remove();
+
+            defaultAjax({
+                url: /*[[@{/rejectionReasons}]]*/null,
+                type: 'GET',
+                data: {
+                    creditId: creditId,
+                    rejectionReasonlistTypeId:/*[[${T(com.affirm.common.model.catalog.CreditRejectionReason).REGULAR_LIST_TYPE}]]*/null
+                },
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var len = arr.length;
+                    if(len==0){
+                        $('#creditGeneratedRejectionReason').append($('<option>', {
+                            value: -1,
+                            text: 'No se encontraron motivos de rechazo'
+                        }));
+
+                        $('#registerGeneratedCreditRejectionButton').disableButton();
+                    }else{
+                        $('#registerGeneratedCreditRejectionButton').enableButton();
+                    }
+                    for (var i = 0; i < len; i++) {
+                        $('#creditGeneratedRejectionReason').append($('<option>', {
+                            value: arr[i].id,
+                            text: arr[i].reason
+                        }));
+                    }
+                }
+            });
+            $('#registerGeneratedCreditRejectionButton').click(function () {
+                askGeneratedRejectCredit(creditId, $('#creditGeneratedRejectionReason').val(), $('#creditGeneratedRejectionComment').val());
+            });
+        }
+
+        function showRegisterDisbursementCreditRejectionModal(creditId) {
+            $('#registerGeneratedCreditRejectionModal').modal();
+            $('#registerGeneratedCreditRejectionModal .loading').hide();
+            $('#registerGeneratedCreditRejectionModal .content').show();
+
+            $('#creditGeneratedRejectionReason').hide();
+            $('#creditDisbursementRejectionReason').show();
+            $('#creditDisbursementRejectionReason').find('option').remove();
+
+            defaultAjax({
+                url: /*[[@{/rejectionReasons}]]*/null,
+                type: 'GET',
+                data: {
+                    creditId: creditId,
+                    rejectionReasonlistTypeId:/*[[${T(com.affirm.common.model.catalog.CreditRejectionReason).REGULAR_LIST_TYPE}]]*/null
+                },
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var len = arr.length;
+                    if(len==0){
+                        $('#creditDisbursementRejectionReason').append($('<option>', {
+                            value: -1,
+                            text: 'No se encontraron motivos de rechazo'
+                        }));
+
+                        $('#registerGeneratedCreditRejectionButton').disableButton();
+                    }else{
+                        $('#registerGeneratedCreditRejectionButton').enableButton();
+                    }
+                    for (var i = 0; i < len; i++) {
+                        $('#creditDisbursementRejectionReason').append($('<option>', {
+                            value: arr[i].id,
+                            text: arr[i].reason
+                        }));
+                    }
+                }
+            });
+            $('#registerGeneratedCreditRejectionButton').click(function () {
+                askGeneratedRejectCredit(creditId, $('#creditDisbursementRejectionReason').val(), $('#creditGeneratedRejectionComment').val());
+            });
+        }
+
+        function showRegisterGeneratedCreditUploadModal(creditId){
+            $('#registerCreditUploadModal').modal();
+            $('#registerCreditUploadModal .loading').hide();
+            $('#registerCreditUploadModal .content').show();
+            $('#registerCreditUploadModalButton').click(function () {
+                askGeneratedUploadCredit(creditId, $('#creditUploadReferenceNumber').val(), $('#loanUploadReferenceNumber').val());
+            });
+        }
+
+        var minDate;
+
+        function showRegisterGeneratedCreditDisbursementModal(creditId, amount, installmets, tea){
+            defaultAjax({
+                url: /*[[@{/getSignatureDate}]]*/null,
+                type: 'POST',
+                data: {
+                    creditId: creditId
+                },
+                success: function (data) {
+                    minDate = $.parseJSON(data);
+                    if(amount != null)
+                        $('#registerCreditDisbursementModal input[name=amount]').val(amount);
+                    if(installmets != null)
+                        $('#registerCreditDisbursementModal input[name=installments]').val(installmets);
+                    if(tea != null)
+                        $('#registerCreditDisbursementModal input[name=tea]').val(tea);
+
+                    $('#registerCreditDisbursementModal').data("minDate", minDate);
+                    showCalendar();
+                    $('#registerCreditDisbursementModal').modal();
+                    $('#registerCreditDisbursementModal .loading').hide();
+                    $('#registerCreditDisbursementModal .content').show();
+                    $('#registerCreditDisbursementModalButton').click(function () {
+                        askGeneratedDisbursementCredit(creditId);
+                    });
+                }
+            });
+        }
+
+        function askGeneratedUploadCredit(creditId, creditDisbursementReferenceNumber, loanDisbursementReferenceNumber) {
+            if ($('#creditUploadReferenceNumber').val().replace(/\s/g,"") == "" && !$('#complete_info').prop('checked')){
+                swal({
+                    title: "",
+                    text: "Se debe ingresar el número de referencia",
+                    type: "error",
+                    html: true,
+                    showCancelButton: false,
+                    confirmButtonColor: "#36c6d3",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: true
+                });
+            }else{
+                if ($('#loanUploadReferenceNumber').length && $('#loanUploadReferenceNumber').val().replace(/\s/g,"") == "" && !$('#loan_complete_info').prop('checked')){
+                    swal({
+                        title: "",
+                        text: "Se debe ingresar el número de referencia",
+                        type: "error",
+                        html: true,
+                        showCancelButton: false,
+                        confirmButtonColor: "#36c6d3",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: true
+                    });
+                }else{
+                    swal({
+                            title: "&iquest;Est&aacute;s seguro de cargar el cr&eacute;dito?",
+                            text: "No podr&aacute;s revertir el cambio.",
+                            type: "warning",
+                            html: true,
+                            showCancelButton: true,
+                            confirmButtonColor: "#36c6d3",
+                            confirmButtonText: "¡Si, Cargar!",
+                            closeOnConfirm: true
+                        },
+                        function () {
+                            $('#registerCreditUploadModalButton').loading('', 2);
+                            defaultAjax({
+                                url: /*[[@{/updateStatus/__${page}__}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    creditId: creditId,
+                                    creditDisbursementReferenceNumber: creditDisbursementReferenceNumber != null ? creditDisbursementReferenceNumber : '',
+                                    loanDisbursementReferenceNumber: loanDisbursementReferenceNumber != null ? loanDisbursementReferenceNumber : ''
+                                },
+                                success: function (data) {
+                                    resetTimer();
+                                    // $('#tableResults > tbody').html(data);
+                                    swal("Cargado", "El crédito ha sido cargado correctamente.", "success");
+                                    $('#registerCreditUploadModal').modal('toggle');
+
+
+                                    // var $table = $('.table');
+                                    // dataTable($table, true, false, true, true);
+                                    let requestData = $('#form-termitated-list').serializeObject();
+                                    resetCustomTable($("#tableResults"))
+                                },
+                                error: function(){
+                                    $('#registerCreditUploadModalButton').unloading();
+                                }
+                            })
+                        });
+                }
+            }
+        }
+
+        function askGeneratedDisbursementCredit(creditId) {
+            if($('#frmRegisterCreditDisbursementModal').valid()){
+                swal({
+                        title: "&iquest;Est&aacute;s seguro de activar el cr&eacute;dito generado?",
+                        text: "No podr&aacute;s revertir el cambio.",
+                        type: "warning",
+                        html: true,
+                        showCancelButton: true,
+                        confirmButtonColor: "#36c6d3",
+                        cancelButtonText: "Cancelar",
+                        confirmButtonText: "¡Si, Activar!",
+                        closeOnConfirm: true
+                    },
+                    function () {
+                        if($('#frmRegisterCreditDisbursementModal').valid()){
+                            $('#registerCreditDisbursementModalButton').loading('', 2);
+                            defaultAjax({
+                                url: /*[[@{/updateStatus/__${page}__}]]*/null,
+                                type: 'POST',
+                                data: $.extend($('#frmRegisterCreditDisbursementModal').serializeObject(), {
+                                    creditId: creditId,
+                                }),
+                                success: function (data) {
+                                    resetTimer();
+                                    // $('#tableResults > tbody').html(data);
+                                    let requestData = $('#form-termitated-list').serializeObject();
+                                    resetCustomTable($("#tableResults"))
+                                    swal("Activado", "El crédito ha sido desembolsado correctamente.", "success");
+                                    $('#registerCreditDisbursementModal').modal('toggle');
+                                    $('#registerCreditDisbursementModalButton').unloading();
+                                    resetCustomTable($("#tableResultEvaluation"));
+                                },
+                                error: function (data) {
+                                    $('#registerCreditDisbursementModalButton').unloading();
+                                }
+                            })
+                        }
+                    });
+            }
+        }
+
+        function approveBankAccountSaving(creditId) {
+
+            swal({
+                    title: "&iquest;Est&aacute;s seguro de activar la solicitud?",
+                    text: "No podr&aacute;s revertir el cambio.",
+                    type: "warning",
+                    html: true,
+                    showCancelButton: true,
+                    confirmButtonColor: "#36c6d3",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonText: "¡Si, Activar!",
+                    closeOnConfirm: true
+                },
+                function () {
+                    defaultAjax({
+                        url: /*[[@{/updateStatus/bank_account_saving}]]*/null,
+                        type: 'POST',
+                        data: $.extend($('#frmRegisterCreditDisbursementModal').serializeObject(), {
+                            creditId: creditId,
+                        }),
+                        success: function (data) {
+                            resetTimer();
+                            // $('#tableResults > tbody').html(data);
+                            swal("Activado", "La solicitud ha sido activada satisfacoriamente", "success");
+                            resetCustomTable($("#tableResultEvaluation"));
+                        },
+                        error: function (data) {
+
+                        }
+                    })
+                });
+        }
+
+        function askGeneratedRejectCredit(creditId, creditRejectionReason, creditRejectionComment) {
+            swal({
+                    title: "&iquest;Est&aacute;s seguro de rechazar el cr&eacute;dito generado?",
+                    text: "No podr&aacute;s revertir el cambio.",
+                    type: "warning",
+                    html: true,
+                    showCancelButton: true,
+                    confirmButtonColor: "#36c6d3",
+                    confirmButtonText: "¡Si, Rechazar!",
+                    cancelButtonText: "Cancelar",
+                    closeOnConfirm: true
+                },
+                function () {
+                    defaultAjax({
+                        url: /*[[@{/rejectCredit/__${page}__}]]*/null,
+                        type: 'POST',
+                        data: {
+                            creditId: creditId,
+                            page : /*[[${page}]]*/null,
+                            creditRejectionReasonId: creditRejectionReason,
+                            creditRejectionReasonComment: creditRejectionComment
+                        },
+                        success: function (data) {
+                            resetTimer();
+                            // $('#tableResults > tbody').html(data);
+                            swal("Eliminada", "El crédito ha sido eliminado correctamente.", "success");
+                            $('#registerGeneratedCreditRejectionModal').modal('toggle');
+                            $('#creditGeneratedRejectionComment').val(null);
+
+                            // var $table = $('.table');
+                            // dataTable($table, true, false, true, true);
+                            let requestData = $('#form-termitated-list').serializeObject();
+                        }
+                    })
+                });
+        }
+
+        let totalCredits = /*[[${totalCredits}]]*/null;
+        if(typeof excludeSetTotals === 'undefined') var excludeSetTotals = null;
+        if(totalCredits != null && !excludeSetTotals){
+            $('#totalCredits').text('Total de Créditos : ' + totalCredits);
+            $('#sumCredits').text('Total de Desembolsos : ' + /*[[${@utilService.doubleMoneyFormat(sumCredits, currency)}]]*/null);
+        }
+
+        function expireLoanApplication(event, loanId) {
+            var btnRef = $(event);
+
+            swal({
+                    title: "",
+                    text: "¿Está seguro que desea expirar la solicitud?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "¡Sí, expirar!",
+                    cancelButtonText: "Cancelar",
+                    closeOnConfirm: false,
+                    html: true
+                },
+                function (expire) {
+                    swal.close();
+
+                    if (expire) {
+                        btnRef.loading();
+                        defaultAjax({
+                            url: /*[[@{/loanApplication/__${page}__/expire}]]*/null,
+                            type: 'POST',
+                            data: {
+                                loanId: loanId
+                            },
+                            success: function (data) {
+                                resetTimer();
+                                // $('#tableResults').DataTable().destroy();
+                                // $('#tableResults > tbody').html(data);
+                                // var $table = $('.table');
+                                // dataTable($table, true, false, true, true);
+                                let requestData = $('#form-termitated-list').serializeObject();
+                                resetCustomTable($("#tableResults"))
+                                swal("Expirada", "La solicitud fue expirada.", "success");
+                            },
+                            complete: function () {
+                                btnRef.unloading();
+                            }
+                        });
+                    }
+
+                });
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+</html>

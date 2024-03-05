@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)">
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/select2.4/js/select2.full.min.js'}"></script>
+
+    <style>
+        .section-content {
+            align-items: start;
+        }
+
+        .section-content .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 400px;
+        }
+
+        #createUser .form-body .form-group {
+            padding: 0px;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <div class="clearfix"></div>
+</th:block>
+
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='users')"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <th:block th:replace="fragments/headers :: entityContentHeader(title='Edición de usuario')"></th:block>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold" style="text-transform: capitalize;">Administración de usuarios</span>
+                            </div>
+                            <div class="actions" th:if="${user?.id != null}">
+                                <div class="btn-group">
+                                    <a class="btn green btn-circle principal-button-action" href="javascript:;" data-toggle="dropdown"
+                                       aria-expanded="true">
+                                        <i class="fa fa-cog"></i> Acciones
+                                        <i class="fa fa-angle-down"></i>
+                                    </a>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li shiro:hasPermission="user:management:resendPassword">
+                                            <a href="#" class="resetPassword">
+                                                <i class="fa fa-lock"></i> Establecer contraseña
+                                            </a>
+                                        </li>
+                                        <li shiro:hasPermission="user:management:activate">
+                                            <a href="#" class="toggleStatus" th:attr="data-active=${user?.active}">
+                                                <i class="fa"
+                                                   th:classappend="${user?.active ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
+                                                <span
+                                                        th:text="${user?.active ? 'Desactivar' : 'Activar'}"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="portlet-body" class="portlet-body form">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <form id="createUser" th:object="${form}" role="form" autocomplete="off">
+                                        <input th:field="*{id}" type="hidden"/>
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label>Nombre</label>
+                                                <input th:field="*{name}"
+                                                       class="form-control" placeholder="Nombre"/>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Apellidos</label>
+                                                <input th:field="*{firstSurname}"
+                                                       class="form-control" placeholder="Apellidos"/>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Email</label>
+                                                <input th:field="*{email}"
+                                                       class="form-control" placeholder="Email"/>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Id de usuario en la entidad</label>
+                                                <input th:field="*{idInEntity}"
+                                                       class="form-control" placeholder="Id usuario"/>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Rol</label>
+                                                <select th:field="*{roleId}" class="form-control">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="entityUsertype : ${entityUserTypes}"
+                                                            th:value="${entityUsertype.id}"
+                                                            th:text="${entityUsertype.entityUserType}"
+                                                            th:selected="${entityUsertype.id == form?.roleId}"></option>
+                                                </select>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                            <th:block
+                                                    th:if="${@entityExtranetService.getPrincipalEntity().id == T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}">
+                                                <div id="channelBdsContainer" class="form-group" style="display: none">
+                                                    <label>Canal</label>
+                                                    <select th:field="*{channelId}" class="form-control">
+                                                        <option value="" hidden="hidden"></option>
+                                                        <option th:each="channel : ${@catalogService.getEntityAcquisitionChannelsByEntity(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}"
+                                                                th:value="${channel.entityAcquisitionChannelId}"
+                                                                th:text="${channel.entityAcquisitionChannel.toUpperCase()}"
+                                                                th:selected="${channel.entityAcquisitionChannelId == form?.channelId}">
+                                                        </option>
+                                                    </select>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                                <div id="organizerBdsContainer" class="form-group"
+                                                     style="display: none">
+                                                    <label>Organizador</label>
+                                                    <select th:field="*{organizerId}" class="form-control">
+                                                        <option value="" hidden="hidden"></option>
+<!--                                                        <option th:each="organizer : ${organizers}"-->
+<!--                                                                th:value="${organizer.id}"-->
+<!--                                                                th:text="${(organizer.entityUserIdFromEntity != null ? organizer.entityUserIdFromEntity : 'N/A') + ' - ' + organizer.firstSurname + ' ' + organizer.name}"-->
+<!--                                                                th:selected="${organizer.id == form?.organizerId}">-->
+<!--                                                        </option>-->
+                                                    </select>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                                <div id="producerBdsContainer" class="form-group" style="display: none">
+                                                    <label>Productor</label>
+                                                    <select th:field="*{producerId}" class="form-control">
+                                                        <option value="" hidden="hidden"></option>
+<!--                                                        <option th:each="producer : ${producers}"-->
+<!--                                                                th:value="${producer.id}"-->
+<!--                                                                th:text="${(producer.entityUserIdFromEntity != null ? producer.entityUserIdFromEntity : 'N/A') + ' - ' + producer.firstSurname + ' ' + producer.name}"-->
+<!--                                                                th:selected="${producer.id == form?.producerId}">-->
+<!--                                                        </option>-->
+                                                    </select>
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                            </th:block>
+
+                                            <div class="form-actions">
+                                                <button type="button" class="addButton btn green principal-button-color"> Guardar
+                                                </button>
+                                                <a th:href="@{/users}" class="btn red"> Volver
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-4" th:if="${user?.id != null}">
+                                    <div class="form-group">
+                                        <div style="margin-top: -4px">
+                                            <label>Estado</label>
+                                            <h4>
+                                                <label id="classEstado" class="label"
+                                                       th:classappend="${user?.active ? 'label-success' : 'label-default'}">
+                                                    <span id="textEstado"
+                                                          th:text="${user?.active ? 'Activo' : 'Inactivo'}"></span>
+                                                </label>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#roleId, #organizerId, #producerId, #channelId').select2({
+            width: 100 + '%'
+        });
+
+        var form = $('#createUser');
+        form.validateForm(createFormValidationJson(JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/), form));
+
+        if (/*[[${user?.active}]]*/) {
+            $('.resetPassword').parent().show();
+        } else {
+            $('.resetPassword').parent().hide();
+        }
+
+        $('.addButton').click(function () {
+            if (!form.valid()) {
+                return;
+            }
+
+            swal({
+                title: '',
+                text: 'Recuerda que si estas cambiando de rol a un organizador o productor, sus usuarios se quedarán sin organizador o productor asociado.',
+                showCancelButton: true,
+                confirmButtonText: "Entendido",
+                cancelButtonText: "Cancelar",
+                type: 'info',
+            }, function (agree) {
+                if (agree) {
+                    var id = /*[[${form.id}]]*/;
+
+                    $('.addButton').loading();
+
+                    defaultAjax({
+                        url: /*[[@{/users/create}]]*/null,
+                        form: form,
+                        type: 'POST',
+                        data: $.extend(form.serializeObject(), {
+                            id: id
+                        }),
+                        success: function () {
+                            var message;
+                            if (id) {
+                                message = "Se actualizó el usuario";
+                            } else {
+                                message = "Se registró el usuario";
+                            }
+                            swal({title: "", text: message, type: "success"}, function (ok) {
+                                window.location = /*[[@{/users}]]*/;
+                            });
+                        },
+                        complete: function (data) {
+                            $('.addButton').unloading();
+                        }
+                    })
+                }
+            });
+        });
+
+        // C/P FROM extranetUserManagement
+        $('.toggleStatus').click(function () {
+            var active = $(this).data('active');
+            var btnSelected = $(this);
+            var email = /*[[${user?.email}]]*/null;
+
+            swal({
+                title: '',
+                text: '¿Estás seguro de querer ' + (active ? 'desactivar' : 'activar') + ' al usuario ' + email + '?',
+                showCancelButton: true,
+                confirmButtonText: "¡Sí, seguro!",
+                cancelButtonText: "Cancelar",
+                type: 'info',
+            }, function (agree) {
+                if (agree) {
+                    defaultAjax({
+                        url: /*[[@{/users/updateActiveUser}]]*/null,
+                        type: 'POST',
+                        data: {
+                            valueToUpdate: !active,
+                            entityUserId: form.find('#id').val()
+                        },
+                        success: function (data) {
+                            if (active) {
+                                swal({title: "", text: "Desactivación satisfactoria", type: "success"});
+                                btnSelected.find('span').text("Activar");
+                                $('.resetPassword').parent().hide();
+                                $('#classEstado').addClass('label-default').removeClass('label-success');
+                                $('#textEstado').text('Inactivo');
+                            } else {
+                                swal({title: "", text: "Activación satisfactoria", type: "success"});
+                                btnSelected.find('span').text("Desactivar");
+                                $('.resetPassword').parent().show();
+                                $('#classEstado').addClass('label-success').removeClass('label-default');
+                                $('#textEstado').text('Activo');
+                            }
+                            btnSelected.data('active', !active);
+                        },
+                        error: function () {
+                            swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                        }
+                    });
+                }
+            });
+        });
+
+        // C/P FROM extranetLogin.html
+        $('.resetPassword').click(function (e) {
+            e.preventDefault();
+            var emailToReset = /*[[${user?.email}]]*/null;
+
+            swal({
+                title: '',
+                text: '¿Estás seguro de querer establecer la contraseña para ' + emailToReset + '?',
+                showCancelButton: true,
+                confirmButtonText: "¡Sí, seguro!",
+                cancelButtonText: "Cancelar",
+                type: 'info',
+            }, function (agree) {
+                if (agree) {
+                    defaultAjax({
+                        url: /*[[@{/users/resendPassword}]]*/null,
+                        type: 'POST',
+                        data: {
+                            email: /*[[${user?.email}]]*/null
+                        },
+                        success: function (data) {
+                            swal("", "Las instrucciones para establecer tu contraseña han sido enviadas a " + emailToReset, "success");
+                        }
+                    });
+                }
+            });
+        });
+
+        /*]]>*/
+    </script>
+
+    <script th:if="${@entityExtranetService.getPrincipalEntity().id == T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}"
+            th:inline="javascript">
+        /*<![CDATA[*/
+        $('#roleId').change(function () {
+            var roleSelected = $('#roleId').val();
+
+            $('#organizerBdsContainer').hide();
+            $('#producerBdsContainer').hide();
+            $('#channelBdsContainer').hide();
+
+            $('#channelId').off('change', channelByRoleOrganizer);
+            $('#channelId').off('change', channelByRoleProducer);
+
+            if (roleSelected == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_USUARIO}]]) {
+                $('#producerBdsContainer').show();
+                $('#channelBdsContainer').show();
+
+                $('#channelId').on('change', channelByRoleProducer);
+            } else if (roleSelected == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_PRODUCTOR}]]) {
+                $('#organizerBdsContainer').show();
+                $('#channelBdsContainer').show();
+
+                $('#channelId').on('change', channelByRoleOrganizer);
+            } else if (roleSelected == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_ORGANIZADOR}]]) {
+                $('#channelBdsContainer').show();
+            }
+
+            $('#channelId').change();
+        });
+        $('#roleId').change();
+
+        function channelByRoleOrganizer(){
+            var channelId = $('#channelId').val();
+            var roleId = $('#roleId').val();
+            var entityUserId = form.find('#id').val();
+
+            if (channelId == null || channelId == '') {
+                return;
+            }
+
+            defaultAjax({
+                url: /*[[@{/users/roleByChannel}]]*/null,
+                data: {
+                    channelId,
+                    roleId,
+                    entityUserId,
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].id + '">' + (arr[i].entityUserIdFromEntity != null ? arr[i].entityUserIdFromEntity : 'N/A') + ' - ' + arr[i].firstSurname + ' ' + arr[i].name + '</option>';
+                    }
+                    $('#organizerBdsContainer').find('select').html(html);
+
+                    if (/*[[${user?.active}]]*/) {
+                        if (roleId == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_USUARIO}]]) {
+                            var producerId = /*[[${user?.hierarchyLevel2}]]*/;
+                            $('#organizerBdsContainer').find('select').find('option[value=' + producerId + ']').prop('selected', true);
+                            $('#organizerBdsContainer').find('select').trigger('change.select2');
+                        } else if (roleId == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_PRODUCTOR}]]) {
+                            var organizerId = /*[[${user?.hierarchyLevel3}]]*/;
+                            $('#organizerBdsContainer').find('select').find('option[value=' + organizerId + ']').prop('selected', true);
+                            $('#organizerBdsContainer').find('select').trigger('change.select2');
+                        }
+                    }
+
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener el listado.');
+                }
+            });
+        }
+
+        function channelByRoleProducer(){
+            var channelId = $('#channelId').val();
+            var roleId = $('#roleId').val();
+            var entityUserId = form.find('#id').val();
+
+            if (channelId == null || channelId == '') {
+                return;
+            }
+
+            defaultAjax({
+                url: /*[[@{/users/roleByChannel}]]*/null,
+                data: {
+                    channelId,
+                    roleId,
+                    entityUserId,
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].id + '">' + (arr[i].entityUserIdFromEntity != null ? arr[i].entityUserIdFromEntity : 'N/A') + ' - ' + arr[i].firstSurname + ' ' + arr[i].name + '</option>';
+                    }
+                    $('#producerBdsContainer').find('select').html(html);
+
+                    if (/*[[${user?.active}]]*/) {
+                        if (roleId == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_USUARIO}]]) {
+                            var producerId = /*[[${user?.hierarchyLevel2}]]*/;
+                            $('#producerBdsContainer').find('select').find('option[value=' + producerId + ']').prop('selected', true);
+                            $('#producerBdsContainer').find('select').trigger('change.select2');
+                        } else if (roleId == [[${T(com.affirm.common.model.catalog.EntityUserType).BDS_PRODUCTOR}]]) {
+                            var organizerId = /*[[${user?.hierarchyLevel3}]]*/;
+                            $('#producerBdsContainer').find('select').find('option[value=' + organizerId + ']').prop('selected', true);
+                            $('#producerBdsContainer').find('select').trigger('change.select2');
+                        }
+                    }
+
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener el listado.');
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+
+</th:block>
+
+</body>
+</html>

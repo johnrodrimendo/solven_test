@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_client_grouped">
+    <div class="inner-question" th:attr="data-question=${q}">
+        <div class="questions-section animated fadeInRight">
+            <div class="forms" id="date-block">
+                <p th:if="${q == 88 or q == 89}" th:utext="#{questions.88.message.oneLine}"></p>
+                <p th:unless="${q == 88 or q == 89}" th:utext="#{questions.88.message}"></p>
+                <form class="inner-question-form" autocomplete="off">
+                    <div class="field inline">
+                        <input id="month" type="text" placeholder="Mes" class="input-outline small-input"/>
+                    </div>
+                    <div class="field inline">
+                        <input id="year" type="text" placeholder="A&ntilde;o" class="input-outline small-input"/>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/, function(){
+                    var dateParam = moment($month.val() + "/" + $year.val(), "MM/YYYY", true);
+                    return {startDate: dateParam.format("MM/YYYY")};
+                });
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+
+                var yearFrom = /*[[${attr.yearFrom}]]*/;
+                var yearTo = /*[[${attr.yearTo}]]*/;
+                var $month = innerQuestion.find('#month');
+                var $year = innerQuestion.find('#year');
+
+                $month.forceIntegerOnly(true, 1, 12);
+                $year.forceIntegerOnly(true, yearFrom, yearTo);
+
+                $month.keyup(function (event) {
+                    if ($(this).val().length === 2) {
+                        $year.focus();
+                    }
+                });
+            })();
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p>&iquest;Desde cu&aacute;ndo cuentas con esta fuente de ingresos?</p>
+            <div class="form-group col-md-6 nopadding">
+                <small>Mes</small>
+                <input class="form-control" name="month" th:value="${form.getMonth()}"/>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group col-md-6 nopadding">
+                <small>A&ntilde;o</small>
+                <input class="form-control" name="year" th:value="${form.getYear()}"/>
+                <div class="errorContainer"></div>
+            </div>
+            
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.getFormValuesJson = function(){
+                var month = questionFlow.find('input[name=month]').val();
+                if (month.length < 2) month = "0" + month;
+                var year = questionFlow.find('input[name=year]').val();
+                return {startDate: month+'/'+year};
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+            var $month = questionFlow.find('input[name=month]');
+            var $year = questionFlow.find('input[name=year]');
+
+            var yearFrom = /*[[${yearFrom}]]*/;
+            var yearTo = /*[[${yearTo}]]*/;
+
+            $month.forceIntegerOnly(true, 1, 12);
+            $year.forceIntegerOnly(true, yearFrom, yearTo);
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

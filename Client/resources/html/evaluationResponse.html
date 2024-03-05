@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorator="templates/privatePagesTemplate">
+<head>
+</head>
+<body>
+
+    <th:block layout:fragment="head">
+    <!-- Own -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var status = /*[[${status}]]*/null;
+        var loanAplicationToken = /*[[${loanAplicationToken}]]*/null;
+        var statusRequestTimeout;
+        var redirectTimeout = 5;
+
+        var statusJson;
+        if (status != null) {
+            statusJson = JSON.parse(status);
+        }
+
+        $(window).load(function () {
+            //paitn initial data
+            if (statusJson != null) {
+                paintStatus();
+                if (statusJson.status == 'R') {
+                    setRequestTimeout();
+                }
+            } else {
+                setRequestTimeout();
+            }
+        });
+
+        function paintStatus() {
+            if (statusJson.status == 'R') {
+                $('#runningDiv').show(500);
+                $('#successDiv').hide(500);
+                $('#failDiv').hide(500);
+            } else if (statusJson.status == 'S') {
+                if (statusJson.approved) {
+                    $('#runningDiv').hide(500);
+                    $('#successDiv').show(500);
+                    $('#failDiv').hide(500);
+
+                    $('#successRedirectionTime').html(redirectTimeout);
+                    setSuccessRedirectTimeout();
+                } else {
+                    $('#runningDiv').hide(500);
+                    $('#successDiv').hide(500);
+                    $('#errorMessage').html(statusJson.message)
+
+                    if (statusJson.messageId == 7 || statusJson.messageId == 8 || statusJson.messageId == 10 || statusJson.messageId == 11 || statusJson.messageId == 12) {
+                        $('#failReason1').show();
+                        $('#failReason2').hide();
+                    } else if (statusJson.messageId == 6 || statusJson.messageId == 13 || statusJson.messageId == 9) {
+                        $('#failReason1').hide();
+                        $('#failReason2').show();
+                    } else {
+                        $('#failReason1').hide();
+                        $('#failReason2').hide();
+                    }
+                    $('#failDiv').show(500);
+                }
+            } else {
+                $('#runningDiv').hide(500);
+                $('#successDiv').hide(500);
+                $('#failDiv').show(500);
+                $('#errorMessage').html(/*[[#{system.error.default}]]*/);
+            }
+        }
+
+        function setRequestTimeout() {
+            statusRequestTimeout = setTimeout(function () {
+                console.log("Corriendo timer");
+                getStatusData();
+            }, 2000);
+        }
+
+        function setSuccessRedirectTimeout() {
+            setTimeout(function () {
+                redirectTimeout = redirectTimeout - 1;
+                $('#successRedirectionTime').html(redirectTimeout);
+                if (redirectTimeout == 1) {
+                    var form = document.forms['frmSuccess'];
+                    addHiddenToForm(form, 'loanAplicationToken', loanAplicationToken);
+                    console.log("dando submit al boton");
+                    form.submit();
+                } else {
+                    setSuccessRedirectTimeout();
+                }
+            }, 1000);
+        }
+
+        function getStatusData() {
+            $.ajax({
+                url: /*[[@{/loanapplication/__${loanAplicationToken}__/json}]]*/null,
+                success: function (result) {
+                    statusJson = JSON.parse(result);
+                    if (statusJson.status == 'R') {
+                        setRequestTimeout();
+                    }
+                    paintStatus();
+                },
+                error: function (result) {
+                    //TODO Invocar modal de error
+                    alert("Error");
+                }
+
+            })
+        }
+
+        $(document).on('ready', function(){
+            /* Accordion */
+            var acc = document.getElementsByClassName("accordion");
+            var i;
+
+            for (i = 0; i < acc.length; i++) {
+                acc[i].onclick = function(){
+                    this.classList.toggle("active");
+                    this.nextElementSibling.classList.toggle("show");
+                }
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+    <script type="text/javascript">
+        function preventBack() {
+            window.history.forward();
+        }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () {
+            null
+        };
+    </script>
+    <style type="text/css">
+        .spinner {
+            margin: 100px auto 0;
+            width: 100px;
+            text-align: center;
+        }
+
+        .spinner > div {
+            width: 15px;
+            height: 15px;
+            background-color: #333;
+
+            border-radius: 100%;
+            display: inline-block;
+            -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+            animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        }
+
+        .spinner .bounce1 {
+            -webkit-animation-delay: -0.32s;
+            animation-delay: -0.32s;
+        }
+
+        .spinner .bounce2 {
+            -webkit-animation-delay: -0.16s;
+            animation-delay: -0.16s;
+        }
+
+        @-webkit-keyframes sk-bouncedelay {
+            0%, 80%, 100% {
+                -webkit-transform: scale(0)
+            }
+            40% {
+                -webkit-transform: scale(1.0)
+            }
+        }
+
+        @keyframes sk-bouncedelay {
+            0%, 80%, 100% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+            }
+            40% {
+                -webkit-transform: scale(1.0);
+                transform: scale(1.0);
+            }
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="content">
+    <section class="evaluation-section">
+        <div class="container" id="evaluationResponse">
+            <div id="runningDiv" style="display:none" class="aff-line-height">
+                <div class="message-container">
+                    <div class="gif-solven-container">
+                        <div class="sk-cube-grid">
+                            <div class="sk-cube sk-cube1"></div>
+                            <div class="sk-cube sk-cube2"></div>
+                            <div class="sk-cube sk-cube3"></div>
+                            <div class="sk-cube sk-cube4"></div>
+                            <div class="sk-cube sk-cube5"></div>
+                            <div class="sk-cube sk-cube6"></div>
+                            <div class="sk-cube sk-cube7"></div>
+                            <div class="sk-cube sk-cube8"></div>
+                            <div class="sk-cube sk-cube9"></div>
+                        </div>
+                    </div>
+                    <h2 th:utext="#{evaluationResponse.state.running.tittle}"></h2>
+                    <p th:utext="#{evaluationResponse.state.running.message}"></p>
+                </div>
+            </div>
+            <div id="successDiv" style="display:none" class="aff-line-height">
+                <div class="message-container">
+                    <div class="gif-solven-container">
+                        <div class="sk-cube-grid">
+                            <div class="sk-cube sk-cube1"></div>
+                            <div class="sk-cube sk-cube2"></div>
+                            <div class="sk-cube sk-cube3"></div>
+                            <div class="sk-cube sk-cube4"></div>
+                            <div class="sk-cube sk-cube5"></div>
+                            <div class="sk-cube sk-cube6"></div>
+                            <div class="sk-cube sk-cube7"></div>
+                            <div class="sk-cube sk-cube8"></div>
+                            <div class="sk-cube sk-cube9"></div>
+                        </div>
+                    </div>
+                    <h2 th:utext="#{evaluationResponse.state.success.tittle}"></h2>
+                    <span th:utext="#{evaluationResponse.state.success.message}"></span>
+
+                    <form role="form" action="#" th:action="@{/loanapplication/offer}" method="get" id="frmSuccess" autocomplete="off">
+                    </form>
+                </div>
+            </div>
+
+            <div id="failDiv" style="display:none" class="aff-line-height">
+                <div class="well">
+                    <h2 th:utext="#{evaluationResponse.state.fail.tittle}"></h2>
+                    <div class="message-area">
+                        <p id="errorMessage"></p>
+                        <p th:utext="#{evaluationResponse.state.fail.subtittle1}"></p>
+                    </div>
+
+                    <div class="accordion-container">
+                        <button class="accordion failReason1" th:utext="#{evaluationResponse.state.fail.reason1.tittle}"></button>
+                        <div class="panel-ac failReason1">
+                            <p th:utext="#{evaluationResponse.state.fail.reason1.body}"></p>
+                        </div>
+                        <button class="accordion failReason2" th:utext="#{evaluationResponse.state.fail.reason2.tittle}"></button>
+                        <div class="panel-ac failReason2">
+                            <p th:utext="#{evaluationResponse.state.fail.reason2.body}"></p>
+                        </div>
+                    </div>
+                    <div class="aff-thanks">
+                        <p th:utext="#{evaluationResponse.state.fail.final.message1}"></p>
+                        <p th:utext="#{evaluationResponse.state.fail.final.message2(${@configuration.APP_NAME})}"></p>
+                        <a th:href="@{/}">
+                            <i class="fa fa-home" aria-hidden="true"></i> Ir al inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

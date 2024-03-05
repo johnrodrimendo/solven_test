@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:text="#{questions.compare.whatForCredit}"></p>
+        <div class="note">
+            <span th:text="#{questions.compare.willFoundForYou}"></span>
+        </div>
+        <div class="field inline">
+            <label class="input-radio"
+                   th:with="comparisonGroupId = ${T(com.affirm.common.model.catalog.ComparisonReason).REASON_GROUP_CREDIT_HISTORY}">
+                <input type="radio" class="howEarnMoney" name="reason" th:value="${comparisonGroupId}"/>
+                <div class="option-wrapper">
+                    <div class="iconic-option-inner">
+                        <i class="icon icon-document-dollar"></i>
+                        <h5 th:utext="${@catalogService.getComparisonReasonsByGroupId(comparisonGroupId, #locale).get(0).reason}"></h5>
+                        <div class="radio"></div>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <div class="field inline">
+            <label class="input-radio"
+                   th:with="comparisonGroupId = ${T(com.affirm.common.model.catalog.ComparisonReason).REASON_GROUP_BETTER_CARD}">
+                <input type="radio" class="howEarnMoney" name="reason" th:value="${comparisonGroupId}"/>
+                <div class="option-wrapper">
+                    <div class="iconic-option-inner">
+                        <i class="icon icon-credit-billiant"></i>
+                        <h5 th:utext="${@catalogService.getComparisonReasonsByGroupId(comparisonGroupId, #locale).get(0).reason}"></h5>
+                        <div class="radio"></div>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <div class="field inline">
+            <label class="input-radio"
+                   th:with="comparisonGroupId = ${T(com.affirm.common.model.catalog.ComparisonReason).REASON_GROUP_LOAN}">
+                <input type="radio" class="howEarnMoney" name="reason" th:value="${comparisonGroupId}"/>
+                <div class="option-wrapper">
+                    <div class="iconic-option-inner">
+                        <i class="icon icon-money-bag"></i>
+                        <h5 th:utext="${@catalogService.getComparisonReasonsByGroupId(comparisonGroupId, #locale).get(0).reason}"></h5>
+                        <div class="radio"></div>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <div class="field inline">
+            <label class="input-radio"
+                   th:with="comparisonGroupId = ${T(com.affirm.common.model.catalog.ComparisonReason).REASON_GROUP_URGENCY}">
+                <input type="radio" class="howEarnMoney" name="reason" th:value="${comparisonGroupId}"/>
+                <div class="option-wrapper">
+                    <div class="iconic-option-inner">
+                        <i class="icon icon-fast-time"></i>
+                        <h5 th:utext="${@catalogService.getComparisonReasonsByGroupId(comparisonGroupId, #locale).get(0).reason}"></h5>
+                        <div class="radio"></div>
+                    </div>
+                </div>
+            </label>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=reason]').on('change', function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    reason: $(this).val()
+                }
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

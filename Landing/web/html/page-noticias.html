@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title> Noticias</title>
+    <meta name="description" th:attr="content=#{static.description.news}" />
+    <link rel="alternate" hreflang="es" href="https://www.solven.pe/blog"/>
+    <link rel="alternate" hreflang="es-pe" href="https://www.solven.pe/blog"/>
+    <link rel="alternate" hreflang="es-ar" href="https://www.solven.com.ar/blog"/>
+    <link rel="alternate" hreflang="x-default" href="https://www.solven.pe/blog"/>
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe main-arg' : 'main-pe'}">
+<th:block layout:fragment="content">
+    <section id="banner" class="main-banner bgbanner-inner bg-blog">
+        <article>
+            <h1>Noticias</h1>
+
+            <p th:text="#{static.pages.news.description}"></p>
+        </article>
+        <img id="bannerPrincipal" th:attr="data-src=@{/img/bgblog.jpg}" alt="" class="lazy"/>
+    </section>
+
+    <section class="w-list-news w-news">
+        <ul class="breadcrumbs">
+            <li>Home</li>
+            <li>Noticias</li>
+        </ul>
+        <ul class="list-news">
+            <li th:each="frontPageNew : ${news}" >
+                <div class="wrap">
+                    <figure>
+                        <a th:href="${frontPageNew?.link}" target="_blank">
+                            <img class="lazy" th:attr="data-src=@{'https://s3.amazonaws.com/solven-public/img/' + ${frontPageNew?.logo}}" alt=""/>
+                        </a>
+                    </figure>
+
+                    <article>
+                        <h2 class="title">
+                            <a th:href="${frontPageNew?.link}" th:text="${frontPageNew?.title}" target="_blank">
+                            </a>
+                        </h2>
+                        <div class="paragraph">
+                            <p th:text="${frontPageNew?.summary?.length()>200?frontPageNew?.summary?.substring(0,200)+' ...':frontPageNew?.summary+' ...'}"></p>
+                        </div>
+
+                        <div class="bt">
+                            <span class="date" th:text="${frontPageNew?.getDateFormatted(#locale)}"></span>
+                            <a th:href="${frontPageNew?.link}" target="_blank">Ver más </a>
+                        </div>
+                    </article>
+                </div>
+            </li>
+
+        </ul>
+        <!--
+        <nav aria-label="Page navigation example" class="nav-pagination" th:if="${#lists.size(posts) > 0}">
+            <ul class="pagination" th:with="currentUrl=(${#httpServletRequest.requestURI})">
+                <li class="page-item" th:if="${currentPage != 1}" style="display: none">
+                    <a class="page-link" th:href="@{${currentUrl}(page=1)}">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item prev" th:if="${currentPage > 1}">
+                    <a class="page-link" th:href="@{${currentUrl}(page=${currentPage}-1)}" aria-label="Previous">
+                        Anterior
+                    </a>
+                </li>
+                <li class="page-item" th:each="page : ${#numbers.sequence(1, pages)}">
+                    <a class="page-link" th:href="@{${currentUrl}(page=${page})}" th:text="${page}" th:class="${page==currentPage}?active:''"></a>
+                </li>
+                <li class="page-item next" th:if="${pages > currentPage}">
+                    <a class="page-link" th:href="@{${currentUrl}(page=${currentPage}+1)}" aria-label="Next">
+                        Siguiente
+                    </a>
+                </li>
+                <li class="page-item" th:if="${pages != currentPage}" style="display: none">
+                    <a class="page-link" th:href="@{${currentUrl}(page=${pages})}">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        -->
+    </section>
+</th:block>
+</body>
+</html>

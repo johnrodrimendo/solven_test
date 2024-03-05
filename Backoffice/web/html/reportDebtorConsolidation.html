@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Reporte de Funnel</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/css/bootstrap-multiselect.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/js/bootstrap-multiselect.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function exportToExcel(){
+            defaultAjax({
+                url: /*[[@{/reporting/debtorsConsolidationReport/export}]]*/null,
+                type: 'POST',
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        }
+
+        function reloadResults(){
+            defaultAjax({
+                url: /*[[@{/reporting/debtorsConsolidationReport/list}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#resultTable').html(data);
+                }
+            });
+            setTimeout(reloadResults, 5000);
+        }
+        setTimeout(reloadResults, 5000);
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Reportes</span>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Consolidado de deudores</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-4 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Reporte de Consolidado de Deudores</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a href="javascript:;" class="btn blue btn-outline " onclick="exportToExcel()">Procesar Reporte</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Historico de Reportes</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-responsive" id="resultTable">
+                                    <th:block th:replace="this :: results"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="results">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Fec. Registro</th>
+            <th>Fec. Procesamiento</th>
+            <th>Estatus</th>
+            <th>Url</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="report : ${historicReports}">
+            <tr>
+                <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(report.processDate)}"></td>
+                <th:block th:switch="${report.status}">
+                    <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                    <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                </th:block>
+                <td>
+                    <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</th:block>
+
+</body>
+
+</html>

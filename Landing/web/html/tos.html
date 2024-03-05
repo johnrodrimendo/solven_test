@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/PrivacyPolicyandTermTemplate">
+
+<head>
+    <title th:text="#{static.title.toc}"></title>
+    <meta name="description" th:attr="content=#{static.description.toc}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="alternate" hreflang="es" href="https://www.solven.pe/terminos-y-condiciones" />
+    <link rel="alternate" hreflang="es-pe" href="https://www.solven.pe/terminos-y-condiciones" />
+    <link rel="alternate" hreflang="es-ar" href="https://www.solven.com.ar/terminos-y-condiciones" />
+    <link rel="alternate" hreflang="x-default" href="https://www.solven.pe/terminos-y-condiciones" />
+    <link rel="stylesheet" th:href="@{/css/TerminosCondiciones.css}" />
+</head>
+
+<body class="page-inner"
+    th:classappend="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-arg' : ''}">
+    <th:block layout:fragment="header">
+        <th:block th:replace="fragments/landingHeaderFragment :: innerHeader"></th:block>
+    </th:block>
+    <th:block layout:fragment="content">
+        <!--SOLVEN-->
+        <th:block th:unless="${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+            <!--ARGENTINA-->
+            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                <th:block th:if="${brandedTermsAndConditons==null}">
+                    <article class="wrap-content tyc-tos gwr">
+                        <h1 class="static-title m-bottom">T&eacute;rminos y Condiciones</h1>
+                        <p class="m-bottom">
+                            Los presentes T&eacute;rminos y Condiciones regulan la relaci&oacute;n entre Solven Funding
+                            S.R.L., CUIT 30-71576048-3, con domicilio en Jovellanos Melchor 253, (en adelante “Solven”) y los
+                            distintos usuarios de la plataforma de Solven. Los
+                            servicios de Solven le permiten a los usuarios cotizar, solicitar y contratar de manera
+                            electr&oacute;nica cr&eacute;ditos y otros productos financieros, de manera simple,
+                            r&aacute;pida
+                            y segura.
+                        </p><br />
+                        <p>
+                            Al utilizar los servicios, los Usuarios aceptan, sin reserva alguna, que todas las
+                            disposiciones contenidas en los presentes T&eacute;rminos y Condiciones tienen
+                            car&aacute;cter
+                            obligatorio y vinculante.
+                        </p>
+                        <ol style="padding: 0 1em;">
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Definiciones</h4>
+                                <p class="m-bottom">
+                                    Los siguientes t&eacute;rminos tendr&aacute;n el significado que a
+                                    continuaci&oacute;n
+                                    se les asigna:
+                                </p><br />
+                                <p class="m-bottom">
+                                    <b>Plataforma Solven:</b> Es el sitio web <a
+                                        href="https://www.solven.com.ar">www.solven.com.ar</a>,
+                                    las aplicaciones m&oacute;viles de Solven, Facebook Messenger u otras aplicaciones
+                                    inform&aacute;ticas, a trav&eacute;s de las cuales se pueden cotizar, solicitar,
+                                    contratar y/u otorgar cr&eacute;ditos, seguros y otros productos financieros.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Pol&iacute;tica de Privacidad:</b> Son las normas que regulan la
+                                    recopilaci&oacute;n,
+                                    uso y tratamiento de Datos Personales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Productos Financieros:</b> Son los cr&eacute;ditos u otros productos que se
+                                    pueden cotizar, solicitar y contratar a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Servicios:</b> Son todos los servicios ofrecidos a trav&eacute;s de la Plataforma
+                                    Solven, que le permiten a los Usuarios Solicitantes cotizar, solicitar y contratar
+                                    diversos Productos Financieros, y a los Usuarios Oferentes contratar con los
+                                    Usuarios Solicitantes.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios Solicitantes:</b> Son todos los usuarios que cotizan, solicitan y
+                                    contratan diversos Productos Financieros a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios Oferentes:</b> Son todas aquellas Entidades Financieras, supervisadas
+                                    por el Banco Central de la Rep&uacute;blica Argentina, y Entidades No Financieras,
+                                    incluida Solven dentro de estas &uacute;ltimas, que pudiesen otorgar los Productos
+                                    Financieros a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Descripci&oacute;n de los Servicios</h4>
+                                <p class="m-bottom">
+                                    A trav&eacute;s de la Plataforma Solven, los Usuarios Solicitantes podr&aacute;n
+                                    cotizar, solicitar y comparar diversos Productos Financieros en l&iacute;nea, de
+                                    manera simple, r&aacute;pida y segura. Los Productos Financieros ser&aacute;n
+                                    otorgados por los Usuarios Oferentes.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En el caso que los Usuarios Solicitantes requieran un Cr&eacute;dito, deber&aacute;n
+                                    indicar el destino o finalidad del mismo, as&iacute; como el monto, el plazo y su
+                                    perfil crediticio. Dicho perfil crediticio es orientativo, puesto que Solven y/o los
+                                    Usuarios Oferentes realizar&aacute;n las consultas necesarias para conocer el perfil
+                                    crediticio de los Usuarios Solicitantes, utilizando tanto la informaci&oacute;n que
+                                    dichos Usuarios Solicitantes proporcionen, as&iacute; como aquella que se encuentre
+                                    en fuentes accesibles al p&uacute;blico u otra informaci&oacute;n que se encuentra
+                                    detallada en nuestra <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                        Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En base a dicho requerimiento y en caso de existir ofertas por parte de los Usuarios
+                                    Oferentes, Solven mostrar&aacute; la/s oferta/s que mejor se adec&uacute;e/n a lo
+                                    que los Usuarios Solicitantes cotizaron, tomando como base las variables registradas
+                                    y obtenidas a lo largo del proceso de evaluaci&oacute;n, as&iacute; como a las
+                                    condiciones de financiamiento (restricciones al perfil crediticio, montos, plazos y
+                                    tasas de inter&eacute;s) de los Usuarios Oferentes. En tal sentido, las cotizaciones
+                                    que se muestren estar&aacute;n alineadas con las condiciones de las ofertas de los
+                                    Usuarios Oferentes con quienes Solven mantiene acuerdos comerciales. Solven no
+                                    garantiza la existencia de ofertas por parte de los Usuarios Oferentes frente a los
+                                    requerimientos de los Usuarios Solicitantes, toda vez que podr&iacute;a no haber
+                                    ninguna oferta que se ajuste al perfil crediticio del Usuario Solicitante en
+                                    cuesti&oacute;n.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven podr&aacute; modificar sus acuerdos comerciales, as&iacute; como la oferta de
+                                    los diversos Productos Financieros que se cotizan a trav&eacute;s de la Plataforma
+                                    Solven, en cualquier momento y a su sola discreci&oacute;n.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El Usuario Solicitante, en cualquier momento, puede dejar de usar la Plataforma
+                                    Solven y los servicios ofrecidos sin expresi&oacute;n de causa alguna. De la misma
+                                    manera, Solven puede dejar de prestar cualquiera o todos los servicios que ofrece, o
+                                    a&ntilde;adir nuevos, en cualquier momento, sin necesidad de expresi&oacute;n de
+                                    causa
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Asimismo, Solven se reserva el derecho de rechazar o cancelar cualquier solicitud de
+                                    registro sin que est&eacute; obligado a comunicar o exponer las razones de su
+                                    decisi&oacute;n
+                                    y sin que ello genere alg&uacute;n derecho a indemnizaci&oacute;n o resarcimiento.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pedido de Cotizaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    Para efectuar un pedido de cotizaci&oacute;n, los Usuarios Solicitantes deben
+                                    proporcionar ciertos datos personales, como su n&uacute;mero de DNI, su
+                                    direcci&oacute;n
+                                    de correo electr&oacute;nico y su n&uacute;mero de tel&eacute;fono, al cual se le
+                                    enviar&aacute; un SMS para verificar la identidad del mismo. Para obtener m&aacute;s
+                                    informaci&oacute;n sobre qu&eacute; informaci&oacute;n personal se recopila visite
+                                    nuestra <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego de ello, los Usuarios Solicitantes deber&aacute;n completar informaci&oacute;n
+                                    adicional que le permita a Solven completar su perfil personal y, en caso de
+                                    tratarse de un producto de Cr&eacute;dito, realizar consultas acerca del
+                                    comportamiento crediticio, para poder mostrarle la/s oferta/s que mejor se
+                                    adec&uacute;e/n
+                                    a lo solicitado.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Perfeccionamiento del Contrato</h4>
+                                <p class="m-bottom">
+                                    A trav&eacute;s de la Plataforma Solven, los Usuarios Solicitantes podr&aacute;n
+                                    solicitar Productos Financieros de manera electr&oacute;nica.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Las solicitudes de los Usuarios Solicitantes, antes de ser aceptadas por parte de
+                                    los Usuarios Oferentes, deber&aacute;n ser procesadas, analizadas y validadas. Esto
+                                    se debe a que, los Usuarios Oferentes necesitan analizar el perfil del Usuario
+                                    Solicitante y verificar que se encuentre enmarcado dentro de las pol&iacute;ticas de
+                                    su compa&ntilde;&iacute;a, a efectos de corroborar que califican para el Producto
+                                    Financiero ofrecido.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, los Usuarios Oferentes
+                                    enviar&aacute;n
+                                    a trav&eacute;s de la Plataforma Solven sus ofertas. Finalmente, la Plataforma
+                                    Solven mostrar&aacute; a los Usuarios Solicitantes la/s oferta/s que mejor se
+                                    adec&uacute;e/n
+                                    a su pedido de cotizaci&oacute;n.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Los Usuarios Solicitantes podr&aacute;n seleccionar la oferta que deseen entre las
+                                    mostradas, en caso se presente m&aacute;s de una variante de la misma, completar
+                                    informaci&oacute;n adicional y brindar su consentimiento, momento a partir del cual
+                                    quedar&aacute;n vinculados contractualmente con los Usuarios Oferentes. La
+                                    aceptaci&oacute;n
+                                    electr&oacute;nica de la oferta constituye la manifestaci&oacute;n de voluntad de
+                                    dichos Usuarios Solicitantes para la contrataci&oacute;n del Producto Financiero.
+                                    Los presentes T&eacute;rminos y Condiciones, como as&iacute; tambi&eacute;n los
+                                    Servicios de Solven se encuentran en un todo de acuerdo con lo dispuesto en los
+                                    Arts. 1104 a 1116 del C&oacute;digo Civil y Comercial de la Naci&oacute;n.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez aceptada electr&oacute;nicamente la oferta por parte del Usuario
+                                    Solicitante, el Usuario Oferente, enviar&aacute; una notificaci&oacute;n
+                                    electr&oacute;nica
+                                    al Usuario Solicitante, a trav&eacute;s de la Plataforma Solven, confirmando que ha
+                                    recepcionado su aceptaci&oacute;n. Luego de ello, el Cr&eacute;dito ser&aacute;
+                                    desembolsado en la cuenta indicada por el Usuario Solicitante bajo las condiciones
+                                    previamente pactadas y aceptadas por las partes.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Plazos de Respuesta</h4>
+                                <p class="m-bottom">
+                                    Una vez que los Usuarios Solicitantes efect&uacute;en un pedido de
+                                    cotizaci&oacute;n,
+                                    habiendo brindado la totalidad de informaci&oacute;n y documentos requeridos, Solven
+                                    mostrar&aacute; la/s oferta/s que mejor se adec&uacute;e/n a lo solicitado, de
+                                    manera inmediata.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego que los Usuarios Solicitantes seleccionen la oferta del Producto Financiero
+                                    que deseen contratar, Solven validar&aacute; y verificar&aacute; la
+                                    informaci&oacute;n
+                                    proporcionada por los Usuarios Solicitantes, a efectos de analizar el cumplimiento
+                                    de las condiciones de los Usuarios Oferentes. El tiempo de validaci&oacute;n y
+                                    verificaci&oacute;n de Solven depender&aacute; de consultas sobre informaci&oacute;n
+                                    proporcionada por terceros para efectuar dichas validaciones, siendo que Solven no
+                                    tiene control alguno sobre los plazos de respuesta de dichos terceros. Asimismo,
+                                    Solven no tiene control sobre cualquier hecho de tercero o circunstancia ajena que
+                                    imposibilite la validaci&oacute;n de la informaci&oacute;n de los Usuarios
+                                    Solicitantes en el plazo estipulado.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, Solven mostrar&aacute; la/s
+                                    oferta/s m&aacute;s conveniente/s, para que los Usuarios Solicitantes analicen y,
+                                    eventualmente, acepten las condiciones del Producto Financiero ofrecido, de manera
+                                    previa al desembolso del Cr&eacute;dito u otorgamiento del Producto Financiero.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El desembolso del Cr&eacute;dito u otorgamiento del Producto Financiero se
+                                    efectuar&aacute;
+                                    en un tiempo aproximado de hasta 72 horas h&aacute;biles desde la aceptaci&oacute;n
+                                    final del Usuario Solicitante, siempre conforme a las condiciones espec&iacute;ficas
+                                    del Producto Financiero contratado, de acuerdo a cada Usuario Oferente. Cabe indicar
+                                    que dicho plazo es referencial, en la medida que el desembolso del Cr&eacute;dito
+                                    depende en &uacute;ltima instancia de este &uacute;ltimo, que comercializa el
+                                    producto financiero y sobre el cual Solven no tiene control alguno.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Asimismo, en aquellos casos en los que el Usuario Oferente prevea que el desembolso
+                                    del Cr&eacute;dito se realice en un punto f&iacute;sico, de manera presencial, tal
+                                    circunstancia se indicar&aacute; al momento de mostrar la/s oferta/s al Usuario
+                                    Solicitante, pudiendo resultar en pedidos adicionales de informaci&oacute;n y/o
+                                    documentaci&oacute;n, plazos extendidos de desembolso y/o hasta en rechazos o
+                                    cancelaciones de las solicitudes de cr&eacute;dito por parte de los Usuarios
+                                    Oferentes, las cuales no generar&aacute;n obligaci&oacute;n alguna para Solven de
+                                    resarcir o indemnizar al Usuario Solicitante ni comunicar los motivos o razones del
+                                    rechazo por parte del Usuario Oferente.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Condiciones de uso de la Plataforma Solven</h4>
+                                <p class="m-bottom">
+                                    Al hacer uso de la Plataforma Solven, los Usuarios Solicitantes aceptan y reconocen:
+                                </p>
+                                <br />
+                                <ol style="list-style-type: upper-alpha;">
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que son personas f&iacute;sicas mayores de dieciocho (18) a&ntilde;os de
+                                            edad con plena capacidad para celebrar contratos legalmente vinculantes.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que la informaci&oacute;n que proporcionan es aut&eacute;ntica, veraz y
+                                            actualizada.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que se les har&aacute; responsables de toda acci&oacute;n realizada en la
+                                            Plataforma Solven en la que los Usuarios Solicitantes hayan participado.
+                                        </p>
+                                        <br />
+                                    </li>
+                                </ol>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Obligaciones del Usuario Solicitante</h4>
+                                <p class="m-bottom">
+                                    Los Usuarios Solicitantes se comprometen a:
+                                </p>
+                                <br />
+                                <ol style="list-style-type: upper-alpha">
+                                    <li>
+                                        <p class="m-bottom">
+                                            Aportar informaci&oacute;n personal con datos v&aacute;lidos, exactos,
+                                            actualizados y verdaderos, quedando terminantemente prohibido la
+                                            utilizaci&oacute;n
+                                            de datos de terceros y/o la registraci&oacute;n de m&aacute;s de un usuario.
+                                            El uso de la Plataforma Solven es estrictamente personal.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            No proporcionar informaci&oacute;n falsa, usurpar la identidad de otra
+                                            persona, cometer actos il&iacute;citos u otros que sean lesivos de intereses
+                                            o derechos de terceros.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Informar a Solven acerca de cualquier cambio y/o actualizaci&oacute;n de la
+                                            informaci&oacute;n personal provista para la solicitud de los Servicios.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Utilizar la Plataforma Solven de conformidad con los presentes
+                                            T&eacute;rminos
+                                            y Condiciones, respetando los derechos de terceros y actuando de buena fe.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            No da&ntilde;ar o tratar de vulnerar el sistema inform&aacute;tico que opera
+                                            la Plataforma Solven, quedando asimismo prohibido el uso de dispositivos o
+                                            procesos automatizados, robots, rastreadores, ara&ntilde;as web u otros
+                                            medios o herramientas que tengan por finalidad extraer informaci&oacute;n de
+                                            la Plataforma Solven.
+                                        </p>
+                                        <br />
+                                    </li>
+                                </ol>
+
+                                <p class="m-bottom">
+                                    En el caso que Solven detecte que se han violado algunas de las obligaciones
+                                    asumidas por los usuarios, Solven se reserva el derecho de prohibir el acceso y uso
+                                    de la Plataforma Solven por parte de las personas que han violado las
+                                    Pol&iacute;ticas
+                                    de Uso, de forma temporal o definitiva, as&iacute; como de iniciar las acciones
+                                    judiciales y/o extrajudiciales que pudieran corresponder.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Asimismo, si el Usuario Solicitante violase cualquiera de estos T&eacute;rminos y
+                                    Condiciones, Solven podr&aacute; cancelar su usuario, borrar su perfil y cualquier
+                                    contenido o informaci&oacute;n que haya publicado proporcionado y/o prohibir el uso
+                                    de la Plataforma Solven, en cualquier momento y a su sola discreci&oacute;n, sin
+                                    necesidad de previo aviso.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Identidad</h4>
+                                <p class="m-bottom">
+                                    Cada Usuario Solicitante u Oferente acepta indemnizar, defender y mantener indemne a
+                                    Solven, sus filiales y otras empresas afiliadas, sus gerentes, empleados, agentes,
+                                    licenciantes, proveedores y cualquier proveedor de informaci&oacute;n de terceros al
+                                    servicio de y contra toda p&eacute;rdida, gasto, da&ntilde;o o perjuicio como
+                                    as&iacute;
+                                    tambi&eacute;n los costos, incluyendo los honorarios razonables de abogados, que
+                                    resulten de cualquier violaci&oacute;n de los T&eacute;rminos y Condiciones y los
+                                    documentos que se incluyen en &eacute;l por referencia.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Limitaci&oacute;n de Responsabilidad</h4>
+                                <p class="m-bottom">
+                                    Solven no garantiza que el cr&eacute;dito solicitado sea aprobado, ni garantiza los
+                                    t&eacute;rminos o condiciones de contrataci&oacute;n, ni el cumplimiento de
+                                    obligaci&oacute;n
+                                    de clase alguna que pueda existir entre ambos. Solven &uacute;nicamente garantiza
+                                    que mientras la Plataforma Solven se encuentre operativa contar&aacute; con
+                                    relaciones con uno o m&aacute;s Usuarios Oferentes, con las cuales habr&aacute;
+                                    suscrito un acuerdo de intercambio seguro y de protecci&oacute;n de datos
+                                    personales, a la/s cual/es podr&aacute; a su discreci&oacute;n enviar los datos
+                                    aportados seg&uacute;n los presentes T&eacute;rminos y Condiciones.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven tiene como funci&oacute;n poner a disposici&oacute;n de los Usuarios
+                                    Solicitantes y los Usuarios Oferentes un espacio virtual para la solicitud y
+                                    contrataci&oacute;n de cr&eacute;ditos y otros productos financieros de forma
+                                    electr&oacute;nica,
+                                    de manera simple, r&aacute;pida y segura. Por tal motivo, Solven no es parte de la
+                                    relaci&oacute;n contractual que vincula a los Usuarios Solicitantes y a los Usuarios
+                                    Oferentes entre ellos, no siendo responsable, en consecuencia: (i) del cumplimiento
+                                    o incumplimiento de las obligaciones asumidas por las partes contratantes; (ii) de
+                                    la calidad o idoneidad de los servicios o productos financieros contratados a
+                                    trav&eacute;s
+                                    de la Plataforma Solven; y/o (iii) de cualquier reclamo que pudiera originarse con
+                                    motivo de la relaci&oacute;n contractual, el cual deber&aacute; cursarse
+                                    directamente al Usuario Oferente.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven tiene como funci&oacute;n poner a disposici&oacute;n de los Usuarios
+                                    Solicitantes y los Usuarios Oferentes un espacio virtual para la solicitud y
+                                    contrataci&oacute;n de cr&eacute;ditos y otros productos financieros de forma
+                                    electr&oacute;nica,
+                                    de manera simple, r&aacute;pida y segura. Por tal motivo, Solven no es parte de la
+                                    relaci&oacute;n contractual que vincula a los Usuarios Solicitantes y a los Usuarios
+                                    Oferentes entre ellos, no siendo responsable, en consecuencia: (i) del cumplimiento
+                                    o incumplimiento de las obligaciones asumidas por las partes contratantes; (ii) de
+                                    la calidad o idoneidad de los servicios o productos financieros contratados a
+                                    trav&eacute;s
+                                    de la Plataforma Solven; y/o (iii) de cualquier reclamo que pudiera originarse con
+                                    motivo de la relaci&oacute;n contractual, el cual deber&aacute; cursarse
+                                    directamente al Usuario Oferente.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven no garantiza el uso continuado o ininterrumpido de los Servicios ni se hace
+                                    responsable por los posibles da&ntilde;os o perjuicios producto de interrupciones,
+                                    interferencias o errores en el sistema, en el servidor o en Internet o por hechos de
+                                    terceros que pudieran afectar el correcto funcionamiento del sistema
+                                    inform&aacute;tico
+                                    de la Plataforma Solven. En estos casos, Solven, se compromete a utilizar todos los
+                                    medios que pudieran estar a su alcance con el fin de restablecer el normal
+                                    funcionamiento del mismo.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En igual sentido, en la medida que Solven utiliza herramientas y medios
+                                    tecnol&oacute;gicos
+                                    para procesar y tratar la informaci&oacute;n, tanto de los Usuarios Solicitantes
+                                    como de los Usuarios Oferentes, Solven no se responsabiliza por los errores u
+                                    omisiones producto de la utilizaci&oacute;n de dichas herramientas o medios
+                                    tecnol&oacute;gicos,
+                                    dado que estos no son infalibles.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Por otro lado, en la medida que Solven utiliza informaci&oacute;n crediticia de los
+                                    Usuarios Solicitantes que ha sido elaborada y proporcionada por terceros (por ej.
+                                    centrales privadas de informaci&oacute;n de riesgos) o que ha sido extra&iacute;da
+                                    de fuentes accesibles al p&uacute;blico, Solven no se responsabiliza por los errores
+                                    u omisiones que dicha informaci&oacute;n pueda contener, en la medida que no es
+                                    informaci&oacute;n de elaboraci&oacute;n propia. Asimismo, dado que Solven no tiene
+                                    control sobre los plazos de respuesta de los terceros que proporcionan
+                                    informaci&oacute;n,
+                                    ni control sobre cualquier circunstancia que imposibilite que la validaci&oacute;n
+                                    de identidad y corroboraci&oacute;n de informaci&oacute;n de los Usuarios
+                                    Solicitantes se efect&uacute;e en los plazos estipulados, Solven no asume
+                                    responsabilidad en caso de que se incumplan dichos plazos.
+                                </p>
+                                <p class="m-bottom">
+                                    Mediante la aceptaci&oacute;n de los T&eacute;rminos y Condiciones, el Usuario
+                                    Solicitante exonera a Solven de toda responsabilidad vinculada con la cesi&oacute;n
+                                    de sus datos personales a los Usuarios Oferentes, as&iacute; como respecto de la
+                                    aprobaci&oacute;n o no y posterior obtenci&oacute;n o no del cr&eacute;dito
+                                    solicitado.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Registro de reclamos</h4>
+                                <p class="m-bottom">
+                                    El Registro de Reclamos de Solven le permite a los Usuarios Solicitantes registrar
+                                    sus quejas o reclamos relacionados a los Servicios brindados por Solven, ello en
+                                    cumplimiento de lo dispuesto por el Art. 27 de la Ley Nº 24.240 – Ley de
+                                    Protecci&oacute;n
+                                    y Defensa los Consumidores. El mismo operar&aacute; a trav&eacute;s del correo
+                                    electr&oacute;nico
+                                    <a href="mailto:reclamos@solven.com.ar"> reclamos@solven.com.ar</a>
+                                    otorg&aacute;ndosele
+                                    al Usuario Solicitante reclamante un n&uacute;mero de reclamo que permitir&aacute;
+                                    al mismo su identificaci&oacute;n y seguimiento durante el proceso. Solven
+                                    responder&aacute;
+                                    el mismo en el menor plazo posible, realizando con el Usuario Solicitante todas las
+                                    intervenciones que resulten necesarias hasta la evacuaci&oacute;n del mismo.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Propiedad Intelectual</h4>
+                                <p class="m-bottom">
+                                    Solven es el propietario de la marca y de los contenidos, incluyendo
+                                    im&aacute;genes,
+                                    gr&aacute;ficos, textos, base de datos, redes, archivos y todos los aquellos
+                                    elementos que se encuentren en la Plataforma Solven que se encuentran protegidos por
+                                    las leyes y los tratados internacionales de derecho de autor, marcas, patentes,
+                                    modelos y dise&ntilde;os industriales. En aquellos casos en que no sea el
+                                    propietario, Solven cuenta con todas las licencias necesarias para su uso por parte
+                                    de los titulares de dicho contenido o derechos de propiedad intelectual.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El contenido de la Plataforma Solven no puede ser modificado, copiado, distribuido,
+                                    enmarcado, reproducido, republicado, descargado, exhibido, publicado, transmitido, o
+                                    vendido en cualquier forma o por cualquier medio, en todo o en parte, sin el permiso
+                                    escrito de Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Cualquier reimpresi&oacute;n, sub-licencia, copia, modificaci&oacute;n,
+                                    publicaci&oacute;n,
+                                    cesi&oacute;n, transferencia, venta, alquiler o cualquier modo de
+                                    distribuci&oacute;n
+                                    de los contenidos de la Plataforma Solven, ya sea total o parcial, digital o
+                                    f&iacute;sica,
+                                    sin el consentimiento expreso y por escrito de Solven, se encuentra estrictamente
+                                    prohibida.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El Usuario Solicitante no podr&aacute; crear trabajos derivados de la Plataforma
+                                    Solven, ni utilizarlos para prestar servicios a terceros, comercializarlos o de
+                                    cualquier forma utilizar la totalidad o parte de los mismos sin el consentimiento
+                                    expreso y por escrito de Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Se deben respetar los derechos de propiedad intelectual de titularidad de Solven y
+                                    de terceros. Queda prohibida la reproducci&oacute;n, distribuci&oacute;n,
+                                    transformaci&oacute;n o cualquier otra forma de utilizaci&oacute;n del contenido que
+                                    se encuentre en la Plataforma Solven, sin la autorizaci&oacute;n previa y expresa de
+                                    Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven autoriza el acceso a la Plataforma Solven seg&uacute;n se desprende de estos
+                                    T&eacute;rminos y Condiciones, pero no tiene obligaci&oacute;n alguna de proveer
+                                    ning&uacute;n equipamiento ni software alguno para la navegaci&oacute;n a
+                                    trav&eacute;s
+                                    la misma y la utilizaci&oacute;n de los Servicios o visualizaci&oacute;n de los
+                                    contenidos all&iacute; expuestos, debiendo cada Usuario Solicitante proveerse a
+                                    s&iacute;
+                                    mismo el equipamiento necesario para su utilizaci&oacute;n.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Enlaces a Sitios Web de Terceros</h4>
+                                <p class="m-bottom">
+                                    La presencia de enlaces no implica una sociedad, relaci&oacute;n de cualquier modo,
+                                    aprobaci&oacute;n o respaldo de Solven a tales sitios web y sus contenidos. Solven
+                                    no es responsable de examinar o evaluar el contenido, la exactitud, la integridad,
+                                    la vigencia, la validez, el cumplimiento de los derechos de autor, la legalidad, la
+                                    decencia, la calidad o cualquier otro aspecto de dichos enlaces o materiales de
+                                    terceros.
+                                </p>
+                                <p class="m-bottom">
+                                    En caso se dispusieran enlaces hacia sitios web de terceros, tales como enlaces
+                                    hacia los sitios web de los Usuarios Oferentes o cualquier otro tercero, Solven no
+                                    garantiza, avala, ni respalda el contenido de dichos sitios web, ni las
+                                    pol&iacute;ticas
+                                    de los mismos.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Notificaciones y Comunicaciones</h4>
+                                <p class="m-bottom">
+                                    Solven cursar&aacute; las notificaciones o comunicaciones a los Usuarios
+                                    Solicitantes a la direcci&oacute;n de correo electr&oacute;nico denunciada por
+                                    &eacute;stos, mientras que las notificaciones o comunicaciones que los Usuarios
+                                    Solicitantes deseen hacer llegar a Solven en relaci&oacute;n a los presentes
+                                    T&eacute;rminos
+                                    y Condiciones, Pol&iacute;tica de Privacidad u otros, deber&aacute;n ser enviadas a
+                                    <a href="mailto:legal@solven.com.ar ">legal@solven.com.ar </a>.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Jurisdicci&oacute;n y Ley Aplicable</h4>
+                                <p class="m-bottom">
+                                    Los presentes T&eacute;rminos y Condiciones y las Pol&iacute;ticas de Privacidad se
+                                    rigen por las leyes vigentes en la Rep&uacute;blica Argentina. Cualquier disputa
+                                    relacionada con la validez, aplicaci&oacute;n o interpretaci&oacute;n de los mismos
+                                    ser&aacute; resuelta ante en los tribunales ordinarios de la Capital Federal.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Inexistencia de Contrato de
+                                    Representaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    La utilizaci&oacute;n de la Plataforma Solven no crea contrato de sociedad, de
+                                    representaci&oacute;n o de mandato entre Solven y lo usuarios de la plataforma.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Domicilio Constituido</h4>
+                                <p class="m-bottom">
+                                    Se fija como domicilio a todos los efectos legales en Jovellanos Melchor 253 y el Usuario
+                                    Solicitante constituye domicilio en el indicado
+                                    en los datos personales de la p&aacute;gina web.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Modificaciones a los T&eacute;rminos y
+                                    Condiciones</h4>
+                                <p class="m-bottom">
+                                    Los presentes T&eacute;rminos y Condiciones podr&aacute;n ser modificados,
+                                    sustituidos o actualizados en cualquier momento a criterio de Solven, sin necesidad
+                                    de consentimiento por parte de los usuarios. Cuando los cambios mencionados se
+                                    pongan en vigencia, Solven enviar&aacute; un mensaje anunciando tal
+                                    modificaci&oacute;n
+                                    a los Usuarios Solicitantes.
+                                </p>
+                                <p class="m-bottom">
+                                    El Usuario Solicitante entiende y acepta que el uso continuado del Servicio
+                                    despu&eacute;s
+                                    de haber realizado cambios constituye la aceptaci&oacute;n de tales modificaciones,
+                                    salvo comunicaci&oacute;n en forma expresa a Solven, lo cual implicar&aacute; que el
+                                    Usuario Solicitante ser&aacute; dado de baja del sistema al momento de, o con
+                                    anterioridad a, que empiecen a regir los nuevos cambios implementados. Solven se
+                                    encuentra facultado a modificar, enmendar o suspender, transitoria o
+                                    definitivamente, los Servicios, contenidos, descripciones y explicaciones de la
+                                    Plataforma Solven.
+                                </p>
+                            </li>
+                        </ol>
+                        <p style="margin-top:2em;">
+                            &Uacute;ltima actualizaci&oacute;n: 01 de Enero de 2020.
+                        </p>
+                    </article>
+                </th:block>
+                <th:block th:unless="${brandedTermsAndConditons==null}" th:utext="${brandedTermsAndConditons}">
+                </th:block>
+            </th:block>
+            <!--PERU-->
+            <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                <th:block th:if="${brandedTermsAndConditons==null AND !@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).ACCESO)}">
+                    <article class="wrap-content tyc-tos gwr">
+                        <h1 class="static-title m-bottom">T&eacute;rminos y Condiciones</h1>
+                        <p class="m-bottom">
+                            Los presentes Términos y Condiciones regulan la relación entre Solven Funding S.A.C., con
+                            RUC Nº
+                            20601444764, con domicilio en Av. Mariscal La Mar 398, Of. 401, Miraflores, Lima (en
+                            adelante
+                            “Solven”) y los distintos usuarios de la plataforma de Solven. Los servicios de Solven le
+                            permiten a
+                            los usuarios cotizar, solicitar y contratar de manera electrónica créditos, seguros y otros
+                            productos
+                            financieros, de manera simple, rápida y segura. Al utilizar los servicios, los usuarios
+                            aceptan todas
+                            las disposiciones contenidas en los presentes Términos y Condiciones, sin reserva alguna.
+                        </p>
+                        <ol style="padding: 0 1em;">
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Definiciones</h4>
+
+                                <p class="m-bottom">
+                                    <b>Plataforma Solven:</b> Es los sitios web <a
+                                        href="https://www.solven.pe">www.solven.pe</a>
+                                    las aplicaciones móviles de Solven, Facebook Messenger u otras aplicaciones
+                                    informáticas, a través de las cuales se pueden
+                                    cotizar, solicitar, contratar y/u otorgar créditos, seguros y otros productos
+                                    financieros.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Pol&iacute;tica de Privacidad:</b> Son las normas que regulan la
+                                    recopilaci&oacute;n,
+                                    uso y tratamiento de Datos Personales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Productos Financieros:</b> Son los cr&eacute;ditos, seguros u otros productos que
+                                    se pueden cotizar, solicitar y contratar a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Servicios:</b> Son todos los servicios ofrecidos a trav&eacute;s de la Plataforma
+                                    Solven, que le permiten a los Usuarios Solicitantes cotizar, solicitar y contratar
+                                    diversos Productos Financieros, y a los Usuarios Oferentes contratar con los
+                                    Usuarios Solicitantes.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios Solicitantes:</b> Son todos los usuarios que cotizan, solicitan y
+                                    contratan diversos Productos Financieros a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios Oferentes:</b> Son los Inversores Institucionales, Instituciones
+                                    Financieras, Fondos de Inversi&oacute;n, Compa&ntilde;&iacute;as Aseguradoras,
+                                    Br&oacute;kers
+                                    de Seguros, Solven u otros terceros, que pudiesen otorgar los Productos Financieros
+                                    a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Nuestros Servicios</h4>
+                                <p class="m-bottom">
+                                    A trav&eacute;s de la Plataforma Solven, los Usuarios Solicitantes podr&aacute;n
+                                    cotizar, solicitar y comparar diversos Productos Financieros en l&iacute;nea, de
+                                    manera simple, r&aacute;pida y segura. Los Productos Financieros ser&aacute;n
+                                    otorgados por los Usuarios Oferentes.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En el caso que los Usuarios Solicitantes requieran un Cr&eacute;dito, deber&aacute;n
+                                    indicar el destino o finalidad del mismo, as&iacute; como el monto, el plazo y su
+                                    perfil crediticio. Dicho perfil crediticio es orientativo, puesto que Solven
+                                    realizar&aacute; las consultas necesarias para conocer el perfil crediticio de los
+                                    Usuarios Solicitantes, utilizando tanto la informaci&oacute;n que dichos Usuarios
+                                    Solicitantes proporcionen, as&iacute; como aquella que se encuentre en fuentes
+                                    accesibles al p&uacute;blico u otra informaci&oacute;n que se encuentra detallada en
+                                    nuestra
+                                    <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En base a dicho requerimiento, Solven mostrar&aacute; la/s oferta/s que mejor se
+                                    adec&uacute;e/n a lo que los Usuarios Solicitantes cotizaron, tomando como base las
+                                    variables registradas y obtenidas a lo largo del proceso de evaluaci&oacute;n,
+                                    as&iacute;
+                                    como a las condiciones de financiamiento (restricciones al perfil crediticio,
+                                    montos, plazos y tasas de inter&eacute;s) de los Usuarios Oferentes. En tal sentido,
+                                    las cotizaciones que se muestren estar&aacute;n alienadas con las condiciones de las
+                                    ofertas de los Usuarios Oferentes con quienes Solven mantiene acuerdos comerciales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En el caso que los Usuarios Solicitantes deseen cotizar una P&oacute;liza de Seguro
+                                    con una Compa&ntilde;&iacute;a Aseguradora o Br&oacute;ker de Seguros,
+                                    deber&aacute;n
+                                    indicar el tipo de p&oacute;liza que desean, completando la informaci&oacute;n
+                                    solicitada por cada tipo de p&oacute;liza en particular e incluyendo el monto de la
+                                    cobertura (si existiese dicha alternativa). Con esta informaci&oacute;n,
+                                    conjuntamente con la informaci&oacute;n que dichos Usuarios Solicitantes
+                                    proporcionen en el proceso e informaci&oacute;n de fuentes accesibles al
+                                    p&uacute;blico,
+                                    Solven mostrar&aacute; la cotizaci&oacute;n que mejor se adec&uacute;e a lo
+                                    requerido por parte de los Usuarios Solicitantes y a las ofertas por parte de las
+                                    Compa&ntilde;&iacute;as Aseguradoras y/o los Br&oacute;kers de Seguros con quien/es
+                                    Solven mantiene acuerdos comerciales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven podr&aacute; modificar sus acuerdos comerciales, as&iacute; como la oferta de
+                                    los diversos Productos Financieros que se cotizan a trav&eacute;s de la Plataforma
+                                    Solven, en cualquier momento y a su sola discreci&oacute;n.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pedido de Cotizaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    Para efectuar un pedido de cotizaci&oacute;n, los Usuarios Solicitantes deben
+                                    proporcionar ciertos datos personales, como su n&uacute;mero de DNI, su
+                                    direcci&oacute;n
+                                    de correo electr&oacute;nico y su n&uacute;mero de tel&eacute;fono, al cual se le
+                                    enviar&aacute; un SMS para verificar la tenencia del mismo. Para obtener m&aacute;s
+                                    informaci&oacute;n sobre qu&eacute; informaci&oacute;n personal se recopila visite
+                                    nuestra <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego de ello, los Usuarios Solicitantes deber&aacute;n completar informaci&oacute;n
+                                    adicional que le permita a Solven completar su perfil personal y, en caso de
+                                    tratarse de un producto de Cr&eacute;dito, realizar consultas acerca del
+                                    comportamiento crediticio, para poder mostrarle la/s oferta/s que mejor se
+                                    adec&uacute;e/n
+                                    a lo solicitado. En igual sentido, para el caso de P&oacute;lizas de Seguro, los
+                                    Usuarios Solicitantes deber&aacute;n proporcionar informaci&oacute;n a Solven para
+                                    que le permita cotizar y presentar la/s P&oacute;liza/s de Seguro/s que mejor se
+                                    adec&uacute;e/n a los requerimientos del Usuario Solicitante.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Formaci&oacute;n del Consentimiento en los
+                                    Contratos a trav&eacute;s de la Plataforma Solven</h4>
+                                <p class="m-bottom">
+                                    A trav&eacute;s de la Plataforma Solven, los Usuarios Solicitantes podr&aacute;n
+                                    solicitar Productos Financieros de manera electr&oacute;nica.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Las solicitudes de los Usuarios Solicitantes, antes de ser aceptadas por parte de
+                                    los Usuarios Oferentes, deber&aacute;n ser procesadas, analizadas y validadas. Esto
+                                    se debe a que, los Usuarios Oferentes necesitan analizar el perfil del Usuario
+                                    Solicitante y verificar que se encuentre enmarcado dentro de las pol&iacute;ticas de
+                                    su compa&ntilde;&iacute;a, a efectos de corroborar que califican para el Producto
+                                    Financiero ofrecido.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, los Usuarios Oferentes
+                                    enviar&aacute;n
+                                    a trav&eacute;s de la Plataforma Solven sus ofertas. Finalmente, la Plataforma
+                                    Solven mostrar&aacute; a los Usuarios Solicitantes la/s oferta/s que mejor se
+                                    adec&uacute;e/n
+                                    a su pedido de cotizaci&oacute;n.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Los Usuarios Solicitantes deber&aacute;n seleccionar la oferta que deseen, en caso
+                                    se presente m&aacute;s de una variante de la misma, completar informaci&oacute;n
+                                    adicional y brindar su consentimiento. La aceptaci&oacute;n electr&oacute;nica de la
+                                    oferta constituye la manifestaci&oacute;n de voluntad de dichos Usuarios
+                                    Solicitantes para la contrataci&oacute;n del Producto Financiero. Sobre este punto,
+                                    cabe indicar que la contrataci&oacute;n electr&oacute;nica se encuentra recogida en
+                                    los art&iacute;culos 141 y 141-A del C&oacute;digo Civil, los cuales establecen de
+                                    manera expresa que la manifestaci&oacute;n de voluntad efectuada a trav&eacute;s de
+                                    medios electr&oacute;nicos es legal, siendo que los actos jur&iacute;dicos que se
+                                    celebren por dichos medios tienen plena validez.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez aceptada electr&oacute;nicamente la oferta por parte del Usuario
+                                    Solicitante, el Usuario Oferente, enviar&aacute; una notificaci&oacute;n
+                                    electr&oacute;nica
+                                    al Usuario Solicitante, a trav&eacute;s de la Plataforma Solven, confirmando que ha
+                                    recepcionado su aceptaci&oacute;n. Luego de ello, el Cr&eacute;dito ser&aacute;
+                                    desembolsado en la cuenta indicada por el Usuario Solicitante, o bien la
+                                    P&oacute;liza
+                                    de Seguro ser&aacute; emitida, siempre bajo las condiciones previamente pactadas y
+                                    aceptadas por las partes.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Plazos de Respuesta</h4>
+                                <p class="m-bottom">
+                                    Una vez que los Usuarios Solicitantes efect&uacute;en un pedido de
+                                    cotizaci&oacute;n,
+                                    habiendo brindado la totalidad de informaci&oacute;n y documentos requeridos, Solven
+                                    mostrar&aacute; la/s oferta/s que mejor se adec&uacute;e/n a lo solicitado, de
+                                    manera inmediata.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego que los Usuarios Solicitantes seleccionen la oferta del Producto Financiero
+                                    que deseen contratar, Solven tomar&aacute; un tiempo aproximado de 3 horas
+                                    h&aacute;biles
+                                    para validar y verificar la informaci&oacute;n proporcionada por los Usuarios
+                                    Solicitantes, a efectos de analizar el cumplimiento de las condiciones de los
+                                    Usuarios Oferentes. Sobre este punto, cabe indicar que dicho tiempo es referencial,
+                                    en tanto Solven depende de consultas sobre informaci&oacute;n proporcionada por
+                                    terceros para efectuar dichas validaciones, siendo que Solven no tiene control
+                                    alguno sobre los plazos de respuesta de dichos terceros. Asimismo, Solven no tiene
+                                    control sobre cualquier hecho de tercero o imponderable que imposibilite la
+                                    validaci&oacute;n
+                                    de la informaci&oacute;n de los Usuarios Solicitantes en el plazo estipulado.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, los Usuarios Oferentes
+                                    mostrar&aacute;n en la Plataforma Solven sus ofertas, para que los Usuarios
+                                    Solicitantes analicen y, eventualmente, acepten las condiciones del Producto
+                                    Financiero ofrecido, de manera previa al desembolso del Cr&eacute;dito o
+                                    emisi&oacute;n
+                                    de la P&oacute;liza de Seguro.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El desembolso del Cr&eacute;dito o emisi&oacute;n de la P&oacute;liza de Seguro se
+                                    efectuar&aacute; en un tiempo aproximado de 6 horas h&aacute;biles desde la
+                                    aceptaci&oacute;n
+                                    final del Usuario Solicitante, siempre conforme a las condiciones espec&iacute;ficas
+                                    del Producto Financiero contratado. Cabe indicar que dicho plazo es referencial, en
+                                    la medida que el desembolso del Cr&eacute;dito o emisi&oacute;n de la P&oacute;liza
+                                    de Seguro depende en &uacute;ltima instancia del Usuario Oferente que comercializa
+                                    el producto financiero y sobre el cual Solven no tiene control alguno.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Programa de Referidos Solven</h4>
+                                <p class="m-bottom">
+                                    El programa de referidos de solicitantes (en adelante el “Programa”) consiste en un
+                                    sistema de recompensas para aquellos Usuarios que deseen (en adelante, “Usuario
+                                    Referenciador”) referir a sus contactos (en adelante “Referido”) para que soliciten
+                                    créditos a través de Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Podrán participar del programa todos los usuarios de la página web, salvo
+                                    colaboradores
+                                    de Solven y sus familiares. Para habilitar su participación, Solven disponibiliza un
+                                    sitio web con login específico, desde el cual “Usuario Referenciador” podrá
+                                    compartir su
+                                    URL conteniendo su ID. El “Usuario Referenciador” recibirá un premio de S/100 por
+                                    cada
+                                    “Referido” que obtenga un préstamo a través del hipervínculo enviado y que este sea
+                                    desembolsado. Solven se reserva el derecho de modificar el monto de la recompensa en
+                                    el
+                                    futuro.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    No tendrán derecho a recibir una recompensa:
+                                    <ul class="list-refer" style="margin-left: 16px;">
+                                        <li style="list-style-type: initial;">
+                                            <p class="m-bottom">
+                                                El “Referido”, utilizando su propio link.
+                                            </p>
+                                        </li>
+                                        <li style="list-style-type: initial;">
+                                            <p class="m-bottom">El “Usuario Referenciador” que haya obtenido un préstamo
+                                                a través de
+                                                Solven, pero que se encuentre con se encuentre con atraso en dicho
+                                                préstamo al momento
+                                                de la fecha de pago de las recompensas.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El pago de recompensas al “Usuario Referenciadores” será abonado mediante
+                                    transferencia
+                                    bancaria a una cuenta de su titularidad, que hubiera sido informada a Solven, a
+                                    través del
+                                    sitio creado para estos fines. En caso de que el “Referido” sea una misma persona
+                                    sea
+                                    referida por 2 o más “Usuarios Referenciadores”, el premio se le otorgará a aquel
+                                    cuyo
+                                    hipervínculo fue utilizado para finalizar el proceso de crédito. El programa de
+                                    referidos
+                                    estará vigente para solicitudes iniciadas hasta el 31/12/2020 inclusive.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Los “Usuarios Referenciadores” adhieren además a las políticas de privacidad y
+                                    términos y
+                                    condiciones generales del sitio web, debiendo hacer buen uso de las herramientas
+                                    brindadas.
+                                    Solven se reserva el derecho de no admitir y/o suspender a aquellos usuarios que no
+                                    cumplan
+                                    con la mismas.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Queda prohibida la suplantaci&oacute;n de una red social o web, real por otra falsa con el
+                                    fin de realizar una acción fraudulenta.Si se crea un perfil falso suplantando a la
+                                    marca, los desembolsos realizados a trav&eacute;s de su ID no recibir&aacute;n bonificaci&oacute;n o
+                                    premio alguno. Sin perjuicio de ello, Solven se reserva la posibilidad de efectuar
+                                    acciones legales
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pol&iacute;tica de Uso de la Plataforma</h4>
+                                <p class="m-bottom">
+                                    Al hacer uso de la Plataforma Solven, los Usuarios Solicitantes certifican y aceptan
+                                    que:
+                                </p>
+                                <br />
+                                <ol style="list-style-type: upper-alpha;">
+                                    <li>
+                                        <p class="m-bottom">Que son mayores de 18 a&ntilde;os de edad y pueden celebrar
+                                            contratos legalmente vinculantes.</p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que la informaci&oacute;n que proporcionen es veraz.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que se les har&aacute; responsables de toda acci&oacute;n realizada en la
+                                            Plataforma Solven en la que los Usuarios Solicitantes hayan participado.
+                                        </p>
+                                        <br />
+                                    </li>
+                                </ol>
+                                <p class="m-bottom">
+                                    En igual sentido, el uso de la Plataforma Solven se encuentra supeditado a las
+                                    siguientes disposiciones:
+                                </p>
+                                <br />
+                                <ol style="list-style-type: lower-roman;">
+                                    <li>
+                                        <p class="m-bottom">
+                                            Ninguna persona podr&aacute; acceder con los datos de un tercero a la
+                                            Plataforma Solven, el uso de la Plataforma Solven es estrictamente personal.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            La Plataforma Solven se debe utilizar de conformidad con los presentes
+                                            T&eacute;rminos
+                                            y Condiciones, respetando los derechos de terceros y actuando de buena fe.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            No se debe proporcionar informaci&oacute;n falsa, usurpar la identidad de
+                                            otra persona, cometer actos il&iacute;citos u otros que sean lesivos de
+                                            intereses o derechos de terceros.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            No se debe da&ntilde;ar o tratar de vulnerar el sistema inform&aacute;tico
+                                            que opera la Plataforma Solven.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Se encuentra expresamente prohibido el uso de dispositivos o procesos
+                                            automatizados, robots, rastreadores, ara&ntilde;as web u otros medios o
+                                            herramientas que tengan por finalidad extraer informaci&oacute;n de la
+                                            Plataforma Solven.
+                                        </p>
+                                        <br />
+                                    </li>
+                                </ol>
+                                <p class="m-bottom">
+                                    En el caso que Solven detecte que se han incurrido en conductas contrarias a la
+                                    presente Pol&iacute;tica de Uso, Solven se reserva el derecho de prohibir el acceso
+                                    y uso de la Plataforma Solven por parte de las personas que han violado las
+                                    Pol&iacute;ticas
+                                    de Uso, as&iacute; como de iniciar las acciones necesarias por responsabilidades
+                                    administrativas, civiles o penales.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Limitaci&oacute;n de Responsabilidad</h4>
+                                <p class="m-bottom">
+                                    Solven no se hace responsable por los posibles da&ntilde;os o perjuicios producto de
+                                    interrupciones, interferencias, errores o conductas de terceros que afecten el
+                                    correcto funcionamiento del sistema inform&aacute;tico de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En igual sentido, en la medida que Solven utiliza herramientas y medios
+                                    tecnol&oacute;gicos
+                                    para procesar y tratar la informaci&oacute;n, tanto de los Usuarios Solicitantes
+                                    como de los Usuarios Oferentes, Solven no se responsabiliza por los errores u
+                                    omisiones producto de la utilizaci&oacute;n de dichas herramientas o medios
+                                    tecnol&oacute;gicos,
+                                    dado que estos no son infalibles.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Por otro lado, en la medida que Solven utiliza informaci&oacute;n crediticia de los
+                                    Usuarios Solicitantes que ha sido elaborada y proporcionada por terceros (por ej.
+                                    centrales privadas de informaci&oacute;n de riesgos) o por fuentes accesibles al
+                                    p&uacute;blico,
+                                    Solven no se responsabiliza por los errores u omisiones que dicha informaci&oacute;n
+                                    pueda contener, en la medida que no es informaci&oacute;n de elaboraci&oacute;n
+                                    propia. Asimismo, dado que Solven no tiene control sobre los plazos de respuesta de
+                                    los terceros que proporcionan informaci&oacute;n, ni control sobre cualquier
+                                    imponderable que imposibilite 5 que la validaci&oacute;n de identidad y
+                                    corroboraci&oacute;n
+                                    de informaci&oacute;n de los Usuarios Solicitantes se efect&uacute;e en los plazos
+                                    estipulados, Solven no asume responsabilidad en caso se incumplan dichos plazos.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven no responde por la calidad o idoneidad de los servicios o productos
+                                    financieros contratados por los Usuarios Solicitantes con los Usuarios Oferentes, ni
+                                    de cualquier reclamaci&oacute;n que se pueda originar relacionado a ello, debido a
+                                    que no forma parte de la relaci&oacute;n de consumo entablada entre los Usuarios
+                                    Solicitantes y los Usuarios Oferentes, a excepci&oacute;n de los productos o
+                                    servicios que sean estrictamente proporcionados por Solven. Las ofertas de los
+                                    Productos Financieros se encuentran debidamente identificadas por los Usuarios
+                                    Oferentes que los est&aacute;n ofreciendo. Los Usuarios Solicitantes podr&aacute;n
+                                    dirigir sus consultas o reclamos a la entidad correspondiente.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Libro de Reclamaciones</h4>
+                                <p class="m-bottom">
+                                    El <a href="https://goo.gl/forms/YSrUopQdzToWErxt2"
+                                        rel="nofollow noopener noreferrer">Libro de Reclamaciones</a> virtual de
+                                    Solven le permite registrar sus quejas o reclamos relacionados a los Servicios
+                                    brindado por Solven, ello en de la Ley N&ordm; 29571 - C&oacute;digo de
+                                    Protecci&oacute;n
+                                    y Defensa del Consumidor.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Propiedad Intelectual</h4>
+                                <p class="m-bottom">
+                                    Solven es el propietario de todo el contenido, incluyendo im&aacute;genes,
+                                    gr&aacute;ficos,
+                                    textos y todos los elementos de propiedad industrial que se encuentren en la
+                                    Plataforma Solven. En aquellos casos en que no sea el propietario, Solven cuenta con
+                                    todas las licencias necesarias para su uso por parte de los titulares de dicho
+                                    contenido o derechos de propiedad intelectual.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Se deben respetar los derechos de propiedad intelectual de titularidad de Solven y
+                                    de terceros. Queda prohibida la reproducci&oacute;n, distribuci&oacute;n,
+                                    transformaci&oacute;n o cualquier otra forma de utilizaci&oacute;n del contenido que
+                                    se encuentre en la Plataforma Solven, sin la autorizaci&oacute;n previa y expresa de
+                                    Solven.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Enlaces a Sitios Web de Terceros</h4>
+                                <p class="m-bottom">
+                                    En caso se dispusieran enlaces hacia sitios web de terceros, tales como enlaces
+                                    hacia los sitios web de los Usuarios Oferentes o cualquier otro tercero, Solven no
+                                    garantiza, avala, ni respalda el contenido de dichos sitios web, ni las
+                                    pol&iacute;ticas
+                                    de los mismos.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pol&iacute;tica de Privacidad</h4>
+                                <p class="m-bottom">
+                                    El tratamiento de la informaci&oacute;n de car&aacute;cter personal se encuentra
+                                    detallado en la <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                        Privacidad</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Comunicaciones</h4>
+                                <p class="m-bottom">
+                                    Cualquier comunicaci&oacute;n, comentario, inquietud o sugerencia respecto de los
+                                    presentes T&eacute;rminos y Condiciones, Pol&iacute;tica de Privacidad u otros,
+                                    deber&aacute; ser enviada a
+                                    <a href="mailto:legal@solven.pe">legal@solven.pe</a>.
+                                </p>
+
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Jurisdicci&oacute;n y Ley Aplicable</h4>
+                                <p class="m-bottom">
+                                    Los presentes T&eacute;rminos y Condiciones se rigen por las leyes vigentes en la
+                                    Rep&uacute;blica del Per&uacute;. Cualquier disputa relacionada con la validez,
+                                    aplicaci&oacute;n o interpretaci&oacute;n de los mismos ser&aacute; resuelta de
+                                    manera amical entre las partes y, de no ser posible ello, ante en los tribunales del
+                                    Cercado de Lima.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Inexistencia de Contrato de
+                                    Representaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    La utilizaci&oacute;n de la Plataforma Solven no crea contrato de sociedad, de
+                                    representaci&oacute;n o de mandato entre Solven y lo usuarios de la plataforma.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Modificaci&oacute;n de los T&eacute;rminos y
+                                    Condiciones</h4>
+                                <p class="m-bottom">
+                                    Solven podr&aacute; modificar los presentes T&eacute;rminos y Condiciones en
+                                    cualquier momento y publicar&aacute; inmediatamente dicha modificaci&oacute;n. Al
+                                    hacer uso de la Plataforma Solven, luego de realizados los cambios, usted
+                                    est&aacute;
+                                    aceptando las modificaciones. En caso de no encontrarse de acuerdo con las nuevas
+                                    modificaciones, deber&aacute; dejar de hacer uso de los Servicios.
+                                </p>
+                            </li>
+                        </ol>
+                        <p style="margin-top:2em;">
+                            &Uacute;ltima actualizaci&oacute;n: 07 de Abril de 2020.
+                        </p>
+                    </article>
+                </th:block>
+                <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).ACCESO)}">
+                    <article class="wrap-content tyc-tos gwr">
+                        <h1 class="static-title m-bottom">T&eacute;rminos y Condiciones</h1>
+                        <p class="m-bottom">
+                            Los presentes Términos y Condiciones Generales de Uso regulan la relación entre Edpyme Acceso Crediticio S.A, con RUC N.º 20438563084, con domicilio real en avenida Enrique Canaval y Moreyra No. 452 piso. 11 – urbanización Santa Ana – distrito de San Isidro – provincia y departamento de Lima o cualquier empresa vinculada (en adelante, “ACCESO”) y los distintos usuarios de la plataforma de ACCESO (en adelante, “Usuario/s”). Los servicios de ACCESO le permiten a los Usuarios cotizar, solicitar, consultar y contratar de manera electrónica créditos y otros productos financieros, de manera simple, rápida y segura. Al utilizar los servicios, los Usuarios aceptan todas las disposiciones contenidas en los presentes Términos y Condiciones, sin reserva ni limitación alguna.
+                        </p><br/>
+                        <p class="m-bottom">
+                            Los Usuarios declaran que toda la información que proporcionen a través de la Plataforma ACCESO es actual, exacta
+                        </p><br/>
+                        <p class="m-bottom">
+                            <b>DEFINICIONES</b>
+                        </p>
+                        <ol style="padding: 0 1em;">
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Plataforma ACCESO</h4>
+                                <p class="m-bottom">
+                                    La plataforma ACCESO está compuesta por los siguientes sitios web:
+                                </p><br />
+
+                                <ol style="padding: 0 1em;">
+                                    <li>
+                                        <p>https://acceso.com.pe/</p>
+                                    </li><li>
+                                        <p>https://oficina.acceso.com.pe/</p>
+                                    </li><li>
+                                        <p>https://credinstante.pe/</p>
+                                    </li><li>
+                                        <p>https://oficina.acceso.com.pe/renovacion</p>
+                                    </li><li>
+                                        <p>https://oficina.acceso.com.pe/contigo</p>
+                                    </li><li>
+                                        <p>https://oficina.acceso.com.pe/conversion-fise</p>
+                                    </li><li>
+                                        <p>https://prestifacil.com.pe/</p>
+                                    </li><br />
+                                </ol>
+                                <p class="m-bottom">
+                                    o cualquier otra página web de propiedad de ACCESO como también sus extensiones, aplicaciones móviles, Chatbot, Facebook, Messenger y en general cualquier otra aplicación informática que ACCESO use como canal mediante el cual los Usuarios pueden: cotizar, solicitar, contratar, consultar el detalle de estado de cuenta del crédito, resumen de su cronograma de pagos, y/u solicitar determinados créditos y otros productos financieros que ACCESO ponga a su disposición.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Política de Privacidad:</b> Son las normas que regulan la recopilación, uso y tratamiento de Datos Personales de los Usuarios.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Productos Financieros:</b> Son los créditos u otros productos que se pueden cotizar, solicitar, contratar, como consultar en caso ya cuente con un Producto Financiero de ACCESO, a través de la Plataforma ACCESO.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Servicios:</b> Son todos los servicios ofrecidos a través de la Plataforma ACCESO, que le permiten a los Usuarios cotizar, solicitar, consultar y contratar diversos Productos Financieros.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios:</b> Son todas las personas naturales que cotizan, solicitan, consultan y contratan diversos Productos Financieros a través de la Plataforma ACCESO.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Nuestros Servicios</h4>
+                                <p class="m-bottom">
+                                    A través de las Plataformas web de ACCESO, los Usuarios podrán cotizar, solicitar, contratar diversos Productos Financieros en línea, como consultar el estado de su crédito, de manera simple, rápida y segura. Los Productos Financieros serán otorgados por ACCESO en caso se cumplan con los requisitos solicitados y previa evaluación crediticio a los Usuarios
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En el caso que los Usuarios requieran alguno de los Productos Financieros ofrecidos por ACCESO, deberán completar su información de carácter personal y patrimonial, objetiva y de manera fidedigna. Dicho perfil crediticio es orientativo, puesto que ACCESO realizará las consultas necesarias para conocer el perfil crediticio de los Usuarios, utilizando tanto la información que dichos Usuarios proporcionen, así como aquella que se encuentre en fuentes accesibles al público u otra información conforme a lo detallado en nuestra Política de Privacidad.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En base a dicho requerimiento, la Plataforma ACCESO comunicará al Usuario la/s oferta/s que mejor se adecúe/n a lo que los Usuarios cotizaron, tomando como base las variables registradas y obtenidas a lo largo del proceso de evaluación, así como a las condiciones de financiamiento (restricciones al perfil crediticio, montos, plazos y tasas de interés) de ACCESO.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    ACCESO podrá modificar sus acuerdos comerciales, así como la oferta de los diversos Productos Financieros que se cotizan a través de la Plataforma ACCESO, en cualquier momento y a su sola discreción, lo cual el Usuario declara conocer y aceptar.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pedido de Cotizaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    Para efectuar un pedido de cotización, los Usuarios deben proporcionar ciertos datos personales, como su número de DNI, su dirección de correo electrónico y su número de teléfono, al cual se le enviará un SMS para verificar su identidad, el cual aplica solo para algunos productos o campañas. Para obtener más información sobre qué información personal se recopila visite nuestra Política de Privacidad contenidas en el siguiente link: <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego de ello, los Usuarios deberán completar la información adicional que le permita a ACCESO completar su perfil personal y, en caso de tratarse de un producto de Crédito, realizar consultas acerca del comportamiento crediticio, para poder mostrarle la/s oferta/s que mejor se adecúe/n a lo solicitado.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Formación del Consentimiento en los Contratos a través de la Plataforma ACCESO</h4>
+                                <p class="m-bottom">
+                                    A través de la Plataforma ACCESO, los Usuarios podrán solicitar Productos Financieros de manera electrónica y/o virtuales, por lo que, el consentimiento del Usuario puede realizarse, por ejemplo, ingresando claves o contraseñas, clic o cliquear en dispositivos, aceptación por voz, datos biométricos (huella dactilar, identificación facial, etc.), entre otros.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Las solicitudes de los Usuarios, para ser aceptadas por parte de ACCESO, deberán ser procesadas, analizadas y validadas. Esto se debe a que ACCESO necesita analizar el perfil de los Usuarios y verificar que se encuentre enmarcado dentro de las políticas de la compañía, a efectos de corroborar que califican para el Producto Financiero ofrecido o no.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, ACCESO enviará sus ofertas a través de la Plataforma ACCESO o un gestor de ventas se pondrá en contacto con el Usuario. Finalmente, la Plataforma ACCESO mostrará a los Usuarios la/s oferta/s que mejor se adecúen a su pedido de cotización.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Los Usuarios deberán seleccionar la oferta que deseen, en caso se presente más de una variante de la misma, completar información adicional y brindar su consentimiento. La aceptación electrónica y/o virtual de la oferta constituye la manifestación de voluntad de dichos Usuarios para la contratación del Producto Financiero, por lo que todos los documentos de crédito que correspondan al Producto Financiero adquirido serán enviados al correo electrónico proporcionado. Sobre este punto, cabe indicar que la contratación electrónica se encuentra recogida en los artículos 141° y 141-A° del Código Civil, los cuales establecen de manera expresa que la manifestación de voluntad efectuada a través de medios electrónicos es legal, siendo que los actos jurídicos que se celebren por dichos medios tienen plena validez. Asimismo, el Reglamento de Gestión de Conducta de Mercado, que regula el comportamiento de las Empresas del Sistema Financiero frente a los Usuarios autoriza a estas empresas a contratar a través de mecanismos distintos al escrito, tales como comunicaciones telefónicas, medios electrónicos u otros mecanismos que determine la empresa.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez aceptada electrónicamente la oferta por parte del Usuario, ACCESO enviará una notificación electrónica al Usuario, a través de la Plataforma ACCESO, salvo en el que la firma de los documentos de crédito deban realizarse de manera manuscrita. Luego de ello, el Producto Financiero será desembolsado en la cuenta indicada por el Usuario, siempre bajo las condiciones previamente pactadas y aceptadas por las partes.
+                                </p>
+                                <p class="m-bottom">
+                                    En caso el Usuario utilice una Plataforma ACCESO que no permita la autoevaluación, un gestor de negocios se comunicará con el Usuario para realizar la respectiva evaluación, recabar información faltante o confirmar aquella que no se haya podido comprobar, para a posterior concretar una eventual operación crediticia.</p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Plazos de Respuesta</h4>
+                                <p class="m-bottom">
+                                    ACCESO depende de consultas sobre información proporcionada por terceros para efectuar cualquier validación, por lo que ACCESO no tiene control alguno sobre los plazos de respuesta de dichos terceros. Asimismo, ACCESO no tiene control sobre cualquier hecho de tercero o imponderable que imposibilite la validación de la información de los Usuarios en el plazo estipulado.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    De acuerdo a ello, ACCESO no asumirá responsabilidad alguna por culpa leve o por cualquier problema o inconveniente imputable a terceros, sea éste de índole técnico, físico o producto de un caso fortuito o fuerza mayor que imposibilite, retrase, demore la ejecución o no permita la realización exitosa del uso de la Plataforma ACCESO. Una vez procesada, analizada y validada una solicitud, ACCESO remitirá el resultado, para que los Usuarios analicen y, eventualmente, acepten de considerarlo conveniente las condiciones del Producto Financiero, de manera previa al desembolso del Crédito.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El desembolso del Crédito se efectuará en un tiempo aproximado de cinco (5) días hábiles desde la aceptación final de los Usuarios y el cumplimiento respectivo del proceso de crédito indicado por un gestor de ventas de ACCESO, siempre conforme a las condiciones específicas del Producto Financiero contratado y en caso no se presenten observaciones respecto a los datos proporcionados por los Usuarios, como, por ejemplo: número de cuenta erróneo, entre otros. Cabe indicar que dicho plazo es referencial.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Política de Uso de la Plataforma</h4>
+                                <p class="m-bottom">
+                                    Al hacer uso de la Plataforma ACCESO, los Usuarios certifican y aceptan lo siguiente:
+                                </p>
+                                <br />
+                                <ol style="padding: 0 1em;">
+                                    <li>
+                                        <p>Que son mayores de 18 años de edad y pueden celebrar contratos legalmente vinculantes.</p>
+                                    </li>
+                                    <li>
+                                        <p>Que la información que proporcionen es veraz.</p>
+                                    </li>
+                                    <li>
+                                        <p>Que se les hará responsables de toda acción realizada en la Plataforma ACCESO en la que los Usuarios hayan participado.</p>
+                                    </li>
+                                    <br />
+                                </ol>
+                                <br />
+                                <p class="m-bottom">
+                                    En igual sentido, el uso de la Plataforma ACCESO se encuentra supeditado a las siguientes disposiciones:
+                                </p>
+                                <br />
+                                <ol style="padding: 0 1em;">
+                                    <li>
+                                        <p>Ninguna persona podrá acceder con los datos de un tercero a la Plataforma ACCESO, el uso de la Plataforma ACCESO es estrictamente personal.</p>
+                                    </li>
+                                    <li>
+                                        <p>La Plataforma ACCESO se debe utilizar de conformidad con los presentes Términos y Condiciones, y las condiciones particulares para cada Producto Financiero, respetando los derechos de terceros y actuando de buena fe.</p>
+                                    </li>
+                                    <li>
+                                        <p>No se debe proporcionar información falsa, usurpar la identidad de otra persona, cometer actos ilícitos u otros que sean lesivos de intereses o derechos de terceros.</p>
+                                    </li>
+                                    <li>
+                                        <p>No se debe dañar o tratar de vulnerar el sistema informático que opera la Plataforma ACCESO</p>
+                                    </li>
+                                    <li>
+                                        <p>Se encuentra expresamente prohibido el uso de dispositivos o procesos automatizados, robots, rastreadores, arañas web u otros medios o herramientas que tengan por finalidad extraer información de la Plataforma ACCESO.</p>
+                                    </li>
+                                    <li>
+                                        <p>Se encuentra terminantemente prohibido utilizar la Plataforma ACCESO para actividades que impliquen infringir o violar las leyes del Perú o del lugar en el que se haga uso de los servicios que se presten a través del mismo.</p>
+                                    </li>
+                                    <li>
+                                        <p>Queda  terminantemente prohibido llevar a cabo actividades de «hacking» (acto o series de actos realizado(s) a través o por conducto del Internet que involucren la eliminación, apropiación, interferencia, daño o la extracción parcial o total no autorizada de información, dinero o bienes de propiedad de terceros registrados en Internet con cualquier propósito, incluyendo pero sin limitarse, el de causar daño, u obtener un beneficio económico en favor de aquel que realice el acto en favor de terceros), a través de la Plataforma de ACCESO.</p>
+                                    </li>
+                                    <br />
+                                </ol>
+
+                                <p class="m-bottom">
+                                    En el caso que ACCESO detecte que se han incurrido en conductas contrarias a los presente términos y condiciones generales de uso, ACCESO se reserva el derecho de prohibir el acceso y uso de la Plataforma ACCESO por parte de las personas que han violado las Políticas de Uso, así como de iniciar las acciones necesarias por responsabilidades administrativas, civiles o penales. El Usuario reconoce que no todos los productos financieros y/o servicios están disponibles en todas las áreas geográficas.
+                                </p>
+
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Confidencialidad</h4>
+                                <p class="m-bottom">
+                                    ACCESO se obliga a mantener la confidencialidad de la información que reciba o tenga carácter de confidencial conforme a las disposiciones legales aplicables en la República del Perú. ACCESO, no asume la obligación de mantener la confidencialidad de cualquier otra información que los usuarios proporcionen, ya sea al inscribirse en la Plataforma ACCESO o en cualquier otro momento posterior.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    ACCESO podrá almacenar y acceder a la información de los datos que los Usuarios hayan decidido registrar como parte del uso de la Plataforma ACCESO, la misma que se almacenará de forma encriptada con la finalidad de preservar la confidencialidad y seguridad de la misma.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Claves secretas y números confidenciales</h4>
+                                <p class="m-bottom">
+                                    En todo momento, el Usuario es el único responsable de mantener en secreto las claves secretas y números confidenciales con los cuales tenga acceso a la Plataforma ACCESO. La clave secreta, así como las claves asignadas por ACCESO, son de carácter personal e intransferible.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Los Usuarios asumen totalmente la responsabilidad por permitir el acceso a terceros a su dispositivo móvil o correo electrónico, liberando a ACCESO de toda responsabilidad por su mal uso.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Limitación de Responsabilidad</h4>
+                                <p class="m-bottom">
+                                    ACCESO no se hace responsable por los posibles daños o perjuicios producto de interrupciones, interferencias, errores o conductas de terceros que afecten el correcto funcionamiento del sistema informático de la Plataforma ACCESO. </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En igual sentido, en la medida que ACCESO utiliza herramientas y medios tecnológicos para procesar y tratar la información de los Usuario, ACCESO no se responsabiliza por los errores u omisiones producto de la utilización de dichas herramientas o medios tecnológicos, dado que estos no son infalibles.
+                                </p>
+                                <p class="m-bottom">
+                                    Por otro lado, en la medida que ACCESO utiliza información crediticia de los Usuario que ha sido elaborada y proporcionada por terceros (por ej. centrales privadas de información de riesgos) o por fuentes accesibles al público, ACCESO no se responsabiliza por los errores u omisiones que dicha información pueda contener, en la medida que no es información de elaboración propia. Asimismo, dado que ACCESO no tiene control sobre los plazos de respuesta de los terceros que proporcionan información, ni control sobre cualquier imponderable que imposibilite que la validación de identidad y corroboración de información de los Usuario se efectúe en los plazos estipulados, ACCESO no asume responsabilidad en caso se incumplan dichos plazos.
+                                </p>
+                                <p class="m-bottom">
+                                    ACCESO no asumirá responsabilidad alguna por culpa leve o por cualquier problema o inconveniente imputable a terceros, sea éste de índole técnico, físico o producto de un caso fortuito o fuerza mayor que imposibilite, retrase, demore la ejecución o no permita la realización exitosa del servicio que se brinda mediante la Plataforma ACCESO. Asimismo, ACCESO no asumirá responsabilidad alguna por el acceso a la Plataforma ACCESO de terceros, siendo los usuarios responsables de resguardar sus datos personales y cerrar sesión, en caso corresponda.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Libro de Reclamaciones</h4>
+                                <p class="m-bottom">
+                                    El Libro de Reclamaciones virtual de ACCESO le permite registrar sus quejas o reclamos relacionados a los Servicios brindados por ACCESO, ello de conformidad con la Ley Nº 29571 – Código de Protección y Defensa del Consumidor.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Propiedad Intelectual</h4>
+                                <p class="m-bottom">
+                                    ACCESO es el propietario de todo el contenido, incluyendo imágenes, gráficos, textos y todos los elementos de propiedad industrial que se encuentren en la Plataforma ACCESO. En aquellos casos en que no sea el propietario, ACCESO cuenta con todas las licencias necesarias para su uso por parte de los titulares de dicho contenido o derechos de propiedad intelectual. Se deben respetar los derechos de propiedad intelectual de titularidad de ACCESO y de terceros. Queda prohibida la reproducción, distribución, transformación o cualquier otra forma de utilización del contenido que se encuentre en la Plataforma ACCESO, sin la autorización previa y expresa de ACCESO.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Enlaces a Sitios Web de Terceros</h4>
+                                <p class="m-bottom">
+                                    En caso se dispusieran enlaces hacia sitios web de terceros, ACCESO no garantiza, avala, ni respalda el contenido de dichos sitios web, ni las políticas de los mismos.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Política de Privacidad</h4>
+                                <p class="m-bottom">
+                                    El tratamiento de la información de carácter personal se encuentra detallado en la Política de Privacidad.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Jurisdicción y Ley Aplicable</h4>
+                                <p class="m-bottom">
+                                    Los presentes Términos y Condiciones se rigen por las leyes vigentes en la República del Perú. Cualquier disputa relacionada con la validez, aplicación o interpretación de los mismos será resuelta de manera amical entre las partes y, de no ser posible ello, ante en los tribunales del Cercado de Lima – Área Metropolitana.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Inexistencia de Contrato de Representación</h4>
+                                <p class="m-bottom">
+                                    La utilización de la Plataforma ACCESO no crea contrato de sociedad, de representación o de mandato entre ACCESO y lo usuarios de la plataforma.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Modificación de los Términos y Condiciones</h4>
+                                <p class="m-bottom">
+                                    ACCESO podrá modificar los presentes Términos y Condiciones en cualquier momento y publicará inmediatamente dicha modificación. Al hacer uso de la Plataforma ACCESO, luego de realizados los cambios, usted está aceptando las modificaciones. En caso de no encontrarse de acuerdo con las nuevas modificaciones, deberá dejar de hacer uso de los Servicios.
+                                </p>
+                            </li>
+                        </ol>
+                        <p style="margin-top:2em;">
+                            Última actualización: 04 de diciembre del 2020
+                        </p>
+                    </article>
+                </th:block>
+                <th:block th:unless="${brandedTermsAndConditons==null}" th:utext="${brandedTermsAndConditons}">
+                </th:block>
+            </th:block>
+            <!--COLOMBIA-->
+            <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                <th:block th:if="${brandedTermsAndConditons==null}">
+                    <article class="wrap-content tyc-tos gwr">
+                        <h1 class="static-title m-bottom">T&eacute;rminos y Condiciones</h1>
+                        <p class="m-bottom">
+                            Los presentes Términos y Condiciones regulan la relación entre Solven Funding S.A.C., con
+                            RUC Nº
+                            20601444764, con domicilio en Av. Mariscal La Mar 398, Of. 401, Miraflores, Lima (en
+                            adelante
+                            “Solven”) y los distintos usuarios de la plataforma de Solven. Los servicios de Solven le
+                            permiten a
+                            los usuarios cotizar, solicitar y contratar de manera electrónica créditos, seguros y otros
+                            productos
+                            financieros, de manera simple, rápida y segura. Al utilizar los servicios, los usuarios
+                            aceptan
+                            todas
+                            las disposiciones contenidas en los presentes Términos y Condiciones, sin reserva alguna.
+                        </p>
+                        <ol style="padding: 0 1em;">
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Definiciones</h4>
+
+                                <p class="m-bottom">
+                                    <b>Plataforma Solven:</b> Es los sitios web <a
+                                        href="https://www.solven.pe">www.solven.pe</a>
+                                    las aplicaciones móviles de Solven, Facebook Messenger u otras aplicaciones
+                                    informáticas, a través de las cuales se pueden
+                                    cotizar, solicitar, contratar y/u otorgar créditos, seguros y otros productos
+                                    financieros.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Pol&iacute;tica de Privacidad:</b> Son las normas que regulan la
+                                    recopilaci&oacute;n,
+                                    uso y tratamiento de Datos Personales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Productos Financieros:</b> Son los cr&eacute;ditos, seguros u otros productos que
+                                    se pueden cotizar, solicitar y contratar a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Servicios:</b> Son todos los servicios ofrecidos a trav&eacute;s de la Plataforma
+                                    Solven, que le permiten a los Usuarios Solicitantes cotizar, solicitar y contratar
+                                    diversos Productos Financieros, y a los Usuarios Oferentes contratar con los
+                                    Usuarios Solicitantes.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios Solicitantes:</b> Son todos los usuarios que cotizan, solicitan y
+                                    contratan diversos Productos Financieros a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    <b>Usuarios Oferentes:</b> Son los Inversores Institucionales, Instituciones
+                                    Financieras, Fondos de Inversi&oacute;n, Compa&ntilde;&iacute;as Aseguradoras,
+                                    Br&oacute;kers
+                                    de Seguros, Solven u otros terceros, que pudiesen otorgar los Productos Financieros
+                                    a trav&eacute;s de la Plataforma Solven.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Nuestros Servicios</h4>
+                                <p class="m-bottom">
+                                    A trav&eacute;s de la Plataforma Solven, los Usuarios Solicitantes podr&aacute;n
+                                    cotizar, solicitar y comparar diversos Productos Financieros en l&iacute;nea, de
+                                    manera simple, r&aacute;pida y segura. Los Productos Financieros ser&aacute;n
+                                    otorgados por los Usuarios Oferentes.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En el caso que los Usuarios Solicitantes requieran un Cr&eacute;dito, deber&aacute;n
+                                    indicar el destino o finalidad del mismo, as&iacute; como el monto, el plazo y su
+                                    perfil crediticio. Dicho perfil crediticio es orientativo, puesto que Solven
+                                    realizar&aacute; las consultas necesarias para conocer el perfil crediticio de los
+                                    Usuarios Solicitantes, utilizando tanto la informaci&oacute;n que dichos Usuarios
+                                    Solicitantes proporcionen, as&iacute; como aquella que se encuentre en fuentes
+                                    accesibles al p&uacute;blico u otra informaci&oacute;n que se encuentra detallada en
+                                    nuestra
+                                    <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En base a dicho requerimiento, Solven mostrar&aacute; la/s oferta/s que mejor se
+                                    adec&uacute;e/n a lo que los Usuarios Solicitantes cotizaron, tomando como base las
+                                    variables registradas y obtenidas a lo largo del proceso de evaluaci&oacute;n,
+                                    as&iacute;
+                                    como a las condiciones de financiamiento (restricciones al perfil crediticio,
+                                    montos, plazos y tasas de inter&eacute;s) de los Usuarios Oferentes. En tal sentido,
+                                    las cotizaciones que se muestren estar&aacute;n alienadas con las condiciones de las
+                                    ofertas de los Usuarios Oferentes con quienes Solven mantiene acuerdos comerciales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En el caso que los Usuarios Solicitantes deseen cotizar una P&oacute;liza de Seguro
+                                    con una Compa&ntilde;&iacute;a Aseguradora o Br&oacute;ker de Seguros,
+                                    deber&aacute;n
+                                    indicar el tipo de p&oacute;liza que desean, completando la informaci&oacute;n
+                                    solicitada por cada tipo de p&oacute;liza en particular e incluyendo el monto de la
+                                    cobertura (si existiese dicha alternativa). Con esta informaci&oacute;n,
+                                    conjuntamente con la informaci&oacute;n que dichos Usuarios Solicitantes
+                                    proporcionen en el proceso e informaci&oacute;n de fuentes accesibles al
+                                    p&uacute;blico,
+                                    Solven mostrar&aacute; la cotizaci&oacute;n que mejor se adec&uacute;e a lo
+                                    requerido por parte de los Usuarios Solicitantes y a las ofertas por parte de las
+                                    Compa&ntilde;&iacute;as Aseguradoras y/o los Br&oacute;kers de Seguros con quien/es
+                                    Solven mantiene acuerdos comerciales.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven podr&aacute; modificar sus acuerdos comerciales, as&iacute; como la oferta de
+                                    los diversos Productos Financieros que se cotizan a trav&eacute;s de la Plataforma
+                                    Solven, en cualquier momento y a su sola discreci&oacute;n.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pedido de Cotizaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    Para efectuar un pedido de cotizaci&oacute;n, los Usuarios Solicitantes deben
+                                    proporcionar ciertos datos personales, como su n&uacute;mero de DNI, su
+                                    direcci&oacute;n
+                                    de correo electr&oacute;nico y su n&uacute;mero de tel&eacute;fono, al cual se le
+                                    enviar&aacute; un SMS para verificar la tenencia del mismo. Para obtener m&aacute;s
+                                    informaci&oacute;n sobre qu&eacute; informaci&oacute;n personal se recopila visite
+                                    nuestra <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de Privacidad</a>.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego de ello, los Usuarios Solicitantes deber&aacute;n completar informaci&oacute;n
+                                    adicional que le permita a Solven completar su perfil personal y, en caso de
+                                    tratarse de un producto de Cr&eacute;dito, realizar consultas acerca del
+                                    comportamiento crediticio, para poder mostrarle la/s oferta/s que mejor se
+                                    adec&uacute;e/n
+                                    a lo solicitado. En igual sentido, para el caso de P&oacute;lizas de Seguro, los
+                                    Usuarios Solicitantes deber&aacute;n proporcionar informaci&oacute;n a Solven para
+                                    que le permita cotizar y presentar la/s P&oacute;liza/s de Seguro/s que mejor se
+                                    adec&uacute;e/n a los requerimientos del Usuario Solicitante.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Formaci&oacute;n del Consentimiento en los
+                                    Contratos a trav&eacute;s de la Plataforma Solven</h4>
+                                <p class="m-bottom">
+                                    A trav&eacute;s de la Plataforma Solven, los Usuarios Solicitantes podr&aacute;n
+                                    solicitar Productos Financieros de manera electr&oacute;nica.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Las solicitudes de los Usuarios Solicitantes, antes de ser aceptadas por parte de
+                                    los Usuarios Oferentes, deber&aacute;n ser procesadas, analizadas y validadas. Esto
+                                    se debe a que, los Usuarios Oferentes necesitan analizar el perfil del Usuario
+                                    Solicitante y verificar que se encuentre enmarcado dentro de las pol&iacute;ticas de
+                                    su compa&ntilde;&iacute;a, a efectos de corroborar que califican para el Producto
+                                    Financiero ofrecido.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, los Usuarios Oferentes
+                                    enviar&aacute;n
+                                    a trav&eacute;s de la Plataforma Solven sus ofertas. Finalmente, la Plataforma
+                                    Solven mostrar&aacute; a los Usuarios Solicitantes la/s oferta/s que mejor se
+                                    adec&uacute;e/n
+                                    a su pedido de cotizaci&oacute;n.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Los Usuarios Solicitantes deber&aacute;n seleccionar la oferta que deseen, en caso
+                                    se presente m&aacute;s de una variante de la misma, completar informaci&oacute;n
+                                    adicional y brindar su consentimiento. La aceptaci&oacute;n electr&oacute;nica de la
+                                    oferta constituye la manifestaci&oacute;n de voluntad de dichos Usuarios
+                                    Solicitantes para la contrataci&oacute;n del Producto Financiero. Sobre este punto,
+                                    cabe indicar que la contrataci&oacute;n electr&oacute;nica se encuentra recogida en
+                                    los art&iacute;culos 141 y 141-A del C&oacute;digo Civil, los cuales establecen de
+                                    manera expresa que la manifestaci&oacute;n de voluntad efectuada a trav&eacute;s de
+                                    medios electr&oacute;nicos es legal, siendo que los actos jur&iacute;dicos que se
+                                    celebren por dichos medios tienen plena validez.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez aceptada electr&oacute;nicamente la oferta por parte del Usuario
+                                    Solicitante, el Usuario Oferente, enviar&aacute; una notificaci&oacute;n
+                                    electr&oacute;nica
+                                    al Usuario Solicitante, a trav&eacute;s de la Plataforma Solven, confirmando que ha
+                                    recepcionado su aceptaci&oacute;n. Luego de ello, el Cr&eacute;dito ser&aacute;
+                                    desembolsado en la cuenta indicada por el Usuario Solicitante, o bien la
+                                    P&oacute;liza
+                                    de Seguro ser&aacute; emitida, siempre bajo las condiciones previamente pactadas y
+                                    aceptadas por las partes.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Plazos de Respuesta</h4>
+                                <p class="m-bottom">
+                                    Una vez que los Usuarios Solicitantes efect&uacute;en un pedido de
+                                    cotizaci&oacute;n,
+                                    habiendo brindado la totalidad de informaci&oacute;n y documentos requeridos, Solven
+                                    mostrar&aacute; la/s oferta/s que mejor se adec&uacute;e/n a lo solicitado, de
+                                    manera inmediata.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Luego que los Usuarios Solicitantes seleccionen la oferta del Producto Financiero
+                                    que deseen contratar, Solven tomar&aacute; un tiempo aproximado de 3 horas
+                                    h&aacute;biles
+                                    para validar y verificar la informaci&oacute;n proporcionada por los Usuarios
+                                    Solicitantes, a efectos de analizar el cumplimiento de las condiciones de los
+                                    Usuarios Oferentes. Sobre este punto, cabe indicar que dicho tiempo es referencial,
+                                    en tanto Solven depende de consultas sobre informaci&oacute;n proporcionada por
+                                    terceros para efectuar dichas validaciones, siendo que Solven no tiene control
+                                    alguno sobre los plazos de respuesta de dichos terceros. Asimismo, Solven no tiene
+                                    control sobre cualquier hecho de tercero o imponderable que imposibilite la
+                                    validaci&oacute;n
+                                    de la informaci&oacute;n de los Usuarios Solicitantes en el plazo estipulado.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Una vez procesada, analizada y validada una solicitud, los Usuarios Oferentes
+                                    mostrar&aacute;n en la Plataforma Solven sus ofertas, para que los Usuarios
+                                    Solicitantes analicen y, eventualmente, acepten las condiciones del Producto
+                                    Financiero ofrecido, de manera previa al desembolso del Cr&eacute;dito o
+                                    emisi&oacute;n
+                                    de la P&oacute;liza de Seguro.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El desembolso del Cr&eacute;dito o emisi&oacute;n de la P&oacute;liza de Seguro se
+                                    efectuar&aacute; en un tiempo aproximado de 6 horas h&aacute;biles desde la
+                                    aceptaci&oacute;n
+                                    final del Usuario Solicitante, siempre conforme a las condiciones espec&iacute;ficas
+                                    del Producto Financiero contratado. Cabe indicar que dicho plazo es referencial, en
+                                    la medida que el desembolso del Cr&eacute;dito o emisi&oacute;n de la P&oacute;liza
+                                    de Seguro depende en &uacute;ltima instancia del Usuario Oferente que comercializa
+                                    el producto financiero y sobre el cual Solven no tiene control alguno.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Programa de Referidos Solven</h4>
+                                <p class="m-bottom">
+                                    El programa de referidos para solicitantes (en adelante “Recomienda” o
+                                    el “Programa”) consiste en un sistema de recompensas para aquellos a Usuarios que
+                                    hubieran obtenido un cr&eacute;dito a trav&eacute;s de la plataforma (en adelante,
+                                    “Usuario
+                                    Referenciador”) por referir a sus contactos (en adelante “Prospectos” o “Referidos”)
+                                    para que soliciten créditos a través de Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Podr&aacute;n participar del programa todos los usuarios que hayan obtenido un
+                                    cr&eacute;dito a trav&eacute;s
+                                    de la plataforma de Solven en la medida que el mismo haya sido bajo la modalidad de
+                                    desembolso en cuenta.
+                                    Para habilitar su participaci&oacute;n Solven enviar&aacute; a los usuarios
+                                    referenciadores por correo
+                                    electr&oacute;nico una URL &uacute;nica para cada uno (en adelante
+                                    “hiperv&iacute;nculo
+                                    para referidos”) que
+                                    permita asociar a cada usuario referido con un usuario referenciador.
+                                    Los usuarios referenciadores tendr&aacute;n el derecho de recibir recompensas por
+                                    cada
+                                    referido
+                                    que obtenga un pr&eacute;stamo a trav&eacute;s del “hiperv&iacute;nculo para
+                                    referidos”
+                                    El valor de la recompensa se establece en S/70 para todo cr&eacute;dito desembolsado
+                                    hasta el
+                                    28/06/19 y de S/ 50 para todo cr&eacute;dito desembolsado luego de dicha fecha y
+                                    hasta
+                                    la
+                                    finalizaci&oacute;n del programa.
+                                    Solven se reserva el derecho de modificar el monto de la recompensa y de enviar o no
+                                    el
+                                    “hiperv&iacute;nculo para referidos” a los usuarios, a&uacute;n siendo elegibles
+                                    bajo el
+                                    programa de
+                                    referidos.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    No tendrán derecho a recompensa alguna:
+                                    <ul class="list-refer">
+                                        <li>
+                                            <p class="m-bottom">
+                                                Los Usuarios referenciadores cuyos referidos no obtengan un
+                                                cr&eacute;dito
+                                                a trav&eacute;s de la plataforma, aun cuando dichos referidos se
+                                                hubieran
+                                                registrado en la misma.
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p class="m-bottom">Los usuarios referidos</p>
+                                        </li>
+                                        <li>
+                                            <p class="m-bottom">Los usuarios referenciadores que se encuentren con
+                                                atraso en
+                                                los pr&eacute;stamos obtenidos a trav&eacute;s de Solven al momento de
+                                                la
+                                                registraci&oacute;n del solicitante referido y/o de la fecha de pago de
+                                                las
+                                                recompensas</p>
+                                        </li>
+                                        <li>
+                                            <p class="m-bottom">Los Usuarios referenciadores en los casos de:</p>
+                                            <ul class="list-sub-refer">
+                                                <li>Cr&eacute;ditos inferiores a S/1.500</li>
+                                                <li>Cr&eacute;ditos cancelados antes de la fecha de pago de recompensa
+                                                </li>
+                                                <li>Cr&eacute;ditos que se encuentren con atrás al momento del pago de
+                                                    la
+                                                    recompensa</li>
+                                                <li>Cr&eacute;ditos en los cuales sea titular</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    El pago de recompensas a los Usuarios Referenciadores ser&aacute; abonado mediante
+                                    transferencia
+                                    bancaria a la cuenta de su titularidad que hubiera sido informada a Solven por
+                                    este &uacute;ltimo dentro de los de los primeros 10 (diez) d&iacute;as
+                                    h&aacute;biles
+                                    del mes siguiente al
+                                    desembolso que se recompensa.
+                                    En caso de que un Prospecto sea una misma persona sea referida por 2 o m&aacute;s
+                                    Solicitantes
+                                    Referenciadores, el premio se le otorgará al referenciador a cuyo
+                                    hiperv&iacute;nculo el
+                                    referido haya ingresado primero.
+                                    El programa de referidos estar&aacute; vigente para solicitudes desembolsadas hasta
+                                    el
+                                    30/9/2019
+                                    inclusive.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Este Programa no considera Referidos v&aacute;lidos a:
+                                    <ul class="list-refer-val">
+                                        <li>Contactos referidos que hubieran comenzado su solicitud de cr&eacute;dito de
+                                            forma previa a ser referidos.
+                                        </li>
+                                        <li>Personas que no cumplan con los T&eacute;rminos y Condiciones del Sitio.
+                                        </li>
+                                        <li>Solicitantes con cr&eacute;ditos otorgados con anterioridad a la referencia
+                                            por
+                                            parte del
+                                            Solicitante Referenciador.</li>
+                                        <li>Directores y empleados de Solven y sus familiares directos.</li>
+                                        <li>Directores y empleados de entidades clientes de Solven y sus familiares
+                                            directos.
+                                        </li>
+                                    </ul>
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pol&iacute;tica de Uso de la Plataforma</h4>
+                                <p class="m-bottom">
+                                    Al hacer uso de la Plataforma Solven, los Usuarios Solicitantes certifican y aceptan
+                                    que:
+                                </p>
+                                <br />
+                                <ol style="list-style-type: upper-alpha;">
+                                    <li>
+                                        <p class="m-bottom">Que son mayores de 18 a&ntilde;os de edad y pueden celebrar
+                                            contratos legalmente vinculantes.</p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que la informaci&oacute;n que proporcionen es veraz.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Que se les har&aacute; responsables de toda acci&oacute;n realizada en la
+                                            Plataforma Solven en la que los Usuarios Solicitantes hayan participado.
+                                        </p>
+                                        <br />
+                                    </li>
+                                </ol>
+                                <p class="m-bottom">
+                                    En igual sentido, el uso de la Plataforma Solven se encuentra supeditado a las
+                                    siguientes disposiciones:
+                                </p>
+                                <br />
+                                <ol style="list-style-type: lower-roman;">
+                                    <li>
+                                        <p class="m-bottom">
+                                            Ninguna persona podr&aacute; acceder con los datos de un tercero a la
+                                            Plataforma Solven, el uso de la Plataforma Solven es estrictamente personal.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            La Plataforma Solven se debe utilizar de conformidad con los presentes
+                                            T&eacute;rminos
+                                            y Condiciones, respetando los derechos de terceros y actuando de buena fe.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            No se debe proporcionar informaci&oacute;n falsa, usurpar la identidad de
+                                            otra persona, cometer actos il&iacute;citos u otros que sean lesivos de
+                                            intereses o derechos de terceros.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            No se debe da&ntilde;ar o tratar de vulnerar el sistema inform&aacute;tico
+                                            que opera la Plataforma Solven.
+                                        </p>
+                                        <br />
+                                    </li>
+                                    <li>
+                                        <p class="m-bottom">
+                                            Se encuentra expresamente prohibido el uso de dispositivos o procesos
+                                            automatizados, robots, rastreadores, ara&ntilde;as web u otros medios o
+                                            herramientas que tengan por finalidad extraer informaci&oacute;n de la
+                                            Plataforma Solven.
+                                        </p>
+                                        <br />
+                                    </li>
+                                </ol>
+                                <p class="m-bottom">
+                                    En el caso que Solven detecte que se han incurrido en conductas contrarias a la
+                                    presente Pol&iacute;tica de Uso, Solven se reserva el derecho de prohibir el acceso
+                                    y uso de la Plataforma Solven por parte de las personas que han violado las
+                                    Pol&iacute;ticas
+                                    de Uso, as&iacute; como de iniciar las acciones necesarias por responsabilidades
+                                    administrativas, civiles o penales.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Limitaci&oacute;n de Responsabilidad</h4>
+                                <p class="m-bottom">
+                                    Solven no se hace responsable por los posibles da&ntilde;os o perjuicios producto de
+                                    interrupciones, interferencias, errores o conductas de terceros que afecten el
+                                    correcto funcionamiento del sistema inform&aacute;tico de la Plataforma Solven.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    En igual sentido, en la medida que Solven utiliza herramientas y medios
+                                    tecnol&oacute;gicos
+                                    para procesar y tratar la informaci&oacute;n, tanto de los Usuarios Solicitantes
+                                    como de los Usuarios Oferentes, Solven no se responsabiliza por los errores u
+                                    omisiones producto de la utilizaci&oacute;n de dichas herramientas o medios
+                                    tecnol&oacute;gicos,
+                                    dado que estos no son infalibles.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Por otro lado, en la medida que Solven utiliza informaci&oacute;n crediticia de los
+                                    Usuarios Solicitantes que ha sido elaborada y proporcionada por terceros (por ej.
+                                    centrales privadas de informaci&oacute;n de riesgos) o por fuentes accesibles al
+                                    p&uacute;blico,
+                                    Solven no se responsabiliza por los errores u omisiones que dicha informaci&oacute;n
+                                    pueda contener, en la medida que no es informaci&oacute;n de elaboraci&oacute;n
+                                    propia. Asimismo, dado que Solven no tiene control sobre los plazos de respuesta de
+                                    los terceros que proporcionan informaci&oacute;n, ni control sobre cualquier
+                                    imponderable que imposibilite 5 que la validaci&oacute;n de identidad y
+                                    corroboraci&oacute;n
+                                    de informaci&oacute;n de los Usuarios Solicitantes se efect&uacute;e en los plazos
+                                    estipulados, Solven no asume responsabilidad en caso se incumplan dichos plazos.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Solven no responde por la calidad o idoneidad de los servicios o productos
+                                    financieros contratados por los Usuarios Solicitantes con los Usuarios Oferentes, ni
+                                    de cualquier reclamaci&oacute;n que se pueda originar relacionado a ello, debido a
+                                    que no forma parte de la relaci&oacute;n de consumo entablada entre los Usuarios
+                                    Solicitantes y los Usuarios Oferentes, a excepci&oacute;n de los productos o
+                                    servicios que sean estrictamente proporcionados por Solven. Las ofertas de los
+                                    Productos Financieros se encuentran debidamente identificadas por los Usuarios
+                                    Oferentes que los est&aacute;n ofreciendo. Los Usuarios Solicitantes podr&aacute;n
+                                    dirigir sus consultas o reclamos a la entidad correspondiente.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Libro de Reclamaciones</h4>
+                                <p class="m-bottom">
+                                    El <a href="https://goo.gl/forms/YSrUopQdzToWErxt2"
+                                        rel="nofollow noopener noreferrer">Libro de Reclamaciones</a> virtual de
+                                    Solven le permite registrar sus quejas o reclamos relacionados a los Servicios
+                                    brindado por Solven, ello en de la Ley N&ordm; 29571 - C&oacute;digo de
+                                    Protecci&oacute;n
+                                    y Defensa del Consumidor.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Propiedad Intelectual</h4>
+                                <p class="m-bottom">
+                                    Solven es el propietario de todo el contenido, incluyendo im&aacute;genes,
+                                    gr&aacute;ficos,
+                                    textos y todos los elementos de propiedad industrial que se encuentren en la
+                                    Plataforma Solven. En aquellos casos en que no sea el propietario, Solven cuenta con
+                                    todas las licencias necesarias para su uso por parte de los titulares de dicho
+                                    contenido o derechos de propiedad intelectual.
+                                </p>
+                                <br />
+                                <p class="m-bottom">
+                                    Se deben respetar los derechos de propiedad intelectual de titularidad de Solven y
+                                    de terceros. Queda prohibida la reproducci&oacute;n, distribuci&oacute;n,
+                                    transformaci&oacute;n o cualquier otra forma de utilizaci&oacute;n del contenido que
+                                    se encuentre en la Plataforma Solven, sin la autorizaci&oacute;n previa y expresa de
+                                    Solven.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Enlaces a Sitios Web de Terceros</h4>
+                                <p class="m-bottom">
+                                    En caso se dispusieran enlaces hacia sitios web de terceros, tales como enlaces
+                                    hacia los sitios web de los Usuarios Oferentes o cualquier otro tercero, Solven no
+                                    garantiza, avala, ni respalda el contenido de dichos sitios web, ni las
+                                    pol&iacute;ticas
+                                    de los mismos.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Pol&iacute;tica de Privacidad</h4>
+                                <p class="m-bottom">
+                                    El tratamiento de la informaci&oacute;n de car&aacute;cter personal se encuentra
+                                    detallado en la <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                        Privacidad</a>.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Comunicaciones</h4>
+                                <p class="m-bottom">
+                                    Cualquier comunicaci&oacute;n, comentario, inquietud o sugerencia respecto de los
+                                    presentes T&eacute;rminos y Condiciones, Pol&iacute;tica de Privacidad u otros,
+                                    deber&aacute; ser enviada a
+                                    <a href="mailto:legal@solven.pe">legal@solven.pe</a>.
+                                </p>
+
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Jurisdicci&oacute;n y Ley Aplicable</h4>
+                                <p class="m-bottom">
+                                    Los presentes T&eacute;rminos y Condiciones se rigen por las leyes vigentes en la
+                                    Rep&uacute;blica del Per&uacute;. Cualquier disputa relacionada con la validez,
+                                    aplicaci&oacute;n o interpretaci&oacute;n de los mismos ser&aacute; resuelta de
+                                    manera amical entre las partes y, de no ser posible ello, ante en los tribunales del
+                                    Cercado de Lima.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Inexistencia de Contrato de
+                                    Representaci&oacute;n</h4>
+                                <p class="m-bottom">
+                                    La utilizaci&oacute;n de la Plataforma Solven no crea contrato de sociedad, de
+                                    representaci&oacute;n o de mandato entre Solven y lo usuarios de la plataforma.
+                                </p>
+                            </li>
+                            <li>
+                                <h4 class="static-subtitle m-bottom">Modificaci&oacute;n de los T&eacute;rminos y
+                                    Condiciones</h4>
+                                <p class="m-bottom">
+                                    Solven podr&aacute; modificar los presentes T&eacute;rminos y Condiciones en
+                                    cualquier momento y publicar&aacute; inmediatamente dicha modificaci&oacute;n. Al
+                                    hacer uso de la Plataforma Solven, luego de realizados los cambios, usted
+                                    est&aacute;
+                                    aceptando las modificaciones. En caso de no encontrarse de acuerdo con las nuevas
+                                    modificaciones, deber&aacute; dejar de hacer uso de los Servicios.
+                                </p>
+                            </li>
+                        </ol>
+                        <p style="margin-top:2em;">
+                            &Uacute;ltima actualizaci&oacute;n: 20 de Junio de 2019.
+                        </p>
+                    </article>
+                </th:block>
+                <th:block th:unless="${brandedTermsAndConditons==null}" th:utext="${brandedTermsAndConditons}">
+                </th:block>
+            </th:block>
+        </th:block>
+        <!--EFECTIVO AL TOQUE-->
+        <th:block th:if="${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+            <article class="wrap-content tyc-tos gwr">
+                <h1 class="static-title m-bottom">T&eacute;rminos y Condiciones</h1>
+                <p class="m-bottom">
+                    Los presentes Términos y Condiciones regulan la relación entre Solven Funding S.A.C., con RUC Nº
+                    20601444764, con domicilio en Av. Mariscal La Mar 398, Of. 401, Miraflores, Lima y los distintos
+                    usuarios de la plataforma Efectivo al Toque. Los servicios de Efectivo al Toque le permite al
+                    usuario
+                    buscar un producto financiero al que aplique de acuerdo a su perfil crediticio. Al utilizar los
+                    servicios, los usuarios aceptan todas las disposiciones contenidas en los presentes Términos y
+                    Condiciones, sin reserva alguna.
+                </p>
+                <br />
+                <ol style="padding: 0 1em;">
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Definiciones</h4>
+                        <p class="m-bottom">
+                            <b>Plataforma Efectivo Al Toque:</b> Es el sitio web <a
+                                href="https://www.efectivoaltoque.com">www.efectivoaltoque.com</a>, la aplicación
+                            móvil y otras aplicaciones informáticas, a través de las cuales se pueden cotizar, solicitar
+                            y/u otorgar créditos, seguros y otros productos financieros.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            <b>Política de Privacidad:</b> Son las normas que regulan la recopilación, uso y tratamiento
+                            de
+                            Datos Personales.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            <b>Productos Financieros:</b> Son los créditos, seguros u otros productos que se pueden
+                            cotizar,
+                            solicitar y contratar a través de la Plataforma Efectivo Al Toque.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            <b>Servicios:</b> Son todos los servicios ofrecidos a través de la Plataforma Efectivo Al
+                            Toque, que
+                            le permiten a los Usuarios Solicitantes cotizar, solicitar y contratar diversos Productos
+                            Financieros, y a los Usuarios Oferentes contratar con los Usuarios Solicitantes.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            <b>Usuarios Solicitantes:</b> Son todos los usuarios que cotizan, solicitan y contratan
+                            diversos
+                            Productos Financieros a través de la Plataforma Efectivo Al Toque.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            <b>Usuarios Oferentes:</b> Son los Inversores Institucionales, Instituciones Financieras,
+                            Fondos
+                            de Inversión, Compañías Aseguradoras, Brókers de Seguro u otros terceros, que pudiesen
+                            otorgar los Productos Financieros a través de la Plataforma Efectivo Al Toque.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Nuestros Servicios</h4>
+                        <p class="m-bottom">
+                            A través de la Plataforma Efectivo Al Toque, los Usuarios Solicitantes podrán cotizar,
+                            solicitar y comparar diversos Productos Financieros en línea, de manera simple, rápida y
+                            segura. Los Productos Financieros serán otorgados por los Usuarios Oferentes.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            En el caso que los Usuarios Solicitantes requieran un Crédito, deberán indicar el monto, el
+                            plazo y su perfil crediticio. Dicho perfil crediticio es orientativo, puesto que Efectivo Al
+                            Toque realizará las consultas necesarias para conocer el perfil crediticio de los Usuarios
+                            Solicitantes, utilizando tanto la información que dichos Usuarios Solicitantes proporcionen,
+                            así como aquella que se encuentre en fuentes accesibles al público u otra información que
+                            se encuentra detallada en nuestra <a th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                Privacidad</a> .
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            En base a dicho requerimiento, Efectivo Al Toque mostrará la/s oferta/s que mejor se
+                            adecúe/n a lo que los Usuarios Solicitantes cotizaron, tomando como base las variables
+                            registradas y obtenidas a lo largo del proceso de evaluación, así como a las condiciones de
+                            financiamiento (restricciones al perfil crediticio, montos, plazos y tasas de interés) de
+                            los
+                            Usuarios Oferentes. En tal sentido, las cotizaciones que se muestren estarán alienadas con
+                            las condiciones de las ofertas de los Usuarios Oferentes con quienes Efectivo Al Toque
+                            mantiene acuerdos comerciales.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            En el caso que los Usuarios Solicitantes deseen cotizar una Póliza de Seguro con una
+                            Compañía Aseguradora o Bróker de Seguros, deberán indicar el tipo de póliza que desean,
+                            completando la información solicitada por cada tipo de póliza en particular e incluyendo el
+                            monto de la cobertura (si existiese dicha alternativa). Con esta información, conjuntamente
+                            con la información que dichos Usuarios Solicitantes proporcionen en el proceso e
+                            información de fuentes accesibles al público, Efectivo Al Toque mostrará la cotización que
+                            mejor se adecúe a lo requerido por parte de los Usuarios Solicitantes y a las ofertas por
+                            parte de las Compañías Aseguradoras y/o los Brókers de Seguros con quien/es Efectivo Al
+                            Toque mantiene acuerdos comerciales.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Efectivo Al Toque podrá modificar sus acuerdos comerciales, así como la oferta de los
+                            diversos Productos Financieros que se cotizan a través de la Plataforma Efectivo Al Toque,
+                            en cualquier momento y a su sola discreción.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Pedido de Cotización</h4>
+                        <p class="m-bottom">
+                            Para efectuar un pedido de cotización, los Usuarios Solicitantes deben proporcionar ciertos
+                            datos personales, como su número de DNI, su dirección de correo electrónico y su número
+                            de teléfono, al cual se le enviará un SMS para verificar la tenencia del mismo. Para obtener
+                            más información sobre qué información personal se recopila visite nuestra <a
+                                th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                Privacidad</a> .
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Luego de ello, los Usuarios Solicitantes deberán completar información adicional que le
+                            permita a Efectivo Al Toque completar su perfil personal y, en caso de tratarse de un
+                            producto de Crédito, realizar consultas acerca del comportamiento crediticio, para poder
+                            mostrarle la/s oferta/s que mejor se adecúe/n a lo solicitado. En igual sentido, para el
+                            caso
+                            de Pólizas de Seguro, los Usuarios Solicitantes deberán proporcionar información a
+                            Efectivo Al Toque para que le permita cotizar y presentar la/s Póliza/s de Seguro/s que
+                            mejor se adecúe/n a los requerimientos del Usuario Solicitante.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Formación del Consentimiento en los Contratos a través de
+                            la Plataforma Efectivo Al Toque</h4>
+                        <p class="m-bottom">
+                            A través de la Plataforma Efectivo Al Toque, los Usuarios Solicitantes podrán solicitar
+                            Productos Financieros de manera electrónica.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Las solicitudes de los Usuarios Solicitantes, antes de ser aceptadas por parte de los
+                            Usuarios Oferentes, deberán ser procesadas, analizadas y validadas. Esto se debe a que, los
+                            Usuarios Oferentes necesitan analizar el perfil del Usuario Solicitante y verificar que se
+                            encuentre enmarcado dentro de las políticas de su compañía, a efectos de corroborar que
+                            califican para el Producto Financiero ofrecido.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Una vez procesada, analizada y validada una solicitud, los Usuarios Oferentes se pondrán
+                            en contacto con los Usuarios Solicitantes para comunicar sus ofertas.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            La aceptación electrónica constituye la manifestación de voluntad de dichos Usuarios
+                            Solicitantes para la contratación del Producto Financiero. Sobre este punto, cabe indicar
+                            que la contratación electrónica se encuentra recogida en los artículos 141 y 141-A del
+                            Código Civil, los cuales establecen de manera expresa que la manifestación de voluntad
+                            efectuada a través de medios electrónicos es legal, siendo que los actos jurídicos que se
+                            celebren por dichos medios tienen plena validez.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Una vez aceptada electrónicamente la oferta por parte del Usuario Solicitante, el Usuario
+                            Oferente, enviará una notificación electrónica al Usuario Solicitante confirmando que ha
+                            recepcionado su aceptación. Luego de ello, el Crédito será desembolsado o bien la Póliza de
+                            Seguro será emitida, siempre bajo las condiciones previamente pactadas y aceptadas por
+                            las partes.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Plazos de Respuesta</h4>
+                        <p class="m-bottom">
+                            Una vez que los Usuarios Solicitantes efectúen un pedido de cotización, habiendo brindado
+                            la totalidad de información y documentos requeridos, Efectivo Al Toque mostrará la/s
+                            oferta/s que mejor se adecúe/n a lo solicitado, de manera inmediata.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Luego que los Usuarios Solicitantes seleccionen la oferta del Producto Financiero, el
+                            Usuario Oferente tomará un tiempo aproximado de 24 horas hábiles para validar y verificar
+                            la información proporcionada y ponerse en contacto. Sobre este punto, cabe indicar que
+                            dicho tiempo es referencial. Asimismo, Efectivo Al Toque no tiene control sobre cualquier
+                            hecho de tercero o imponderable que imposibilite la validación de la información de los
+                            Usuarios Solicitantes en el plazo estipulado.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Política de Uso de la Plataforma</h4>
+                        <p class="m-bottom">
+                            Al hacer uso de la Plataforma Efectivo Al Toque, los Usuarios Solicitantes certifican y
+                            aceptan que:
+                        </p>
+                        <br />
+                        <ol style="list-style-type: upper-alpha;">
+                            <li>
+                                <p class="m-bottom">
+                                    Que son mayores de 18 años de edad y pueden celebrar contratos
+                                    legalmente vinculantes.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <p class="m-bottom">
+                                    Que la información que proporcionen es veraz.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <p class="m-bottom">
+                                    Que se les hará responsables de toda acción realizada en la Plataforma
+                                    Efectivo Al Toque en la que los Usuarios Solicitantes hayan participado.
+                                </p>
+                                <br />
+                            </li>
+                        </ol>
+                        <p class="m-bottom">
+                            En igual sentido, el uso de la Plataforma Efectivo Al Toque se encuentra supeditado a las
+                            siguientes
+                            disposiciones:
+                        </p>
+                        <br />
+                        <ol style="list-style-type: upper-alpha;">
+                            <li>
+                                <p class="m-bottom">
+                                    Ninguna persona podrá acceder con los datos de un tercero a la Plataforma
+                                    Efectivo Al Toque, el uso de la Plataforma Efectivo Al Toque es estrictamente
+                                    personal.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <p class="m-bottom">
+                                    La Plataforma Efectivo Al Toque se debe utilizar de conformidad con los
+                                    presentes Términos y Condiciones, respetando los derechos de terceros y
+                                    actuando de buena fe.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <p class="m-bottom">
+                                    No se debe proporcionar información falsa, usurpar la identidad de otra persona,
+                                    cometer actos ilícitos u otros que sean lesivos de intereses o derechos de terceros.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <p class="m-bottom">
+                                    No se debe dañar o tratar de vulnerar el sistema informático que opera la
+                                    Plataforma Efectivo Al Toque.
+                                </p>
+                                <br />
+                            </li>
+                            <li>
+                                <p class="m-bottom">
+                                    Se encuentra expresamente prohibido el uso de dispositivos o procesos
+                                    automatizados, robots, rastreadores, arañas web u otros medios o herramientas
+                                    que tengan por finalidad extraer información de la Plataforma Efectivo Al Toque.
+                                </p>
+                                <br />
+                            </li>
+                        </ol>
+                        <p class="m-bottom">
+                            En el caso que Efectivo Al Toque detecte que se han incurrido en conductas contrarias a la
+                            presente
+                            Política de Uso, Efectivo Al Toque se reserva el derecho de prohibir el acceso y uso de la
+                            Plataforma
+                            Efectivo Al Toque por parte de las personas que han violado las Políticas de Uso, así como
+                            de iniciar
+                            las acciones necesarias por responsabilidades administrativas, civiles o penales.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Limitación de Responsabilidad</h4>
+                        <p class="m-bottom">
+                            Efectivo Al Toque no se hace responsable por los posibles daños o perjuicios producto de
+                            interrupciones, interferencias, errores o conductas de terceros que afecten el correcto
+                            funcionamiento del sistema informático de la Plataforma Efectivo Al Toque.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            En igual sentido, en la medida que Efectivo Al Toque utiliza herramientas y medios
+                            tecnológicos para procesar y tratar la información, tanto de los Usuarios Solicitantes como
+                            de los Usuarios Oferentes, Efectivo Al Toque no se responsabiliza por los errores u
+                            omisiones producto de la utilización de dichas herramientas o medios tecnológicos, dado
+                            que estos no son infalibles.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Por otro lado, en la medida que Efectivo Al Toque utiliza información crediticia de los
+                            Usuarios Solicitantes que ha sido elaborada y proporcionada por terceros (por ej. centrales
+                            privadas de información de riesgos) o por fuentes accesibles al público, Efectivo Al Toque
+                            no se responsabiliza por los errores u omisiones que dicha información pueda contener, en
+                            la medida que no es información de elaboración propia. Asimismo, dado que Efectivo Al
+                            Toque no tiene control sobre los plazos de respuesta de los terceros que proporcionan
+                            información, ni control sobre cualquier imponderable que imposibilite 5 que la validación
+                            de identidad y corroboración de información de los Usuarios Solicitantes se efectúe en los
+                            plazos estipulados, Solven no asume responsabilidad en caso se incumplan dichos plazos.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Efectivo Al Toque no responde por la calidad o idoneidad de los servicios o productos
+                            financieros contratados por los Usuarios Solicitantes con los Usuarios Oferentes, ni de
+                            cualquier reclamación que se pueda originar relacionado a ello, debido a que no forma parte
+                            de la relación de consumo entablada entre los Usuarios Solicitantes y los Usuarios
+                            Oferentes, a excepción de los productos o servicios que sean estrictamente
+                            proporcionados por Efectivo Al Toque. Las ofertas de los Productos Financieros se
+                            encuentran debidamente identificadas por los Usuarios Oferentes que los están
+                            ofreciendo. Los Usuarios Solicitantes podrán dirigir sus consultas o reclamos a la entidad
+                            correspondiente.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Libro de Reclamaciones</h4>
+                        <p class="m-bottom">
+                            El <a href="https://goo.gl/forms/YSrUopQdzToWErxt2" rel="nofollow noopener noreferrer">Libro
+                                de Reclamaciones</a> virtual de Efectivo Al Toque le permite registrar sus quejas o
+                            reclamos relacionados a los Servicios brindados por Efectivo Al Toque, ello en de la Ley Nº
+                            29571 - Código de Protección y Defensa del Consumidor.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Propiedad Intelectual</h4>
+                        <p class="m-bottom">
+                            Solven Funding SAC. es el propietario de todo el contenido, incluyendo imágenes, gráficos,
+                            textos y
+                            todos los elementos de propiedad industrial que se encuentren en la Plataforma Efectivo Al
+                            Toque.
+                            En aquellos casos en que no sea el propietario, Efectivo Al Toque cuenta con todas las
+                            licencias
+                            necesarias para su uso por parte de los titulares de dicho contenido o derechos de propiedad
+                            intelectual.
+                        </p>
+                        <br />
+                        <p class="m-bottom">
+                            Se deben respetar los derechos de propiedad intelectual de titularidad de Efectivo Al Toque
+                            y de
+                            terceros. Queda prohibida la reproducción, distribución, transformación o cualquier otra
+                            forma de
+                            utilización del contenido que se encuentre en la Plataforma sin la autorización previa y
+                            expresa de
+                            Efectivo Al Toque.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Enlaces a Sitios Web de Terceros</h4>
+                        <p class="m-bottom">
+                            En caso se dispusieran enlaces hacia sitios web de terceros, tales como enlaces hacia los
+                            sitios web
+                            de los Usuarios Oferentes o cualquier otro tercero, Efectivo Al Toque no garantiza, avala,
+                            ni
+                            respalda el contenido de dichos sitios web, ni las políticas de los mismos.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Política de Privacidad</h4>
+                        <p class="m-bottom">
+                            El tratamiento de la información de carácter personal se encuentra detallado en la <a
+                                th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                Privacidad</a>
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Comunicaciones</h4>
+                        <p class="m-bottom">
+                            Cualquier comunicación, comentario, inquietud o sugerencia respecto de los presentes
+                            Términos y
+                            Condiciones, Política de Privacidad u otros, deberá ser enviada a <a
+                                href="mailto:legal@solven.pe">legal@solven.pe</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Jurisdicción y Ley Aplicable</h4>
+                        <p class="m-bottom">
+                            Los presentes Términos y Condiciones se rigen por las leyes vigentes en la República del
+                            Perú.
+                            Cualquier disputa relacionada con la validez, aplicación o interpretación de los mismos será
+                            resuelta de manera amical entre las partes y, de no ser posible ello, ante en los tribunales
+                            del
+                            Cercado de Lima.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Inexistencia de Contrato de Representación</h4>
+                        <p class="m-bottom">
+                            La utilización de la Plataforma Efectivo Al Toque no crea contrato de sociedad, de
+                            representación o
+                            de mandato entre Solven Funding SAC. y los usuarios de la plataforma.
+                        </p>
+                    </li>
+                    <li>
+                        <h4 class="static-subtitle m-bottom">Modificación de los Términos y Condiciones</h4>
+                        <p class="m-bottom">
+                            Solven Funding SAC. podrá modificar los presentes Términos y Condiciones en cualquier
+                            momento
+                            y publicará inmediatamente dicha modificación. Al hacer uso de la Plataforma Efectivo Al
+                            Toque,
+                            luego de realizados los cambios, usted está aceptando las modificaciones. En caso de no
+                            encontrarse de acuerdo con las nuevas modificaciones, deberá dejar de hacer uso de los
+                            Servicios.
+                        </p>
+                    </li>
+                </ol>
+                <p style="margin-top:2em;">
+                    &Uacute;ltima actualizaci&oacute;n: 17 de Diciembre de 2018.
+                </p>
+            </article>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

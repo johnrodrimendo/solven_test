@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}" type="text/javascript"></script>
+    <!-- / CounterUp -->
+
+    <!-- noUiSlider -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/wnumb-1.0.2/wNumb.min.js'}"></script>
+    <!-- / noUiSlider -->
+
+    <!--File Input-->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-fileinput/css/fileinput.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-fileinput/js/fileinput.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-fileinput/js/fileinput_locale_es.js'}"></script>
+    <!-- / File Input -->
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!-- / Bootstrap DatePicker -->
+
+    <!-- Take Picture -->
+    <link rel="stylesheet" th:href="@{/css/take-picture.min.css}"/>
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+    <script th:src="@{/js/take-picture/take-picture.js}"></script>
+    <!-- / Take Picture -->
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}" rel="stylesheet"/>
+    <!--/ Drop Zone-->
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var v_start = /*[[ ${loanApplication?.getProductMaxMinParameter()?.minDaysFirstDueDate} ]]*/null;
+        var v_end = /*[[ ${loanApplication?.getProductMaxMinParameter()?.maxDaysFirstDueDate} ]]*/null;
+
+        $(document).ready(function () {
+
+            // Show always the doc section
+            $('#docSection').show();
+
+            var datebutton = $('#dateSelect');
+            // load modal datepicker
+            var openDateModal = /*[[ ${loanApplication?.firstDueDate == null} ]]*/;
+            if (openDateModal) {
+                $('#endDatePicker').modal({backdrop: 'static', keyboard: false, show: true});
+                datebutton.prop("disabled", true);
+            } else {
+                $('#loadingAjax').fadeIn();
+                defaultAjax({
+                    url: /*[[@{/debtconsolidationloanapplication/__${loanAplicationToken}__/offer/recalculate/json}]]*/,
+                    type: 'POST',
+                    success: function (data) {
+                        $('#offersContainer').replaceWith(data);
+                        initializeOffersPanels();
+                    }
+                });
+            }
+
+            //== modal onload ==//
+            if ($('#firstDueDate').length > 0) {
+                $('#firstDueDate').datepicker({
+                    startDate: '+'+v_start+'d',
+                    endDate: '+'+v_end+'d',
+                    daysOfWeekDisabled: "0,6"
+                }).on('changeDate', function (ev) {
+                    datebutton.prop("disabled", false);
+                    datebutton.removeClass("buttonDisabled");
+                });
+            }
+
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var periodValue = /*[[${loanApplication.installments}]]*/;
+        $(document).on('ready', function () {
+
+//            refreshAmmount();
+
+            <!-- Slider -->
+            var monthsSlider = document.getElementById('loanApplicationPeriodMonths'),
+                    preiodMonthsLabel = document.getElementById('loanApplicationPeriodMonths-label'),
+                    periodMonthsEndDate = document.getElementById('loanApplicationPeriodEndDate-finish'),
+                    periodFinish;
+            noUiSlider.create(monthsSlider, {
+                start: periodValue,
+                step: 1,
+                connect: 'lower',
+                range: {
+                    'min': 2,
+                    'max': 36
+                },
+                format: wNumb({
+                    decimals: 0,
+                    thousand: ' ',
+                    postfix: ' meses'
+                })
+            });
+
+            monthsSlider.noUiSlider.on('update', function (values, handle) {
+                periodValue = toNumberString(values[handle]);
+                preiodMonthsLabel.innerHTML = values[handle];
+                periodFinish = getFinishDate(toNumberString(values[handle]), 'month');
+                periodMonthsEndDate.innerHTML = 'Finaliza (' + periodFinish + ')';
+                if (document.getElementById('loan-cuotes')) {
+                    document.getElementById('loan-cuotes').innerHTML = values[handle];
+                    document.getElementById('finish-date').innerHTML = 'Finaliza (' + periodFinish + ')';
+                }
+
+//                refreshAmmount();
+            });
+
+            monthsSlider.noUiSlider.on('change', function(values, handle){
+                console.log("change")
+                periodValue = toNumberString(values[handle]);
+                updateOffer(periodValue);
+            });
+            <!-- / Slider -->
+
+            <!-- Actions -->
+            $('#consolidateButton').click(function () {
+                $('#consolidateButton').loading();
+                defaultAjax({
+                    url: /*[[@{/debtconsolidationloanapplication/__${loanAplicationToken}__/consolidationresume}]]*/null,
+                    type: 'POST',
+                    data: {},
+                    success: function (data) {
+                        $('#consolidateButton').unloading();
+                    }, error: function () {
+                        $('#consolidateButton').unloading();
+                    }
+                });
+            });
+
+            $('#btnSubmit').click(function (e) {
+                e.preventDefault();
+                if ($('#frmDocuments').valid()) {
+                    $('#btnSubmit').loading();
+
+                    var params = $('#frmDocuments').serializeObject();
+                    params.loanOfferId = $('[data-offer]').data('offer');
+                    defaultAjax({
+                        url: /*[[@{/debtconsolidationloanapplication/__${loanAplicationToken}__/offer}]]*/null,
+                        type: 'POST',
+                        form: $('#frmDocuments'),
+                        data: params,
+                        error: function () {
+                            $('#btnSubmit').unloading();
+                        }
+                    });
+                }
+            });
+            <!-- /ok Actions -->
+
+            <!-- Cosolidation Buttons -->
+            $('.consolidationButton').on('click', function (event) {
+                event.preventDefault();
+
+                var conolidationButtonElement = $(this);
+
+                var active;
+                switch ($(this).data('value')) {
+                    case 'yes':
+                        active = true;
+                        break;
+                    case 'not':
+                        active = false;
+                        break;
+                }
+
+                $(this).loading();
+                $('#loadingAjax').fadeIn();
+                $('.general-resume').hide();
+                defaultAjax({
+                    url: /*[[@{/debtconsolidationloanapplication/__${loanAplicationToken}__/offer/activeconsolidation}]]*/null,
+                    type: 'POST',
+                    data: {
+                        accountType: $(this).closest('.item-inner').data('account-type'),
+                        entityCode: $(this).closest('.item-inner').data('entity-code'),
+                        active: active
+                    }, success: function (data) {
+                        $(conolidationButtonElement).unloading();
+                        $('#offersContainer').replaceWith(data);
+
+                        switch ($(conolidationButtonElement).data('value')) {
+                            case 'yes':
+                                $(conolidationButtonElement).data('value', 'not');
+                                $(conolidationButtonElement).closest('.item-inner').removeClass('disabled-recommended');
+                                $(conolidationButtonElement).children('span').html('No consolidar');
+                                $(conolidationButtonElement).children('i').removeClass('control-add').addClass('remove-icon');
+                                $(conolidationButtonElement).removeClass('consolidate-button').addClass('no-consolidate-button');
+                                break;
+                            case 'not':
+                                $(conolidationButtonElement).data('value', 'yes');
+                                $(conolidationButtonElement).closest('.item-inner').addClass('disabled-recommended');
+                                $(conolidationButtonElement).children('i').removeClass('remove-icon').addClass('control-add');
+                                $(conolidationButtonElement).children('span').html('Consolidar');
+                                $(conolidationButtonElement).removeClass('no-consolidate-button').addClass('consolidate-button');
+                                break;
+                        }
+                        initializeOffersPanels();
+                    }, error: function () {
+                        $(conolidationButtonElement).unloading();
+                        $('#loadingAjax').hide();
+                        $('.general-resume').fadeIn();
+                    }
+                });
+
+            });
+            <!-- / Cosolidation Buttons -->
+
+        });
+
+        function updateOffer(installemnts) {
+            var params = {};
+            if (installemnts != null) {
+                params.installments = installemnts;
+            }
+            $('#loadingAjax').fadeIn();
+            $('.general-resume').hide();
+            defaultAjax({
+                url: /*[[@{/debtconsolidationloanapplication/__${loanAplicationToken}__/offer/recalculate/json}]]*/,
+                data: params,
+                type: 'POST',
+                success: function (data) {
+                    $('#offersContainer').replaceWith(data);
+                    initializeOffersPanels();
+                }
+            });
+        }
+
+        function initializeOffersPanels() {
+            <!-- counterUp -->
+            counterUpInit();
+            <!-- / counterUp -->
+        }
+
+        //        function refreshAmmount() {
+        //            // Calculate new balance
+        //            var totalBalance = 0;
+        //            $('[data-balance]').each(function () {
+        //                totalBalance = totalBalance + parseInt($(this).data('balance'));
+        //            });
+        //
+        //            $('#totalBalance').attr('data-value', totalBalance);
+        //            $('#totalBalance').html(totalBalance);
+        //
+        //
+        //            // Calculate new monthly payment
+        //            var monthlyPayment = doubleTwoDecimal(totalBalance / periodValue);
+        //            $('#monthlyPayment').attr('data-value', monthlyPayment);
+        //            $('#monthlyPayment').html(monthlyPayment);
+        //        }
+
+        function toNumberString(number) {
+            return Number(number.replace(/[^0-9]/g, ''));
+        }
+
+        function showScheduleModal() {
+            $('#offerScheduleModal').modal('show');
+        }
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var dniFront = /*[[${frontDniFile}]]*/null;
+         /*var dniBack = /!*[[${backDniFile}]]*!/;
+         var selfie = /!*[[${selfieFile}]]*!/;*/
+        var step = 1;
+        var toSend = [null, null, null];
+
+        /*if (dniFront && !dniBack && !selfie) {
+         step = 2;
+         } else if (!dniFront && dniBack && !selfie){
+         step = 3;
+         } else if (!dniFront && !dniBack && selfie){
+         step = 4;
+         } else if (!dniFront && !dniBack && !selfie){
+         step = 1;
+         } else {
+         step = 5;
+         }*/
+
+        $(document).on('ready', function(){
+
+
+            if ( $('.accordion-content .resume-items .item-inner').length == 1 ) {
+                $('.item-inner .actions').hide();
+            }
+
+            // Check if mobile
+            var md = new MobileDetect(window.navigator.userAgent),
+                    is_mobile = false;
+
+            if (md.mobile()) {
+                is_mobile = (md.os().toLowerCase() === 'androidos' || md.os().toLowerCase() === 'ios') ? true : false;
+            }
+
+            if (is_mobile) {
+                $('.thumb').hide();
+
+                $('.tp-container').hide();
+                $('.tp-mobile').css({'display' : 'block'});
+
+                $('.imageFromMobile').on('change', function(){
+
+                    if (step == 1) {
+                        var  data = new FormData();
+                        data.append("file", $(this)[0].files[0]);
+                        data.append("userFileType", /*[[${T(com.affirm.common.model.catalog.UserFileType).DNI}]]*/);
+
+                        $('#step-' + step).children('p').hide();
+                        $('#step-' + step).children('.loading').removeClass('loading-ajax-invisible');
+
+                        sendImageToServerMobile(data);
+                        $('.imageFromMobile').parent('.upload-file').removeClass('active-upload');
+                        return false;
+                    }
+
+                    if (step == 2) {
+                        var  data = new FormData();
+                        data.append("file", $(this)[0].files[0]);
+                        data.append("userFileType", /*[[${T(com.affirm.common.model.catalog.UserFileType).DNI}]]*/);
+
+                        $('#step-' + step).children('p').hide();
+                        $('#step-' + step).children('.loading').removeClass('loading-ajax-invisible');
+
+                        $('.imageFromMobile').parent('.upload-file').removeClass('active-upload');
+                        sendImageToServerMobile(data);
+                        $(this).remove();
+                        return false;
+                    }
+
+                    if (step == 3) {
+                        var  data = new FormData();
+                        data.append("file", $(this)[0].files[0]);
+                        data.append("userFileType", /*[[${T(com.affirm.common.model.catalog.UserFileType).SELFIE}]]*/);
+
+                        $('#step-' + step).children('p').hide();
+                        $('#step-' + step).children('.loading').removeClass('loading-ajax-invisible');
+
+                        $('.imageFromMobile').parent('.upload-file').removeClass('active-upload');
+                        sendImageToServerMobile(data);
+                        $(this).remove();
+                        if (dniFront) {
+                            $('#documentBlock, #frmDocuments').fadeIn();
+                            $("html, body").animate({scrollTop: $("#frmDocuments").offset().top}, 1000);
+                        }
+                        return false;
+                    }
+
+                });
+
+
+            } else {
+
+                var tp = new takePicture();
+
+                var photo = [];
+                console.log(tp.checkCompatibility());
+
+                $('#start-camera').on('click', function(e){
+                    e.preventDefault();
+                    if (tp.checkCompatibility()) {
+                        $(this).hide();
+                        tp.startCamera();
+                        $('#msg').fadeIn();
+                    } else {
+                        showErrorModal('Lo sentimos tu navegador no es compatible con el componente intente con otro navegador.');
+                    }
+
+                });
+
+                $('#take-photo').on('click', function(e){
+                    e.preventDefault();
+                    switch (step) {
+
+                        case 1:
+
+                            if (toSend[0] != null) {
+                                step = 2;
+                                photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                $('#close_' + step).fadeIn();
+                            } else {
+
+                                photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                $('#close_' + step).fadeIn();
+
+                                $('#msg').fadeIn().html('Genial, ahora una foto del dorso tu documento.');
+                                $('#step-' + step).children('p').hide();
+
+                                photo['image_' + step ]['filename'] = "dni-front.jpg";
+                                photo['image_' + step ]['fileType'] = /*[[${T(com.affirm.common.model.catalog.UserFileType).DNI}]]*/;
+                                toSend[0] = photo['image_' + step];
+                                tp.deletePhoto();
+                                step ++;
+                                paintCurrentStep();
+                                if(isComplete()) {
+                                    $('#uploadImage').fadeIn();
+                                }
+                                break;
+                            }
+
+                        case 2:
+
+                            if (toSend[1] != null) {
+                                step = 3;
+                                photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                $('#close_' + step).fadeIn();
+                            } else {
+                                photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                $('#close_' + step).fadeIn();
+
+                                $('#msg').hide().fadeIn().html('Y por &uacute;ltimo, t&oacute;mate una selfie.');
+                                $('#step-' + step).children('p').hide();
+
+                                photo['image_' + step ]['filename'] = "back-front.jpg";
+                                photo['image_' + step ]['fileType'] = /*[[${T(com.affirm.common.model.catalog.UserFileType).DNI}]]*/;
+                                toSend[1] = photo['image_' + step];
+                                tp.deletePhoto();
+                                step ++;
+                                paintCurrentStep();
+                                if(isComplete()) {
+                                    $('#uploadImage').fadeIn();
+                                }
+                                break;
+                            }
+
+                        case 3:
+
+                            if(toSend[2] != null) {
+                                break;
+                            } else {
+
+                                $('#msg').hide().fadeIn().html('Y por &uacute;ltimo, t&oacute;mate una selfie.');
+                                $('#step-' + step).children('p').hide();
+                                photo['image_' + step] = {file: tp.takePhoto('#thumb_' + step)};
+                                $('#close_' + step).fadeIn();
+
+                                $('#msg').hide();
+
+                                photo['image_' + step ]['filename'] = "selfie.jpg";
+                                photo['image_' + step ]['fileType'] = /*[[${T(com.affirm.common.model.catalog.UserFileType).SELFIE}]]*/;
+                                toSend[2] = photo['image_' + step];
+                                tp.deletePhoto();
+                                step ++;
+                                paintCurrentStep();
+                                if(isComplete()) {
+                                    $('#uploadImage').fadeIn();
+                                    if ($('.fileImage').length > 0 ) {
+                                        $('#refSection,#btnSubmit').fadeIn();
+                                    }
+                                }
+                                break;
+                            }
+
+                    }
+                    console.log(toSend);
+
+                });
+
+                $('.closeRoundButton').on('click', function(e){
+                    e.preventDefault();
+
+                    $('#uploadImage').hide();
+
+                    var src = $(this);
+                    toSend[src.data('id')] = null;
+
+                    $('#step-' + (src.data('id') + 1)).addClass('disabled').removeClass('active');
+                    $('#step-input-' + (src.data('id') + 1)).parent('.upload-file').removeClass('active-upload');
+                    $('#close_' + (src.data('id') + 1)).hide();
+                    src.closest('.thumb').children('#thumb_' + (src.data('id') + 1)).removeAttr('src');
+                    step = 1;
+                    console.log(toSend);
+                    return false;
+
+                });
+
+                $('#uploadImage').on('click', function (e) {
+                    e.preventDefault();
+
+                    if (isComplete()) {
+
+                        var data1 = new FormData();
+                        data1.append("file", toSend[0]['file'], toSend[0]['filename']);
+                        data1.append("userFileType", toSend[0]['fileType']);
+
+                        var data2 = new FormData();
+                        data2.append("file", toSend[1]['file'], toSend[1]['filename']);
+                        data2.append("userFileType", toSend[1]['fileType']);
+
+                        var data3 = new FormData();
+                        data3.append("file", toSend[2]['file'], toSend[2]['filename']);
+                        data3.append("userFileType", toSend[2]['fileType']);
+
+                        sendImageToServer(data1,data2, data3);
+                    }
+
+                });
+
+                $('#delete-photo').on('click', function(e){
+                    e.preventDefault();
+                    tp.deletePhoto();
+                });
+
+            }
+
+            $('#nextBlock').on('click', function(e){
+                e.preventDefault();
+                $(this).hide();
+                if (dniFront) {
+                    $('#documentBlock, #frmDocuments').fadeIn();
+                    $("html, body").animate({scrollTop: $("#frmDocuments").offset().top}, 1000);
+                    if ($('.fileImage').length > 0 ) {
+                        $('#refSection,#btnSubmit').fadeIn();
+                    }
+                } else {
+                    $('#documentBlock').fadeIn();
+                    $("html, body").animate({scrollTop: $("#documentBlock").offset().top}, 1000);
+                }
+
+            });
+
+            var clone;
+            $('#relative1').on('change', function() {
+
+                $('.relative2').attr('disabled', false);
+                $('#relative2 option').attr('disabled', false);
+                if ($(this).val() != 3) {
+                    $('.relative2').attr('disabled', false);
+                    $('#relative2 option[value="'+ $(this).val() + '"]').attr('disabled', true);
+                }
+
+                console.log(clone);
+            });
+
+        });
+
+        function isComplete() {
+            return (toSend[0] != null && toSend[1] != null && toSend[2] != null) ? true: false;
+        }
+
+        function paintCurrentStep() {
+            $('#step-' + (step - 1)).children('.loading').addClass('loading-ajax-invisible');
+            $('#step-' + (step - 1)).children('p').fadeIn();
+            $('#step-' + (step - 1)).removeClass('disabled').addClass('active');
+            $('#step-input-' + step).parent('.upload-file').addClass('active-upload');
+
+        }
+
+        function sendImageToServerMobile(data) {
+
+            var imageUrl = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/userFile} ]]*/;
+            defaultAjax({
+                url: imageUrl,
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function (message) {
+                    console.log(message);
+                    step = step + 1;
+                    paintCurrentStep();
+                    if (step > 3) {
+                        $('.tp-container, #msg').hide();
+                        $("#frmDocumentsContainer,#docSection").fadeIn();
+                        $("html, body").animate({scrollTop: $("#frmDocumentsContainer").offset().top}, 1000);
+                    }
+                }
+            });
+        }
+
+        function sendImageToServer(data1, data2, data3) {
+
+            var imageUrl = /*[[ @{/__${productUrl}__/__${loanAplicationToken}__/userFile} ]]*/;
+
+            $('#uploadImage').loading();
+
+            defaultAjax({
+                url: imageUrl,
+                data: data1,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function () {
+                    debugger;
+                    defaultAjax({
+                        url: imageUrl,
+                        data: data2,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        success: function () {
+                            debugger;
+                            defaultAjax({
+                                url: imageUrl,
+                                data: data3,
+                                cache: false,
+                                contentType: false,
+                                processData: false,
+                                type: 'POST',
+                                success: function (message) {
+                                    console.log(message);
+                                    $('#uploadImage').unloading();
+                                    $('#uploadImage').hide();
+                                    $('.tp-container, #msg, .closeRoundButton').hide();
+                                    $("#frmDocumentsContainer, #frmDocuments,#docSection").fadeIn();
+                                    $("html, body").animate({scrollTop: $("#frmDocuments").offset().top}, 1000);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+
+
+
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<!-- /Header -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+    <!-- Offert Alternative -->
+    <div class="consolidation">
+        <div class="container">
+            <div class="consolidation-container">
+                <div class="box-inner">
+                    <div class="top-box no-margin">
+                        <h2 class="title">Resumen de deudas a consolidar</h2>
+                        <p class="help-message">Hemos seleccionado las deudas que te conviene consolidar con Solven, puedes elegir no consolidar alguna deuda ya seleccionada haciendo click en <b>no consolidar</b>.</p>
+                    </div>
+                    <div class="accordion-container" data-accordion-group="true">
+                        <form action="" autocomplete="off">
+                            <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(creditCardDebts)}">
+                                <div data-control="true" class="head-accordion no-hand">
+                                    <div class="hero-details">
+                                        <h2><span class="circle-step">1</span> <span class="circle-text">Tarjetas de cr&eacute;dito</span>
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div data-content="true" class="accordion-content">
+                                    <div class="resume-items">
+                                        <ul>
+                                            <li th:each="debt : ${creditCardDebts}">
+                                                <div class="item-inner no-recommended"
+                                                     th:classappend="${debt.selected?'':'disabled-recommended'}"
+                                                     th:attr="data-account-type=${debt.consolidationAccounttype}, data-entity-code=${debt.entity.code}">
+                                                    <h3><span th:text="${debt.entity.shortName}"></span>
+                                                        <small th:text="'('+${@utilService.integerMoneyFormat(debt.getTotalBalance())}+'; '+${@utilService.percentFormat(debt.getTotalRate()*100)}+')'"></small>
+                                                    </h3>
+                                                    <div class="actions">
+                                                        <button th:if="${debt.selected}"
+                                                                class="consolidationButton no-consolidate-button"
+                                                                data-value="not">
+                                                            <span>No consolidar</span>
+                                                            <i class="icon remove-icon"></i>
+                                                        </button>
+                                                        <button th:if="${!debt.selected}"
+                                                                class="consolidationButton consolidate-button"
+                                                                data-value="yes">
+                                                            <span>Consolidar</span>
+                                                            <i class="icon control-add"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(consumeDebts)}">
+                                <div data-control="true" class="head-accordion no-hand">
+                                    <div class="hero-details">
+                                        <h2><span class="circle-step">2</span> <span class="circle-text">Cr&eacute;ditos de consumo</span>
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div data-content="true" class="accordion-content">
+                                    <div class="resume-items">
+                                        <ul>
+                                            <li th:each="debt : ${consumeDebts}">
+                                                <div class="item-inner no-recommended"
+                                                     th:classappend="${debt.selected?'':'disabled-recommended'}"
+                                                     th:attr="data-account-type=${debt.consolidationAccounttype}, data-entity-code=${debt.entity.code}">
+                                                    <h3><span th:text="${debt.entity.shortName}"></span>
+                                                        <small th:text="'('+${@utilService.integerMoneyFormat(debt.balance)}+'; '+${@utilService.percentFormat(debt.rate)}+')'"></small>
+                                                    </h3>
+                                                    <div class="actions">
+                                                        <button th:if="${debt.selected}"
+                                                                class="consolidationButton no-consolidate-button"
+                                                                data-value="not">
+                                                            <span>No consolidar</span>
+                                                            <i class="icon remove-icon"></i>
+                                                        </button>
+                                                        <button th:if="${!debt.selected}"
+                                                                class="consolidationButton consolidate-button"
+                                                                data-value="yes">
+                                                            <span>Consolidar</span>
+                                                            <i class="icon control-add"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(commerceDebts)}">
+                                <div data-control="true" class="head-accordion no-hand">
+                                    <div class="hero-details">
+                                        <h2><span class="circle-step">3</span> <span class="circle-text">Cr&eacute;ditos para mi negocio</span>
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div data-content="true" class="accordion-content">
+                                    <div class="resume-items">
+                                        <ul>
+                                            <li th:each="debt : ${commerceDebts}">
+                                                <div class="item-inner no-recommended"
+                                                     th:classappend="${debt.selected?'':'disabled-recommended'}"
+                                                     th:attr="data-account-type=${debt.consolidationAccounttype}, data-entity-code=${debt.entity.code}">
+                                                    <h3><span th:text="${debt.entity.shortName}"></span>
+                                                        <small th:text="'('+${@utilService.integerMoneyFormat(debt.balance)}+'; '+${@utilService.percentFormat(debt.rate)}+')'"></small>
+                                                    </h3>
+                                                    <div class="actions">
+                                                        <button th:if="${debt.selected}"
+                                                                class="consolidationButton no-consolidate-button"
+                                                                data-value="not">
+                                                            <span>No consolidar</span>
+                                                            <i class="icon remove-icon"></i>
+                                                        </button>
+                                                        <button th:if="${!debt.selected}"
+                                                                class="consolidationButton consolidate-button"
+                                                                data-value="yes">
+                                                            <span>Consolidar</span>
+                                                            <i class="icon control-add"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="loan-details loanApplicationMonths margin-bottom-3 " style="display: block;">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-7">
+                                        <div class="slider-section">
+                                            <label>&iquest;En que
+                                                per&iacute;odo?</label>
+                                            <div id="loanApplicationPeriodMonths"></div>
+                                            <div class="values">
+                                                <div class="min-value normal-number">2 meses</div>
+                                                <div class="max-value normal-number">36 meses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-5">
+                                        <div class="square-found date">
+                                            <h4 id="loanApplicationPeriodMonths-label" class="bold-number">12 meses</h4>
+                                            <span id="loanApplicationPeriodEndDate-finish">Finaliza (enero 2018)</span>
+                                        </div>
+                                        <input type="text" id="loanApplicationPeriodMonths-input"
+                                               name="loanApplicationInstallemnts" class="slider"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <h2 class="title">Oferta</h2>
+                            <div id="offersContainer" class="resume-total-container">
+                                <div id="loadingAjax" class="gif-solven-container" style="display: none;">
+                                    <div class="sk-cube-grid">
+                                        <div class="sk-cube sk-cube1"></div>
+                                        <div class="sk-cube sk-cube2"></div>
+                                        <div class="sk-cube sk-cube3"></div>
+                                        <div class="sk-cube sk-cube4"></div>
+                                        <div class="sk-cube sk-cube5"></div>
+                                        <div class="sk-cube sk-cube6"></div>
+                                        <div class="sk-cube sk-cube7"></div>
+                                        <div class="sk-cube sk-cube8"></div>
+                                        <div class="sk-cube sk-cube9"></div>
+                                    </div>
+                                </div>
+                                <div class="general-resume" th:if="${offer != null}" th:attr="data-offer=${offer.id}">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 column">
+                                            <div class="lightblue-box">
+                                                <p>Tu ahorro mensual</p>
+                                                <div class="saving-wrap">
+                                                    <div class="prefix">S/</div>
+                                                    <h2 data-counter="counterup"
+                                                        th:attr="data-value=${@utilService.doubleFormat(preConsolidationMonthlyInstallment)}">
+                                                        0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 column">
+                                            <ul>
+                                                <li>
+                                                    <p>Monto total calculado: </p>
+                                                    <div class="amount-wrap">
+                                                        <span class="prefix">S/</span>
+                                                        <h5 id="totalBalance" data-counter="counterup"
+                                                            th:text="${@utilService.doubleMoneyFormat(offer.ammount, null)}">
+                                                            0</h5>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <p>Tu nueva cuota mensual: </p>
+                                                    <div class="amount-wrap">
+                                                        <span class="prefix">S/</span>
+                                                        <h5 id="monthlyPayment" data-counter="counterup"
+                                                            th:text="${@utilService.doubleMoneyFormat(offer.installmentAmountAvg, null)}">
+                                                            0</h5>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <p>Comisi&oacute;n: </p>
+                                                    <div class="amount-wrap">
+                                                        <span class="prefix">S/</span>
+                                                        <h5 id="totalBalance" data-counter="counterup"
+                                                            th:text="${@utilService.doubleMoneyFormat(offer.loanCommission, null)}">
+                                                            0</h5>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <p>TEA: </p>
+                                                    <div class="amount-wrap">
+                                                        <h5 id="teaDebts" data-counter="counterup"
+                                                            th:text="${@utilService.percentFormat(offer.effectiveAnualRate)}">
+                                                            0</h5>
+                                                    </div>
+                                                    <p>- TCEA: </p>
+                                                    <div class="amount-wrap">
+                                                        <h5 id="tceaDebts" data-counter="counterup"
+                                                            th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate)}">
+                                                            0</h5>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-lg-5 col-md-5 col-sm-5 column">
+                                            <div class="button-wrap">
+                                                <button id="cronogramaButton" class="button lightblue-button" onclick="showScheduleModal();return false;">Ver cronograma
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="offerScheduleModal" class="modal fade"
+                                     tabindex='-1'>
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-lightblue-header" style="padding: 1.3em">
+                                                <button type="button" class="closeRoundButton"
+                                                        data-dismiss="modal" style="top: 1.3em;"><i
+                                                        class="icon close-icon"></i>
+                                                </button>
+                                                <h4>Cronograma de pagos preliminar</h4>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <th:block th:if="${offer != null}" layout:fragment="modalSchedule">
+                                                    <th:block th:replace="fragments/modalScheduleFragment :: modalSchedule(laoanApplication=${loanAppplication}, offer=${offer}, person=${person})"></th:block>
+                                                </th:block>
+
+                                            </div>
+                                            <div class="actions" style="padding: 0 1.5em 1.5em 0">
+                                                <button type="button" class="button black-button"
+                                                        data-dismiss="modal">
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <br/>
+                        <div class="actions">
+                            <button class="button red-button" id="nextBlock">Continuar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="documentBlock">
+                    <!-- tp component -->
+                    <div class="widget-tp">
+                        <div class="top">
+                            <h3>Ay&uacute;danos a verificar tu identidad.</h3>
+                            <small>(tomando las fotos paso a paso)</small>
+                        </div>
+                        <div class="tp-container" th:if="${frontDniFile == null}">
+                            <div class="tp-app">
+
+                                <div class="focus-t"></div>
+                                <div class="focus-b"></div>
+
+                                <button class="visible button lightblue-button" id="start-camera">Activa tu c&aacute;mara</button>
+                                <!--<a href="#" class="visible"></a>-->
+
+                                <video id="camera-stream"></video>
+
+                                <img id="snap"/>
+
+                                <p id="error-message"></p>
+
+                                <div class="controls">
+                                    <!--<a href="#" id="delete-photo" title="Volver a tomarla" class="disabled"><i class="material-icons">delete</i></a>-->
+                                    <a href="#" id="take-photo" title="Tomar la foto"><i class="material-icons">camera_alt</i></a>
+                                    <!--<a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled"><i class="material-icons">file_download</i></a>-->
+                                    <!--<a href="#" id="save-photo" title="Listo" class="disabled"><i class="material-icons"><i class="material-icons">done</i></i></a>-->
+                                </div>
+                                <!-- Hidden canvas element. Used for taking snapshot of video. -->
+                                <canvas></canvas>
+                            </div>
+                        </div>
+                        <div class="steps-tp">
+                            <small id="msg" class="successMessage" th:if="${frontDniFile == null}">Toma una foto del frente de tu documento.</small>
+                            <br/>
+                            <br/>
+                            <ul class="row">
+                                <li class="col-lg-4 col-md-4 column">
+                                    <div class="thumb">
+                                        <button type="button" id="close_1" class="closeRoundButton" data-id="0"><i
+                                                class="icon close-icon"></i></button>
+                                        <img id="thumb_1" th:if="${frontDniFile !=null}" th:src="@{/__${productUrl}__/__${loanAplicationToken}__/userFile/__${@fileService.generateUserFileEncrypt(frontDniFile.userId, frontDniFile.fileName, frontDniFile.id)}__/image.jpg(thumbnail=true)}"/>
+                                        <img id="thumb_1" th:if="${frontDniFile == null}" />
+                                    </div>
+                                    <div id="step-1" class="square" th:classappend="${frontDniFile != null ? 'active' : 'disabled'}">
+                                        <div class="loading loading-ajax-invisible">
+                                            <div class="sk-circle">
+                                                <div class="sk-circle1 sk-child"></div>
+                                                <div class="sk-circle2 sk-child"></div>
+                                                <div class="sk-circle3 sk-child"></div>
+                                                <div class="sk-circle4 sk-child"></div>
+                                                <div class="sk-circle5 sk-child"></div>
+                                                <div class="sk-circle6 sk-child"></div>
+                                                <div class="sk-circle7 sk-child"></div>
+                                                <div class="sk-circle8 sk-child"></div>
+                                            </div>
+                                            <span
+                                                class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                                        </div>
+                                        <p>Documento (frente)</p>
+                                    </div>
+                                    <div class="tp-mobile">
+                                        <label for="step-input-1" class="upload-file active-upload" th:if="${frontDniFile == null}">
+                                            Haz click para tomar una foto de tu documento (frontal)
+                                            <input type="file" accept="image/*" capture="camera" id="step-input-1" class="imageFromMobile" data-step="1"/>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li class="col-lg-4 col-md-4 column">
+                                    <div class="thumb">
+                                        <button type="button" id="close_2" class="closeRoundButton" data-id="1"><i
+                                                class="icon close-icon"></i></button>
+                                        <img id="thumb_2" th:if="${backDniFile != null}" th:src="@{/__${productUrl}__/__${loanAplicationToken}__/userFile/__${@fileService.generateUserFileEncrypt(backDniFile.userId, backDniFile.fileName, backDniFile.id)}__/image.jpg(thumbnail=true)}"/>
+                                        <img id="thumb_2" th:if="${backDniFile == null}"/>
+                                    </div>
+                                    <div id="step-2" class="square" th:classappend="${backDniFile != null ? 'active' : 'disabled'}">
+                                        <div class="loading loading-ajax-invisible">
+                                            <div class="sk-circle">
+                                                <div class="sk-circle1 sk-child"></div>
+                                                <div class="sk-circle2 sk-child"></div>
+                                                <div class="sk-circle3 sk-child"></div>
+                                                <div class="sk-circle4 sk-child"></div>
+                                                <div class="sk-circle5 sk-child"></div>
+                                                <div class="sk-circle6 sk-child"></div>
+                                                <div class="sk-circle7 sk-child"></div>
+                                                <div class="sk-circle8 sk-child"></div>
+                                            </div>
+                                            <span
+                                                class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                                        </div>
+                                        <p>Documento (dorso)</p>
+                                    </div>
+                                    <div class="tp-mobile">
+                                        <label for="step-input-2" class="upload-file" th:if="${backDniFile == null}">
+                                            Haz click para tomar una foto de tu documento (dorso)
+                                            <input type="file" accept="image/*" capture="camera" id="step-input-2" class="imageFromMobile" data-step="2"/>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li class="col-lg-4 col-md-4 column">
+                                    <div class="thumb">
+                                        <button type="button" id="close_3" class="closeRoundButton" data-id="2"><i
+                                                class="icon close-icon"></i></button>
+                                        <img id="thumb_3" th:if="${selfieFile != null}" th:src="@{/__${productUrl}__/__${loanAplicationToken}__/userFile/__${@fileService.generateUserFileEncrypt(selfieFile.userId, selfieFile.fileName, selfieFile.id)}__/image.jpg(thumbnail=true)}"/>
+                                        <img id="thumb_3" th:if="${selfieFile == null}"/>
+                                    </div>
+                                    <div id="step-3" class="square" th:classappend="${selfieFile != null ? 'active' : 'disabled'}">
+                                        <div class="loading loading-ajax-invisible">
+                                            <div class="sk-circle">
+                                                <div class="sk-circle1 sk-child"></div>
+                                                <div class="sk-circle2 sk-child"></div>
+                                                <div class="sk-circle3 sk-child"></div>
+                                                <div class="sk-circle4 sk-child"></div>
+                                                <div class="sk-circle5 sk-child"></div>
+                                                <div class="sk-circle6 sk-child"></div>
+                                                <div class="sk-circle7 sk-child"></div>
+                                                <div class="sk-circle8 sk-child"></div>
+                                            </div>
+                                            <span
+                                                class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                                        </div>
+                                        <p>Selfie</p>
+                                    </div>
+                                    <div class="tp-mobile">
+                                        <label for="step-input-3" class="upload-file" th:if="${selfieFile == null}">
+                                            Haz click para tomarte una selfie
+                                            <input type="file" accept="image/*" capture="camera" id="step-input-3" class="imageFromMobile" data-step="3"/>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="actions">
+                                <button class="button red-button" id="uploadImage" style="display: none;">Subir</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end tp component -->
+
+                </div>
+
+                <th:block th:replace="fragments/loanOfferFragments :: documentationContainer"></th:block>
+
+                <th:block th:replace="fragments/loanOfferFragments :: documentationUploadModal"></th:block>
+
+            </div>
+
+            <div class="modal" id="endDatePicker">
+                <div class="modal-dialog calendarModal">
+                    <div class="modal-content">
+                        <div class="modal-lightblue-header">
+                            <h2>&iquest;Cu&aacute;ndo quieres pagar la 1era. cuota?</h2>
+                        </div>
+                        <div class="modal-body">
+                            <form action="#" role="form" autocomplete="off">
+                                <div id="calendar-section" class="calendar-container">
+                                    <div id="firstDueDate">
+                                        <input type="hidden" id="firstDueDateInput"
+                                               class="form-control small-input-number"
+                                               placeholder="dd/mm/yyyy"/>
+                                    </div>
+                                    <div id="response-ajax"></div>
+                                    <div class="field">
+                                        <button class="button red-button red-button buttonDisabled" id="dateSelect">
+                                            <span>Confirmar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+
+                    $('#dateSelect').on('click', function (event) {
+                        event.preventDefault();
+                        if ($('#firstDueDateInput').val()) {
+                            $('#dateSelect').loading();
+                            defaultAjax({
+                                url: /*[[@{/debtconsolidationloanapplication/__${loanAplicationToken}__/offer/recalculate/json}]]*/,
+                                type: 'POST',
+                                data: {
+                                    firstDueDate: $('#firstDueDateInput').val()
+                                },
+                                success: function (data) {
+                                    $('#offersContainer').replaceWith(data);
+                                    $('#endDatePicker').modal('hide');
+                                    $('#dateSelect').unloading();
+                                    initializeOffersPanels();
+                                },
+                                error: function () {
+                                    $('#dateSelect').unloading();
+                                    $('#loadingoffer').css({'display': 'none'});
+                                }
+                            });
+                        } else {
+                            $('#response-ajax').html('Debe seleccionar la fecha');
+                        }
+                    });
+
+                    /*]]>*/
+                </script>
+            </div>
+        </div>
+    </div>
+    <!-- / Offert Alternative -->
+</th:block>
+<!-- /Content -->
+
+<!-- Footer -->
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+<!-- / Footer -->
+
+</body>
+</html>

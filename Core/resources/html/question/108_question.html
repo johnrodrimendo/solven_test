@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:utext="#{question.108.title}"></p>
+            <!--<div class="">-->
+            <div class="form-group col-md-3 nopadding" th:if="${loanApplication.countryId != T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                <select class="form-control partnerDocType" th:field="*{partnerDocType}">
+                    <option th:each="type : ${@catalogService.getIdentityDocumentTypeByCountry(loanApplication.countryId, false)}"
+                            th:value="${type.id}" th:text="${type.name}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <!--</div>-->
+            <!--<div class="col-md-6">-->
+            <div class="form-group col-md-9 nopadding">
+                <label th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                       class="type-doc">CUIT / CUIL / CDI</label>
+                <input type="text" class="form-control" th:field="*{partnerDocNumber}"
+                       pattern="[0-9]*"/>
+                <div class="errorContainer"></div>
+            </div>
+            <!--</div>-->
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('.partnerDocType').on('change', function () {                         
+                if ($(this).val() == 2) {
+                    questionFlow.getFormElement().data('validatorJson').rules.partnerDocNumber.maxlength = 9;
+                } else {
+                    questionFlow.getFormElement().data('validatorJson').rules.partnerDocNumber.maxlength = 8;
+                }
+                questionFlow.getFormElement().validateForm(questionFlow.getFormElement().data('validatorJson'));
+                questionFlow.getFormElement().data('validator').resetForm();
+            });
+            questionFlow.find('.partnerDocType').change();
+
+            questionFlow.find('.send-button').on('click', function(){
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

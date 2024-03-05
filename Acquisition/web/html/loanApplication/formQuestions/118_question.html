@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:utext="#{questions.block.residenceTime}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="field field-amount inline">
+                    <div class="wrap-field">
+                        <input type="text" class="input-outline amount-input input-months" maxlength="3"
+                               th:field="*{months}"/>
+                        <small class="input-help">Tiempo en meses</small>
+                    </div>
+                </div>
+                <div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var months = $('#months');
+        setTimeout(function () {
+            months.focus();
+        }, 300);
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+
+        var months = $('#months');
+        setTimeout(function () {
+            months.focus();
+        }, 300);
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

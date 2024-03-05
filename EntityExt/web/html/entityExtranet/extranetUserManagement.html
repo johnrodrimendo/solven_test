@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}" rel="stylesheet"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/switchery/switchery.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/switchery/switchery.min.css'}" rel="stylesheet"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}" type="text/javascript"></script>
+
+    <!-- Bootstrap selectpicker -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
+    <!-- / Bootstrap selectpicker -->
+
+    <link rel="stylesheet" th:href="@{/css/company.css}" />
+    <script th:src="@{/js/ext_tablepaginator.js}"></script>
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function closeUploadUserFileModal() {
+            if ($("#uploadUserFile").is(':visible')) {
+                Dropzone.forElement("div#uploadUserFile").destroy();
+                $('#response-block, #usersWillBeAdded').html('');
+            }
+            $('#uploadVehiclesheetFileModal').modal('hide');
+        }
+        var vehicleNumber;
+        $(document).on('ready', function () {
+            var formEmployer = $('#createEmployerForm');
+            var vehicleToUpload;
+            $('#confirmUpload').on('click', function (event) {
+                event.preventDefault();
+                $('#confirmUpload').loading();
+                defaultAjax({
+                    url: /*[[@{/vehicles/file/confirm}]]*/null,
+                    type: 'POST',
+                    data: {
+                        //bankArray: JSON.stringify(bankMappings),
+                        vehiclesToUpload:JSON.stringify(vehiclesToUpload),
+                        disablePrevious: $('#disablePrevious').prop('checked') ? false : true
+                    },
+                    success: function (data) {
+                        resetTimer();
+                        var dataJson = JSON.parse(data);
+                        $('#confirmUpload').unloading();
+                        $('#usersWillBeAdded').html('');
+                        if (dataJson.toAdd > 0)
+                            $('#usersWillBeAdded').html(successAjaxMessage('Se a&nacute;adieron ' + vehicleNumber + ' de vehiculos.<br/>'));
+                        if (dataJson.toUpdate > 0)
+                            $('#usersWillBeAdded').html(successAjaxMessage('Se actualizaron ' + vehicleNumber + ' de vehiculos.'));
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    }
+                    , error: function () {
+                        $('#confirmUpload').unloading();
+                        $('#response-block').html(errorAjaxMessage('Se produjo un error inesperado, <br/>por favor int&eacute;ntalo nuevamente o cont&aacute;ctanos.'));
+                    }
+                });
+            });
+            $('#uploadFile').on('click', function (event) {
+                event.preventDefault();
+                $("#uploadUserFile").dropzone({
+                    url: /*[[ @{/vehicles/file} ]]*/,
+                    paramName: 'file',
+                    maxFilesize: /*[[ ${@configuration.MAX_UPLOAD_FILE_SIZE_MB()} ]]*/, // MB
+                    maxFiles: 1,
+                    dictDefaultMessage: 'Arrastra el archivo excel para cargar o actualizar tu lista de vehiculos.',
+                    dictFallbackMessage: "El navegador no soporta esta funcionalidad.",
+                    dictFallbackText: 'Ocurrio un error.',
+                    dictInvalidFileType: 'El formato no es v&aacute;lido.',
+                    dictFileTooBig: 'El tamaño excede el l&iacute;mite.',
+                    dictResponseError: 'Ocurrio un error.',
+                    dictCancelUpload: 'La operaci&oacute;n fue cancelada.',
+                    dictCancelUploadConfirmation: 'La operaci&oacute;n fue cancelada.',
+                    dictMaxFilesExceeded: 'Solo se puede subir un archivo a la vez.',
+                    acceptedFiles: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/wps-office.xls',
+                    headers: addCsrfToJsonHeaders({
+                        'x-request-sender-type': 'ajax'
+                    }),
+                    init: function () {
+                        this.on("success", function (file, response) {
+                            resetTimer();
+                            $('#confirmUpload').enableButton();
+                            $('#confirmUpload').prop('disabled',false).css('opacity',1);
+                            $('#uploadErrorContainer').html("").hide();
+                            if(response.vehiclesToAdd==undefined){
+                                $('#usersWillBeAdded').html(successAjaxMessage('Hubo un error en la lectura de la hoja de vehiculos por favor revise  que no contenga errores y vuelva a intentar'));
+                                $('#confirmUpload').disableButton();
+                                $('#confirmUpload').prop('disabled',true).css('opacity',0.5);
+                            }else{
+                                $('#usersWillBeAdded').html(successAjaxMessage('Se agregar&aacute;(n) ' + response.vehiclesToAdd + ' vehiculo(s)'));
+                                vehiclesToUpload=response.vehiclesArr;
+                                vehicleNumber=response.vehiclesToAdd;
+                            }
+                            if (response.vehiclesWithEmptyfields>0) {
+                                $('#uploadErrorContainer').append('Se ignorar&aacute;n <b>' + response.vehiclesWithEmptyfields +
+                                    '</b> vehiculo(s) con campos vacios por favor revise si los campos estan completos<br/>');
+                                $('#uploadErrorContainer').show();
+                            }
+                            if (response.vehiclesWithUnkwonBrand>0) {
+                                $('#uploadErrorContainer').append('Se ignorar&aacute;n <b>' + response.vehiclesWithUnkwonBrand +
+                                    '</b> vehiculo(s) con una marca desconocida revise si la marca esta correctamente escrita.<br/>');
+                                $('#uploadErrorContainer').show();
+                            }
+                            if (response.vehiclesRepeated>0) {
+                                $('#uploadErrorContainer').append('Se ignorar&aacute;n <b>' + response.vehiclesRepeated +
+                                    '</b> vehiculo(s) que se encuentr&aacute;n repetido(s) revise si los datos estan correctamente escrito(s).<br/>');
+                                $('#uploadErrorContainer').show();
+                            }
+                            $('#actionButtons').fadeIn();
+                        },
+                        this.on('error', function (file, response) {
+                            this.removeFile(file);
+                            $('#usersWillBeAdded').html('');
+                            if (response.constructor == Object) {
+                                if (response.type == "message")
+                                    $('#response-block').html(errorAjaxMessage(response.message));
+                            } else {
+                                if (response != null && response != '')
+                                    $('#response-block').html(errorAjaxMessage(response));
+                                else
+                                    $('#response-block').html(errorAjaxMessage('Se produjo un error inesperado, <br/>por favor inténtalo nuevamente o contáctanos.'));
+                            }
+                        }));
+                    }
+                });
+                $("#bankMappings").hide();
+                $("#bankMappingsContainer").html('');
+                $("#uploadErrorContainer").hide();
+                $('#actionButtons').hide();
+                $('#uploadVehiclesheetFileModal').modal({backdrop: 'static', keyboard: false, show: true});
+            });
+            $('#createUserSaveButton').on('click', function (event) {
+                event.preventDefault();
+                $('#confirmUpload').loading();
+                defaultAjax({
+                    url: /*[[@{/createUser}]]*/null,
+                    type: 'POST',
+                    formValidation: $('#registerEntityUserForm').data('validator'),
+                    data: {
+                        name:         $('#name').val(),
+                        firstSurname: $('#firstSurname').val(),
+                        email:        $('#email').val()
+                    },
+                    success: function (data) {
+                        resetTimer();
+                        window.location.reload();
+                    }
+                });
+            });
+            var validator = /*[[${registerEntityUserForm.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                $('#registerEntityUserForm').validateForm(createFormValidationJson(jsonValidator, $('#registerEntityUserForm')));
+            }
+        });
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function updateTFA(){
+            var tfaTitle="&iquest;Est&aacute;s seguro de activar TFA?";
+            var tfaText="Esto enviar&aacute; un email a los usuarios";
+            var tfaLogin=JSON.parse($("#tfaValueId").attr('tfavalue').toLowerCase());
+            var tfaBtnText="¡Si, Activar!";
+            console.log('TFA '+tfaLogin);
+            if (tfaLogin){
+                tfaTitle="&iquest;Est&aacute;s seguro de desactivar TFA?";
+                tfaText="";
+                tfaBtnText="¡Si, Desactivar!";
+            }
+            swal({
+                title: tfaTitle,
+                text: tfaText,
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#36c6d3",
+                confirmButtonText: tfaBtnText,
+                closeOnConfirm: true
+            },
+            function () {
+                defaultAjax({
+                    url: /*[[@{/updateTfaLogin}]]*/null,
+                    type: 'POST',
+                    data: {
+                        value: !tfaLogin
+                    },
+                    success: function (data) {
+                        resetTimer();
+                        //$('#tableResults > tbody').html(data);
+                        swal("Actualizado", "Se actualizó correctamente los usuarios de la entidad TFA.", "success");
+                        updateTFABox(tfaLogin);
+                    }
+                })
+            });
+        }
+        function updateTFABox(value){
+            value=!value;
+            $("#tfaValueId").attr('tfavalue',value);
+            var tfaValue='Desactivar TFA';
+            var tfaTitle='TFA activo';
+            var tfaMessage='Desactivar la autenticación por dos factores para todos los usuarios de la entidad.';
+            if(!value){
+                tfaValue='Activar TFA';
+                tfaTitle='TFA inactivo';
+                tfaMessage='Activar la autenticación por dos factores para todos los usuarios de la entidad.';
+            }
+            $("#tfaValueId").html(tfaValue);
+            $("#tfaTitleId").html(tfaTitle);
+            $("#tfaMessageId").html(tfaMessage);
+        }
+        $(document).on('ready', function () {
+            $('.activeBtn').click(function () {
+                var active = $(this).data('active');
+                var btnSelected = $(this);
+                defaultAjax({
+                    url: /*[[@{/users/updateActiveUser}]]*/null,
+                    type: 'POST',
+                    data: {
+                        valueToUpdate: !active,
+                        entityUserId: $(this).data('id')
+                    },
+                    success: function (data) {
+                        if (active) {
+                            swal({title: "", text: "Desactivación satisfactoria", type: "success"});
+                            btnSelected.text("Inactivo");
+                        } else {
+                            swal({title: "", text: "Activación satisfactoria", type: "success"});
+                            btnSelected.text("Activo");
+                        }
+                        btnSelected.toggleClass('btn-primary');
+                        btnSelected.toggleClass('btn-danger');
+                        btnSelected.data('active', !active);
+                    },
+                    error: function () {
+                        swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                    }
+                });
+            });
+
+            var $table = $('.table');
+            // dataTable( $table, false, false, true, false );
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('.selectpicker').selectpicker({
+            noneSelectedText : 'No visible' // by this default 'Nothing selected' -->will change to Please Select
+        });
+
+        function noVisible(selectId){
+            let noVisibleVal = ["-1"];
+            $(selectId).val(noVisibleVal);
+            $(selectId).selectpicker('val', noVisibleVal);
+            $(selectId).selectpicker('refresh')
+        }
+
+        function showUpdatePermissionModal(self) {
+            var userId = $(self).data('user-id');
+            var userList = /*[[${userList}]]*/null;
+            for (var i = 0; i < userList.length; i++) {
+                var user = userList[i];
+                if (user.userId == userId) {
+                    for (var j = 0; j < user.form.values.length; j++) {
+                        var formValue = user.form.values[j];
+                        if(formValue.roleGroups && formValue.roleGroups.length){
+                            let multipleValues = [];
+                            formValue.roleGroups.map(x=> {
+                                let rolesGroup = x.roles.map(e => e.id);
+                                let filterMatchRoles = user.roles.filter( y => rolesGroup.indexOf(y) != -1);
+                                if([...new Set(filterMatchRoles)].length == [...new Set(rolesGroup)].length) multipleValues.push(x.code);
+                            })
+                            $('#selRole' + formValue.extranetMenuId).val(multipleValues);
+                            $('#selRole' + formValue.extranetMenuId).selectpicker('val', multipleValues);
+                            $('#selRole' + formValue.extranetMenuId).selectpicker('refresh')
+                        }
+                        if(formValue.menuEntityProductCategories && formValue.menuEntityProductCategories.length){
+                            let multipleEntityProductValues = [];
+                            formValue.menuEntityProductCategories.map(x=> {
+                                multipleEntityProductValues.push(x);
+                            })
+                            $('#setProductCategory-' + formValue.extranetMenuId).val(multipleEntityProductValues);
+                            $('#setProductCategory-' + formValue.extranetMenuId).selectpicker('val', multipleEntityProductValues);
+                            $('#setProductCategory-' + formValue.extranetMenuId).selectpicker('refresh')
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            $('#updateRolesModal').data('user-id', userId);
+            $('#confirmUpdateRolesModal').off('click');
+            $('#confirmUpdateRolesModal').on('click', function(){
+                var menuEntityArray = [];
+                $('#updateRolesForm').find('select[name=role]').each(function(){
+                    menuEntityArray[menuEntityArray.length] = {
+                        extranetMenuEntityId: $(this).attr('id').replace("selRole",""),
+                        roleGroups: $(this).val()
+                    };
+                });
+                $('#updateRolesForm').find('select[name=product]').each(function(){
+                    let pos = menuEntityArray.findIndex(x => x.extranetMenuEntityId == $(this).attr('id').replace("setProductCategory-",""));
+                    if(pos != -1) menuEntityArray[pos]["entityProductCategories"] = $(this).val()
+                });
+
+
+                defaultAjax({
+                    url: /*[[@{/udpatePermissions}]]*/null,
+                    type: 'POST',
+                    data: {entityUserId: $('#updateRolesModal').data('user-id'), roles: JSON.stringify(menuEntityArray)},
+                    success: function (data) {
+                        swal("Actualizado", "Se actualizaron los permisos correctamente.", "success");
+                        location.reload();
+                    }
+                });
+                $('#updateRolesForm').serializeObject()
+            });
+            $('#updateRolesModal').modal();
+        }
+        function showCreateUserModal() {
+            $('#createUserModal').modal();
+            $('#createUserModal .loading').hide();
+            $('#createUserModal .content').show();
+        }
+        $(document).on('ready', function () {
+            $('#closeUpdateRolesModal').click(function () {
+                $('#updateRolesModal').modal('hide');
+            });
+        });
+        /*]]>*/
+    </script>
+
+    <style>
+        .bootstrap-select{
+            width: 100%;
+            min-width: 100%;
+        }
+        .bootstrap-select .dropdown-toggle{
+            margin: 0px;
+            padding-left: 10px;
+
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <div class="clearfix"></div>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='actions')"/>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+<!--            <div shiro:hasPermission="user:management:tfa" class="row">-->
+<!--                <div class="col-md-4 ">-->
+<!--                    <div id="portletAdmin" class="portlet light bordered">-->
+<!--                        <div class="portlet-title">-->
+<!--                            <div class="caption font-red-sharp">-->
+<!--                                <span id="tfaTitleId" class="caption-subject font-green-steel bold" th:text="${entity?.tfaLogin?'TFA activo':'TFA inactivo'}"></span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="portlet-body">-->
+<!--                            <div class="row">-->
+<!--                                <div id="tfaMessageId" class="col-lg-7 col-md-12 col-sm-9 text-justify"-->
+<!--                                     th:text="${entity?.tfaLogin?'Desactivar la autenticacion por dos factores para todos los usuarios de la entidad.':'Activar la autenticacion por dos factores para todos los usuarios de la entidad.'}">-->
+<!--                                </div>-->
+<!--                                <div class="col-lg-5 col-md-12 col-sm-3">-->
+<!--                                    <a id="tfaValueId" href="javascript:;" class="btn blue btn-outline " th:attr="tfavalue=${entity?.tfaLogin}" th:onclick="'updateTFA()'" th:text="${entity?.tfaLogin?'Desactivar TFA':'Activar TFA'}"></a>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="row">
+
+                <th:block th:replace="fragments/headers :: entityContentHeader(title='Administracion de usuarios')"></th:block>
+
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+<!--                        <div class="portlet-title">-->
+<!--                            <div class="caption">-->
+<!--                                <span class="caption-subject font-green bold" style="text-transform: capitalize;">Administracion de usuarios</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                        <div id="portlet-body" class="portlet-body">
+                            <div class="actions entity-evaluation-page">
+<!--                                <div class="btn-group">-->
+<!--                                    <a class="btn green btn-circle" href="javascript:;" data-toggle="dropdown"-->
+<!--                                       aria-expanded="true">-->
+<!--                                        <i class="fa fa-cog"></i> Acciones-->
+<!--                                        <i class="fa fa-angle-down"></i>-->
+<!--                                    </a>-->
+<!--                                    <ul class="dropdown-menu pull-right">-->
+<!--                                        <li>-->
+<!--                                            <a href="#" id="createUser" th:onclick="'showCreateUserModal()'">-->
+<!--                                                <i class="fa fa-upload"></i> &nbsp;&nbsp;Crear nuevo usuario-->
+<!--                                            </a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </div>-->
+
+                                <div class="dropdown ml-auto" style="margin-right: 20px;min-width: 160px">
+                                    <button class="btn btn-default btn-circle dropdown-toggle d-flex" type="button" data-toggle="dropdown">
+                                        <i class="fa fa-cog"></i>
+                                        &nbsp;
+                                        Acciones
+                                        &nbsp;
+                                        <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/select_arrow.svg" class="ml-auto pull-right" alt="" style="width: 12px"/>
+                                    </button>
+                                    <ul class="dropdown-menu pull-left" role="menu">
+                                        <li><a href="javascript:;" th:onclick="'showCreateUserModal()'">&nbsp;Crear usuario</a></li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                            <div class="row" style="overflow:auto;">
+                                <table id="tableResults" class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="user: ${userList}">
+                                        <td th:text="${user.userName}"></td>
+                                        <td th:text="${user.email}"></td>
+                                        <td class="th-actions-row">
+                                            <button shiro:hasPermission="user:management:activate" class="btn btn-sm activeBtn"
+                                                    th:attr="data-id=${user.userId}, data-active=${user?.active}"
+                                                    th:text="${user?.active? 'Activo' : 'Inactivo'}"
+                                                    th:classappend="${user?.active ? 'btn-primary' : 'btn-danger'}"
+                                                    style="min-width: 110px;"
+                                            >
+                                            </button>
+                                            <button shiro:hasPermission="user:management:permission"
+                                                    th:attr="data-user-id=${user.userId}" type="button" class="btn blue btn-sm" th:onclick="'showUpdatePermissionModal(this)'"
+                                                    style="min-width: 110px;"
+                                            >
+                                                Permisos
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="updateRolesModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal">Permisos del usuario</h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-middle text-center">
+                        <form id="updateRolesForm" style="margin-bottom: 15px;">
+                            <th:block th:each="extranetMenuEntity, stat : ${extranetMenuEntities}">
+                                <div class="form-group" style="max-width: unset;">
+                                    <label class="col-md-4 control-label" style="font-weight: unset;" th:utext="${extranetMenuEntity?.extranetMenu?.name}"></label>
+                                    <div class="col-md-4" style="min-width: 33%">
+                                        <select data-none-selected-text="No visible" th:id="${'selRole' + extranetMenuEntity?.extranetMenu?.id}" class="form-control selectpicker user-role-selectpicker" name="role" multiple="true">
+                                            <option th:each="roleGroup : ${extranetMenuEntity.getroleGroupToShow()}" th:value="${roleGroup.code}" th:text="${roleGroup.label}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4" style="min-width: 33%">
+                                        <select data-none-selected-text="Sin indicar" th:id="${'setProductCategory-' + extranetMenuEntity?.extranetMenu?.id}" class="form-control selectpicker user-product-category-selectpicker" name="product" multiple="true">
+                                            <option th:each="menuEntityProductCategory : ${extranetMenuEntity?.extranetMenu?.menuEntityProductCategories}" th:value="${menuEntityProductCategory.productCategoryId}" th:text="${menuEntityProductCategory?.productCategory?.category}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </form>
+                        <div id="actionButtons">
+                            <button type="button" class="button black-button" id="closeUpdateRolesModal">Cancelar</button>
+                            <button type="button" class="button bg-red" id="confirmUpdateRolesModal">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="createUserModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap"><h4 class="title-modal">Crear nuevo usuario</h4></div>
+                        <div class="corner-close"><button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button></div>
+                    </div>
+                    <div class="modal-middle">
+                        <div class="block-content">
+                            <div class="contact-form">
+                                <form id="registerEntityUserForm">
+                                    <div id="response-block2"></div>
+                                    <div class="field">
+                                        <label class="control-label" name="nameLabel" id="nameLabel">Nombre</label>
+                                        <input type="text" name="name" id="name" class="input-outline"/>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message"></span>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label class="control-label" name="firstSurnameLabel" id="firstSurnameLabel">Apellido</label>
+                                        <input type="text" name="firstSurname" id="firstSurname" class="input-outline"/>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message"></span>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label class="control-label" name="emailLabel" id="emailLabel">Email</label>
+                                        <input type="text" name="email" id="email" class="input-outline"/>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message"></span>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <small>*Se enviará un email al usuario para que registre su password</small>
+                                    </div>
+                                    <div class="field text-center">
+                                        <button type="button" id="cancelButtonSaveButton"  class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                        <button id="createUserSaveButton" type="button" class="btn btn-success">Crear</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

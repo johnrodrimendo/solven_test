@@ -1,0 +1,297 @@
+.wrap-consolidation{
+    position: relative;
+    .forms{
+        p{
+            padding: 0 130px;
+        }
+    }
+    .btn-next{
+        color: $lightblue-1;
+        background-color: #fff;
+        border: 1px solid $lightblue-1;
+        padding: .35em .8em;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: .85em;
+        transition: all .3s ease;
+        border-radius: 4px;
+        &:hover{
+            color: #fff;
+            background-color: $lightblue-1;
+            border: 1px solid $lightblue-1;
+            transform: none;
+        }
+        &:active{
+            transform: scale(.95);
+        }
+    }
+    .list-consolidation-detail{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+
+        height: 304px;
+        overflow-y: auto;
+        .item-consolidation-detail{
+            margin-bottom: 1em;
+            background: #F9F9FB;
+            border: 1px solid #F9F9FB;
+            border-radius: 5px;
+            position: relative;
+            width: 100%;
+            padding: 1em;
+            overflow: hidden;
+            transition: background .3s ease;
+            &:before{
+                content: '';
+                display: block;
+                width: 100%;
+                background: #D6D8DD;
+                height: 5px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+            &:after{
+                content: '';
+                background: white;
+                top: 0;
+                transform: skew(-28deg);
+                height: 5px;
+                left: 10%;
+                position: absolute;
+                width: 20px;
+            }
+            form{
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                .w-logo, .w-amount, .w-buttons{
+                    min-height: 102px;
+                }
+
+                .w-logo{
+                    width: 15%;
+                    width: 130px;
+                    padding-right: 1em;
+                    border-right: 1px solid #D6D8DD;
+                    img{
+                        width: 100%;
+                        height: auto;
+                        filter: grayscale(1);
+                        opacity: .5;
+                    }
+                }
+                .w-amount{
+                    width: 60%;
+                    padding-left: 2em;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                    border-right: 1px solid #D6D8DD;
+                    .w-title{
+                        text-align: left;
+                        width: 100%;
+                        strong{
+                            color: $black_color_main;
+                            font-family: 'Lato Medium', 'Helvetica', sans-serif;
+                            font-size: 1em;
+                            display: block;
+                            line-height: 1.2;
+                        }
+                        small{
+                            display: block;
+                            margin-bottom: .4em;
+                        }
+                    }
+                    .field{
+                        margin-left: 0;
+                        margin-top: 0;
+                        margin-bottom: 0;
+                    }
+                    input.input-outline, select.input-outline, textarea.input-outline{
+                        height: 38px;
+                    }
+                    .field-amount .wrap-field .box-icon{
+                        height: 38px;
+                    }
+                }
+
+                #creditCardNumber{
+                    max-width: 200px;
+                }
+
+                .w-buttons{
+                    padding-left: 1em;
+                    width: 25%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    .ask-wrap{
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        flex-wrap: wrap;
+
+                    }
+                    small{
+                        width: 100%;
+                    }
+                    button{
+                        width: 50px;
+                        margin-right: 2%;
+                        min-width: inherit;
+                        transition: all .3s ease;
+                        transfom: none;
+
+                        &:hover{
+                            background-color: #13bed3;
+                        }
+                        &:active{
+                            transform: scale(0.95);
+                        }
+                        &.bg-red-3{
+                            background-color: $red-3;
+                            color: #fff;
+                            &:hover{
+                                background-color: $red-2;
+                            }
+                        }
+                        &:last-child{
+                            margin-right: 0;
+                        }
+                    }
+                    .close-button{
+                        width: 30px;
+                        height: 25px;
+                        background-color: $red-1;
+                        border-radius: 3px;
+                        color: #fff;
+                    }
+                }
+            }
+            &.active{
+                background: $lightblue-4;
+                border: 1px solid $lightblue-4;
+                &:before{
+                    background: $lightblue-2;
+                }
+                form{
+                    .w-logo{
+                        img{
+                            filter: grayscale(0);
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .confirm_button{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@media screen and (max-width: 860px){
+    .wrap-consolidation{
+        .list-consolidation-detail{
+            .item-consolidation-detail{
+                padding: 1em .4em;
+                form{
+                    .w-logo{
+                        padding-right: .5em;
+                    }
+                    .w-buttons{
+                        width: 18%;
+                        padding-left: .5em;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 767px){
+    .wrap-consolidation{
+        .forms{
+            p{
+                margin-bottom: .5em !important;
+            }
+        }
+        .list-consolidation-detail{
+            .item-consolidation-detail{
+                form{
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    .w-logo{
+                        width: 32%;
+                        margin-bottom: .5em;
+                    }
+                    .w-amount{
+                        width: 68%;
+                        border-right: 0;
+                        padding-left: .5em;
+                        margin: 0 auto .5em auto;
+                        display: block;
+                        .w-title{
+                            text-align: center;
+                        }
+                    }
+                    .w-buttons{
+                        width: 100%;
+                        padding-left: 0;
+                        min-height: 70px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 540px){
+    .wrap-consolidation{
+        .forms{
+            p{
+                padding: 0;
+                width: 100%;
+
+            }
+        }
+        .btn-next{
+            position: relative;
+            margin: .5em auto;
+            display: block;
+            max-width: 140px;
+        }
+        .list-consolidation-detail{
+            .item-consolidation-detail{
+                form{
+                    margin-top: 0 !important;
+                    .w-logo{
+                        width: 100%;
+                        min-height: 40px;
+                        border-right: 0;
+                        img{
+                            width: 120px;
+                        }
+                    }
+                    .w-amount{
+                        width: 100%;
+                        padding-left: 0;
+                    }
+                    .w-buttons{
+
+                    }
+                }
+            }
+        }
+    }
+}

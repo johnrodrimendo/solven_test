@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/companyTemplate">
+<head>
+
+    <title>Pendiente de Autorización</title>
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!-- / Bootstrap DatePicker -->
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <link rel="stylesheet" th:href="@{/css/company.css}" />
+
+    <!-- TablePaginator -->
+    <script th:src="@{/js/ext_tablepaginator.js}"></script>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+
+    <!-- Locale -->
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+    <!-- / Locale -->
+
+
+    <script th:inline="javascript" th:if="${showAeluRegisterPreliminaryDocReceptionScript}">
+        /*<![CDATA[*/
+        function registerPreliminaryDocumentationReception(employeeId, button) {
+            swal({
+                title: "&iquest;Est&aacute;s seguro de registrar la recepci&oacute;n de la documentaci&oacute;n preliminar?",
+                text: "No podr&aacute;s revertir el cambio.",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#36c6d3",
+                confirmButtonText: "¡Si, registrar!",
+                closeOnConfirm: true
+            },
+            function () {
+                $(button).loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/pendingAuthorization/preliminaryDocumentation}]]*/null,
+                    type: 'POST',
+                    data: {
+                        employeeId: employeeId
+                    },
+                    success: function (data) {
+                        $(button).unloading();
+                        swal("Registrado", "La recepción ha sido registrada correctamente.", "success");
+                        window.location.reload();
+                    }
+                    , error: function (xhr, data) {
+                        $(button).unloading();
+                    }
+                });
+            });
+        };
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${showAeluRegisterPromisoryNoteReceptionScript}">
+        /*<![CDATA[*/
+        function registerPromisoryNoteReception(employeeId, button) {
+
+
+            swal({
+                title: "&iquest;Est&aacute;s seguro de registrar la recepci&oacute;n de la documentaci&oacute;n final?",
+                text: "No podr&aacute;s revertir el cambio.",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#36c6d3",
+                confirmButtonText: "¡Si, registrar!",
+                closeOnConfirm: true
+            },
+            function () {
+                $(button).loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/pendingAuthorization/promisoryNote}]]*/null,
+                    type: 'POST',
+                    data: {
+                        employeeId: employeeId
+                    },
+                    success: function (data) {
+                        $(button).unloading();
+                        swal("Registrado", "La recepción ha sido registrada correctamente.", "success");
+                        window.location.reload();
+                    }
+                    , error: function (xhr, data) {
+                        $(button).unloading();
+                    }
+                });
+            });
+        };
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <th:block th:replace="fragments/headers :: companyDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetCompanySidebar(currentPage='pending-authorization')"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <span class="active">Pendientes Autorizaci&oacute;n</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+            <div><input type="hidden" id="msg"/></div>
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <span class="caption-subject bold uppercase"><i class="icon-settings font-dark"></i> Empleados</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div th:if="${employees?.size() > 0}" id="sample_1_2_wrapper" class="dataTables_wrapper">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover table-checkable order-column dataTable"
+                                   id="paysheetList" role="grid" aria-describedby="sample_1_2_info">
+                                <thead>
+                                <tr role="row">
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;" width="50">
+                                        #
+                                    </th>
+                                    <th class="sorting companyCol" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:left;display:none;" width="200">
+                                        Empresa
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;" width="50">
+                                        T.D.
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;" width="150">
+                                        N&uacute;mero doc.
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;" width="200"> Nombres
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Apellido paterno
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Apellido materno
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;width: 196px;" width="200">
+                                        Email
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;" width="130">
+                                        Ingreso
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;" width="130">
+                                        Descuentos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending"
+                                        style="text-align:center;" width="300">
+                                        Cta. Bancaria
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Actions : activate to sort column ascending"
+                                        style="text-align:center;width: 250px;">
+                                        Acciones
+                                    </th>
+                                    <th class="sorting contractCol" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Actions : activate to sort column ascending"
+                                        style="text-align:center;width: 191px;">
+                                        <span>Contrato</span>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody id="tableContent">
+                                <th:block th:replace="this :: list"></th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div th:if="${employees == null or employees?.size() == 0}">No hay empleados para mostrar</div>
+                </div>
+            </div>
+
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+<th:block th:fragment="list">
+    <tr role="row" class="row-employee" th:each="employee, iterEmployee : ${employees}" th:id="${'row-' + employee.id}">
+        <td style="text-align:left;" th:text="${iterEmployee.count}"></td>
+        <td style="text-align:left;">
+            <span th:text="${employee.docType.name}"></span>
+        </td>
+        <td style="text-align:left;">
+            <span th:text="${employee.docNumber}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.name}" style="display: block;width: 150px;"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.firstSurname}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.lastSurname}"></span>
+        </td>
+        <td style="padding:1em;text-align:left;">
+            <span th:text="${employee.workEmail}"></span>
+        </td>
+        <td style="text-align:center;">
+            <span th:text="${@utilService.integerMoneyFormat(employee.fixedGrossIncome)}"
+                  style="display: block;width: 100px;"></span>
+        </td>
+        <td style="text-align:center;">
+            <span th:text="${@utilService.integerMoneyFormat(employee.monthlyDeduction)}"
+                  style="display: block;width: 100px;"></span>
+        </td>
+        <td>
+            <span style="display: block;width: 200px"></span>
+            <th:block th:if="${employee.bank != null and employee.accountNumber != null}">
+                <span><b th:text="${employee.bank}"></b></span>
+                <br/>
+                <span><b>Cta.:</b></span>
+                <span th:text="${employee.accountNumber}"></span>
+                <br/>
+            </th:block>
+            <th:block th:if="${employee.accountNumberCci != null}">
+                <span><b>CCI:</b></span>
+                <span th:text="${employee.accountNumberCci}"></span>
+            </th:block>
+
+        </td>
+        <td style="text-align:center;vertical-align: middle;" id="col-status">
+
+            <th:block th:if="${employee.showAeluRecivePreliminaryDocButton}">
+                <button type="button" class="btn btn-warning btn-sm" style="width:180px;" th:onclick="'registerPreliminaryDocumentationReception(' + ${employee.id} + ',this)'">
+                        <i class="fa fa-check"></i> Recibí doc. preliminar </button>
+            </th:block>
+
+            <th:block th:if="${employee.showAeluRecivePromisoryNoteButton}">
+                <button type="button" class="btn btn-warning btn-sm" style="width:180px;" th:onclick="'registerPromisoryNoteReception(' + ${employee.id} + ',this)'">
+                        <i class="fa fa-check"></i> Recibí doc. final</button>
+            </th:block>
+        </td>
+        <td style="text-align:center;vertical-align: middle;">
+            <th:block th:each="contractFile : ${employee.contractFile}">
+                <a target="_blank" th:title="${contractFile?.productCategory?.category}"
+                   th:href="@{/userFile/__${@fileService.generateUserFileEncrypt(employee.userId, contractFile?.fileName, contractFile?.id)}__/image.jpg}"
+                   class="btn red btn-sm" th:attr="data-id=${employee.id}" style="margin-left: 1px;margin-right: 1px;display: inline-block;float: right;padding: 6px;">
+                    <i class="fa fa-file-pdf-o" style="font-size: 1.5em;margin-top: .25em;"></i>
+                </a>
+            </th:block>
+        </td>
+    </tr>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate">
+<head>
+
+    <title>Cr&eacute;ditos</title>
+
+    <!-- Jquery Validation -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}" type="text/javascript"></script>
+    <!-- / CounterUp -->
+
+    <!-- Swipebox -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}" rel="stylesheet"/>
+    <!-- / Swipebox -->
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/assets/owl.carousel.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/owl.carousel.min.js'}"></script>
+    <!-- / Owl. Carousel -->
+
+    <script>
+        /*<![CDATA[*/
+
+        $(document).on('ready', function () {
+
+            <!-- CounterUp -->
+            $('.counter').counterUp({
+                delay: 10,
+                time: 1000
+            });
+            <!-- / CounterUp -->
+
+            <!-- Swipebox -->
+            $('.swipebox-video').swipebox();
+            <!-- / Swipebox -->
+
+            <!-- Carousel -->
+            $('.info-payment').owlCarousel({
+                items: 3,
+                nav: true,
+                navText: ['<i class="icon control-prev-icon"></i>', '<i class="icon control-next-icon"></i>'],
+                responsiveClass: true,
+                responsive: {
+                    0: {
+                        items: 1,
+                        nav: true
+                    },
+                    600: {
+                        items: 2,
+                        nav: true
+                    },
+                    1000: {
+                        items: 3,
+                        nav: false
+                    }
+                }
+            });
+            <!-- / Carousel -->
+
+            <!-- Show details -->
+            $('.seeMore').on('click', function (event) {
+                event.preventDefault();
+
+                $('#credit-' + $(this).data('id')).slideToggle('slow');
+
+            });
+            <!-- / Show details -->
+
+        });
+
+        /*]]>*/
+    </script>
+
+
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: dashboardHeader "></th:block>
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetSidebar(currentPage='loans')"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/client/dashboard}">Tablero</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span class="active">Cr&eacute;ditos</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+
+            <!-- Notification -->
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:if="${loanApplication != null and (loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).PRE_EVAL_APPROVED or loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).EVAL_APPROVED)}">
+                    <div class="note note-success">
+                        <h4 class="block">Finaliza tu solicitud de cr&eacute;dito para <span th:text="${loanApplication.reason.mailingReplacement2}"></span> haciendo click <a rel="noopener noreferrer" target="_blank" th:href="${@utilService.createLoanApplicationClientUrl(loanApplication?.userId, loanApplication?.id, loanApplication?.personId)}" class="btn btn-outline red">aqu&iacute;</a></h4>
+                    </div>
+                </div>
+            </div>
+            <!-- / Notification -->
+
+            <!-- Payment places -->
+            <div class="row" th:if="${credits != null}">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="panel-group accordion" id="accordion3">
+                        <div class="panel panel-default" th:if="false">
+                            <div class="panel-heading bg-green bg-font-green">
+                                <h4 class="panel-title">
+                                    <a style="color: white;" class="accordion-toggle accordion-toggle-styled collapsed"
+                                       data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_1"
+                                       aria-expanded="false"> <i class="fa fa-bank"></i>Informaci&oacute;n y Lugares de
+                                        Pago </a>
+                                </h4>
+                            </div>
+                            <div id="collapse_3_1" class="panel-collapse collapse" aria-expanded="false"
+                                 style="height: 0px;">
+                                <div class="panel-body" style="padding: 1em">
+                                    <div class="info-payment owl-carousel owl-theme">
+                                        <div class="item" th:each="bank : ${@catalogService.getBanks(true)}">
+                                            <div class="box-outline"
+                                                 style="border: 1px solid #d9d9d9;overflow: hidden;padding: 1em">
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 column">
+                                                    <img th:src="@{/img/bcp-logo.png}" alt="Bcp"
+                                                         style="max-width: 100px"/>
+                                                </div>
+                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 column">
+                                                    <ul>
+                                                        <li>
+                                                            <h6 style="margin: 0">Cuenta Bancaria</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                        <li>
+                                                            <h6 style="margin: 0">Codigo Interbancario</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                    </ul>
+                                                    <a class="swipebox-video" rel="vimeo"
+                                                       href="http://vimeo.com/29193046">&iquest;C&oacute;mo pagar?</a>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 column location"
+                                                     style="text-align: center">
+                                                    <img th:src="@{/img/map.png}" alt="Location"
+                                                         style="max-width: 60px"/><br/>
+                                                    <a rel="noopener noreferrer" target="_blank" href="http://www.encuentrabcp.com.pe/buscador/">Lugares
+                                                        de pago mas
+                                                        cercanos </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="item" th:each="bank : ${@catalogService.getBanks(true)}">
+                                            <div class="box-outline"
+                                                 style="border: 1px solid #d9d9d9;overflow: hidden;padding: 1em">
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 column">
+                                                    <img th:src="@{/img/bcp-logo.png}" alt="Bcp"
+                                                         style="max-width: 100px"/>
+                                                </div>
+                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 column">
+                                                    <ul>
+                                                        <li>
+                                                            <h6 style="margin: 0">Cuenta Bancaria</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                        <li>
+                                                            <h6 style="margin: 0">Codigo Interbancario</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                    </ul>
+                                                    <a class="swipebox-video" rel="vimeo"
+                                                       href="http://vimeo.com/29193046">&iquest;C&oacute;mo pagar?</a>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 column location"
+                                                     style="text-align: center">
+                                                    <img th:src="@{/img/map.png}" alt="Location"
+                                                         style="max-width: 60px"/><br/>
+                                                    <a rel="noopener noreferrer" target="_blank" href="http://www.encuentrabcp.com.pe/buscador/">Lugares
+                                                        de pago mas
+                                                        cercanos </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="item" th:each="bank : ${@catalogService.getBanks(true)}">
+                                            <div class="box-outline"
+                                                 style="border: 1px solid #d9d9d9;overflow: hidden;padding: 1em">
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 column">
+                                                    <img th:src="@{/img/bcp-logo.png}" alt="Bcp"
+                                                         style="max-width: 100px"/>
+                                                </div>
+                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 column">
+                                                    <ul>
+                                                        <li>
+                                                            <h6 style="margin: 0">Cuenta Bancaria</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                        <li>
+                                                            <h6 style="margin: 0">Codigo Interbancario</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                    </ul>
+                                                    <a class="swipebox-video" rel="vimeo"
+                                                       href="http://vimeo.com/29193046">&iquest;C&oacute;mo pagar?</a>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 column location"
+                                                     style="text-align: center">
+                                                    <img th:src="@{/img/map.png}" alt="Location"
+                                                         style="max-width: 60px"/><br/>
+                                                    <a rel="noopener noreferrer" target="_blank" href="http://www.encuentrabcp.com.pe/buscador/">Lugares
+                                                        de pago mas
+                                                        cercanos </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="item" th:each="bank : ${@catalogService.getBanks(true)}">
+                                            <div class="box-outline"
+                                                 style="border: 1px solid #d9d9d9;overflow: hidden;padding: 1em">
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 column">
+                                                    <img th:src="@{/img/bcp-logo.png}" alt="Bcp"
+                                                         style="max-width: 100px"/>
+                                                </div>
+                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 column">
+                                                    <ul>
+                                                        <li>
+                                                            <h6 style="margin: 0">Cuenta Bancaria</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                        <li>
+                                                            <h6 style="margin: 0">Codigo Interbancario</h6>
+                                                            <p>4456464646546545</p>
+                                                        </li>
+                                                    </ul>
+                                                    <a class="swipebox-video" rel="vimeo"
+                                                       href="http://vimeo.com/29193046">&iquest;C&oacute;mo pagar?</a>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 column location"
+                                                     style="text-align: center">
+                                                    <img th:src="@{/img/map.png}" alt="Location"
+                                                         style="max-width: 60px"/><br/>
+                                                    <a rel="noopener noreferrer" target="_blank" href="http://www.encuentrabcp.com.pe/buscador/">Lugares
+                                                        de pago mas
+                                                        cercanos </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Payment places -->
+
+            <!-- No results -->
+            <div class="portlet light bg-inverse" th:if="${credits == null}">
+                <div class="portlet-title">
+                    <div class="caption font-purple-plum">
+                        <i class="icon-speech font-purple-plum"></i>
+                        <span class="caption-subject bold uppercase"> A&uacute;n no tienes cr&eacute;ditos</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <p>No tienes cr&eacute;ditos para mostrar.</p>
+                </div>
+            </div>
+            <!-- / No results -->
+
+            <!-- Top summary -->
+            <div class="portlet box green" th:if="${credits != null}" th:each="credit : ${credits}">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-tag"></i>Tu cr&eacute;dito para <span
+                            th:text="${credit.loanApplicationReason.mailingReplacement2}"></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-green-sharp">
+                                            <small style="font-size: 24px;" class="font-green-sharp">S/</small>
+                                            <span style="font-size: 24px;" data-counter="counterup" th:attr="data-value=${@utilService.doubleFormat(credit.getTotalPendingAmmount())}">0</span>
+                                            <small style="font-size: .5em">/
+                                                <small>S/</small>
+                                                <span data-counter="counterup"
+                                                      th:attr="data-value=${credit.amount?.intValue()}"></span></small>
+                                            <small style="font-size: .5em">(TEA <span
+                                                    th:text="${@utilService.percentFormat(credit.effectiveAnnualRate)}"></span>)
+                                            </small>
+                                        </h3>
+                                        <small><a style="cursor: help;border-bottom: 1px dotted" class="tooltips" data-container="body" data-placement="bottom" data-original-title="Incluye la comisi&oacute;n por desembolso.">Lo que te falta</a> / Lo que sacaste</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-red-haze">
+
+                                            <span style="font-size: 24px;" data-counter="counterup" th:attr="data-value=${credit.getPendingInstallments()}">0</span>
+
+                                            <th:block th:if="${credit.product?.id != credit.product?.SALARY_ADVANCE}">
+                                                <small class="font-red-haze" th:text="${credit.product?.paymentType?.pluralName}"></small>
+                                            </th:block>
+                                            <small class="font-red-haze">cuota</small>
+
+                                            <small style="font-size: .55em"> /
+                                                <span data-counter="counterup" th:attr="data-value=${credit.installments}"></span>
+                                                <th:block th:if="${credit.product?.id != credit.product?.SALARY_ADVANCE}">
+                                                    <small th:text="${credit.product?.paymentType?.pluralName}"></small>
+                                                </th:block>
+                                                <small>cuota</small>
+                                            </small>
+                                        </h3>
+
+                                        <small>Pendientes / Total Restantes</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-calculator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" th:if="${credit.disbursementAccount != null}">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-red-haze">
+                                            Informaci&oacute;n de Cuenta
+                                        </h3>
+                                        <p>Tu desembolso se har&aacute; a la cuenta <b th:text="${credit.disbursementAccount}">*************4812</b></p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-calculator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" th:if="${credit.nextPayment != null}">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-blue-sharp">
+                                            <small style="font-size: 24px;" class="font-blue-sharp">S/</small>
+                                            <span style="font-size: 24px;" data-counter="counterup"
+                                                  th:attr="data-value=${@utilService.doubleFormat(credit.nextPayment.installmentAmount)}">150</span>
+                                            <small style="font-size: .5em"> / <span
+                                                    th:text="${@utilService.dateCustomFormat(credit.nextPayment.dueDate, 'dd MMM', #locale)}"></span>
+                                            </small>
+                                        </h3>
+                                        <small>Pr&oacute;xima Cuota</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-calendar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" th:if="${credit.getDaysInArrears() > 0}">
+                            <div class="note note-danger" style="height: 122px;">
+                                <h4 class="block">Tu cr&eacute;dito esta en mora.</h4>
+                                <p>Puedes ver el detalle de tu cr&eacute;dito haciendo click en el boton ver detalles</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="text-align: center;">
+                            <button type="button" th:attr="data-id=${credit.id}" class="btn red btn-lg seeMore"
+                                    style="margin-top: 1em">Ver detalle
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display: none;" th:id="'credit-' + ${credit.id}">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="portlet box green">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="fa fa-th-list"></i><span></span>Detalle del cr&eacute;dito
+                                    </div>
+                                    <div class="actions" th:with="params=${@catalogService.getEntityProductParam(credit.entity.id, credit.product.id)}">
+                                        <a style="color:white;text-decoration: underline;margin-right: .5em;"
+                                           rel="noopener noreferrer"
+                                           target="_blank"
+                                           th:if="${credit.contractFile != null and params.sendContract}"
+                                           th:href="@{/client/userFile/__${@fileService.generateUserFileEncrypt(credit?.contractFile[0]?.userId, credit?.contractFile[0]?.fileName, credit?.contractFile[0]?.id)}__/image.jpg}">
+                                            <i class="icon icon-pdf" style="font-size: 1.75em;display: inline-block;vertical-align: middle;"></i> Descarga tu contrato en pdf</a>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead class="flip-content">
+                                        <tr>
+                                            <th>Cuota</th>
+                                            <th>Vencimiento</th>
+                                            <th>Capital</th>
+                                            <th>Interés<br/>(Inc. <th:block th:text="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>)</th>
+                                            <th>Gasto<br/>de Recaudo<br/>(Inc. <th:block th:text="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>)</th>
+                                            <th>Interés<br/>Moratorio</th>
+                                            <th>Cargos<br/>por Mora</th>
+                                            <th>Cuota<br/>total</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="managementSchedule : ${credit?.managementSchedule}">
+                                            <td class="text-center" th:text="${managementSchedule?.installmentId}"></td>
+                                            <td class="text-center">
+                                                <span th:text="${@utilService.dateFormat(managementSchedule?.getDueDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(managementSchedule?.getDueDate())}"></span>
+                                                <small th:if="${managementSchedule?.getDaysInArrears()} > 0"
+                                                       class="font-red-mint"
+                                                       th:text="'(' + ${managementSchedule?.getDaysInArrears()} + ')' "></small>
+                                            </td>
+                                            <td class="numeric">
+                                                <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getInstallmentCapital())}"></span>
+                                                <small class="font-green-sharp"
+                                                       th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getPendingInstallmentCapital())}"></small>
+                                            </td>
+                                            <td class="numeric">
+                                                <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalInterest())}"></span>
+                                                <small class="font-green-sharp"
+                                                       th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingInterest())}"></small>
+                                            </td>
+                                            <td class="numeric">
+                                                <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalCollectionCommission())}"></span>
+                                                <small class="font-green-sharp"
+                                                       th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingCollectionCommission())}"></small>
+                                            </td>
+                                            <td class="numeric">
+                                                <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalMoratoriumInterest())}"></span>
+                                                <small class="font-green-sharp"
+                                                       th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingMoratoriumInterest())}"></small>
+                                            </td>
+                                            <td class="numeric">
+                                                <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getTotalMoratoriumCharge())}"></span>
+                                                <small class="font-green-sharp"
+                                                       th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getTotalPendingMoratoriumCharge())}"></small>
+                                            </td>
+                                            <td class="numeric">
+                                                <span th:text="${@utilService.doubleMoneyFormat(managementSchedule?.getInstallmentAmount())}"></span>
+                                                <small class="font-green-sharp"
+                                                       th:text="' / ' + ${@utilService.doubleMoneyFormat(managementSchedule?.getPendingInstallmentAmount())}"></small>
+                                            </td>
+                                            <td class="text-center">
+                                            <span th:if="${managementSchedule?.getInstallmentStatusId() == 1}"
+                                                  class="label label-xs label-info">Pendiente</span>
+                                                <span th:if="${managementSchedule?.getInstallmentStatusId() == 2}"
+                                                      class="label label-xs label-warning">Vencida</span>
+                                                <span th:if="${managementSchedule?.getInstallmentStatusId() == 3}"
+                                                      class="label label-xs label-danger">En Mora</span>
+                                                <span th:if="${managementSchedule?.getInstallmentStatusId() == 4}"
+                                                      class="label label-xs label-success">Pagada</span>
+                                            </td>
+                                            <!--<td th:text="${managementSchedule?.getDaysAhead()}"></td>-->
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / Top summary -->
+
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+
+</body>
+</html>

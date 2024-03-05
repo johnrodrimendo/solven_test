@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>Crédito Vehicular - Detalle</title>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/showcase/masterslider/jquery.easing.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/showcase/masterslider/masterslider.min.js'}"></script>
+
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/royalslider/royalslider.css'}" rel='stylesheet' type='text/css' />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/royalslider/jquery.royalslider.min.js'}"></script>
+    <style>
+        #gallery-1 {
+            width: 100%;
+            height: 440px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+        .royalSlider > .rsImg {
+            visibility:hidden;
+        }
+        .royalSlider img {
+        }
+        .rsWebkit3d .rsSlide {
+            -webkit-transform: none;
+        }
+        .rsWebkit3d img {
+            -webkit-transform: translateZ(0);
+        }
+        .royalSlider .rsContainer img{
+            width: 100% !important;
+            height: auto !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .royalSlider.rsFullscreen .rsContainer img{
+            max-width: 1280px !important;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+
+        @media screen and (max-width: 1200px){
+            .royalSlider.rsFullscreen .rsContainer img{
+                width: 90% !important;
+                max-width: 90% !important;
+            }
+        }
+
+    </style>
+</head>
+<body id="mainCarFinancing">
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader(showHelp=true)"></th:block>
+</th:block>
+
+<th:block th:fragment="slider">
+    <div id="gallery-1" class="royalSlider rsDefault">
+        <th:block th:each="image:${vehicleDetails?.image}">
+            <a class="rsImg" data-rsw="400" data-rsh="500" th:attr="data-rsBigImg=${image}" th:href="${image}" >
+                <img width="96" height="72" class="rsTmb" th:src="${image}" />
+            </a>
+        </th:block>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        jQuery(document).ready(function($) {
+            $('#gallery-1').royalSlider({
+                fullscreen: {
+                    enabled: true,
+                    nativeFS: true
+                },
+                controlNavigation: 'thumbnails',
+                autoScaleSlider: true,
+                autoScaleSliderWidth: 600,
+                autoScaleSliderHeight: 430,
+                loop: false,
+                imageScaleMode: 'fit-if-smaller',
+                navigateByClick: true,
+                numImagesToPreload: 2,
+                arrowsNav: true,
+                arrowsNavAutoHide: true,
+                arrowsNavHideOnTouch: true,
+                keyboardNavEnabled: true,
+                fadeinLoadedSlide: true,
+                globalCaption: true,
+                globalCaptionInside: false,
+                thumbs: {
+                    appendSpan: true,
+                    firstMargin: true,
+                    paddingBottom: 4
+                }
+            });
+            $('.rsContainer').on('touchmove touchend', function(){});
+
+        });
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="car-content">
+        <div class="top-bar-filter">
+            <div class="container">
+                <div class="custom-breadcrumb">
+                    <ul>
+                        <li>
+                            <a th:href="@{/}">Home</a>
+                        </li>
+                        <li>
+                            <a href="javascript:goBack()">Autos disponibles</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" th:text="${vehicle.brand.brand}+' '+${vehicle.model}"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="controls-filters right">
+                    <a th:href="@{/vehiculo/busqueda}" class="text-lightblue">Regresar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-with-gallery">
+            <div class="wrap-detail-gallery container ">
+
+                <div id="sliderFragment" class="wrap-gallery">
+                    <th:block th:replace="this :: slider"></th:block>
+                </div>
+
+                <div class="car-desc">
+                    <div class="wrap-title">
+                        <div class="title-wrap">
+                            <div class="vTitle">
+                                <h2 class="text-black" th:text="${vehicle.brand.brand}+' '+${vehicle.model}"></h2>
+                            </div>
+                            <div class="cnt">
+                                <div class="brand-logo">
+                                    <img th:src="${vehicle?.brand?.image}" alt=""/>
+                                </div>
+                                <span th:text="${vehicle?.version}"></span>
+                            </div>
+                        </div>
+                        <div class="wrap-price">
+                            <div class="wrap">
+                                <span class="price-default" th:text="${@utilService.integerMoneyFormat(vehicle?.listPrice, vehicle?.currency)}"></span>
+                                <small th:text="${@utilService.percentajeSave(vehicle?.listPrice, vehicle?.price)}"></small>
+                            </div>
+                            <div class="cnt">
+                                <span>Precio online</span>
+                                <strong class="price-online" th:text="${@utilService.integerMoneyFormat(vehicle?.price, vehicle?.currency)}"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wrap-detail">
+                        <div class="detail-description">
+                            <h3>Especificaciones</h3>
+                            <ul class="categories">
+                                <li>
+                                    <p><span class="title">Año de Fabricación</span><span class="description" th:text="${vehicle?.yearOfProduction}"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Transmisión</span><span class="description" th:text="${vehicle.transmission == vehicle.MECANICO ? 'Mec&aacute;nica' : 'Autom&aacute;tica'}"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Combustible</span><span class="description" th:text="${vehicle.gasType?.type}"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Garantía</span><span class="description" th:text="${vehicle?.warranty}"></span></p>
+                                </li>
+                                <li class="wrap-list-color">
+                                    <p class="p">
+                                        <span class="title">Colores</span>
+                                        <ul class="description colors" >
+                                            <li th:each="vehicleDetails:${vehicle?.vehicleDetails}">
+                                                <label th:for="${vehicleDetails?.color}" class="choose-color">
+                                                    <span th:text="${vehicleDetails.color}"></span>
+                                                    <span th:class="${vehicleDetails?.boxClass}" th:style="${vehicleDetails?.boxStyle}"></span>
+                                                    <input type="radio" th:id="${vehicleDetails?.id}" class="colorPicker" name="colorpicker"/>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-description">
+                            <h3>Motor</h3>
+                            <ul class="categories">
+                                <li>
+                                    <p><span class="title">Capacidad de motor</span><span class="description" th:text="${vehicle?.engine}"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Potencia</span><span class="description" th:text="${vehicle?.power}"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Torque</span><span class="description" th:text="${vehicle?.torque}"></span></p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-description">
+                            <h3>Carrocería</h3>
+                            <ul class="categories">
+                                <li>
+                                    <p><span class="title">Aros</span><span class="description" th:text="${vehicle?.rims}"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Frenos</span><span class="description icon" th:classappend="${vehicle?.brakes} ? icon-true : icon-false"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Carrocería</span><span class="description" th:text="${vehicle?.bodyType}"></span></p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-description">
+                            <h3>Equipamiento</h3>
+                            <ul class="categories">
+                                <li>
+                                    <p><span class="title">Airbag</span><span class="description icon" th:classappend="${vehicle?.airbag} ? icon-true : icon-false"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Radio</span><span class="description icon" th:classappend="${vehicle?.radio} ? icon-true : icon-false"></span></p>
+                                </li>
+                                <li>
+                                    <p><span class="title">Aire Acondicionado</span><span class="description icon" th:classappend="${vehicle?.airConditioning} ? icon-true : icon-false"></span></p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <a th:href="${vehicle?.brochureURL}" class="button btnBrochure" target="_blank">Ficha Técnica</a>
+                        <button id="applyButton" class="button bg-red" th:text="#{button.apply}"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="legal container">
+                <table style="font-family: sans-serif; font-size: 8px; text-align: justify; margin: 10px 0;"><tbody><tr><td>No válido para flotas ni endosos. No acumulable con otras promociones. Fotos y colores referenciales. Válido en los locales de Mitsui Automotriz en Miraflores y Surco. Los datos técnicos y de equipamiento de los vehículos están sujetos a la versión del modelo elegido.  Los precios de venta al público indicados en esta web son referenciales, por lo que los precios finales que ofrezca un punto de venta de Mitsui pueden ser distintos. La compra de cualquier producto o servicio está sujeto a los términos y condiciones fijados en cada operación. Los precios incluyen IGV y están indicados en Dólares Americanos, teniendo en cuenta el tipo de cambio del día aplicándose al momento de la transacción.</td></tr></tbody></table>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function(){
+            var $applyButton = $('#applyButton');
+            var $chooseColor = $('.choose-color');
+            var $listColors  = $('.colors');
+
+            $chooseColor.on('click' , function(e) {
+                e.preventDefault();
+                var $this =  $(this);
+                $(this).toggleClass('box-color-active').parent().siblings().find('label').removeClass('box-color-active');
+                $(this).closest('.wrap-list-color').removeClass('error');
+
+                var $vehicleId = $listColors.find('.box-color-active').find('input').attr('id');
+                var $groupId = /*[[${vehicle?.groupId}]]*/null;
+                defaultAjax({
+                    url: /*[[@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/pickColor}]]*/null,
+                    type: 'POST',
+                    data: {
+                        vehicleId : $vehicleId,
+                        groupId : $groupId
+                    },
+                    success: function (data) {
+                        $('#sliderFragment').html(data);
+                    }
+                });
+            });
+
+            $applyButton.click(function(){
+                var $vehicleId = $listColors.find('.box-color-active').find('input').attr('id');
+                if( $vehicleId !== undefined){
+                    defaultAjax({
+                        url: /*[[@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/detalles}]]*/null,
+                        type: 'POST',
+                        data: {
+                            vehicleId : $vehicleId
+                        },
+                        success: function (data) {
+                            window.location.replace(data);
+                        }
+                    });
+                }
+                else{
+                    showErrorModal("Debes elegir un color para continuar");
+                    $('.wrap-list-color').addClass('error');
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+</th:block>
+
+</body>
+</html>

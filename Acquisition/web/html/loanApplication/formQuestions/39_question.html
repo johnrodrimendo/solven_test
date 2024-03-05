@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q39">
+            <p th:utext="#{questions.block.shareOptions}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="centrado">
+                    <div>
+                        <div class="field field-percentage inline">
+                            <div class="wrap-field">
+                                <input type="text" class="input-outline medium-input" th:field="*{shareholding}"/>
+                                <div class="box-icon box-right prefix-box tiny-input q-box-icon">
+                                    <span class="subfix"><i class="icon icon-percent"></i></span>
+                                </div>
+                                <small class="input-help" th:text="#{static.question.participation}"></small>
+                            </div>
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+
+        $(document).ready(function () {
+            var shareholding = $('#shareholding');
+            setTimeout(function () {
+                shareholding.focus();
+            }, 320);
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

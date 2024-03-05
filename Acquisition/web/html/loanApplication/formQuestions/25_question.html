@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q25">
+            <form th:object="${form}" id="questionForm" autocomplete="off">
+                <p th:utext="#{questions.block.profession}"></p>
+                <div class="field inline">
+                    <select th:field="*{profession}" data-width="245" data-placeholder="Sectores">
+                        <th:block th:each="profession : ${@catalogService.getProfessionsActive(#locale)}">
+                            <option value="" disabled="disabled" selected="selected"></option>
+                            <option th:value="${profession.id}" th:text="${profession.profession}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var $profession = $('#profession');
+
+        $profession.on('select2:select', function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {profession: $('#profession').val()}
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

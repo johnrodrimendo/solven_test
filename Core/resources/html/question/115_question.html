@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="form-group">
+            <p th:text="#{questions.block.assistedProcess(${personFirstName ?: 'Hola'})}"></p>
+            <div class="field inline">
+                <select class="form-control" th:field="*{assistedProcess}">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option value="false">Yo lo hago</option>
+                    <option value="true">Llámame</option>
+                </select>
+            </div>
+            <div class="errorContainer"></div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('select[name=assistedProcess]').on('change', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

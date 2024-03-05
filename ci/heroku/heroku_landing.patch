@@ -1,0 +1,147 @@
+diff --git a/.slugignore b/.slugignore
+index 3260956..1ed9899 100644
+--- a/.slugignore
++++ b/.slugignore
+@@ -8,49 +8,49 @@
+ /Backoffice
+ /Schedule
+ /Job
+-###########################ACQUISITION#################
+-/Client/resources/clientResources/external
+-/Client/resources/clientResources/frontend
+-/Client/resources/clientResources/theme_default/workflow
+-/Landing
+-/CompanyExt
+-/EntityExt
+-/Backoffice
+-/Schedule
+-/Job
+-###########################COMPANYEXT#################
+-/Client/resources/clientResources/external
+-/Client/resources/clientResources/frontend
+-/Client/resources/clientResources/theme_default/workflow
+-/Landing
+-/Acquisition
+-/EntityExt
+-/Backoffice
+-/Schedule
+-/Job
+-###########################ENTITYEXT#################
+-/Client/resources/clientResources/external
+-/Client/resources/clientResources/frontend
+-/Client/resources/clientResources/theme_default/workflow
+-/Landing
+-/Acquisition
+-/CompanyExt
+-/Backoffice
+-/Schedule
+-/Job
+-########################BACKOFFICE################
+-/Client
+-/Landing
+-/Acquisition
+-/CompanyExt
+-/EntityExt
+-/Schedule
+-/Job
+-#########################WORKER###################
+-/Client
+-/Landing
+-/Acquisition
+-/CompanyExt
+-/EntityExt
+-/Backoffice
+-/CoreWeb
++############################ACQUISITION#################
++#/Client/resources/clientResources/external
++#/Client/resources/clientResources/frontend
++#/Client/resources/clientResources/theme_default/workflow
++#/Landing
++#/CompanyExt
++#/EntityExt
++#/Backoffice
++#/Schedule
++#/Job
++############################COMPANYEXT#################
++#/Client/resources/clientResources/external
++#/Client/resources/clientResources/frontend
++#/Client/resources/clientResources/theme_default/workflow
++#/Landing
++#/Acquisition
++#/EntityExt
++#/Backoffice
++#/Schedule
++#/Job
++############################ENTITYEXT#################
++#/Client/resources/clientResources/external
++#/Client/resources/clientResources/frontend
++#/Client/resources/clientResources/theme_default/workflow
++#/Landing
++#/Acquisition
++#/CompanyExt
++#/Backoffice
++#/Schedule
++#/Job
++#########################BACKOFFICE################
++#/Client
++#/Landing
++#/Acquisition
++#/CompanyExt
++#/EntityExt
++#/Schedule
++#/Job
++##########################WORKER###################
++#/Client
++#/Landing
++#/Acquisition
++#/CompanyExt
++#/EntityExt
++#/Backoffice
++#/CoreWeb
+diff --git a/Procfile b/Procfile
+index 1b2cfb0..7887474 100644
+--- a/Procfile
++++ b/Procfile
+@@ -1,13 +1,13 @@
+ #LANDING
+ web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar Landing/target/dependency/webapp-runner.jar --port $PORT --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH Landing/target/*.war
+ #ACQUISITION
+-web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar Acquisition/target/dependency/webapp-runner.jar --port $PORT --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH Acquisition/target/*.war
++#web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar Acquisition/target/dependency/webapp-runner.jar --port $PORT --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH Acquisition/target/*.war
+ #COMPANYEXT
+-web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar CompanyExt/target/dependency/webapp-runner.jar --port $PORT --path /company --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH CompanyExt/target/*.war
++#web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar CompanyExt/target/dependency/webapp-runner.jar --port $PORT --path /company --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH CompanyExt/target/*.war
+ #ENTITYEXT
+-web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar EntityExt/target/dependency/webapp-runner.jar --port $PORT --path /funcionarios --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH EntityExt/target/*.war
++#web: java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar EntityExt/target/dependency/webapp-runner.jar --port $PORT --path /funcionarios --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH EntityExt/target/*.war
+ #BACKOFFICE
+-web: java $JAVA_OPTS -jar Backoffice/target/dependency/webapp-runner.jar --port $PORT --context-xml Backoffice/target/dependency/apache-context.xml --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json Backoffice/target/*.war
++#web: java $JAVA_OPTS -jar Backoffice/target/dependency/webapp-runner.jar --port $PORT --context-xml Backoffice/target/dependency/apache-context.xml --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json Backoffice/target/*.war
+ #JOB
+-worker:    sh Job/target/bin/worker
+-schedule:  sh Schedule/target/bin/worker
++#worker:    sh Job/target/bin/worker
++#schedule:  sh Schedule/target/bin/worker
+diff --git a/pom.xml b/pom.xml
+index 46be454..c25b3dc 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -12,12 +12,12 @@
+         <module>CoreWeb</module>
+         <module>Client</module>
+         <module>Landing</module>
+-        <module>Acquisition</module>
+-        <module>CompanyExt</module>
+-        <module>EntityExt</module>
+-        <module>Backoffice</module>
+-        <module>Job</module>
+-        <module>Schedule</module>
++<!--        <module>Acquisition</module>-->
++<!--        <module>CompanyExt</module>-->
++<!--        <module>EntityExt</module>-->
++<!--        <module>Backoffice</module>-->
++<!--        <module>Job</module>-->
++<!--        <module>Schedule</module>-->
+     </modules>
+     <profiles>
+         <profile>

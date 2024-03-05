@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <title th:text="${header}"></title>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ ${agent?.avatarUrl} ]]*/;
+
+        function validateIframe() {
+            if ( window.location !== window.parent.location )
+            {
+                $("img.logo").hide();
+                $("a.logoLinkUrl").hide();
+                $("div.logo a.logo").hide();
+            }
+        }
+
+        validateIframe();
+
+        $(document).ready(function(){
+            updateBranding();
+            validateIframe();
+            updateBranding();
+        })
+
+        /*$(document).on('ready', function () {
+            var size = 130;
+            if ($(window).width() <= 1280 && $(window).width() > 768) {
+                size = 100;
+            } else if ($(window).width() <= 768) {
+                size = 60;
+            }
+
+            $('.avatar-advisor').css('margin', '0 auto');
+
+            $('.avatar-advisor').doOnce(function () {
+                $(".avatar-advisor").imgProgress({
+
+                    // path to the image
+                    img_url: url,
+
+                    // size in pixels
+                    size: size,
+
+                    // bar size
+                    barSize: 6,
+
+                    // background color
+                    backgroundColor: '#BEEFF2',
+
+                    // foreground color
+                    foregroundColor: '#26CAD3',
+
+                    // CSS background-size property
+                    backgroundSize: 'cover',
+
+                    // current percentage value
+                    percent: 100
+
+                });
+            });
+
+            $('.avatar-advisor span').hide();
+
+        });*/
+
+        /*]]>*/
+
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var
+            $cadena_colorweb = /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#F7323F')}]]*/ ;
+        var
+            $cadena_colorwebsecond = /*[[${@brandingService.getEntityBrandingSecundaryColor(#httpServletRequest, '#FFA100')}]]*/ ;
+        var $StrokeSolvenColor = '#BEEFF2'; //Solven Default Color
+        var $FillSolvenColor = '#26CAD3'; //Solven Default Color
+        var $cadena_colorwhite = '#FFFFFF'; //Solven Default Color
+        var isBranded = /*[[${@brandingService.isBranded(#httpServletRequest)}]]*/ ;
+        var
+            $backgroundColorAgent = /*[[${@brandingService.getEntityBrandingAgentBackgroundColor(#httpServletRequest, '#CA005D')}]]*/ ;
+        var
+            $textColorAgent = /*[[${@brandingService.getEntityBrandingAgentTextColor(#httpServletRequest, '#FFFFFF')}]]*/ ;
+        var $cadena_colorgris = '#D6D8DD'; // Solven Default Color
+        var $color_line_one = /*[[${@brandingService.getEntityBrandingLineOne(#httpServletRequest, 'transparent')}]]*/ ;
+        var $color_line_two = /*[[${@brandingService.getEntityBrandingLineTwo(#httpServletRequest, 'transparent')}]]*/ ;
+        var
+            $color_line_three = /*[[${@brandingService.getEntityBrandingLineThree(#httpServletRequest, 'transparent')}]]*/ ;
+        var
+            $fav_icon = /*[[${@brandingService.getEntityBrandingFavIcon(#httpServletRequest, 'https://s3.amazonaws.com/solven-public/img/icons/favicon/favicon.png')}]]*/ ;
+        var
+            $tertiary_color = /*[[${@brandingService.getEntityBrandingTertiaryColor(#httpServletRequest, '#34465d')}]]*/ ;
+        var $process_logo = /*[[${@brandingService.getEntityBrandingProcessLogo(#httpServletRequest, null)}]]*/ ;
+
+        var isEfectivoAlToque = /*[[${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}]]*/ null;
+        if (isEfectivoAlToque) {
+            $cadena_colorweb = "#000effbf";
+            $("#favicon").attr("href", '/img/favicon-al-toque.png')
+        }
+
+        var isBancoAztecaEntity = /*[[${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}]]*/ null;
+
+
+        function updateBranding(){
+            $(".card-branded-detail .box-content").css({'border-color': $cadena_colorweb});$(".card-branded-detail .box-header").css({'background': $cadena_colorweb});
+            $('.bg-red-outline').css("background", 'white').css("border", `1px solid ${$cadena_colorweb}`).css("color", `${$cadena_colorweb}`);
+            document.documentElement.style.setProperty('--branding-loading-color', /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#26CAD3')}]]*/);
+            function o(o,c){o.find(".bloc.first").css("background",c),o.find(".bar-offer").css("background",c),o.find(".box-c").css("background",c),o.find(".btn-offer").css("border-color",c),o.find(".btn-offer").find(".circle-inner").css("color",c),o.find(".box-b").find("p").find("span").css("color",c),o.find(".icon-check").css({"background-color":c,"border-color":c}),o.css("border-color",c)}isBranded&&($("#favicon").attr("href",$fav_icon),$("#noDebtsButton").css({color:$cadena_colorweb,"border-color":$cadena_colorweb}),$("#noDebtsButton").hover(function(){$(this).css("background-color",$cadena_colorweb),$(this).css("color","#FFFFFF")},function(){$(this).css({"background-color":"#FFFFFF",color:$cadena_colorweb,"border-color":$cadena_colorweb})}),$("body").find("#email").focus(function(){$(this).css("border-color",$cadena_colorweb)}),$("body").find("#email").blur(function(){$(this).css("border-color","#D6D8DD")}),$(".item-consolidation-detail .no-consolidate-button").css("background-color",$cadena_colorwebsecond),$(".item-consolidation-detail form .w-buttons .close-button").css("background-color",$cadena_colorwebsecond),$(".item-consolidation-detail form .w-buttons .close-button").hover(function(){$(this).css("background-color",$cadena_colorwebsecond)},function(){$(this).css("background-color",$cadena_colorwebsecond)}),$(".modal .wrap-form .button.bg-transparent").css({color:$cadena_colorweb,"border-color":$cadena_colorweb}),$(".modal .wrap-form .wrap-field .input-outline").css("border-color",$cadena_colorgris),$(".modal .wrap-form .wrap-field .input-outline").hover(function(){$(this).css("border-color",$cadena_colorweb)},function(){$(this).css("border-color",$cadena_colorgris)}),$(".modal .wrap-form .wrap-field .input-outline").delegate("*","focus",function(){$(this).css("border-color",$cadena_colorweb)}),$(".check-label a").css("color",$cadena_colorweb),$("#anchor-back, .box-offert").css({"border-color":$cadena_colorweb}),$("#anchor-back svg").css({fill:$cadena_colorweb}),$(".brand-txt-colorweb").css("color",$cadena_colorweb),$(".text-red.text-bold").css("color",$cadena_colorweb),$(".message p").css({background:$cadena_colorweb,color:$cadena_colorwhite}),$(".message span").css("border-left","16px solid "+$cadena_colorweb),$(".brand-txt-white").css("color",$cadena_colorwhite),$(".choose-agent .underline").css("background","#e8e8e8"),$("body.brand .brand-footer .underline").css("background",$cadena_colorweb),$(".imgProgress-svg").css("background",$cadena_colorgris),$(".imgProgress-svg").css("border-color",$cadena_colorgris),$(".imgProgress-svg .imgProgress-circle").css("fill",$cadena_colorgris),$(".imgProgress-svg .imgProgress-circle").css("stroke",$cadena_colorweb),$(".brand .divisor-bottom").css("color",$cadena_colorweb),$(".agent-img").css("border-color",$cadena_colorweb),$("li.steps-question .progress-line").css("background",$cadena_colorweb),$("li.steps-question.active .w").css("background",$cadena_colorweb),$("li.steps-question.active>span, .estimated").css("color",$cadena_colorweb),$(".bg-black").css("background",$cadena_colorwebsecond),$(".bg-red").css("background",$cadena_colorweb),$(".btn-delete .text-red").css("color",$cadena_colorweb),$(".bg-lightblue").css("background",$cadena_colorweb),$(".sk-fading-circle .sk-circle2:not(.loading-indicator)").css({"border-top-color":$cadena_colorweb,"border-left-color":$cadena_colorweb}),$(".divisor-bottom").css("background",$cadena_colorweb),$("body.brand .modal .modal-dialog .modal-content .modal-top .corner-close  ").css("background",$cadena_colorweb),$("body").find(".sweet-alert button").css("background",$cadena_colorweb),$("body").find(".car-model").css("color",$cadena_colorweb),$("body").find(".currency").css("color",$cadena_colorweb),$("body").find(".text-lightblue").css("color",$cadena_colorweb),$("small a").css("color",$cadena_colorweb),$(".loan-process .container .questions-section .note a:not(.anchor-button)").css("color",$cadena_colorweb),$("#open-modal-question1").css("color",$cadena_colorweb),$(".modal .icon-close").css("background",$cadena_colorweb),$("body").find(".select2-selection:focus").css("border-color",$cadena_colorweb),$("body").find("b[role=presentation]").css("border-color",$cadena_colorweb+" transparent transparent transparent"),$("#documents .tp-wrap .msg-block span").css("background",$cadena_colorweb),$(".sidebar-breadcrumb ul li .circle").css("background","#e2e2e2"),$(".sidebar-breadcrumb ul li span").css("color","#e2e2e2"),$(".sidebar-breadcrumb ul li .bullets").css("background","#e2e2e2"),$(".sidebar-breadcrumb ul li.active .circle").css("background",$cadena_colorwebsecond),$(".sidebar-breadcrumb ul li.active span").css("color",$cadena_colorwebsecond),$(".sidebar-breadcrumb ul li.active .bullets").css("background",$cadena_colorwebsecond),$("body").find(".progressBar .bar").css("background",$cadena_colorweb),$("body").find("#question-replaceable").find(".positive").css("color",$cadena_colorwebsecond),$("body").find("#question-replaceable").find(".icon-star").css("color",$cadena_colorwebsecond),$(".brand .bottom-footer.brand-footer ul li span").css("color","#7A808D"),$(".brand .bottom-footer.brand-footer ul li a").css("color",$cadena_colorweb),$("body").find(".icon-edit").css("color",$cadena_colorweb),$("#edit-loan").css("color",$cadena_colorweb),$("#edit-loan").on("click",function(){console.log("open modal"),$(".modal .icon-close").css("background",$cadena_colorweb),$(".bg-red").css("background",$cadena_colorweb)}),$(".input-radio").delegate("*","focus",function(){var o=$(this);o.addClass("hover-input"),o.css("border-color",$cadena_colorweb),$("body").find("b[role=presentation]").css("border-color",$cadena_colorweb+" transparent"),$("body").find("li[aria-selected=true]").css("background",$cadena_colorweb)}),$(".input-radio").delegate("*","blur",function(){var o=$(this);o.removeClass("hover-input"),o.css("border-color",$cadena_colorgris)}),$(".field").delegate("*","focus",function(){$(this).css("border-color",$cadena_colorweb),$("body").find("b[role=presentation]").css("border-color",$cadena_colorweb+" transparent"),$("body").find("li[aria-selected=true]").css("background",$cadena_colorweb)}),$(".field").delegate("*","blur",function(){$(this).css("border-color",$cadena_colorgris)}),$("body").find(".custom-check").on("click",function(){$(this).hasClass("checked")?$(this).find(".check-inner").css({background:"inherit","border-color":$cadena_colorgris}):$(this).find(".check-inner").css({background:$cadena_colorweb,"border-color":$cadena_colorweb})}),$(".help-block-error").css("color",$cadena_colorweb),$(".offer-title .line").css("background",$cadena_colorweb),$("body").find(".select2").on("click",function(){$("body").find(".select2-container").find(".select2-results__group").css("color",$cadena_colorweb),$("body").find(".select2-results__option").css({background:$cadena_colorwhite,color:"#34465d"}),$("body").find(".select2-results__option.select2-results__option--highlighted").css({background:$cadena_colorweb,color:$cadena_colorwhite,"border-color":$cadena_colorweb}).sibling().css({background:$cadena_colorwhite,color:"#34465d"})}),$(".horizontal-line .circle").css({border:"3px solid "+$cadena_colorweb,color:$cadena_colorweb}),$(".display-check .check-default a").css({color:$cadena_colorweb}),$(".offer-container ul .best-offer").eq(0).hover(function(){o($(this),gradientOfHexaColors($cadena_colorweb,"#FFFFFF",1))},function(){o($(this),"#B6BAC2")}),$(".offer-container ul .best-offer").eq(1).hover(function(){o($(this),gradientOfHexaColors($cadena_colorweb,"#FFFFFF",1))},function(){o($(this),"#B6BAC2")}),$(".offer-container ul .best-offer").eq(2).hover(function(){o($(this),gradientOfHexaColors($cadena_colorweb,"#FFFFFF",1))},function(){o($(this),"#B6BAC2")}),$(".input-radio, .h-input-radio").hover(function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover")&&(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".input-radio, .h-input-radio").removeClass("hover"),o.addClass("hover")),$(".input-radio, .h-input-radio").removeClass("hover"),o.addClass("click").siblings().removeClass("hover")):o.hasClass("hover")||(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),o.addClass("hover").siblings().removeClass("hover"))},function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover"),o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".input-radio, .h-input-radio").removeClass("hover"),o.removeClass("hover"),o.addClass("click")):o.hasClass("hover")?o.removeClass("hover"):(o.css({background:"#FFFFFF","border-color":"#D6D8DD"}),o.find(".radio").css({border:"2px solid #D6D8DD",background:"#FFFFFF"}))}),$(".input-radio").hover(function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover")&&(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".input-radio").removeClass("hover"),o.addClass("hover")),$(".input-radio").removeClass("hover"),o.addClass("click").siblings().removeClass("hover")):o.hasClass("hover")||(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),o.addClass("hover").siblings().removeClass("hover"))},function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover"),o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".input-radio").removeClass("hover"),o.removeClass("hover"),o.addClass("click")):o.hasClass("hover")?o.removeClass("hover"):(o.css({background:"#FFFFFF","border-color":"#D6D8DD"}),o.find(".radio").css({border:"2px solid #D6D8DD",background:"#FFFFFF"}))}),$(".chooseCredit .input-radio").hover(function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover")&&(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".input-radio").removeClass("hover"),o.addClass("hover")),$(".chooseCredit  .input-radio").removeClass("hover"),o.addClass("click").parent().siblings().find(".input-radio").removeClass("hover")):o.hasClass("hover")||(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),o.addClass("hover").parent().siblings().find(".input-radio").removeClass("hover"))},function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover"),o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".chooseCredit .input-radio").removeClass("hover"),o.removeClass("hover"),o.addClass("click")):o.hasClass("hover")?o.removeClass("hover"):(o.css({background:"#FFFFFF","border-color":"#d6d8dd"}),o.find(".radio").css({border:"2px solid #D6D8DD",background:"#FFFFFF"}))}),$(".input-radio, .h-input-radio").on("change",function(){var o=$(this);o.addClass("click").siblings().removeClass("click"),$(".input-radio, .h-input-radio").css({background:"#FFFFFF","border-color":"#d6d8dd"}),$(".input-radio, .h-input-radio").find(".radio").css({border:"2px solid #D6D8DD",background:"#FFFFFF"}),o.hasClass("click")?(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb})):console.log("no class click"),$(".input-radio, .h-input-radio").removeClass("hover")}),$(".input-radio-modal").hover(function(){var o=$(this);console.log("hover");if(o.hasClass("hover")){if(o.hasClass("click")){o.css({background:"#f9f9fb","border-color":$cadena_colorweb}).removeClass("hover").find(".radio").css({background:$cadena_colorweb,"border-color":"#FFF"})}else{o.css({background:"#FFFFFF","border-color":"#D6D8DD"}).removeClass("hover").find(".radio").css({background:"#FFF","border-color":"#D6D8DD"})}}else{if(o.hasClass("click")){o.css({background:"#f9f9fb","border-color":$cadena_colorweb}).addClass("hover").siblings().css({background:"#FFFFFF","border-color":"#D6D8DD"}).find(".radio").css({background:"#FFF","border-color":"#D6D8DD"})}else{o.css({background:"#f9f9fb","border-color":$cadena_colorweb}).addClass("hover").find(".radio").css({background:$cadena_colorweb,"border-color":"#FFF"})}}}),$(".input-radio-modal").on("click",function(){var o=$(this);console.log("click");if(o.hasClass("click")){if(o.hasClass("hover")){}else{o.css({background:"#FFFFFF","border-color":"#f8f8f8"})}}else{$(".input-radio-modal").removeClass("click").css({background:"#FFFFFF","border-color":"#f8f8f8"}).find(".radio").css({background:"#FFF","border-color":"#D6D8DD"});o.addClass("click").css({background:"#f9f9fb","border-color":$cadena_colorweb}).find(".radio").css({background:$cadena_colorweb,"border-color":"#FFF"})}}),$(window).load(function(){$("#edit-loan").css("color",$cadena_colorweb),$(".car-model").css("color",$cadena_colorweb),$("body").find(".corner-close").each(function(o){$(".corner-close").css("background",$cadena_colorweb)}),$("body").find(".brandSelected").each(function(o){$(this).on("click",function(){$(this).addClass("test"),$("body").find(".bg-red").css("background",$cadena_colorweb),console.log("click")})}),$("body").find("#edit-loan").on("click",function(){$("#edit-modal").find(".bg-red").css("background",$cadena_colorweb),$("#edit-modal").find(".corner-close").css("color",$cadena_colorweb),console.log("open modal")})}),$(".choose-agent").hasClass("brand")&&($(".choose-agent").find(".brand-footer").find("span").css("color","#e8e8e8"),$(".choose-agent").find(".brand-footer").find("a").css("color","#e8e8e8")),$(".offer-container .offer-title .call-offer-modal a").css("color",$cadena_colorweb),$("#take-photo").css("background",$cadena_colorweb),$(".main-buttons .bg-t").css({background:"#FFFFFF","border-color":$cadena_colorweb,color:$cadena_colorweb}),$(".main-buttons .bg-t").hover(function(){$(this).css({background:$cadena_colorweb,"border-color":$cadena_colorweb,color:"#FFFFFF"})},function(){$(this).css({background:"#FFFFFF","border-color":$cadena_colorweb,color:$cadena_colorweb})}),$("body").find(".sweet-alert button").css("background-color",$cadena_colorweb),$("#open-modal-question60").css("color",$cadena_colorweb),$(".loan-process .container .adviser-section .horizontal-line .line").css("background-color",$cadena_colorweb),$(".schedule-modal-accept-offer").css({background:$cadena_colorweb,color:"#fff"}),$(".main-choose-agent").css("background",$backgroundColorAgent),$(".choose-agent.brand.brand-bg-colorweb").css("background",$backgroundColorAgent),$(".horizontal-line .brand-bg-colorweb").css("background",$cadena_colorweb),$("body.main-choose-agent .hero-content p").css("color",$textColorAgent),$("body.main-choose-agent .hero-content ul li .circle h4").css("color",$textColorAgent),$(".choose-agent.brand .bottom-footer.brand-footer ul li a, .choose-agent.brand .bottom-footer.brand-footer ul li span").css("color",$textColorAgent),$(".loading-red .sk-fading-circle .sk-circle span").css("background",$cadena_colorweb),$(".loan-process .msg-loaded span .sk-fading-circle .sk-circle span").css("background",$cadena_colorweb),$(".sk-fading-circle .sk-circle span").css("background",$cadena_colorweb),$(".w-lines .color-one").css("background",$color_line_one),$(".w-lines .color-two").css("background",$color_line_two),$(".w-lines .color-three").css("background",$color_line_three),$("#loanNumberButton").css("background",$cadena_colorweb),$(document).on("mouseenter"," body .select2-container .select2-dropdown .select2-results .select2-results__options .select2-results__option--highlighted",function(){$(this).css({background:gradientOfHexaColors($cadena_colorweb,"#FFFFFF",.4),color:"#FFFFFF"}).siblings().css({background:"#FFFFFF",color:"#34465d"})},function(){$(this).css({background:gradientOfHexaColors($cadena_colorweb,"#FFFFFF",.96),color:"#FFFFFF "}).siblings().css({background:"#FFFFFF",color:"#34465d"})}),$(document).on("mouseleave"," body .select2-container .select2-dropdown .select2-results .select2-results__options .select2-results__option--highlighted",function(){$(this).css({background:"#FFFFFF",color:"#34465d"}).siblings().css({background:"#FFFFFF",color:"#34465d"})}),$("body").find(".select2-container--open").find(".select2-results__option").css({background:"#FFFFFF",color:$cadena_colorweb}),$(".line.brand-bg-colorweb").css("background",$cadena_colorweb),$(".brand .bottom-footer.brand-footer.sullana-footer ul li a").css("color",$textColorAgent),$(".brand .bottom-footer.brand-footer.sullana-footer ul li .underline").css("background",$textColorAgent),$(window).on("load",function(){$(".circle figure").addClass("loaded")}),$(".pdfViewer .pdf-bar").css("background",$cadena_colorweb),$("body .brand .pdfViewer.bg-black").css("background","#34465d"),$(".sk-circle span").css("background",$cadena_colorweb),$(".pdf-container .sk-circle span").css("background","#FFFFFF"),$(".pdf-header .container .row .column-2 .help .circle").css("color",$cadena_colorwebsecond),$(".sidebar-cajasullana ul li.active .circle").css("background",$cadena_colorweb),$(".sidebar-cajasullana ul li.active span").css("color",$cadena_colorweb),$(".sidebar-cajasullana ul li.active .bullets").css("background",$cadena_colorweb),$(".modal .h-input-radio").hover(function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover")&&(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".h-input-radio").removeClass("hover"),o.addClass("hover")),$(".modal .h-input-radio").removeClass("hover"),o.addClass("click").parent().siblings().find(".input-radio").removeClass("hover")):o.hasClass("hover")||(o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),o.addClass("hover").parent().siblings().find(".input-radio").removeClass("hover"))},function(){var o=$(this);o.hasClass("click")?(o.hasClass("hover"),o.css({background:"#F9F9FB","border-color":$cadena_colorweb}),o.find(".radio").css({border:"5px solid white",background:$cadena_colorweb}),$(".modal .h-input-radio").removeClass("hover"),o.removeClass("hover"),o.addClass("click")):o.hasClass("hover")?o.removeClass("hover"):(o.css({background:"#FFFFFF","border-color":"#d6d8dd"}),o.find(".radio").css({border:"2px solid #D6D8DD",background:"#FFFFFF"}))}));if(isEfectivoAlToque){$("body").find(".bottom-footer .bar").css("background",$cadena_colorweb);$(".bg-red").css("background",$cadena_colorweb)}$(".q135 .see-contract").css("border", "2px solid " + $cadena_colorweb);$(".q135 .see-contract").css("color", $cadena_colorweb);$(".forms.q135").find(".box-content").css("border", "2px solid " + $cadena_colorweb);$(".forms.q135").find(".box-header").css("background", $cadena_colorweb);
+
+            $('body').find('#nprogress .peg').css("box-shadow", `0 0 10px ${$cadena_colorweb}, 0 0 5px ${$cadena_colorweb}`);
+
+            let styleBranding = document.createElement('style');
+            styleBranding.type = 'text/css';
+            styleBranding.innerHTML = `#nprogress .peg{
+            box-shadow : 0 0 10px ${$cadena_colorweb}, 0 0 5px ${$cadena_colorweb} !important;
+        }`;
+            document.getElementsByTagName('head')[0].appendChild(styleBranding);
+        }
+        /*]]>*/
+    </script>
+
+</head>
+<body th:classappend="${isBranded != null and isBranded ? 'wrap-pages brand' : 'wrap-pages'}">
+
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<th:block layout:fragment="content">
+
+    <section class="loan-process">
+        <div class="container">
+            <div class="adviser-section animated fadeIn">
+                <div class="avatar-progress">
+                    <div class="avatar-advisor avatar-advisor-content">
+                        <img class="avatar-advisor-img" th:style="${@brandingService.isBranded(#httpServletRequest) ? 'border: 3px solid '+@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#F7323F')+'!important;' : ''}" th:src="${agent?.getProcessAvatar()}"/>
+                    </div>
+                </div>
+                <div class="horizontal-line">
+                    <div class="line"></div>
+                </div>
+            </div>
+
+            <div id="question-replaceable"></div>
+
+            <div id="error-content">
+                <div class="block text-center">
+                    <p class="text-black" th:text="${status}"></p>
+                    <br/>
+                    <div class="actions">
+                        <th:block th:switch="${@brandingService.isBranded(#httpServletRequest)}">
+                            <a th:case="false" th:href="@{/}" class="anchor-button bg-red ">Ir a Solven</a>
+                            <a th:case="true" id="irHome" th:href="@{/}" class="anchor-button bg-red" >Ir a Home</a>
+                        </th:block>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Header begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <!-- Header ends -->
+    <th:block th:replace="fragments/modalContactFragment :: modalContactFragment"></th:block>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function getUrlBase(urlPathBase){
+            let isAlfin = [[${@brandingService.isBranded(#httpServletRequest) and @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}]];
+            if(isAlfin){
+                document.getElementById("irHome").href='https://www.alfinbanco.pe';
+                return;
+            }
+            let urlBase = urlPathBase.origin;
+            if(urlBase[urlBase.length -1] == '/') urlBase = urlBase.substring(0, urlBase.length - 1);
+            let urlPathName =  urlPathBase.pathname || "";
+            if(urlPathName.length && urlPathName[0] == "/") urlPathName = urlPathName.substring(1,urlPathName.length-1);
+            if(urlPathName.indexOf("/") != -1) urlPathName = urlPathName.substring(0,urlPathName.indexOf("/"));
+            switch (urlPathName){
+                case 'pagos':
+                case 'pago-de-cuota':
+                case 'cuenta':
+                case 'identidad':
+                case 'consejero':
+                    if(urlPathName == 'pagos') urlPathName = 'pago-de-cuota';
+                    let urlToReturn = urlBase + '/' + urlPathName;
+                    document.querySelectorAll("a.logo").forEach(function(logoLinkUrl) {
+                        logoLinkUrl.setAttribute("href", urlToReturn)
+                    });
+                    document.getElementById("irHome").href=urlToReturn;
+                    break;
+            }
+        }
+
+        var componentSelector = document.querySelector("a.logo");
+        if(componentSelector != null){
+            getUrlBase(new URL(window.location.href));
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)">
+<head>
+    <!--    JQUERY VALIDATION-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <style>
+        .table-responsive {
+            overflow-y: hidden;
+        }
+
+        #tableResults .data-input,
+        .portlet-title .btn-cancel,
+        .portlet-title .btn-save,
+        .table-responsive .btn-add {
+            display: none;
+        }
+
+        .table-responsive .btn-add {
+            font-size: 13px;
+        }
+
+        .cluster-row .rowActions .actions {
+            display: none;
+            border: none;
+        }
+
+        .cluster-row .btn-delete {
+            color: #666;
+            font-size: 19px;
+        }
+
+        .sweet-alert h2 {
+            font-size: 23px;
+            line-height: 30px;
+        }
+
+        .swal-success {
+            min-height: 244px;
+        }
+
+        .swal-success .sa-icon.sa-success .sa-line {
+            background-color: #A5DC86 !important;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <div class="clearfix"></div>
+</th:block>
+
+<th:block layout:fragment="content">
+    <th:block
+            th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='comercial')"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+
+                <th:block th:replace="fragments/headers :: entityContentHeader(title='Comercial')"></th:block>
+
+<!--                <div class="col-lg-12">-->
+<!--                    <div class="portlet light bordered">-->
+<!--                        <div class="portlet-title">-->
+<!--                            <div class="caption">-->
+<!--                                <span class="caption-subject font-green bold uppercase">Comercial</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+            <div class="row">
+                <div class="col-md-12" th:each="product : ${products}">
+                    <div th:class="${products.size() == 1 ? '' : 'portlet light bordered'}"
+                         th:attr="data-product=${product.productId}">
+                        <div th:if="${products.size() > 1}" class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold uppercase"
+                                      th:text="${product.product}"></span>
+                            </div>
+                        </div>
+                        <div th:class="portlet-body">
+                            <div class="row">
+                                <div class="col-md-12" th:each="price : ${product.prices}">
+                                    <div th:class="${product.prices.size() == 1 ? '' : 'portlet light bordered'}"
+                                         th:attr="data-price=${price.priceId}">
+                                        <div th:if="${product.prices.size() > 1}" class="portlet-title">
+                                            <div class="caption">
+                                                <span class="caption-subject font-green bold uppercase"
+                                                      th:text="${price.price}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="row" th:each="cluster : ${price.clusters}">
+                                                <th:block th:replace="this :: cluster"></th:block>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var jsonValidator = /*[[${form.validator.toJson(#locale)}]]*/null;
+        // console.log(jsonValidator);
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block th:fragment="cluster">
+    <div th:attr="data-cluster=${cluster?.id}" class="col-md-12 cluster"
+         th:with="currency=${@entityExtranetService.getActiveEntityCurrency()},productId=${cluster?.rateCommissions?.get(0)?.productId}">
+        <div class="portlet light bordered">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject font-green bold uppercase" th:text="${cluster?.cluster}"></span>
+                </div>
+                <div class="actions" shiro:hasPermission="commercial:rateCommission:edit">
+                    <a class="btn btn-circle btn-default btn-edit">
+                        <i class="fa fa-edit"></i> Editar</a>
+                    <a class="btn btn-circle btn-default btn-cancel">
+                        <i class="fa fa-undo"></i> Cancelar</a>
+                    <a class="btn btn-circle btn-default btn-save">
+                        <i class="fa fa-save"></i> Guardar</a>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-responsive">
+                    <form th:attr="id=${'form_' + cluster?.id}" class="form">
+                        <table id="tableResults" class=" table table-striped table-bordered dataTable"
+                               th:attr="data-cluster-id=${cluster?.id}">
+                            <thead>
+                            <tr>
+                                <th>Plazo desde (meses)</th>
+                                <th>Plazo hasta (meses)</th>
+                                <th>Monto min.</th>
+                                <th>Monto max.</th>
+                                <th th:text="${(countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA) ? 'T.N.A.' : (countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU) ? 'T.E.A.' : ''}"></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="cluster-row"
+                                th:each="rateCommission, iter : ${cluster?.rateCommissions}">
+                                <td>
+                                    <div class="field">
+                                        <span th:text="${rateCommission.minInstallments}"></span>
+                                        <input th:name="${'minInstallments_'+ iter.index}"
+                                               th:attr="data-initial=${rateCommission.minInstallments}"
+                                               class="data-input form-control input-sm"/>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field">
+                                        <span th:text="${rateCommission.installments}"></span>
+                                        <input th:name="${'maxInstallments_'+ iter.index}"
+                                               th:attr="data-initial=${rateCommission.installments}"
+                                               class="data-input form-control input-sm plazo-hasta"/>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field">
+                                        <span th:text="${@utilService.integerOnlyMoney(rateCommission.minAmount, currency)}"></span>
+                                        <input th:name="${'minAmount_'+ iter.index}"
+                                               th:attr="data-initial=${rateCommission.minAmount}"
+                                               class="data-input form-control input-sm monto-min"/>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field">
+                                        <span th:text="${@utilService.integerOnlyMoney(rateCommission.maxAmountCommission, currency)}"></span>
+                                        <input th:name="${'maxAmount_'+ iter.index}"
+                                               th:attr="data-initial=${rateCommission.maxAmountCommission}"
+                                               class="data-input form-control input-sm monto-max"/>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="field">
+                                        <span th:text="${@utilService.percentFormat(rateCommission.effectiveAnualRate)}"></span>
+                                        <input th:name="${'effectiveAnnualRate_'+ iter.index}"
+                                               th:attr="data-initial=${rateCommission.effectiveAnualRate}"
+                                               class="data-input form-control input-sm"/>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </td>
+                                <td class="rowActions">
+                                    <div class="actions" shiro:hasPermission="commercial:rateCommission:edit">
+                                        <a th:if="${iter.index ne 0}" class="btn-delete">
+                                            <i class="fa fa-trash-o"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="actions">
+                            <a class="btn btn-circle btn-default btn-add">
+                                <i class="fa fa-pencil"></i> Agregar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                (function () {
+                    var MAX_ROWS = 10;
+                    var clusterId = /*[[ ${cluster?.id} ]]*/null;
+                    var productId = /*[[ ${product?.productId} ]]*/null;
+                    var priceId = /*[[ ${price?.priceId} ]]*/null;
+
+                    var clusterContainerSelector = 'div[data-product=' + productId + ']' + ' ' + 'div[data-price=' + priceId + ']' + ' ' + 'div[data-cluster=' + clusterId + ']';
+                    var cluster = $(clusterContainerSelector);
+                    var highlightColor = '#FECC00';
+                    var maxInstallments = /*[[ ${@configuration.MAX_INSTALLMENTS} ]]*/null;
+                    var clusterForm = cluster.find('form');
+
+                    function showEditButtons(doShow) {
+                        if (doShow) {
+                            cluster.find('.btn-edit').hide();
+                            cluster.find('.btn-save').show();
+                            cluster.find('.btn-cancel').show();
+                            cluster.find('.btn-add').show();
+                            cluster.find(".rowActions .actions").show();
+                        } else {
+                            cluster.find('.btn-edit').show();
+                            cluster.find('.btn-save').hide();
+                            cluster.find('.btn-cancel').hide();
+                            cluster.find('.btn-add').hide();
+                        }
+                    }
+
+                    function sequenceEditableRow() {
+                        cluster.find(".cluster-row").each(function (idx, row) {
+                            if (idx > 0) {
+                                $(row).find('td').not(':nth-child(1)').find('span').hide();
+                                $(row).find('td').not(':nth-child(1)').find('.data-input').show();
+                            } else {
+                                $(row).find('.data-input').show();
+                                $(row).find('span').hide();
+                            }
+                        });
+
+                        if (jsonValidator != null) {
+                            var json = JSON.parse(jsonValidator);
+                            dynamicValidation(clusterForm, json);
+                        }
+                    }
+
+                    function enableButtons(enable) {
+                        if (enable) {
+                            cluster.find('.btn-edit').css('pointer-events', '');
+                            cluster.find('.btn-save').css('pointer-events', '');
+                            cluster.find('.btn-cancel').css('pointer-events', '');
+                            cluster.find('.btn-add').css('pointer-events', '');
+                        } else {
+                            cluster.find('.btn-edit').css('pointer-events', 'none');
+                            cluster.find('.btn-save').css('pointer-events', 'none');
+                            cluster.find('.btn-cancel').css('pointer-events', 'none');
+                            cluster.find('.btn-add').css('pointer-events', 'none');
+                        }
+                    }
+
+                    function refreshSingleCluster(elem) {
+                        enableButtons(false);
+
+                        elem.loading();
+                        defaultAjax({
+                            url: /*[[ @{/__${@entityExtranetComercialController.URL}__/cluster/__${cluster?.id}__/__${product.productId}__/__${price.priceId}__} ]]*/null,
+                            type: 'GET',
+                            success: function (data) {
+                                cluster.replaceWith(data);
+                            }, error: function () {
+                                elem.unloading();
+                                enableButtons(false);
+                            }
+                        });
+                    }
+
+                    function dynamicValidation(form, jsonValidatorBase) {
+                        // console.log(form);
+
+                        var dynamic = form.find('.cluster-row').get().map(function (row) {
+                            // console.log($(row));
+                            var json = {};
+
+                            $(row).find('.data-input').each(function () {
+                                if (Object.keys($(this).data()).length > 1) {
+                                    // console.log($(this).rules());
+                                    $(this).rules('remove');
+                                }
+
+                                var root = $(this).attr('name');
+                                json[root] = jsonValidatorBase[root.substring(0, root.length - 2)];
+                            });
+
+                            return json;
+                        });
+
+                        var dynamicJsonValidation = Object.assign({}, ...dynamic);
+                        // console.log(dynamicJsonValidation);
+
+                        form.validateForm(createFormValidationJson(dynamicJsonValidation, form));
+                        // console.log(form.data('validatorJson').rules);
+
+                        form.find('.cluster-row').each(function () {
+                            var minValue = $(this).find('td:nth-child(1) .data-input').data('initial');
+                            $(this).find('td:nth-child(2) .data-input').rules('add', {
+                                min: minValue,
+                                messages: {min: 'Este valor no puede ser menor a ' + minValue + '.'}
+                            });
+                        });
+                    }
+
+                    /*----------------------------------------------------------------------------------*/
+                    /* EDITAR
+                    /*----------------------------------------------------------------------------------*/
+                    cluster.find('.btn-edit').click(function () {
+                        // console.log("Editar");
+
+                        cluster.find('.data-input').each(function () {
+                            var initialValue = $(this).data('initial');
+                            $(this).val(initialValue);
+                        });
+
+                        showEditButtons(true);
+                        sequenceEditableRow();
+                    });
+
+                    $(document).on('keyup', clusterContainerSelector + ' ' + '.data-input', function () {
+                        if ($(this).data('initial') && $(this).val() === $(this).data('initial').toString()) {
+                            $(this).closest('td').css('background', "");
+                        } else {
+                            $(this).closest('td').css('background', highlightColor);
+                        }
+                    });
+                    /*----------------------------------------------------------------------------------*/
+                    /* EDITAR - PLAZO HASTA
+                    /*----------------------------------------------------------------------------------*/
+                    $(document).on('blur', clusterContainerSelector + ' ' + '.plazo-hasta', function () {
+                        // console.log('blur');
+
+                        var value = $(this).val();
+                        if (value.trim() !== '') {
+                            var newVal = Number($(this).val()) + 1;
+                            var nextRow = $(this).closest('tr').next('tr');
+                            nextRow.find('td:nth-child(1) span, td:nth-child(2) span').text(newVal);
+                            nextRow.find('td:nth-child(1) .data-input').val(newVal);
+                            nextRow.find('td:nth-child(1) .data-input, td:nth-child(2) .data-input').data('initial', newVal);
+                            // console.log(nextRow.find('td:nth-child(2) .data-input').rules());
+                            nextRow.find('td:nth-child(2) .data-input').rules('add', {
+                                min: newVal,
+                                messages: {min: 'Este valor no puede ser menor a ' + newVal + '.'}
+                            });
+                            // console.log(nextRow.find('td:nth-child(2) .data-input'));
+                            // console.log(nextRow.find('td:nth-child(2) .data-input').rules());
+                            nextRow.find('td:nth-child(2) .data-input').trigger('blur');
+                        }
+                    });
+                    $(document).on('blur', clusterContainerSelector + ' ' + '.monto-min, ' + clusterContainerSelector + ' ' + '.monto-max', function () {
+                        var value = $(this).val();
+                        var row = $(this).closest('tr');
+
+                        if ($(this).hasClass('monto-min') && value.trim() !== '') {
+                            // RESET VALIDATION TO MAX_AMOUNT WHEN MIN_AMOUNT IS UPDATED
+                            row.find('td:nth-child(4) .data-input').rules('add', {
+                                min: Number(value),
+                                messages: {min: 'Este valor no puede ser menor a ' + value + '.'}
+                            });
+                        } else if ($(this).hasClass('monto-max') && value.trim() !== '') {
+                            // RESET VALIDATION TO MIN_AMOUNT WHEN MAX_AMOUNT IS UPDATED
+                            row.find('td:nth-child(3) .data-input').rules('add', {
+                                max: Number(value),
+                                messages: {max: 'Este valor no puede ser mayor a ' + value + '.'}
+                            });
+                        }
+                    });
+                    /*----------------------------------------------------------------------------------*/
+                    /* CANCELAR
+                    /*----------------------------------------------------------------------------------*/
+                    cluster.find('.btn-cancel').click(function () {
+                        // console.log("Cancelar");
+
+                        cluster.find(".data-input").each(function () {
+                            $(this).closest('td').css("background", "");
+                            $(this).hide();
+                        });
+
+                        // showEditButtons(false);
+                        cluster.find(".rowActions .actions").hide();
+                        cluster.find(".cluster-row span").show();
+
+                        refreshSingleCluster($(this));
+                    });
+                    /*----------------------------------------------------------------------------------*/
+                    /* ELIMINAR
+                    /*----------------------------------------------------------------------------------*/
+                    $(document).on('click', clusterContainerSelector + ' ' + '.btn-delete', function () {
+                        // console.log("ELiminar");
+
+                        $(this).closest('.cluster-row').remove();
+                        cluster.find('.cluster-row').find('td:nth-child(2) .data-input').trigger('blur');
+
+                        clusterForm.find('.cluster-row').each(function (idx) {
+                            $(this).find('.data-input').each(function () {
+                                var oldName = $(this).attr('name');
+                                $(this).attr('name', oldName.substring(0, oldName.length - 2) + '_' + idx);
+
+                                // console.log($(this).attr('name'));
+                            });
+                        });
+
+                        if (jsonValidator != null) {
+                            var json = JSON.parse(jsonValidator);
+                            dynamicValidation(clusterForm, json);
+                        }
+                    });
+                    /*----------------------------------------------------------------------------------*/
+                    /* AGREGAR
+                    /*----------------------------------------------------------------------------------*/
+                    cluster.find('.btn-add').click(function () {
+                        var rowIdx = cluster.find('.cluster-row').length;
+                        var lastPlazoHasta = cluster.find(".plazo-hasta").last().val();
+                        var nextPlazoHasta = Number(lastPlazoHasta) + 1;
+
+                        if (rowIdx === MAX_ROWS) {
+                            swal({
+                                title: '',
+                                text: 'Se llegó al máximo de registros',
+                                type: 'warning'
+                            });
+                            return;
+                        }
+                        if (!clusterForm.valid()) {
+                            return;
+                        }
+                        if (lastPlazoHasta.trim() === '') {
+                            swal({
+                                title: '',
+                                text: 'Debes ingresar un valor válido para "Plazo Hasta" del ultimo registro',
+                                type: 'warning'
+                            });
+                            return;
+                        }
+                        if (Number(lastPlazoHasta) >= Number(maxInstallments)) {
+                            swal({
+                                title: '',
+                                text: 'Se llegó al máximo de plazos (' + maxInstallments + ' meses)',
+                                type: 'warning'
+                            });
+                            return;
+                        }
+
+                        var fila = '<tr class="cluster-row">\n' +
+                            '                                <td>\n' +
+                            '                                    <div class="field">\n' +
+                            '                                        <span>' + nextPlazoHasta + '</span>\n' +
+                            '                                        <input name="minInstallments_' + rowIdx + '"\n' +
+                            '                                               data-initial="' + nextPlazoHasta + '"\n' +
+                            '                                               class="data-input form-control input-sm" value="' + nextPlazoHasta + '"/>\n' +
+                            '                                        <div class="errorContainer"></div>\n' +
+                            '                                    </div>\n' +
+                            '                                </td>\n' +
+                            '                                <td>\n' +
+                            '                                    <div class="field">\n' +
+                            '                                        <input name="maxInstallments_' + rowIdx + '"\n' +
+                            '                                               data-initial="' + nextPlazoHasta + '"\n' +
+                            '                                               class="data-input form-control input-sm plazo-hasta" value="' + nextPlazoHasta + '"/>\n' +
+                            '                                        <div class="errorContainer"></div>\n' +
+                            '                                    </div>\n' +
+                            '                                </td>\n' +
+                            '                                <td>\n' +
+                            '                                    <div class="field">\n' +
+                            '                                        <input name="minAmount_' + rowIdx + '"\n' +
+                            '                                               class="data-input form-control input-sm monto-min"/>\n' +
+                            '                                        <div class="errorContainer"></div>\n' +
+                            '                                    </div>\n' +
+                            '                                </td>\n' +
+                            '                                <td>\n' +
+                            '                                    <div class="field">\n' +
+                            '                                        <input name="maxAmount_' + rowIdx + '"\n' +
+                            '                                               class="data-input form-control input-sm monto-max"/>\n' +
+                            '                                        <div class="errorContainer"></div>\n' +
+                            '                                    </div>\n' +
+                            '                                </td>\n' +
+                            '                                <td>\n' +
+                            '                                    <div class="field">\n' +
+                            '                                        <input name="effectiveAnnualRate_' + rowIdx + '"\n' +
+                            '                                               class="data-input form-control input-sm"/>\n' +
+                            '                                        <div class="errorContainer"></div>\n' +
+                            '                                    </div>\n' +
+                            '                                </td>\n' +
+                            '                                <td class="rowActions">\n' +
+                            '                                    <div class="actions">\n' +
+                            '                                        <a class="btn-delete">\n' +
+                            '                                            <i class="fa fa-trash-o"></i>\n' +
+                            '                                        </a>\n' +
+                            '                                    </div>\n' +
+                            '                                </td>\n' +
+                            '                            </tr>';
+
+                        cluster.find("#tableResults").append(fila);
+                        cluster.find("#tableResults .cluster-row").last().css("background", highlightColor);
+                        sequenceEditableRow();
+                        cluster.find(".rowActions .actions").show();
+                    });
+                    /*----------------------------------------------------------------------------------*/
+                    /* GUARDAR
+                    /*----------------------------------------------------------------------------------*/
+                    cluster.find('.btn-save').click(function () {
+                        if (!clusterForm.valid()) {
+                            return;
+                        }
+
+                        var btnSave = $(this);
+                        swal({
+                                title: "¿Estás seguro de guardar los cambios?",
+                                text: "No se podrán revertir",
+                                html: true,
+                                type: "warning",
+                                showCancelButton: true,
+                                cancelButtonText: 'No',
+                                showConfirmButton: true,
+                                confirmButtonText: 'Si',
+                                closeOnConfirm: false,
+                            },
+                            function (confirm) {
+                                swal.close();
+
+                                if (confirm) {
+                                    btnSave.loading();
+                                    enableButtons(false);
+                                    var idCluster = /*[[${cluster?.id}]]*/;
+                                    var table = $('table[data-cluster-id=' + idCluster + ']');
+                                    var rows = table.find('tbody tr');
+
+                                    var rateCommissions = [];
+                                    for (var i = 0; i < rows.length; i++) {
+                                        var row = rows[i];
+                                        var inputs = $(row).find('input');
+
+                                        var minInstallments = inputs[0].value;
+                                        var installment = inputs[1].value;
+                                        var minAmount = inputs[2].value;
+                                        var maxAmountCommission = inputs[3].value;
+                                        var effectiveAnualRate = inputs[4].value;
+
+                                        var rateCommission = {
+                                            minInstallments: parseInt(minInstallments),
+                                            maxInstallments: parseInt(installment),
+                                            minAmount: parseFloat(minAmount),
+                                            maxAmount: parseFloat(maxAmountCommission),
+                                            effectiveAnnualRate: parseFloat(effectiveAnualRate)
+                                        };
+
+                                        rateCommissions.push(rateCommission);
+                                    }
+
+                                    defaultAjax({
+                                        url: /*[[ @{/__${@entityExtranetComercialController.URL}__/cluster/__${cluster?.id}__/__${product.productId}__/__${price.priceId}__} ]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            rateCommissionsJson: JSON.stringify(rateCommissions)
+                                        },
+                                        success: function () {
+                                            swal({
+                                                title: "Se guardaron los cambios",
+                                                type: "success",
+                                                customClass: "swal-success",
+                                                showConfirmButton: true,
+                                            });
+
+                                            refreshSingleCluster(btnSave);
+                                        }, error: function () {
+                                            clusterForm.valid();
+                                            btnSave.unloading();
+                                            enableButtons(true);
+                                        }
+                                    });
+                                }
+                            });
+                    });
+                })();
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

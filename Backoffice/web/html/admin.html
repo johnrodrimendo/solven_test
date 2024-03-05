@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Administración</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function clearCache() {
+            var baseUrl = /*[[@{/clearCache/}]]*/null;
+            defaultAjax({
+                url: baseUrl,
+                type: 'POST',
+                data: {},
+                success: function (data) {
+                    alert("Caché limpiado");
+                }
+            });
+        }
+        function clearCacheCli() {
+            var baseUrl = /*[[@{/clearCacheCli/}]]*/null;
+            defaultAjax({
+                url: baseUrl,
+                type: 'POST',
+                data: {},
+                success: function (data) {
+                    alert("Caché limpiado");
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <!-- Home, Administración.-->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Administración</span>
+                </li>
+            </ul>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-3 ">
+                        <div id="portletAdmin"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Recargar Catálogos</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-12 col-sm-9">
+                                        Vacía la caché de los catálogos y vuelve a cargar la data ubicada en la base de
+                                        datos.
+                                    </div>
+                                    <div class="col-lg-5 col-md-12 col-sm-3">
+                                        <a href="javascript:;" class="btn blue btn-outline " onclick="clearCache()">Limpiar
+                                            BO</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                <!--<div class="col-md-3 ">
+                    <div id="portletAdmin"
+                         th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Recargar Catálogos Cliente</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-lg-7 col-md-12 col-sm-9">
+                                    Vacía la caché de los catálogos y vuelve a cargar la data ubicada en la base de
+                                    datos en cliente.
+                                </div>
+                                <div class="col-lg-5 col-md-12 col-sm-3">
+                                    <a href="javascript:;" class="btn blue btn-outline " onclick="clearCache()">Limpiar
+                                        CLI</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</th:block>
+</body>
+
+</html>

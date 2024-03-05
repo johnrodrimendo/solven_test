@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var showTypeAccount = /*[[${showTypeAccount}]]*/null;
+        /*]]>*/
+
+    </script>
+
+    <div id="chooseCreditCard" class="questions-section animated fadeInRight arg">
+        <p th:text="#{questions.83.title}"></p>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <div class="note">
+                <span th:text="${'(Recuerda que debes ser titular de la misma, caso contrario ' + entity.shortName + ' no podrá realizar la transferencia.)'}"></span>
+            </div>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <div class="note">
+                <span th:text="${'(Recordá que debes ser titular de la misma, caso contrario ' + entity.shortName + ' no podrá realizar la transferencia.)'}"></span>
+            </div>
+        </th:block>
+        <th:block th:if="${extraText != null}">
+            <div class="note">
+                <span th:text="${extraText}"></span>
+            </div>
+        </th:block>
+        <div class="forms">
+            <form id="questionForm" th:object="${form}" autocomplete="off" class="q83"  style="flex-direction: column;align-items: center;justify-content: center;">
+                <input type="hidden" th:value="*{campaignBds}" name="campaignBds"/>
+                <div class="fl-container-83">
+                    <div class="field inline">
+                        <small th:text="#{form.field.bank}" class="input-help"></small>
+                        <select th:value="*{bankId}" name="bankId" id="bankId" data-placeholder="Selecciona el banco"
+                                data-width="220">
+                            <option value="" hidden="hidden"></option>
+                            <th:block th:each="bank : ${banks}">
+                                <option value="" disabled="disabled" selected="selected"></option>
+                                <option th:value="${bank.id}" th:text="${bank.name}"></option>
+                            </th:block>
+                        </select>
+                        <div class="errorContainer text-left"></div>
+                    </div>
+                    <div th:if="${showTypeAccount}" class="field inline">
+                        <small th:text="#{form.field.bankAccountType}" class="input-help"></small>
+                        <select th:value="*{bankAccountType}" name="bankAccountType" id="bankAccountType"
+                                data-placeholder="Seleccione el tipo de cuenta" data-width="230">
+                            <option value="" hidden="hidden" selected="selected" disabled="disabled"></option>
+                            <th:block th:each="bankAccountType : ${bankAccountTypes}">
+                                <option th:value="${bankAccountType.get('value')}" th:text="#{${bankAccountType.get('text')}}"></option>
+                            </th:block>
+                        </select>
+                        <div class="errorContainer text-left"></div>
+                    </div>
+                    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                        <div class="field inline">
+                            <small th:text="#{form.field.bankAccountNumber}" class="input-help"></small>
+                            <input type="text" th:value="*{bankAccountNumber}" name="bankAccountNumber"
+                                   id="bankAccountNumber" class="input-outline"/>
+                            <div class="errorContainer text-left"></div>
+                        </div>
+                        <!--                    <div class="field inline">-->
+                        <!--                        <small th:text="#{loanApplicationSignature.bankAccountDepartment}" class="input-help"></small>-->
+                        <!--                        <select th:value="*{bankAccountDepartment}" id="bankAccountDepartment"-->
+                        <!--                                name="bankAccountDepartment" data-placeholder="Seleccione el lugar" data-width="250">-->
+                        <!--                            <th:block th:each="department : ${@catalogService.getDepartments()}">-->
+                        <!--                                <option value="" hidden="hidden" disabled="disabled" selected="selected"></option>-->
+                        <!--                                <option th:value="${department.id}" th:text="${department.name}"></option>-->
+                        <!--                            </th:block>-->
+                        <!--                        </select>-->
+                        <!--                        <div class="errorContainer text-left"></div>-->
+                        <!--                    </div>-->
+                    </th:block>
+                    <th:block th:if="${requireCci}">
+                        <div class="field inline">
+                            <small th:text="#{form.field.bankAccountCci}" class="input-help"></small>
+                            <input type="text" th:value="*{bankAccountCci}" name="bankAccountCci" id="bankAccountCci"
+                                   class="input-outline"/>
+                            <div class="errorContainer text-left"></div>
+                        </div>
+
+                    </th:block>
+                </div>
+                <!--<div class="fl-container-83">
+                </div>-->
+                <div class="wrap-button"
+                     th:classappend="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'wrap-button arg' : 'wrap-button'}">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var jsonObj = JSON.parse(/*[[${bankAccountDetails}]]*/null);
+        if (jsonObj != null) {
+            if (jsonObj.bankId) {
+                $('#bankId option[value="' + jsonObj.bankId + '"]').prop('selected', true);
+                $('#bankId').trigger('change.select2');
+            }
+            if (jsonObj.accountType) {
+                $('#bankAccountType option[value="' + jsonObj.accountType + '"]').prop('selected', true);
+                $('#bankAccountType').trigger('change.select2');
+            }
+            if (jsonObj.accountNumber) {
+                $('#bankAccountCci').val(jsonObj.accountNumber);
+            }
+        }
+        setTimeout(()=>{
+            if($(".field  input[type='text']")){
+                if($(".field  input[type='text']").parent().outerWidth() > 0) $("div.field .select2").parent().outerWidth($(".field  input[type='text']").parent().outerWidth())
+            }
+        },100)
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

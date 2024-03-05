@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+<body>
+
+<th:block th:fragment="summarySheet" th:with="countryId=${credit != null ? credit.country.id : loanApplication.country.id}">
+    <div class="top-summary" th:style="${entityBranding != null ? 'margin-bottom: 1em;overflow:hidden;padding: .5em 0;border-bottom: 5px solid ' + entityBranding.entityPrimaryColor  : 'margin-bottom: 1em;overflow:hidden;padding: .5em 0;border-bottom: 5px solid ' + T(com.affirm.common.model.catalog.EntityBranding).defaultColor}">
+        <div class="logo-left" th:switch="${credit != null}">
+            <th:block th:case="${true}">
+                <img th:src="${credit?.entity.logoUrl}" th:alt="${credit.entity.fullName}" th:title="${credit.entity.fullName}"/>
+            </th:block>
+            <th:block th:case="${false}">
+                <img th:src="${offer?.entity.logoUrl}" th:alt="${offer.entity.fullName}" th:title="${offer.entity.fullName}"/>
+            </th:block>
+        </div>
+        <div class="title-right">
+            <h3>CRONOGRAMA<br/>PRELIMINAR</h3>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div class="bg-gray gray-block">
+        <div class="row">
+            <h3>DATOS DEL CLIENTE:</h3>
+            <p th:text="${person?.fullName}"></p>
+        </div>
+    </div>
+
+    <div class="bg-gray gray-block">
+        <div class="row">
+            <h3>CARACTER&Iacute;STICAS DEL CR&Eacute;DITO:</h3>
+            <div class="two-col column">
+                <p><b>Monto del cr&eacute;dito (incluido ITF):</b> <span th:text="${@utilService.doubleMoneyFormat(credit != null? credit?.getCreditAmount() : offer?.ammount, credit != null? credit?.currency : offer?.currency)}"></span></p>
+                <p><b>N&deg; de cuotas</b>: <span th:text="${credit != null? credit?.installments:offer?.installments}">1</span></p>
+                <p><b>Periodicidad</b>: <span>MENSUAL</span></p>
+                <p><b>Fecha de desembolso</b>: <span th:text="${@utilService.dateCustomFormat(credit?.disbursementDate, 'dd/MM/yyyy', #locale)}"></span></p>
+            </div>
+            <div class="two-col column">
+                <p><b>C&oacute;digo de cr&eacute;dito</b>: <span th:text="${credit?.code}"></span></p>
+                <p><b>Moneda</b>: <span th:text="${credit != null? credit?.currency?.currency : offer?.currency?.currency}">Soles</span></p>
+                <p><b>Fecha de vcto. del cr&eacute;dito</b>:
+                    <th:block th:if="${credit?.managementSchedule != null}">
+                        <span th:text="${#dates.format(credit?.managementSchedule.get(credit?.managementSchedule.size()-1).dueDate, 'dd/MM/yyyy')}"></span>
+                    </th:block>
+                    <th:block th:if="${offer?.offerSchedule != null}">
+                        <span th:text="${#dates.format(offer?.offerSchedule.get(offer?.offerSchedule.size()-1).dueDate, 'dd/MM/yyyy')}"></span>
+                    </th:block>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray gray-block" th:if="false">
+        <div class="row">
+            <h3>COMISIONES</h3>
+            <div class="column">
+                <p><b th:utext="#{contract.automatic.taxincluded}"></b>: <span th:text="${@utilService.doubleMoneyFormat(credit != null? credit?.installmentAmount:offer.installmentAmmount, credit != null? credit?.currency : offer?.currency)}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray gray-block" th:if="false">
+        <div class="row">
+            <h3>INTERESES POR FALTA DE PAGO</h3>
+            <div class="column">
+                <p><b>Tasa de inter&eacute;s moratorio<sup class="red-text">1</sup></b>:
+                    <span th:text="${@utilService.percentFormat(credit?.moratoriumRate != null? credit?.moratoriumRate*100:(offer != null ? offer?.moratoriumRate*100:0))}"></span>
+                </p>
+                <p><b>Comisi&oacute;n falta de pago a t&eacute;rmino</b>: <span th:text="${@utilService.doubleMoneyFormat(credit?.commission2 != null? credit?.commission2:(offer != null ? offer?.commission2:0), credit != null? credit?.currency : offer?.currency)}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray gray-block">
+        <div class="row">
+            <h3>TASAS</h3>
+            <div class="column"
+                 th:with="
+                 effectiveAnnualRate=${credit != null ? (countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? credit.nominalAnualRate : credit.effectiveAnnualRate) : (offer != null ? (countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? offer.nominalAnualRate : offer.effectiveAnualRate) : 0)},
+                 commission2=${credit != null ? credit.commission2 : (offer != null ? offer.commission2 : 0)},
+                 commission=${credit != null ? credit.commission : (offer != null ? offer.commission : 0)},
+                 effectiveAnnualCostRate=${credit != null ? credit.effectiveAnnualCostRate : (offer != null ? offer.effectiveAnnualCostRate : 0)},
+                 moratoriumRate=${credit != null ? credit.moratoriumRate*100 : (offer != null ? offer.moratoriumRate*100 : 0)},
+                 currency=${credit != null? credit?.currency : offer?.currency},
+                 commissionType=${credit != null ? credit.commissionType : (offer != null ? offer.commissionType : null)}">
+                <div class="two-col column">
+                    <p>
+                        <b th:utext="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'TNA' : 'TEA'}"></b>
+                        <th:block th:if="${loanApplication?.productCategory.id != T(com.affirm.common.model.catalog.ProductCategory).ADELANTO}">
+                            <span th:text="${@utilService.percentFormat(effectiveAnnualRate)}"></span>
+                        </th:block>
+                        <th:block th:if="${loanApplication?.productCategory.id == T(com.affirm.common.model.catalog.ProductCategory).ADELANTO}">
+                            <span>N/A</span>
+                        </th:block>
+                    </p>
+                    <p th:if="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                        <b>Comisi&oacute;n falta de pago a t&eacute;rmino</b>: <span th:text="${@utilService.doubleMoneyFormat(commission2, currency)}"></span>
+                    </p>
+                    <p th:if="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                        <b>Comisi&oacute;n por uso de plataforma</b>:
+                        <span th:if="${commissionType} == 'V'" th:text="${@utilService.doubleMoneyFormat(commission, currency)} +  #{contract.detail.plustaxsymbol}"></span>
+                        <span th:if="${commissionType} == 'P'" th:text="${@utilService.percentFormat(commission)} +  #{contract.detail.plustaxsymbol}"></span>
+                    </p>
+                </div>
+                <div class="two-col column">
+                    <p>
+                        <b th:utext="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'CFT' : 'TCEA'}"></b>
+                        <th:block th:if="${loanApplication?.productCategory.id != T(com.affirm.common.model.catalog.ProductCategory).ADELANTO}">
+                            <span th:text="${@utilService.percentFormat(effectiveAnnualCostRate)}"></span>
+                        </th:block>
+                        <th:block th:if="${loanApplication?.productCategory.id == T(com.affirm.common.model.catalog.ProductCategory).ADELANTO}">
+                            <span>N/A</span>
+                        </th:block>
+                    </p>
+                    <p><b th:utext="#{contract.label.teamoratorium}"></b>: <span th:text="${@utilService.percentFormat(moratoriumRate)}"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray gray-block" th:if="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+        <div class="row">
+            <h3>GASTOS</h3>
+            <div class="column">
+                <p><b>Impuesto a las transacciones financieras</b>: <span></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-footer bg-gray gray-block" th:if="${params != null}">
+        <div th:text="${params.legalFooter}"></div>
+    </div>
+
+</th:block>
+
+<th:block th:fragment="offerSchedule">
+    <br/>
+    <div class="top-summary">
+        <div class="title-right">
+            <h3>Cronograma<br/>de Pagos</h3>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div class="table-responsive" th:if="${offer?.offerSchedule != null}">
+        <table class="table table-bordered" th:with="showInsurance=${offer?.entity?.id != offer?.entity?.MULTIFINANZAS}">
+            <thead>
+            <tr>
+                <th>Cuota</th>
+                <th>Vencimiento</th>
+                <!--<th>Remanente</th>-->
+                <th>Capital</th>
+                <th>Inter&eacute;s<br/>
+                    <th:block th:if="${offer?.entity?.igv > 0.0}">
+                        <span th:if="${loanApplication != null}" th:utext="${loanApplication.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? '(Inc. IVA)' : '(Inc. IGV)'}"></span>
+                        <span th:if="${loanApplication == null}" th:utext="#{contract.detail.plustax}"></span>
+                    </th:block>
+                </th>
+                <th th:if="${showInsurance}" th:utext="${@contractScheduleService.getGastosComisionesHeader(offer?.entity?.id)}"></th>
+                <th th:if="${showInsurance}" th:text="#{contract.titles.desgravamen}"></th>
+                <th>Cuota<br/>total</th>
+                <th>Saldo de la deuda</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="offerSchedule : ${offer?.offerSchedule}">
+                <td th:text="${offerSchedule?.getInstallmentId()}"></td>
+                <td th:text="${@utilService.dateFormat(offerSchedule?.getDueDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(offerSchedule?.getDueDate())}"></td>
+                <!--<td th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getRemainingCapital())}"></td>-->
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentCapital(), offer.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalInterest(), offer.currency)}"></td>
+                <td th:if="${showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalCollectionCommission(), offer.currency)}"></td>
+                <td th:if="${showInsurance}" class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInsurance(), offer.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentAmount(), offer.currency)}"></td>
+                <td class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.remainingCapital, offer.currency)}"></td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td colspan="2" align="right"><b>Totales:</b></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer.getTotalScheduleField('installmentCapital'), offer.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer.getTotalScheduleField('totalInterest'), offer.currency)}"></td>
+                <td th:if="${showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(offer.getTotalScheduleField('totalCollectionCommission'), offer.currency)}"></td>
+                <td th:if="${showInsurance}" class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer.getTotalScheduleField('insurance'), offer.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer.getTotalScheduleField('installmentAmount'), offer.currency)}"></td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</th:block>
+
+<th:block th:fragment="modalSchedule">
+
+    <div class="bg-gray gray-block">
+        <div class="row on-modal">
+            <h3 class="on-modal">CARACTER&Iacute;STICAS DEL CR&Eacute;DITO:</h3>
+            <div class="two-col column">
+                <p class="on-modal"><b>Solicitante</b><span th:text="${person?.fullName}"></span></p>
+                <p class="on-modal"><b>Tipo de Cr&eacute;dito</b>
+                    <th:block th:switch="${offer?.entity?.id}">
+                        <span th:case="${T(com.affirm.common.model.catalog.Entity).COMPARTAMOS}">Crédito Perfecto</span>
+                        <span th:case="${T(com.affirm.common.model.catalog.Entity).CREDIGOB}">Crédito a 30 días con opción a <br/>renovación por 30 o 60 días mas</span>
+                        <span th:case="*" th:text="${offer?.product.name}"></span>
+                    </th:block>
+                </p>
+            </div>
+            <div class="two-col column">
+                <p class="on-modal"><b>Nro. de Operaci&oacute;n</b> <span th:text="${loanApplication?.code}"></span></p>
+                <th:block th:if="${offer?.entity?.id == offer?.entity?.MULTIFINANZAS}">
+                    <p class="on-modal"><b>Monto del cr&eacute;dito</b> <span th:text="${@utilService.doubleMoneyFormat(offer?.ammount + offer?.stampTax, offer.currency)}"></span></p>
+                </th:block>
+                <th:block th:if="${offer?.entity?.id != offer?.entity?.MULTIFINANZAS and offer?.entity?.id != offer?.entity?.BANCO_DEL_SOL}">
+                    <p class="on-modal"><b>Monto del cr&eacute;dito</b> <span th:text="${@utilService.doubleMoneyFormat(offer?.ammount, offer.currency)}"></span></p>
+                </th:block>
+                <p th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}" class="on-modal"><b>Impuesto de sellos</b> <span th:text="${@utilService.doubleMoneyFormat(offer?.stampTax, offer.currency)}"></span></p>
+                <p th:if="${offer?.product?.id == T(com.affirm.common.model.catalog.Product).AUTOS}" class="on-modal"><b>Cuota Inicial</b> <span th:text="${@utilService.doubleMoneyFormat(offer?.downPayment, T(com.affirm.common.model.catalog.Currency).USD_SYMBOL)}"></span></p>
+                <p th:if="${offer?.product?.id == T(com.affirm.common.model.catalog.Product).AUTOS}" class="on-modal"><b>Tipo de Cambio</b> <span th:text="${@utilService.doubleMoneyFormat(offer?.exchangeRate, T(com.affirm.common.model.catalog.Currency).PEN_SYMBOL)}"></span></p>
+                <th:block th:if="${offer?.entity?.id == offer?.entity?.MULTIFINANZAS}">
+                    <p class="on-modal"><b style="margin-right: 0.6em;">Monto a transferir</b>  <span th:text="${@utilService.doubleMoneyFormat(offer?.ammount, offer.currency)}"></span></p>
+                </th:block>
+                <th:block th:if="${offer?.entity?.id != offer?.entity?.MULTIFINANZAS and offer?.entity?.id != offer?.entity?.BANCO_DEL_SOL and offer?.entity?.id != offer?.entity?.FUNDACION_DE_LA_MUJER and offer?.entity?.id != offer?.entity?.FINANSOL}">
+                    <p class="on-modal"><b style="margin-right: 0.6em;">Comisi&oacute;n Solven</b>  <span th:text="${@utilService.doubleMoneyFormat(offer?.loanCommission, offer.currency)}"></span></p>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-header-summary" style="--webkit-border-radius:5px;--moz--border-radius: 5px;--o--border-radius:5px;border-radius:5px;background: #f9f9fb;margin-bottom: 1.5em; padding: 1em;">
+
+        <div class="row bp">
+
+            <th:block th:if="${offer?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_CREDIGOB_PROOVEDOR_ESTADO}">
+                <div class="col-md-8 col-xs-6">
+                    <p style="color: #34465d;font-size:.85em;text-transform:uppercase;text-align: center;"><b>TEM:</b>
+                        <span th:text="${@utilService.percentFormat(offer.monthlyRate * 100.0,offer.currency)}"></span>
+                    </p>
+                </div>
+            </th:block>
+
+            <th:block th:unless="${offer?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_CREDIGOB_PROOVEDOR_ESTADO}">
+                <div class="col-md-4 col-xs-6">
+                    <p style="color: #34465d;font-size:.85em;text-transform:uppercase;text-align: center;"><b th:utext="#{contract.label.tea}"></b>
+                        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                            <span th:if="${offer?.product.id != T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate != null? credit?.effectiveAnnualRate:(offer != null ? offer?.effectiveAnualRate:0),offer.currency)}"></span><span th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE} ">N/A</span>
+                        </th:block>
+
+                        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                            <span th:if="${offer?.product.id != T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate != null? credit?.effectiveAnnualRate:(offer != null ? offer?.nominalAnualRate:0),offer.currency)}"></span><span th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE} ">N/A</span>
+                        </th:block>
+                        <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                            <span th:if="${offer?.product.id != T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate != null? credit?.effectiveAnnualRate:(offer != null ? offer?.effectiveAnualRate:0),offer.currency)}"></span><span th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE} ">N/A</span>
+                        </th:block>
+                    </p>
+                </div>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <div class="col-md-4 col-xs-3">
+                        <p style="color: #34465d;font-size:.85em;text-transform:uppercase;text-align: center;">
+                            <b th:utext="#{contract.text.efectiveanualrate}"></b>
+                            <span th:if="${offer?.product.id != T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate != null? credit?.effectiveAnnualRate:(offer != null ? offer?.effectiveAnualRate:0))}"></span><span th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE} ">N/A</span>
+                        </p>
+                    </div>
+                </th:block>
+                <div class="col-md-4 col-xs-6">
+                    <p style="color: #34465d;font-size:.85em;text-transform:uppercase;text-align: center;"><b th:utext="#{contract.label.tcea}"></b> <span style="margin-left: .5em" th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate,offer.currency)}"></span></p>
+                </div>
+            </th:block>
+
+            <div class="col-md-4">
+                <p style="color: #34465d;font-size:.85em;text-transform:uppercase;text-align: center;"><b>Plazo</b> <span style="margin-left: .5em" th:text="${offer.installments}"></span> <span th:text="${offer.installments > 1} ? ${offer?.product.paymentType.pluralName} : #{label.installment}"></span></p>
+            </div>
+        </div>
+    </div>
+    <!--div class="top-summary">
+        <div class="title-right">
+            <h3 class="on-modal">Cronograma <br/>de Pagos</h3>
+        </div>
+    </div-->
+    <div class="clear"></div>
+    <div class="table-responsive" th:if="${offer?.offerSchedule != null}">
+        <table class="table table-bordered" style="--webkit-border-radius:5px;--moz--border-radius: 5px;--o--border-radius:5px;border-radius:5px;overflow: hidden;" th:with="showInsurance=${offer?.entity?.id != offer?.entity?.MULTIFINANZAS}">
+            <thead>
+            <tr align="center" style="background: #34465d;color: white;">
+                <th style="text-align: center;vertical-align: middle">Cuota</th>
+                <th style="text-align: center;vertical-align: middle">Vencimiento</th>
+                <th style="text-align: center;vertical-align: middle">Capital</th>
+                <th style="text-align: center;vertical-align: middle">Inter&eacute;s<br/>
+                    <th:block th:if="${offer?.entity?.igv > 0.0}">
+                        <span th:if="${loanApplication != null}" th:utext="${loanApplication.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? '(Inc. IVA)' : '(Inc. IGV)'}"></span>
+                        <span th:if="${loanApplication == null}" th:utext="#{contract.detail.plustax}"></span>
+                    </th:block></th>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                    <th th:if="${showInsurance}" style="text-align: center;vertical-align: middle" th:utext="${@contractScheduleService.getGastosComisionesHeader(offer?.entity?.id)}"></th>
+                    <th th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).AUTOS}" style="text-align: center;vertical-align: middle">Seguro<br/>Vehicular</th>
+                    <th th:if="${showInsurance}" style="text-align: center;vertical-align: middle" th:text="#{contract.titles.desgravamen}"></th>
+                </th:block>
+                <th style="text-align: center;vertical-align: middle">Cuota<br/>total</th>
+                <th style="text-align: center;vertical-align: middle">Saldo de la deuda</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="offerSchedule : ${offer?.offerSchedule}">
+                <td th:text="${offerSchedule?.getInstallmentId()}"></td>
+                <td th:text="${@utilService.dateFormat(offerSchedule?.getDueDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(offerSchedule?.getDueDate())}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentCapital(), offer.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalInterest(), offer.currency)}"></td>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                    <td th:if="${showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalCollectionCommission(), offer.currency)}"></td>
+                    <td th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).AUTOS}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getCarInsurance(), offer.currency)}"></td>
+                    <td th:if="${showInsurance}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInsurance(), offer.currency)}"></td>
+                </th:block>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentAmount(), offer.currency)}"></td>
+                <td class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.remainingCapital, offer.currency)}"></td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td colspan="2" align="right"><b>Totales:</b></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer?.getTotalScheduleField('installmentCapital'), offer.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer?.getTotalScheduleField('totalInterest'), offer.currency)}"></td>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                    <td th:if="${showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(offer?.getTotalScheduleField('totalCollectionCommission'), offer.currency)}"></td>
+                    <td th:if="${offer?.product.id == T(com.affirm.common.model.catalog.Product).AUTOS}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(offer?.getTotalScheduleField('carInsurance'), offer.currency)}"></td>
+                    <td th:if="${showInsurance}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(offer?.getTotalScheduleField('insurance'), offer.currency)}"></td>
+                </th:block>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offer?.getTotalScheduleField('installmentAmount'), offer.currency)}"></td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="table-responsive" th:if="${credit?.originalSchedule != null}">
+        <table class="table table-bordered" th:with="showInsurance=${credit?.entity?.id != credit?.entity?.MULTIFINANZAS}">
+            <thead>
+            <tr>
+                <th>Cuota</th>
+                <th>Vencimiento</th>
+                <!--<th>Remanente</th>-->
+                <th>Capital</th>
+                <th>Inter&eacute;s<br/><th:block th:if="${credit?.entity?.igv > 0.0}"><span th:utext="${credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? '(Inc. IVA)' : '(Inc. IGV)'}"></span></th:block></th>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                    <th th:if="${!showInsurance}" th:utext="${@contractScheduleService.getGastosComisionesHeader(credit?.entity?.id)}"></th>
+                    <th th:if="${showInsurance}" th:text="#{contract.titles.desgravamen}"></th>
+                </th:block>
+                <th>Cuota<br/>total</th>
+                <th>Saldo de la deuda</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="offerSchedule : ${credit?.originalSchedule}">
+                <td th:text="${offerSchedule?.getInstallmentId()}"></td>
+                <td th:text="${@utilService.dateFormat(offerSchedule?.getDueDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(offerSchedule?.getDueDate())}"></td>
+                <!--<td th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getRemainingCapital())}"></td>-->
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentCapital(), credit.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalInterest(), credit.currency)}"></td>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                    <td th:if="${!showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalCollectionCommission(), credit.currency)}"></td>
+                    <td th:if="${showInsurance}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInsurance(), credit.currency)}"></td>
+                </th:block>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentAmount(), credit.currency)}"></td>
+                <td class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.remainingCapital, credit.currency)}"></td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td colspan="2" align="right"><b>Totales:</b></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('installmentCapital', 'O'), credit.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalInterest', 'O'), credit.currency)}"></td>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest) or @countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                    <td th:if="${!showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalCollectionCommission', 'O'), credit.currency)}"></td>
+                    <td th:if="${showInsurance}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('insurance', 'O'), credit.currency)}"></td>
+                </th:block>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('installmentAmount', 'O'), credit.currency)}"></td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</th:block>
+
+<th:block th:fragment="creditSchedule">
+    <br/>
+    <div class="top-summary" th:style="${entityBranding != null ? 'margin-bottom: 1em;overflow:hidden;padding: .5em 0;border-bottom: 5px solid ' + entityBranding.entityPrimaryColor  : 'margin-bottom: 1em;overflow:hidden;padding: .5em 0;border-bottom: 5px solid ' + T(com.affirm.common.model.catalog.EntityBranding).defaultColor}">
+        <!--<div class="title-right">-->
+        <!--<h3>Cronograma<br/>de Pagos</h3>-->
+        <!--</div>-->
+    </div>
+    <div class="clear"></div>
+    <div class="table-responsive" th:if="${credit?.originalSchedule != null}">
+        <table class="table table-bordered" th:with="showInsurance=${credit?.entity?.id != credit?.entity?.MULTIFINANZAS}">
+            <thead>
+            <tr>
+                <th>Cuota</th>
+                <th>Vencimiento</th>
+                <!--<th>Remanente</th>-->
+                <th>Capital</th>
+                <th>Inter&eacute;s<br/><th:block th:if="${credit?.entity?.igv > 0.0}"><span th:utext="${credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? '(Inc. IVA)' : '(Inc. IGV)'}"></span></th:block></th>
+                <th:block th:if="${credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU  or credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA}">
+                    <th th:if="${showInsurance}" th:utext="${@contractScheduleService.getGastosComisionesHeader(credit?.entity?.id)}"></th>
+                    <th th:if="${showInsurance}" th:text="#{contract.titles.desgravamen}"></th>
+                </th:block>
+                <th>Cuota<br/>total</th>
+                <th>Saldo de la deuda</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="offerSchedule : ${credit?.originalSchedule}">
+                <td th:text="${offerSchedule?.getInstallmentId()}"></td>
+                <td th:text="${@utilService.dateFormat(offerSchedule?.getDueDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(offerSchedule?.getDueDate())}"></td>
+                <!--<td th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getRemainingCapital())}"></td>-->
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentCapital(), credit.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalInterest(), credit.currency)}"></td>
+                <th:block th:if="${credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU or credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA}">
+                    <td th:if="${showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalCollectionCommission(), credit.currency)}"></td>
+                    <td th:if="${showInsurance}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInsurance(), credit.currency)}"></td>
+                </th:block>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentAmount(), credit.currency)}"></td>
+                <td class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.remainingCapital, credit.currency)}"></td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td colspan="2" align="right"><b>Totales:</b></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('installmentCapital', 'O'), credit.currency)}"></td>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalInterest', 'O'), credit.currency)}"></td>
+                <th:block th:if="${credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU or credit.country.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA}">
+                    <td th:if="${showInsurance}" class="numeric" th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('totalCollectionCommission', 'O'), credit.currency)}"></td>
+                    <td th:if="${showInsurance}" class="numeric"
+                        th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('insurance', 'O'), credit.currency)}"></td>
+                </th:block>
+                <td class="numeric"
+                    th:text="${@utilService.doubleMoneyFormat(credit.getTotalScheduleField('installmentAmount', 'O'), credit.currency)}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</th:block>
+
+</body>
+</html>

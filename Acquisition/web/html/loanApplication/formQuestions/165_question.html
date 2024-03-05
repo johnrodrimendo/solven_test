@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--Google maps-->
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q165">
+        <div class="form q165">
+            <p>¡Estás Preaprobado! ¿Cómo quieres continuar el proceso?</p>
+            <form id="questionForm" th:object="${form}" autocomplete="off" style="display: flex; justify-content: center">
+
+                <div class="firstOption">
+                    <button type="button" class="button  rounded-button-fill-question" th:onclick="'selectQuestionOption(2)'">100% digital</button>
+                    <p style="text-align: center;">
+                        Necesitas contar solo con tu<br/>
+                        DNI a la mano. Te tomará<br/>
+                        entre 5-6 minutos.
+                    </p>
+                </div>
+
+                <div class="secondOption">
+                    <button type="button" class="button rounded-button-question" th:onclick="'selectQuestionOption(1)'">Desembolso <br/> en agencia</button>
+                    <p style="text-align: center;">
+                        Necesitas contar con tu DNI<br/>
+                        y culminar el trámite en<br/>
+                        agencia.
+                    </p>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function selectQuestionOption(option){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    product: option
+                }
+            }, "");
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <p th:utext="#{questions.block.address}"></p>
+        <div class="forms no-top q22-82" >
+            <form id="questionForm" th:object="${form}" class="flex-form-map">
+                <div class="first">
+                    <div class="field inline field-name field-col-3 field-namevia" >
+                        <input th:attr="placeholder=#{question.142.placeholder}"
+                            th:field="*{roadName}" type="text" class="input-outline peru-roadname" />
+                        <span class="icon-tooltip">?</span>
+                        <div class="field-tooltip">Coloca la direcci&oacute;n en este orden: Av/Calle/Mz y n&uacute;mero. Ejemplo: Av. Mariscal La Mar 398 (no utilices s&iacute;mbolos).
+                            <div class="field-tooltip-arrow"></div>
+                        </div>
+                        <div class="errorContainer"> </div>
+                    </div>
+                </div>
+                <div class="third">
+                    <th:block th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                        <div class="field inline  field-col-3 field-col-2 ">
+                            <select th:field="*{departamento}" id="departamento" data-width="230"
+                                    th:attr="data-placeholder=#{question.map.department}" >
+                                <option value="" hidden="hidden"></option>
+                                <option th:each="top : ${topDepartments}" th:value="${top.id}" th:text="${top.name}"></option>
+                                <option value="null" disabled="disabled">----------</option>
+                                <option th:each="deparment : ${allDepartments}" th:value="${deparment.id}" th:text="${deparment.name}"></option>
+                            </select>
+                            <div class="errorContainer">
+                                <small class="input-help"></small>
+                            </div>
+
+                        </div>
+
+                        <div class="field inline field-col-3">
+                            <select th:field="*{provincia}" id="provincia" data-width="230" th:attr="data-placeholder=#{question.map.province}"></select>
+                            <div class="errorContainer"> </div>
+                        </div>
+                        <div class="field inline field-col-3">
+                            <select class="selec2-item" th:field="*{distrito}" id="district" data-width="230"  th:attr="data-placeholder=#{question.map.district}"></select>
+                            <div class="errorContainer"> </div>
+                        </div>
+                    </th:block>
+                    <th:block th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA}">
+                        <div class="field inline  field-col-3 field-col-2 ">
+                            <select th:field="*{departamento}" id="departamento" data-width="230"
+                                    th:attr="data-placeholder=#{question.map.department}" >
+                                <option value="" hidden="hidden"></option>
+                                <option th:each="deparment : ${allDepartments}" th:value="${deparment.departmentId}" th:text="${deparment.name}"></option>
+                            </select>
+                            <div class="errorContainer">
+                                <small class="input-help"></small>
+                            </div>
+                        </div>
+
+                        <div class="field inline field-col-3">
+                            <select th:field="*{provincia}" id="provincia" data-width="230" th:attr="data-placeholder=#{question.map.province}"></select>
+                            <div class="errorContainer"> </div>
+                        </div>
+                        <div class="field inline field-col-3">
+                            <select class="selec2-item" th:field="*{distrito}" id="district" data-width="230"  th:attr="data-placeholder=#{question.map.district}"></select>
+                            <div class="errorContainer"> </div>
+                        </div>
+                    </th:block>
+                </div>
+                <div class="field inline field-col-3 residencia">
+                    <select class="selec2-item" th:field="*{housingType}" id="housingType" data-width="230"
+                        th:attr="data-placeholder=#{question.map.residence}">
+                        <option value="" hidden="hidden" selected="selected"></option>
+                        <option th:each="type : ${houseTypes}"
+                                th:value="${type.id}" th:text="${type.type}"></option>
+                    </select>
+                    <div class="errorContainer"> </div>
+                </div>
+                <div class="third" th:if="${showReference != null and showReference}">
+                    <div class="field inline max-field" style="margin-top: 1rem;">
+                        <textarea th:field="*{reference}" placeholder="Ingresa una referencia" rows="2" class="input-outline" style="height: auto"></textarea>
+                        <div class="errorContainer"> </div>
+                        <script>
+                            $("textarea").css('height','auto');
+                        </script>
+                    </div>
+                </div>
+                <div class="field inline field-button">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var jsonObj = /*[[${jsonLocationDetails}]]*/null;
+        if (jsonObj !== null) {
+            jsonObj = JSON.parse(/*[[${jsonLocationDetails}]]*/null);
+        }
+        if (jsonObj != null || (jsonObj !== null && typeof jsonObj === 'object' && Object.keys(jsonObj).length !== 0)) {
+            $('#roadName').val(jsonObj.roadName);
+
+            $('#departamento option[value="' + jsonObj.departamento + '"]').prop('selected', true);
+            $('#departamento').trigger('change.select2');
+
+            $('#provincia').html('<option value="' + jsonObj.provincia + '">' + jsonObj.provinciaLabel + '</option>');
+            $('#provincia option[value="' + jsonObj.provincia + '"]').prop('selected', true);
+            $('#provincia').trigger('change.select2');
+
+            $('#district').html('<option value="' + jsonObj.distrito + '">' + jsonObj.distritoLabel + '</option>');
+            $('#district option[value="' + jsonObj.distrito + '"]').prop('selected', true);
+            $('#district').trigger('change.select2');
+
+            if(jsonObj.houseType){
+                $('#housingType option[value="' + jsonObj.houseType + '"]').prop('selected', true);
+                $('#housingType').trigger('change.select2');
+            }
+
+            if (/*[[ ${@countryContextService.isCountryContextInArgentina(#httpServletRequest)} ]]*/false) {
+                $('#postalCode').val(jsonObj.postalCode);
+                $('#withoutNumberId').prop('checked', jsonObj.withoutNumber);
+                if (jsonObj.withoutNumber) {
+                    $('#withoutNumberId').closest('.custom-check').addClass('checked');
+                }
+                $('#houseNumber').val(jsonObj.houseNumber);
+                $('#floor').val(jsonObj.floor);
+                $('#interior').val(jsonObj.interior);
+                $('#reference').val(jsonObj.reference);
+            }
+        }
+        questionFw.initializeFormInputs();
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+
+        $('#sendButton').on('click', function(){
+            sendForm();
+        });
+
+        function sendForm(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(),
+                        {
+
+                        })
+                }, "");
+            }
+        }
+
+        $('#withoutNumberId').click(function(){
+            if (this.checked){
+                $('#houseNumber').prop('readonly', true);
+                $('#houseNumber').val('');
+            }else
+                $('#houseNumber').prop('readonly', false);
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${enableNavigatorLocation != null and  enableNavigatorLocation == true}">
+        /*<![CDATA[*/
+        // Browser geolocation
+        var browserLocation = /*[[${browserLocation}]]*/;
+        if (navigator.geolocation && !browserLocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    },
+                    error: function (xhr, errorJson) {
+                        return;
+                    }
+                }, "navlocation");
+            }, function (error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        console.log("User denied the request for Geolocation");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        console.log("Location information is unavailable");
+                        break;
+                    case error.TIMEOUT:
+                        console.log("The request to get user location timed out");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        console.log("Unknow geolocation error");
+                        break;
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" >
+        /*<![CDATA[*/
+        var $departameto = $('#departamento');
+        var $provincia = $('#provincia');
+        var $distric = $('#district');
+
+        var valProvincia;
+        var valDistrito;
+
+        $provincia.select2({
+            "language": {
+                "noResults": function () {
+                    return "No se encontró algún resultado";
+                }
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }
+        });
+
+        $('input[name=roadName]').keydown(function (e) {
+            if (e.which == 9) {
+                $departameto.select2('open');
+            }
+        });
+
+        var changeDepartment = function() {
+            var url = /*[[@{/address/province}]]*/null;
+            if (/*[[ ${loanApplication.countryId} ]] == [[ ${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA} ]]*/) {
+                url = /*[[@{/address/province/general}]]*/null;
+            }
+
+            $departameto.attr('disabled', 'disabled');
+            $provincia.attr('disabled', 'disabled');
+            $distric.attr('disabled', 'disabled');
+            defaultAjax({
+                url: url,
+                data: {
+                    departmentId: $departameto.val()
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+
+                    if (/*[[ ${loanApplication.countryId} ]] != [[ ${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA} ]]*/) {
+                        var topProvince = arr.find(function (item) {
+                            return item.id == "01"
+                        });
+                        arr.splice(arr.indexOf(topProvince), 1);
+                        html += '<option value="' + topProvince.id + '">' + topProvince.name + '</option>';
+                        html += '<option value="null" disabled="disabled">----------</option>';
+
+                        var len = arr.length;
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                        }
+                    } else {
+                        var len = arr.length;
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + arr[i].provinceId + '">' + arr[i].name + '</option>';
+                        }
+                    }
+
+                    $provincia.html(html);
+
+                    //conditional for no open select
+                    if(valProvincia == null){
+                        setTimeout(function() {
+                            $provincia.select2('open');
+                        }, 100);
+                    }
+
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                },
+                complete: function() {
+
+                    if(valProvincia){
+                        $('#provincia option[value="'+valProvincia+'"]').prop('selected', true);
+                        $provincia.trigger('change.select2');
+                        valProvincia= null;
+                    }
+
+                    $departameto.removeAttr('disabled');
+                    $provincia.removeAttr('disabled');
+                    $distric.removeAttr('disabled');
+
+
+                }
+            });
+        };
+
+        var changeProvince = function () {
+            var url = /*[[@{/address/district}]]*/null;
+            if (/*[[ ${loanApplication.countryId} ]] == [[ ${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA} ]]*/) {
+                url = /*[[@{/address/district/general}]]*/null;
+            }
+
+            $departameto.attr('disabled', 'disabled');
+            $provincia.attr('disabled', 'disabled');
+            $distric.attr('disabled', 'disabled');
+            defaultAjax({
+                url: url,
+                data: {
+                    departmentId: $departameto.val(),
+                    provinceId: $provincia.val()
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+
+                    if (/*[[ ${loanApplication.countryId} ]] != [[ ${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA} ]]*/) {
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                        }
+                    } else {
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + arr[i].districtId + '">' + arr[i].name + '</option>';
+                        }
+                    }
+
+                    $distric.html(html);
+
+                    // conditional for no open select
+                    if(valDistrito == null) {
+                        setTimeout(function () {
+                            $distric.select2('open');
+                        }, 100);
+                    }
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener los distritos/barrios.');
+                },
+                complete: function() {
+                    // set value select 2
+                    if(valDistrito){
+                        $('#district option[value="'+valDistrito+'"]').prop('selected', true);
+                        $distric.trigger('change.select2');
+                        valDistrito = null;
+                    }
+
+                    $departameto.removeAttr('disabled');
+                    $provincia.removeAttr('disabled');
+                    $distric.removeAttr('disabled');
+                }
+            });
+        };
+
+        $departameto.on('change', changeDepartment);
+        $provincia.on('change', changeProvince);
+
+
+        if($provincia.val() != null){
+            valProvincia = $provincia.val();
+            $departameto.change();
+        }
+
+        if($distric.val() != null){
+            valDistrito = $distric.val();
+            $provincia.change();
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)">
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/fullcalendar-3.9.0/fullcalendar.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/fullcalendar-3.9.0/locale/es.js'}" type="text/javascript"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/fullcalendar-3.9.0/fullcalendar.min.css'}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <div class="clearfix"></div>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='dates')"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="portlet light portlet-fit calendar">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold uppercase">Citas</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div style="margin: 0 auto;">
+                                <div id="calendar"></div>
+                                <div style="clear:both"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var events = JSON.parse(/*[[${extranetDates}]]*/);
+        if (events !== null) {
+            events.forEach(function (e, i) {
+                e.start = new Date(e.startDate);
+                e.end = new Date(e.endDate);
+                e.title = e.name + ' ' + e.firstSurname + ' ' + e.lastSurname + '\n'+
+                    'Telefono: '+ e.phone + '\n' +
+                    'DNI:' + e.docNumber;
+                e.className = 'info';
+                e.allDay = false;
+                e.fullName = e.name + ' ' + e.firstSurname + ' ' + e.lastSurname;
+            });
+        } else {
+            events = [];
+        }
+        $('#calendar').fullCalendar({
+            defaultView: 'agendaWeek',
+            businessHours: [
+                {
+                    dow: [1,2,3,4,5],
+                    start: '08:30',
+                    end: '18:00'
+                },
+                {
+                    dow: [6],
+                    start: '08:30',
+                    end: '13:00'
+                }
+            ],
+            hiddenDays: [0],
+            slotLabelFormat: 'HH:mm',
+            allDaySlot: false,
+            selectHelper: true,
+            header: {
+                left: 'title',
+                center: '',
+                right: 'prev, next'
+            },
+            minTime: '08:30:00',
+            maxTime: '18:30:00',
+            height: 'auto',
+            eventClick: function(event) {
+                swal({
+                    title: "",
+                    text: 'Telefono: '+ event.phone + '\n' +
+                    'DNI:' + event.docNumber + '\n' +
+                    'Nombre completo: ' + event.fullName,
+                });
+            },
+            events: events
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

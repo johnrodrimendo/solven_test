@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <title th:text="${@brandingService.getMetaTittle(#httpServletRequest, #locale)} != null ?
+        ${@brandingService.getMetaTittle(#httpServletRequest, #locale)} :
+        ${'Solven | El crédito que mereces | ' + (@brandingService.isBranded(#httpServletRequest) ?  @brandingService.getEntityBranding(#httpServletRequest)?.entity?.shortName : 'Solven')}"></title>
+    <meta name="description"
+          th:attr="content=${@brandingService.getMetaDescription(#httpServletRequest, #locale)} != null ? ${@brandingService.getMetaDescription(#httpServletRequest, #locale)} : #{static.description.credito.consumo}"/>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es"/>
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es-pe"/>
+    <link rel="alternate" href="https://www.solven.com.ar/credito-de-consumo" hreflang="es-ar"/>
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="x-default"/>
+    <meta th:if="${@brandingService.getEntityBranding(#httpServletRequest).entity.id == T(com.affirm.common.model.catalog.Entity).AZTECA}"
+          name="facebook-domain-verification" content="9x9q2rc7m1tmqgdsyadckogvcbk67s"/>
+
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} != null" id="favicon" rel="icon"
+          type="image/x-icon" th:href="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)}"/>
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} == null" id="favicon" rel="icon"
+          type="image/png" th:href="@{/img/favicon.png}"/>
+
+    <script th:inline="javascript">
+        let primaryLoadingColor = [[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#26CAD3')}]];
+        let rootVarLoading = document.createElement('style');
+        rootVarLoading.type = 'text/css';
+        rootVarLoading.innerHTML = `:root {--loading-page-color: ${primaryLoadingColor}; --loading-color: ${primaryLoadingColor}}`;
+        document.getElementsByTagName('head')[0].appendChild(rootVarLoading);
+    </script>
+
+
+    <th:block layout:fragment="css">
+        <style>
+            body {
+                font-family: 'Lato', sans-serif;
+            }
+
+            @media only screen and (min-width: 960px) {
+                .document-row {
+                    align-items: flex-end !important;
+                }
+                .wrap-image img[src].logo {
+                    height: 45px;
+                    top: 1rem!important;
+                    width: auto!important;
+                }
+            }
+
+        </style>
+
+        <link rel="stylesheet" th:href="@{/css/branding.css}"/>
+        <style>
+            :root {
+                --loading-page-color: #006EBF;
+                --primary-branding-color: #006EBF !important;
+                --second-branding-color: #70BD00 !important;
+            }
+
+            input:active {
+                border-color: var(--primary-branding-color) !important;
+            }
+
+            .poweredBySolvenFirmaDesktop > .poweredBySolven path {
+                fill: #cbcbcb;
+            }
+
+            .wrap-image {
+                width: 100% !important;
+            }
+
+            .bg-degrade {
+                display: none;
+            }
+
+            .wrap-image img.bg {
+                transform: translate(-50%, -50%) scale(1);
+                min-width: 100%;
+            }
+
+            .wrap {
+                z-index: 4;
+                height: 60vh;
+            }
+
+            .tos {
+                padding: 0px;
+                margin-top: 10px !important;
+            }
+
+            @media screen and (max-height: 749px) and (min-width: 960px) {
+                .is-iframe main {
+                    min-height: 750px !important;
+                    padding-top: 10px;
+                }
+
+                .is-iframe .img-landing-background {
+                    min-height: 750px !important;
+                }
+            }
+
+            .img-landing-background {
+                min-height: 100vh;
+                min-width: 100vw;
+                z-index: -1;
+                max-width: 100%;
+                height: 100vh;
+                object-fit: cover;
+                object-position: top;
+            }
+
+            .logo-landing-azteca-mobile {
+                display: none;
+                left: calc(50% - 1rem - 70px);
+                position: absolute;
+                top: 1.5rem;
+                width: auto;
+                height: 75px;
+                z-index: 3;
+            }
+
+            .form-container {
+                max-width: 460px;
+                margin-left: auto;
+                margin-right: 5rem;
+                z-index: 3;
+                margin-top: 2rem;
+            }
+
+            .form-headline-subtitle {
+                font-size: 1.4rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-headline-subtitle-mobile {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-headline-subtitle span,
+            .form-headline-subtitle-mobile span {
+                font-weight: bolder;
+            }
+
+            .form-headline-subtitle span {
+                color: var(--primary-branding-color);
+            }
+
+            .form-headline-subtitle-mobile span {
+                text-decoration: underline;
+            }
+
+            .form-headline-subtitle-mobile {
+                display: none;
+            }
+
+            .custom-form {
+                background: #f9f9f9a6;
+                border-radius: 1.5rem;
+                padding-left: 1.2rem;
+                padding-right: 1.2rem;
+            }
+
+            .tos {
+                margin: 0;
+                width: 100%;
+            }
+
+            .tos > p {
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+            .frm-l5 .ds-fl .field {
+                margin-left: 0px;
+                padding-right: 0px;
+            }
+
+            .custom-form-headline {
+                text-align: left !important;
+                font-size: 2.3rem !important;
+                font-weight: bold !important;
+                color: var(--primary-branding-color);
+            }
+
+            .custom-header {
+                margin-left: 0px;
+                margin-right: 0px;
+                max-width: 100%;
+                width: 100% !important;
+                background: transparent !important;
+                color: #FA4616;
+                border: none;
+                margin-top: 10vh;
+            }
+
+            span.select2, #documentNumber {
+                background-color: white;
+            }
+
+            section h2::after {
+                display: none;
+            }
+
+            .tos-mobile-container {
+                background-color: white;
+                display: none;
+            }
+
+            .tos-mobile-container > .tos {
+                padding: 10px;
+            }
+
+            .custom-form-headline-mobile {
+                display: none;
+            }
+
+            .poweredBySolvenFirma {
+                display: none;
+            }
+
+            .poweredBySolvenFirmaDesktop {
+                display: block;
+                position: absolute;
+                bottom: 15px;
+                max-width: 190px;
+                right: 15px;
+            }
+
+            .c-full select, .c-full .select2 {
+                flex-grow: unset !important;
+                width: calc(30% - .25rem) !important;
+                min-width: 70px;
+                max-width: 70px;
+            }
+
+            #btnReview {
+                width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+                /*background-color: var(--second-branding-color);*/
+                background: transparent;
+                box-shadow: none;
+                padding: 0;
+                height: 70px;
+            }
+
+            .c-i label.icon-checkbox a, .c-full label.icon-checkbox a {
+                color: var(--primary-branding-color);
+            }
+
+            #loanForm {
+                padding-top: 1.2rem;
+                padding-bottom: 1.2rem;
+            }
+
+            .frm-l5 .ds-col {
+                max-width: unset;
+                width: 100%;
+            }
+
+            .headline-title-mobile {
+                display: none;
+            }
+
+            .opacity-mobile {
+                display: none;
+            }
+
+            .frm-l5 #documentNumber {
+                margin-right: 0.5rem !important;
+            }
+
+            .listado {
+                position: absolute;
+                bottom: 0px;
+                display: block;
+            }
+
+            @media screen and (min-width: 960px) {
+                main {
+                    /*min-height: 678px;*/
+                }
+
+                .img-landing-background {
+                    height: auto;
+                }
+            }
+
+            @media screen and (min-width: 960px) and (max-height: 850px) {
+
+                .header h2 {
+                    padding-bottom: 0px;
+                }
+            }
+
+
+            @media screen and (min-width: 960px) and (max-height: 750px) {
+
+                .header h2 {
+                    padding-bottom: 0px;
+                }
+
+                .form .f-ww {
+                    margin-bottom: 0.5rem !important;
+                }
+            }
+
+            @media screen and (min-width: 1200px) and (max-height: 650px) {
+                .custom-header {
+                    margin-top: 3vh;
+                }
+
+                #btnReview {
+                    width: 100%;
+                }
+            }
+
+            @media screen and (min-width: 1200px) and (max-height: 600px) {
+                .custom-header {
+                    margin-top: 0px;
+                }
+
+                .custom-header h2 {
+                    padding-bottom: 0px;
+                }
+
+                #loanForm {
+                    padding-top: 1rem;
+                }
+            }
+
+            @media screen and (min-width: 960px) and (min-height: 640px) {
+
+                #loanForm {
+                    /*min-height: 65vh;*/
+                }
+
+                .custom-form-headline {
+                    margin-top: 10px !important;
+                }
+
+                .form-headline-subtitle {
+                    font-size: 1.25rem;
+                    margin-top: 0.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                div.ds-fl.ds-col-bottom {
+                    margin-bottom: 10px;
+                }
+            }
+
+            @media screen and (max-width: 960px) and  (max-height: 640px) {
+
+                .form-container {
+                    padding-top: 18vh !important;
+                }
+
+            }
+
+            @media screen and (min-width: 960px) and (max-width: 1023px) {
+                .azteca-entity {
+                    min-height: 100vh;
+                }
+
+                .custom-header {
+                    margin-top: 5vh;
+                }
+
+                #loanForm {
+                    margin-top: 3vh;
+                }
+            }
+
+            @media screen and (max-width: 959px) {
+                body {
+                    height: 100%;
+                }
+
+                .tos {
+                    margin-top: 10px;
+                }
+
+                .svg-billete{
+                    height: auto;
+                    width: 100%;
+                }
+
+                .opacity-mobile {
+                    display: block;
+                    height: 100%;
+                    width: 100%;
+                    position: absolute;
+                    left: 0;
+                    background-color: var(--primary-branding-color);
+                    opacity: 0.85;
+                }
+
+                .form-headline-subtitle {
+                    display: none;
+                }
+
+                .form-headline-subtitle-mobile {
+                    display: block;
+                    color: var(--primary-branding-color);
+                }
+
+                .frm-l5 .ds-col {
+                    min-width: unset;
+                }
+
+                .logo-landing-azteca-mobile {
+                    display: block;
+                    left: 30px;
+                    top: 0;
+                }
+
+                .custom-form-headline-mobile {
+                    margin-top: 0px !important;
+                }
+
+                main.azteca-entity {
+                    background: url("https://solven-public.s3.amazonaws.com/img/acceso/branding/landing-acceso-solven.jpg");
+                    background-size: cover;
+                    background-position: revert;
+                    height: 100vh;
+                    min-height: 800px
+                }
+
+                .headline-title-mobile {
+                    display: block;
+                    font-size: 1.6rem;
+                    font-weight: bolder;
+                    margin-bottom: 1.2rem;
+                    color: white;
+                }
+
+                .form-container {
+                    /* padding-top: 18vh;*/
+                    padding-top: 15vh;
+                    max-width: 70%;
+                    margin-left: auto;
+                    margin-right: auto;
+                    max-height: 100%;
+                    display: inline-block;
+                    align-self: flex-start;
+                    margin-top: unset;
+                }
+
+                .tos-mobile-container {
+                    display: block;
+                }
+
+                .poweredBySolvenFirma {
+                    display: contents;
+                }
+
+                .poweredBySolvenFirmaDesktop {
+                    display: none;
+                }
+
+                .custom-form-headline-mobile {
+                    display: block;
+                    color: #FA4616;
+                    font-size: 25px !important;
+                    font-weight: bold !important;
+                    text-align: left !important;
+                    text-transform: uppercase;
+                }
+
+                .custom-form-headline {
+                    display: none;
+                }
+
+                .custom-header {
+                    display: none;
+                }
+
+                #loanForm {
+                    margin-top: unset;
+                    margin-bottom: unset;
+                    background: #ffffff;
+                    min-height: 320px;
+                }
+
+                .frm-l5 #documentNumber {
+                    margin-right: 0 !important;
+                }
+
+                .listado {
+                    display: none;
+                }
+            }
+
+            @media screen and (max-width: 700px) {
+                .custom-input {
+                    margin-bottom: 20px;
+                }
+
+                main.azteca-entity {
+                    background: url("https://solven-public.s3.amazonaws.com/img/acceso/branding/landing-acceso-solven.jpg");
+                    background-size: cover;
+                    background-position: center;
+                }
+
+                .c-full select, .c-full .select2 {
+                    flex-grow: unset !important;
+                    width: calc(30% - .25rem) !important;
+                    min-width: 70px !important;
+                }
+            }
+
+            @media screen and (max-width: 500px) {
+                .form-container {
+                    max-width: 95%;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+
+                .c-full select, .c-full .select2 {
+                    flex-grow: unset !important;
+                    width: calc(30% - .25rem) !important;
+                    min-width: 70px !important;
+                }
+            }
+
+            @media screen and (max-width: 450px) {
+                main.azteca-entity {
+                    min-height: 850px
+                }
+            }
+
+            @media screen and (max-height: 700px) {
+
+                .wrap-image {
+                    height: 750px;
+                }
+            }
+
+            .circle {
+                background: #FA4616;
+                border-radius: 0.8em;
+                -moz-border-radius: 0.8em;
+                -webkit-border-radius: 0.8em;
+                color: #ffffff;
+                display: inline-block;
+                font-weight: bold;
+                line-height: 1.6em;
+                margin-right: 5px;
+                text-align: center;
+                width: 1.6em;
+            }
+
+            .lista-pasos {
+                display: flex;
+                width: 100%;
+                margin-bottom: 15px
+            }
+
+            .wrap-image a {
+                top: 1rem;
+            }
+
+            /*.logo-landing-azteca-mobile {*/
+            /*    left: 10px;*/
+            /*    top: 1rem;*/
+            /*}*/
+
+            .list {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                text-align: left;
+                width: 100%;
+            }
+
+            .list > li {
+                font-size: 15px;
+                max-width: 400px;
+                min-width: 200px;
+                text-align: center;
+                width: 15%;
+                color: #fff;
+            }
+
+            .badget-custom{
+                background: var(--second-branding-color);;
+                color: white;
+                display: inline-block;
+                font-style: italic;
+                padding-left: 8px;
+                padding-right: 8px;
+                padding-bottom: 4px;
+                border-radius: 5px;
+            }
+
+            @media screen and (min-width: 750px) {
+                .logo-landing-azteca-mobile {
+                    left: 150px;
+                }
+            }
+
+            .svg-billete{
+                /*position: absolute;*/
+                /*left: 10%;*/
+                /*top: -20px;*/
+                filter: drop-shadow(3px 0.05rem 2px rgb(0 0 0 / 25%));
+                transition: filter 0.3s;
+                height: 70px;
+            }
+
+            .svg-billete:hover{
+                transition: filter 0.3s;
+                filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.2));
+            }
+
+        </style>
+        <script defer="true" type="text/javascript" th:src="@{/js/landing5.js}"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            !function (t) {
+                "use strict";
+                t.loadCSS || (t.loadCSS = function () {
+                });
+                var e = loadCSS.relpreload = {};
+                if (e.support = function () {
+                    var e;
+                    try {
+                        e = t.document.createElement("link").relList.supports("preload")
+                    } catch (t) {
+                        e = !1
+                    }
+                    return function () {
+                        return e
+                    }
+                }(), e.bindMediaToggle = function (t) {
+                    header - desktop_fdlm2
+                    var e = t.media || "all";
+
+                    function a() {
+                        t.media = e
+                    }
+
+                    t.addEventListener ? t.addEventListener("load", a) : t.attachEvent && t.attachEvent("onload",
+                        a), setTimeout(function () {
+                        t.rel = "stylesheet", t.media = "only x"
+                    }), setTimeout(a, 3e3)
+                }, e.poly = function () {
+                    if (!e.support())
+                        for (var a = t.document.getElementsByTagName("link"), n = 0; n < a.length; n++) {
+                            var o = a[n];
+                            "preload" !== o.rel || "style" !== o.getAttribute("as") || o.getAttribute(
+                                "data-loadcss") || (o.setAttribute("data-loadcss", !0), e.bindMediaToggle(o))
+                        }
+                }, !e.support()) {
+                    e.poly();
+                    var a = t.setInterval(e.poly, 500);
+                    t.addEventListener ? t.addEventListener("load", function () {
+                        e.poly(), t.clearInterval(a)
+                    }) : t.attachEvent && t.attachEvent("onload", function () {
+                        e.poly(), t.clearInterval(a)
+                    })
+                }
+                "undefined" != typeof exports ? exports.loadCSS = loadCSS : t.loadCSS = loadCSS
+            }("undefined" != typeof global ? global : this);
+            /*window.onload = function () {
+                var e = new XMLHttpRequest;
+                e.open("GET", "https://fonts.googleapis.com/css?family=Lato:300,400,700,900", !0), e
+                    .onreadystatechange = function () {
+                        if (4 == e.readyState && 200 == e.status) {
+                            var t = document.createElement("style");
+                            t.innerHTML = e.responseText, document.head.appendChild(t)
+                        }
+                    }, e.send()
+            };*/
+            var primaryColor = /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#00c8d3')}]]*/,
+                mobileHeaderBackgroundColor = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).mobileHeaderBackgroundColor}]]*/,
+                mobileHeaderTextColor = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).mobileHeaderTextColor}]]*/,
+                fav_icon = /*[[${@brandingService.getEntityBrandingFavIcon(#httpServletRequest, 'https://s3.amazonaws.com/solven-public/img/icons/favicon/favicon.png')}]]*/,
+                isBranded = /*[[${@brandingService.isBranded(#httpServletRequest)}]]*/,
+                entityBrandingLoanLanding = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale)}]]*/,
+                primaryColorBg = "linear-gradient(to bottom, #33486f4D 0%," + primaryColor + "4D 100%)";
+            if (entityBrandingLoanLanding != null) {
+                var customStyle = document.createElement('style');
+                customStyle.type = 'text/css';
+                customStyle.innerHTML = `
+                    :root {
+                        --primary-branding-color: ${primaryColor};
+                    }
+                    `;
+                if (entityBrandingLoanLanding.fontFamily) customStyle.innerHTML += `* {font-family: ${entityBrandingLoanLanding.fontFamily} !important;} \n`;
+                if (entityBrandingLoanLanding.hideTitlePoints) customStyle.innerHTML += `section h2::after {content: none !important} \n`;
+                if (entityBrandingLoanLanding.hidePoweredBy) customStyle.innerHTML += `.poweredBySolven {visibility: hidden;!important} \n`;
+                if (entityBrandingLoanLanding.customColorForHeadlineText) customStyle.innerHTML += `.header.brand-bg-p h2 {color:${entityBrandingLoanLanding.customColorForHeadlineText} !important; }\n`;
+                if (entityBrandingLoanLanding.hideTagsLines) $("ul.list").hide();
+                if (entityBrandingLoanLanding.customColorForHeadlineUnderline) customStyle.innerHTML += `.header-title-mobile h2 {border-color:${entityBrandingLoanLanding.customColorForHeadlineUnderline} !important; }\n`;
+                document.getElementsByTagName('head')[0].appendChild(customStyle);
+            }
+            document.addEventListener('DOMContentLoaded', function (event) {
+                if (document.querySelector('.bg-degrade')) document.querySelector('.bg-degrade').style.background = primaryColorBg;
+                if (document.querySelector('.header')) document.querySelector('.header').style.borderColor = primaryColor;
+                /*                if(document.querySelector('#btnReview')) document.querySelector('#btnReview').style.background = primaryColor;
+                                if(document.querySelector('.tos')) document.querySelector('.tos').style.borderColor = primaryColor;
+                                if(document.querySelector('.brand-bg-p')) document.querySelector('.brand-bg-p').style.background = mobileHeaderBackgroundColor;
+                                if(document.querySelector('.brand-bg-p h2')) document.querySelector('.brand-bg-p h2').style.color = mobileHeaderTextColor;
+                                if(entityBrandingLoanLanding != null){
+                                    if(entityBrandingLoanLanding.showTagLineAsColumns) $("#tagLineContainer").addClass("brand-column");
+                                    if(entityBrandingLoanLanding.customColorForFormButton) document.querySelector('#btnReview').style.background = entityBrandingLoanLanding.customColorForFormButton;
+                                    if(entityBrandingLoanLanding.customColorForImageMessage) document.querySelector('.h1 > h1:nth-child(1)').style.color = entityBrandingLoanLanding.customColorForImageMessage;
+                                    if(entityBrandingLoanLanding.customColorForImageSubMessage) document.querySelector('.h1 > p:nth-child(2)').style.color = entityBrandingLoanLanding.customColorForImageSubMessage;
+                                    if(entityBrandingLoanLanding.customColorForHeadlineUnderline) document.querySelector('header.f').style.borderColor = entityBrandingLoanLanding.customColorForHeadlineUnderline;
+                                }
+                                var chk = document.querySelectorAll(".icon-checkbox a");
+                                if(chk.length){
+                                    chk[0].style.color = primaryColor;
+                                    chk[1].style.color = primaryColor;
+                                }*/
+            });
+            /*]]>*/
+        </script>
+    </th:block>
+</head>
+
+<body style="overflow-y: hidden">
+
+<th:block layout:fragment="content">
+    <div id="loading-screen" style="height: 100%;">
+        <div class="process-loading-container circle-progress-question" style="position: initial !important;">
+            <div class="loading-content">
+                <div class="sk-circle">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <main class="f toload azteca-entity no-modify-iframe">
+
+        <div class="opacity-mobile"></div>
+
+        <section class="form-container">
+            <a th:href="@{/}" class="logoLinkUrl">
+                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                    <img class="lazy logo logo-landing-azteca-mobile"
+                         th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/acceso/branding/logo-prestifacil-pastilla-mobile.png'}"/>
+                </th:block>
+            </a>
+
+            <form class="f f-ww-custom form frm-l5 custom-form exclude-iframe" id="loanForm" onsubmit="return false;">
+
+                <h2 class="custom-form-headline">
+                    Tu préstamo<span class="badget-custom">rápido y fácil</span>sin necesidad de un banco
+                </h2>
+                <h5 class="form-headline-subtitle-mobile">Tu préstamo rápido y fácil sin necesidad de un banco</h5>
+
+                <div class="ds-fl ds-col" id="amoundAndDestination">
+                    <div class="field c-i f f-ww custom-input">
+                        <label for="amount" th:text="#{questions.block.amountAndInstallments}"></label>
+                        <div class="c">
+                            <input style="background-color: white" id="amount" placeholder="Escribe un monto"
+                                   name="amount" type="text"/>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field c-i f f-ww custom-input-2">
+                        <label th:utext="#{question.branding.creditDestination}"></label>
+                        <select data-width="230" id="reason" name="reason"
+                                data-placeholder="Destino de crédito">
+                            <option value="" hidden="hidden">Destino de crédito</option>
+                            <option
+                                    th:each="reason : ${@brandingService.getLoanApplicationReasons(#httpServletRequest, #locale)}"
+                                    th:value="${reason?.id}" th:text="${reason?.reason}"></option>
+                        </select>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+                <div class="ds-fl ds-col flex-direction-column">
+                    <div class="field c-full f f-ww field-full">
+                        <label>¿Cuál es tu número de documento?</label>
+                        <select id="docType" name="docType" class="custom-select ignore_validation"
+                                data-placeholder="DNI">
+                            <option value="" hidden="hidden">DNI</option>
+                            <option value="1" selected="true">DNI</option>
+                            <option value="2">CE</option>
+                        </select>
+                        <input id="documentNumber" name="documentNumber" placeholder="Escribe tu número de documento"
+                               type="text" autocorrect="off" autocomplete="off"
+                               autocapitalize="none"/>
+                        <div class="errorContainer" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="ds-fl ds-col flex-direction-column">
+                    <div class="field c-full f f-ww field-full">
+                        <label>¿Cuál es tu correo electrónico?</label>
+                        <input style="background-color: white" id="email" name="email" placeholder="nombre@dominio.com"
+                               type="text" autocorrect="off"
+                               autocapitalize="none"/>
+                        <div class="errorContainer" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="ds-fl ds-col flex-direction-column">
+                    <div class="field c-full f f-ww field-full">
+                        <label>¿Cuál es tu número de celular?</label>
+                        <input style="background-color: white" id="celNumber" name="phone"
+                               placeholder="Mínimo 9 caracteres" type="text" autocorrect="off"
+                               autocapitalize="none"/>
+                        <div class="errorContainer" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="ds-fl ds-col flex-direction-column">
+                    <div class="field c-full f f-ww field-full" style="margin-bottom: 10px !important;">
+                        <input type="checkbox" id="acceptAgreement" name="acceptAgreement"/>
+                        <label for="acceptAgreement" class="icon-checkbox acceptAgreement">
+                            <th:block
+                                    th:if="${@brandingService.getEntityBranding(#httpServletRequest).entity.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                                      <span class="check-label">He le&iacute;do, comprendo y autorizo el <a
+                                                              href="javascript:void(0);" id="openModalAzteca">tratamiento de datos personales</a>
+                                                      </span>
+                            </th:block>
+                            <th:block
+                                    th:unless="${@brandingService.getEntityBranding(#httpServletRequest).entity.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                                      <span class="check-label">He le&iacute;do, comprendo y acepto los <a
+                                                              target="_blank"
+                                                              th:href="@{/terminos-y-condiciones}">T&eacute;rminos y Condiciones</a> / <a
+                                                              target="_blank" th:href="@{/politica-de-privacidad}">Pol&iacute;tica de
+                                            Privacidad</a></span>
+                            </th:block>
+                        </label>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="ds-fl ds-col-bottom">
+                    <div class="c-i c-right f f-ww btnReviewContainer"
+                         style="margin-left: auto;margin-right: auto;margin-top: 0.5rem;margin-bottom: 0.5rem !important;">
+
+                        <button id="btnReview" class="btn">
+                            <svg class="svg-billete" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 337 75" xml:space="preserve">
+                            <defs>
+                            </defs>
+                                                            <g transform="matrix(1 0 0 1 167.88 36.96)"  >
+                            <g style=""   >
+                                    <g transform="matrix(0.49 0 0 0.46 0 0)" clip-path="url(#CLIPPATH_39)"  >
+                            <linearGradient id="SVGID_17" gradientUnits="userSpaceOnUse" gradientTransform="matrix(682.51 0 0 -682.51 -341.22 190701.69)"  x1="-6.98652e-7" y1="279.412" x2="1" y2="279.412">
+                            <stop offset="0%" style="stop-color:rgb(150,203,0);stop-opacity: 1"/>
+                                <stop offset="11.73%" style="stop-color:rgb(150,203,0);stop-opacity: 1"/>
+                                <stop offset="43.85%" style="stop-color:rgb(132,195,0);stop-opacity: 1"/>
+                                <stop offset="77.37%" style="stop-color:rgb(112,189,0);stop-opacity: 1"/>
+                                <stop offset="97.77%" style="stop-color:rgb(150,203,0);stop-opacity: 1"/>
+                                <stop offset="100%" style="stop-color:rgb(150,203,0);stop-opacity: 1"/>
+                            </linearGradient>
+                                        <clipPath id="CLIPPATH_39" >
+                                <path transform="matrix(1 0 0 1 0 0) translate(-385.65, -137.95)" d="M 546.4 138 c 0 -38.2 31 -69.2 69.2 -69.2 s 69.2 31 69.2 69.2 s -31 69.2 -69.2 69.2 S 546.4 176.2 546.4 138 M 554.2 89.6 H 54.9 c -5.8 0 -10.5 4.7 -10.5 10.5 v 75.7 c 0 5.8 4.7 10.5 10.5 10.5 h 499.2 c 14.4 18.4 36.7 30.2 61.9 30.2 c 25.1 0 47.5 -11.8 61.9 -30.2 h 38.5 c 5.8 0 10.5 -4.7 10.5 -10.5 v -75.7 c 0 -5.8 -4.7 -10.5 -10.5 -10.5 H 678 c -14.4 -18.4 -36.7 -30.2 -61.9 -30.2 C 590.9 59.4 568.6 71.3 554.2 89.6" stroke-linecap="round" />
+                            </clipPath>
+                                        <rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: url(#SVGID_17); fill-rule: nonzero; opacity: 1;"  x="-341.25" y="-78.55" rx="0" ry="0" width="682.5" height="157.1" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -127.67 1.27)" clip-path="url(#CLIPPATH_40)"  >
+                            <clipPath id="CLIPPATH_40" >
+                                <rect transform="matrix(1 0 0 1 274.9 -1)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-125.1, -140.7)" d="M 120.9 124.4 c 0 -0.8 0.1 -1.5 0.2 -2 c 0.1 -0.5 0.4 -1 0.7 -1.3 c 0.3 -0.3 0.7 -0.6 1.3 -0.7 c 0.5 -0.1 1.2 -0.2 2 -0.2 c 0.8 0 1.5 0.1 2 0.2 c 0.5 0.1 1 0.4 1.3 0.7 c 0.3 0.3 0.5 0.8 0.7 1.3 s 0.2 1.2 0.2 2 c 0 0.8 -0.1 1.5 -0.2 2.1 c -0.1 0.6 -0.3 1 -0.7 1.3 c -0.3 0.3 -0.7 0.6 -1.3 0.7 c -0.5 0.1 -1.2 0.2 -2 0.2 c -0.8 0 -1.5 -0.1 -2 -0.2 c -0.5 -0.1 -1 -0.4 -1.3 -0.7 c -0.3 -0.3 -0.5 -0.8 -0.7 -1.3 C 120.9 125.9 120.9 125.3 120.9 124.4 M 121.8 133 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.2 0.3 -0.3 0.5 -0.4 c 0.2 -0.1 0.6 -0.2 1 -0.2 c 0.4 -0.1 0.9 -0.1 1.5 -0.1 c 0.6 0 1.1 0 1.6 0.1 c 0.4 0.1 0.7 0.1 1 0.2 c 0.2 0.1 0.4 0.2 0.5 0.4 c 0.1 0.2 0.2 0.3 0.2 0.5 l 0.8 26.6 c 0 0.3 -0.1 0.5 -0.2 0.7 c -0.1 0.2 -0.3 0.4 -0.6 0.5 c -0.3 0.1 -0.7 0.2 -1.2 0.3 c -0.5 0.1 -1.2 0.1 -1.9 0.1 c -0.8 0 -1.4 0 -1.9 -0.1 c -0.5 -0.1 -0.9 -0.2 -1.2 -0.3 c -0.3 -0.1 -0.5 -0.3 -0.6 -0.5 c -0.1 -0.2 -0.2 -0.4 -0.2 -0.7 L 121.8 133 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -115.42 -0.58)" clip-path="url(#CLIPPATH_41)"  >
+                            <clipPath id="CLIPPATH_41" >
+                                <rect transform="matrix(1 0 0 1 249.9 3)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-150.1, -136.7)" d="M 162.5 144.1 c 0 2 -0.4 3.7 -1.1 5.2 c -0.7 1.5 -1.7 2.8 -3 3.8 c -1.3 1 -2.8 1.8 -4.5 2.3 s -3.5 0.8 -5.5 0.8 c -1.3 0 -2.5 -0.1 -3.6 -0.3 c -1.1 -0.2 -2.1 -0.5 -3 -0.8 c -0.9 -0.3 -1.6 -0.6 -2.2 -1 c -0.6 -0.3 -1 -0.6 -1.2 -0.9 c -0.3 -0.3 -0.4 -0.6 -0.5 -1.1 c -0.1 -0.5 -0.2 -1.2 -0.2 -2.1 c 0 -0.6 0 -1.1 0.1 -1.5 c 0 -0.4 0.1 -0.7 0.2 -1 c 0.1 -0.3 0.2 -0.4 0.4 -0.5 c 0.1 -0.1 0.3 -0.2 0.5 -0.2 c 0.3 0 0.7 0.2 1.2 0.5 c 0.5 0.3 1.1 0.7 1.9 1.1 c 0.8 0.4 1.7 0.7 2.8 1.1 c 1.1 0.3 2.3 0.5 3.8 0.5 c 0.9 0 1.8 -0.1 2.5 -0.3 c 0.7 -0.2 1.4 -0.5 1.9 -1 c 0.5 -0.4 0.9 -0.9 1.2 -1.5 c 0.3 -0.6 0.4 -1.3 0.4 -2 c 0 -0.9 -0.2 -1.6 -0.7 -2.2 c -0.5 -0.6 -1.1 -1.2 -1.8 -1.6 c -0.8 -0.5 -1.6 -0.9 -2.6 -1.3 c -1 -0.4 -1.9 -0.9 -3 -1.3 c -1 -0.5 -2 -1 -3 -1.6 c -1 -0.6 -1.8 -1.3 -2.6 -2.1 c -0.8 -0.8 -1.4 -1.8 -1.8 -2.9 c -0.5 -1.1 -0.7 -2.5 -0.7 -4.1 c 0 -1.8 0.3 -3.4 1 -4.8 c 0.7 -1.4 1.6 -2.5 2.7 -3.4 c 1.1 -0.9 2.5 -1.6 4 -2 c 1.6 -0.4 3.2 -0.7 4.9 -0.7 c 0.9 0 1.8 0.1 2.7 0.2 c 0.9 0.1 1.7 0.3 2.5 0.6 s 1.5 0.5 2.1 0.8 c 0.6 0.3 1 0.5 1.2 0.7 c 0.2 0.2 0.3 0.4 0.4 0.5 c 0.1 0.1 0.1 0.3 0.2 0.5 c 0 0.2 0.1 0.5 0.1 0.8 c 0 0.3 0 0.8 0 1.3 c 0 0.6 0 1 0 1.4 c 0 0.4 -0.1 0.7 -0.1 1 c -0.1 0.3 -0.2 0.4 -0.3 0.6 c -0.1 0.1 -0.3 0.2 -0.5 0.2 c -0.2 0 -0.6 -0.1 -1 -0.4 c -0.5 -0.3 -1 -0.6 -1.7 -0.9 c -0.7 -0.3 -1.5 -0.6 -2.4 -0.9 c -0.9 -0.3 -1.9 -0.4 -3 -0.4 c -0.8 0 -1.6 0.1 -2.2 0.3 c -0.6 0.2 -1.1 0.5 -1.6 0.9 c -0.4 0.4 -0.7 0.8 -0.9 1.3 c -0.2 0.5 -0.3 1 -0.3 1.6 c 0 0.8 0.2 1.6 0.7 2.2 c 0.5 0.6 1.1 1.2 1.8 1.6 c 0.8 0.5 1.6 0.9 2.6 1.3 c 1 0.4 2 0.9 3 1.3 c 1 0.5 2 1 3 1.6 c 1 0.6 1.8 1.3 2.6 2.1 c 0.8 0.8 1.4 1.8 1.8 2.9 C 162.3 141.3 162.5 142.6 162.5 144.1" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -100.6 1.62)" clip-path="url(#CLIPPATH_42)"  >
+                            <clipPath id="CLIPPATH_42" >
+                                <rect transform="matrix(1 0 0 1 219.65 -1.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-180.35, -141.45)" d="M 194.4 141.2 c 0 2.2 -0.3 4.3 -0.9 6.1 c -0.6 1.8 -1.5 3.4 -2.7 4.7 s -2.7 2.4 -4.5 3.1 c -1.8 0.7 -3.9 1.1 -6.3 1.1 c -2.3 0 -4.3 -0.3 -6.1 -1 c -1.7 -0.6 -3.1 -1.6 -4.3 -2.8 c -1.1 -1.2 -2 -2.7 -2.5 -4.5 s -0.8 -3.9 -0.8 -6.2 c 0 -2.2 0.3 -4.3 0.9 -6.1 c 0.6 -1.8 1.5 -3.4 2.7 -4.7 c 1.2 -1.3 2.7 -2.3 4.5 -3.1 c 1.8 -0.7 3.9 -1.1 6.3 -1.1 c 2.3 0 4.4 0.3 6.1 1 c 1.7 0.6 3.1 1.6 4.3 2.8 c 1.1 1.2 2 2.7 2.5 4.5 C 194.1 136.8 194.4 138.9 194.4 141.2 M 186.8 141.5 c 0 -1.3 -0.1 -2.5 -0.3 -3.6 c -0.2 -1.1 -0.6 -2 -1 -2.8 c -0.5 -0.8 -1.1 -1.4 -1.9 -1.9 c -0.8 -0.4 -1.8 -0.7 -3.1 -0.7 c -1.1 0 -2.1 0.2 -2.9 0.6 c -0.8 0.4 -1.5 1 -2 1.8 c -0.5 0.8 -0.9 1.7 -1.2 2.8 c -0.3 1.1 -0.4 2.3 -0.4 3.7 c 0 1.3 0.1 2.5 0.3 3.6 c 0.2 1.1 0.6 2 1 2.8 c 0.5 0.8 1.1 1.4 2 1.9 c 0.8 0.4 1.8 0.7 3 0.7 c 1.1 0 2.1 -0.2 2.9 -0.6 c 0.8 -0.4 1.5 -1 2 -1.7 c 0.5 -0.8 0.9 -1.7 1.2 -2.8 C 186.7 144.1 186.8 142.9 186.8 141.5" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -89.06 -1.25)" clip-path="url(#CLIPPATH_43)"  >
+                            <clipPath id="CLIPPATH_43" >
+                                <rect transform="matrix(1 0 0 1 196.1 4.45)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-203.9, -135.25)" d="M 207.6 154.5 c 0 0.2 -0.1 0.4 -0.2 0.5 s -0.3 0.3 -0.6 0.4 c -0.3 0.1 -0.7 0.2 -1.1 0.2 c -0.5 0 -1.1 0.1 -1.8 0.1 c -0.7 0 -1.3 0 -1.8 -0.1 c -0.5 0 -0.8 -0.1 -1.1 -0.2 c -0.3 -0.1 -0.5 -0.2 -0.6 -0.4 c -0.1 -0.1 -0.2 -0.3 -0.2 -0.5 V 116 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.2 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 -0.1 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0.1 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.2 0.2 0.3 0.2 0.5 V 154.5 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -81.85 -1.07)" clip-path="url(#CLIPPATH_44)"  >
+                            <clipPath id="CLIPPATH_44" >
+                                <rect transform="matrix(1 0 0 1 181.4 4.05)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-218.6, -135.65)" d="M 222.9 119.5 c 0 1.5 -0.3 2.5 -0.9 3.1 s -1.7 0.8 -3.4 0.8 c -1.7 0 -2.8 -0.3 -3.4 -0.8 c -0.6 -0.5 -0.9 -1.5 -0.9 -3 c 0 -1.5 0.3 -2.5 0.9 -3.1 c 0.6 -0.6 1.7 -0.9 3.4 -0.9 c 1.6 0 2.8 0.3 3.3 0.8 C 222.6 117.1 222.9 118.1 222.9 119.5 M 222.4 154.5 c 0 0.2 -0.1 0.4 -0.2 0.5 s -0.3 0.3 -0.6 0.4 c -0.3 0.1 -0.7 0.2 -1.1 0.2 c -0.5 0 -1.1 0.1 -1.8 0.1 c -0.7 0 -1.3 0 -1.8 -0.1 c -0.5 0 -0.8 -0.1 -1.1 -0.2 c -0.3 -0.1 -0.5 -0.2 -0.6 -0.4 c -0.1 -0.1 -0.2 -0.3 -0.2 -0.5 v -26.1 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.1 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 -0.1 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0.1 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.1 0.2 0.3 0.2 0.5 V 154.5 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -71.96 1.69)" clip-path="url(#CLIPPATH_45)"  >
+                            <clipPath id="CLIPPATH_45" >
+                                <rect transform="matrix(1 0 0 1 161.2 -1.9)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-238.8, -141.6)" d="M 249.5 150.4 c 0 0.5 0 0.9 0 1.3 c 0 0.3 -0.1 0.6 -0.1 0.9 c 0 0.2 -0.1 0.4 -0.2 0.6 c -0.1 0.1 -0.2 0.3 -0.5 0.6 c -0.2 0.2 -0.6 0.5 -1.2 0.8 c -0.6 0.3 -1.2 0.6 -1.9 0.9 c -0.7 0.3 -1.5 0.5 -2.4 0.6 c -0.8 0.2 -1.7 0.2 -2.6 0.2 c -2 0 -3.8 -0.3 -5.4 -0.9 c -1.6 -0.6 -2.9 -1.5 -3.9 -2.8 c -1.1 -1.2 -1.9 -2.7 -2.4 -4.5 c -0.5 -1.8 -0.8 -3.8 -0.8 -6 c 0 -2.6 0.3 -4.9 1 -6.8 c 0.7 -1.9 1.6 -3.5 2.7 -4.7 c 1.2 -1.2 2.6 -2.2 4.2 -2.8 c 1.6 -0.6 3.4 -0.9 5.3 -0.9 c 0.8 0 1.5 0.1 2.3 0.2 c 0.8 0.1 1.5 0.3 2.1 0.6 c 0.7 0.2 1.2 0.5 1.8 0.8 c 0.5 0.3 0.9 0.5 1.1 0.8 c 0.2 0.2 0.4 0.4 0.5 0.5 c 0.1 0.1 0.2 0.3 0.2 0.6 c 0 0.2 0.1 0.5 0.1 0.9 c 0 0.3 0 0.8 0 1.2 c 0 1.1 -0.1 1.9 -0.3 2.4 c -0.2 0.5 -0.4 0.7 -0.8 0.7 c -0.3 0 -0.7 -0.1 -1.1 -0.4 s -0.8 -0.6 -1.3 -0.9 c -0.5 -0.3 -1.1 -0.6 -1.8 -0.9 c -0.7 -0.3 -1.5 -0.4 -2.5 -0.4 c -1.9 0 -3.4 0.7 -4.4 2.2 c -1 1.5 -1.5 3.6 -1.5 6.5 c 0 1.4 0.1 2.6 0.4 3.7 c 0.3 1.1 0.6 2 1.1 2.7 c 0.5 0.7 1.1 1.3 1.9 1.6 s 1.6 0.5 2.6 0.5 c 1 0 1.9 -0.2 2.6 -0.5 c 0.7 -0.3 1.4 -0.6 1.9 -1 c 0.5 -0.4 1 -0.7 1.4 -1 c 0.4 -0.3 0.7 -0.5 0.9 -0.5 c 0.2 0 0.3 0.1 0.4 0.1 c 0.1 0.1 0.2 0.3 0.3 0.5 c 0.1 0.3 0.1 0.6 0.2 1 C 249.5 149.2 249.5 149.7 249.5 150.4" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -61.18 -1.39)" clip-path="url(#CLIPPATH_46)"  >
+                            <clipPath id="CLIPPATH_46" >
+                                <rect transform="matrix(1 0 0 1 139.2 4.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-260.8, -134.95)" d="M 262.2 154.5 c 0 0.2 -0.1 0.4 -0.2 0.5 c -0.1 0.1 -0.3 0.3 -0.6 0.4 c -0.3 0.1 -0.7 0.2 -1.1 0.2 c -0.5 0 -1.1 0.1 -1.8 0.1 c -0.7 0 -1.3 0 -1.8 -0.1 c -0.5 0 -0.8 -0.1 -1.1 -0.2 c -0.3 -0.1 -0.5 -0.2 -0.6 -0.4 c -0.1 -0.1 -0.2 -0.3 -0.2 -0.5 v -26.2 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.1 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 0 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.1 0.2 0.3 0.2 0.5 V 154.5 z M 259.4 115.5 c 0.1 -0.2 0.3 -0.4 0.5 -0.6 c 0.2 -0.2 0.4 -0.3 0.7 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.4 0 1 -0.1 1.6 -0.1 c 0.9 0 1.6 0 2.1 0.1 c 0.5 0.1 0.9 0.2 1.1 0.3 c 0.2 0.1 0.3 0.3 0.3 0.5 c 0 0.2 -0.1 0.4 -0.3 0.6 l -5.7 6.8 c -0.2 0.2 -0.3 0.4 -0.5 0.5 c -0.2 0.1 -0.4 0.2 -0.6 0.3 c -0.2 0.1 -0.6 0.1 -0.9 0.2 c -0.4 0 -0.8 0.1 -1.4 0.1 c -0.7 0 -1.2 0 -1.6 -0.1 c -0.4 -0.1 -0.7 -0.2 -0.8 -0.3 c -0.2 -0.1 -0.2 -0.3 -0.2 -0.5 c 0 -0.2 0.1 -0.4 0.3 -0.7 L 259.4 115.5 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -53.83 0.14)" clip-path="url(#CLIPPATH_47)"  >
+                            <clipPath id="CLIPPATH_47" >
+                                <rect transform="matrix(1 0 0 1 124.2 1.45)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-275.8, -138.25)" d="M 285.1 151.9 c 0 0.9 -0.1 1.5 -0.2 2 c -0.1 0.5 -0.2 0.8 -0.4 1 c -0.2 0.2 -0.4 0.4 -0.8 0.5 c -0.3 0.1 -0.7 0.3 -1.2 0.4 c -0.5 0.1 -1 0.2 -1.5 0.2 c -0.5 0.1 -1.1 0.1 -1.6 0.1 c -1.5 0 -2.7 -0.2 -3.8 -0.6 c -1.1 -0.4 -2 -0.9 -2.7 -1.7 c -0.7 -0.8 -1.2 -1.7 -1.6 -2.9 c -0.3 -1.2 -0.5 -2.6 -0.5 -4.2 v -13.4 h -3.1 c -0.4 0 -0.7 -0.2 -0.9 -0.7 c -0.2 -0.5 -0.3 -1.2 -0.3 -2.3 c 0 -0.6 0 -1 0.1 -1.4 c 0 -0.4 0.1 -0.7 0.2 -0.9 c 0.1 -0.2 0.2 -0.4 0.4 -0.5 c 0.1 -0.1 0.3 -0.1 0.5 -0.1 h 3.1 v -5.8 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.2 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 0 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0.1 0.9 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.2 0.2 0.3 0.2 0.5 v 5.8 h 5.7 c 0.2 0 0.4 0 0.5 0.1 c 0.1 0.1 0.3 0.3 0.4 0.5 c 0.1 0.2 0.2 0.5 0.2 0.9 c 0 0.4 0.1 0.9 0.1 1.4 c 0 1.1 -0.1 1.8 -0.3 2.3 c -0.2 0.5 -0.5 0.7 -0.9 0.7 h -5.7 v 12.3 c 0 1.4 0.2 2.5 0.7 3.2 c 0.4 0.7 1.2 1.1 2.4 1.1 c 0.4 0 0.7 0 1.1 -0.1 c 0.3 -0.1 0.6 -0.1 0.8 -0.2 c 0.2 -0.1 0.4 -0.2 0.6 -0.2 c 0.2 -0.1 0.3 -0.1 0.5 -0.1 c 0.1 0 0.2 0 0.3 0.1 c 0.1 0.1 0.2 0.2 0.2 0.4 c 0.1 0.2 0.1 0.5 0.2 0.8 C 285 150.9 285.1 151.4 285.1 151.9" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -41.87 1.62)" clip-path="url(#CLIPPATH_48)"  >
+                            <clipPath id="CLIPPATH_48" >
+                                <rect transform="matrix(1 0 0 1 99.8 -1.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-300.2, -141.45)" d="M 312.1 154.6 c 0 0.3 -0.1 0.5 -0.3 0.6 c -0.2 0.2 -0.5 0.3 -0.9 0.3 c -0.4 0.1 -1 0.1 -1.9 0.1 c -0.9 0 -1.5 0 -1.9 -0.1 c -0.4 -0.1 -0.7 -0.2 -0.9 -0.3 c -0.2 -0.2 -0.2 -0.4 -0.2 -0.6 v -2.1 c -1.1 1.2 -2.3 2.1 -3.7 2.7 c -1.4 0.6 -2.9 1 -4.6 1 c -1.4 0 -2.7 -0.2 -3.8 -0.5 c -1.2 -0.4 -2.2 -0.9 -3 -1.6 c -0.9 -0.7 -1.5 -1.6 -2 -2.7 c -0.5 -1.1 -0.7 -2.3 -0.7 -3.7 c 0 -1.5 0.3 -2.8 0.9 -4 c 0.6 -1.1 1.5 -2.1 2.7 -2.8 c 1.2 -0.7 2.7 -1.3 4.4 -1.6 c 1.8 -0.4 3.8 -0.5 6.1 -0.5 h 2.6 v -1.6 c 0 -0.8 -0.1 -1.5 -0.2 -2.2 c -0.2 -0.6 -0.4 -1.1 -0.8 -1.5 c -0.4 -0.4 -0.9 -0.7 -1.5 -0.9 c -0.6 -0.2 -1.4 -0.3 -2.4 -0.3 c -1.2 0 -2.3 0.1 -3.3 0.4 c -1 0.3 -1.8 0.6 -2.6 0.9 c -0.7 0.3 -1.4 0.6 -1.9 0.9 c -0.5 0.3 -0.9 0.4 -1.2 0.4 c -0.2 0 -0.4 -0.1 -0.6 -0.2 c -0.2 -0.1 -0.3 -0.3 -0.4 -0.6 c -0.1 -0.3 -0.2 -0.6 -0.2 -0.9 c -0.1 -0.4 -0.1 -0.8 -0.1 -1.2 c 0 -0.6 0 -1.1 0.1 -1.4 c 0.1 -0.4 0.3 -0.7 0.6 -1 c 0.3 -0.3 0.8 -0.6 1.4 -0.9 c 0.7 -0.3 1.5 -0.7 2.4 -1 c 0.9 -0.3 1.9 -0.5 3 -0.7 c 1.1 -0.2 2.2 -0.3 3.4 -0.3 c 2.1 0 3.8 0.2 5.3 0.6 c 1.5 0.4 2.7 1 3.6 1.8 c 0.9 0.8 1.6 1.9 2.1 3.2 c 0.4 1.3 0.6 2.9 0.6 4.7 V 154.6 z M 304.9 143.4 H 302 c -1.2 0 -2.2 0.1 -3 0.3 c -0.8 0.2 -1.5 0.4 -2.1 0.8 c -0.5 0.4 -0.9 0.8 -1.2 1.3 c -0.2 0.5 -0.4 1.1 -0.4 1.7 c 0 1.1 0.3 2 1 2.6 c 0.7 0.6 1.7 0.9 2.9 0.9 c 1 0 2 -0.3 2.9 -0.8 c 0.9 -0.5 1.8 -1.3 2.7 -2.3 V 143.4 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -30.65 -1.25)" clip-path="url(#CLIPPATH_49)"  >
+                            <clipPath id="CLIPPATH_49" >
+                                <rect transform="matrix(1 0 0 1 76.9 4.45)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-323.1, -135.25)" d="M 326.8 154.5 c 0 0.2 -0.1 0.4 -0.2 0.5 s -0.3 0.3 -0.6 0.4 c -0.3 0.1 -0.7 0.2 -1.1 0.2 c -0.5 0 -1.1 0.1 -1.8 0.1 c -0.7 0 -1.3 0 -1.8 -0.1 c -0.5 0 -0.8 -0.1 -1.1 -0.2 c -0.3 -0.1 -0.5 -0.2 -0.6 -0.4 c -0.1 -0.1 -0.2 -0.3 -0.2 -0.5 V 116 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.2 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 -0.1 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0.1 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.2 0.2 0.3 0.2 0.5 V 154.5 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 -19.16 1.62)" clip-path="url(#CLIPPATH_50)"  >
+                            <clipPath id="CLIPPATH_50" >
+                                <rect transform="matrix(1 0 0 1 53.45 -1.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-346.55, -141.45)" d="M 360.6 141.2 c 0 2.2 -0.3 4.3 -0.9 6.1 c -0.6 1.8 -1.5 3.4 -2.7 4.7 c -1.2 1.3 -2.7 2.4 -4.5 3.1 c -1.8 0.7 -3.9 1.1 -6.3 1.1 c -2.3 0 -4.3 -0.3 -6.1 -1 c -1.7 -0.6 -3.1 -1.6 -4.3 -2.8 c -1.1 -1.2 -2 -2.7 -2.5 -4.5 s -0.8 -3.9 -0.8 -6.2 c 0 -2.2 0.3 -4.3 0.9 -6.1 c 0.6 -1.8 1.5 -3.4 2.7 -4.7 c 1.2 -1.3 2.7 -2.3 4.5 -3.1 c 1.8 -0.7 3.9 -1.1 6.3 -1.1 c 2.3 0 4.4 0.3 6.1 1 c 1.7 0.6 3.1 1.6 4.3 2.8 c 1.1 1.2 2 2.7 2.5 4.5 C 360.4 136.8 360.6 138.9 360.6 141.2 M 353.1 141.5 c 0 -1.3 -0.1 -2.5 -0.3 -3.6 c -0.2 -1.1 -0.6 -2 -1 -2.8 c -0.5 -0.8 -1.1 -1.4 -1.9 -1.9 c -0.8 -0.4 -1.8 -0.7 -3.1 -0.7 c -1.1 0 -2.1 0.2 -2.9 0.6 c -0.8 0.4 -1.5 1 -2 1.8 c -0.5 0.8 -0.9 1.7 -1.2 2.8 c -0.3 1.1 -0.4 2.3 -0.4 3.7 c 0 1.3 0.1 2.5 0.3 3.6 c 0.2 1.1 0.6 2 1 2.8 c 0.5 0.8 1.1 1.4 2 1.9 c 0.8 0.4 1.8 0.7 3 0.7 c 1.1 0 2.1 -0.2 2.9 -0.6 c 0.8 -0.4 1.5 -1 2 -1.7 c 0.5 -0.8 0.9 -1.7 1.2 -2.8 C 352.9 144.1 353.1 142.9 353.1 141.5" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 2.38 1.62)" clip-path="url(#CLIPPATH_51)"  >
+                            <clipPath id="CLIPPATH_51" >
+                                <rect transform="matrix(1 0 0 1 9.5 -1.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-390.5, -141.45)" d="M 402.3 154.6 c 0 0.3 -0.1 0.5 -0.3 0.6 c -0.2 0.2 -0.5 0.3 -0.9 0.3 c -0.4 0.1 -1 0.1 -1.9 0.1 c -0.9 0 -1.5 0 -1.9 -0.1 c -0.4 -0.1 -0.7 -0.2 -0.8 -0.3 c -0.2 -0.2 -0.2 -0.4 -0.2 -0.6 v -2.1 c -1.1 1.2 -2.3 2.1 -3.7 2.7 c -1.4 0.6 -2.9 1 -4.6 1 c -1.4 0 -2.7 -0.2 -3.8 -0.5 c -1.2 -0.4 -2.2 -0.9 -3 -1.6 c -0.9 -0.7 -1.5 -1.6 -2 -2.7 c -0.5 -1.1 -0.7 -2.3 -0.7 -3.7 c 0 -1.5 0.3 -2.8 0.9 -4 c 0.6 -1.1 1.5 -2.1 2.7 -2.8 c 1.2 -0.7 2.7 -1.3 4.4 -1.6 c 1.8 -0.4 3.8 -0.5 6.1 -0.5 h 2.6 v -1.6 c 0 -0.8 -0.1 -1.5 -0.2 -2.2 c -0.2 -0.6 -0.4 -1.1 -0.8 -1.5 c -0.4 -0.4 -0.9 -0.7 -1.5 -0.9 c -0.6 -0.2 -1.4 -0.3 -2.4 -0.3 c -1.2 0 -2.3 0.1 -3.3 0.4 c -1 0.3 -1.8 0.6 -2.6 0.9 c -0.7 0.3 -1.4 0.6 -1.9 0.9 c -0.5 0.3 -0.9 0.4 -1.2 0.4 c -0.2 0 -0.4 -0.1 -0.6 -0.2 c -0.2 -0.1 -0.3 -0.3 -0.4 -0.6 c -0.1 -0.3 -0.2 -0.6 -0.2 -0.9 c -0.1 -0.4 -0.1 -0.8 -0.1 -1.2 c 0 -0.6 0 -1.1 0.1 -1.4 c 0.1 -0.4 0.3 -0.7 0.6 -1 c 0.3 -0.3 0.8 -0.6 1.4 -0.9 c 0.7 -0.3 1.5 -0.7 2.4 -1 c 0.9 -0.3 1.9 -0.5 3 -0.7 c 1.1 -0.2 2.2 -0.3 3.4 -0.3 c 2.1 0 3.8 0.2 5.3 0.6 c 1.5 0.4 2.7 1 3.6 1.8 c 0.9 0.8 1.6 1.9 2.1 3.2 c 0.4 1.3 0.6 2.9 0.6 4.7 V 154.6 z M 395.1 143.4 h -2.8 c -1.2 0 -2.2 0.1 -3 0.3 c -0.8 0.2 -1.5 0.4 -2.1 0.8 c -0.5 0.4 -0.9 0.8 -1.2 1.3 c -0.2 0.5 -0.4 1.1 -0.4 1.7 c 0 1.1 0.3 2 1 2.6 c 0.7 0.6 1.7 0.9 2.9 0.9 c 1 0 2 -0.3 2.9 -0.8 c 0.9 -0.5 1.8 -1.3 2.7 -2.3 V 143.4 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 17.44 3.94)" clip-path="url(#CLIPPATH_52)"  >
+                            <clipPath id="CLIPPATH_52" >
+                                <rect transform="matrix(1 0 0 1 -21.25 -6.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-421.25, -146.45)" d="M 434.5 164.9 c 0 0.2 -0.1 0.4 -0.2 0.5 c -0.1 0.2 -0.3 0.3 -0.6 0.4 c -0.3 0.1 -0.6 0.2 -1.1 0.2 c -0.5 0.1 -1.1 0.1 -1.8 0.1 c -0.7 0 -1.3 0 -1.8 -0.1 s -0.8 -0.1 -1.1 -0.2 c -0.3 -0.1 -0.5 -0.2 -0.6 -0.4 c -0.1 -0.2 -0.2 -0.3 -0.2 -0.5 v -12.4 c -0.7 0.6 -1.4 1.2 -2.1 1.7 c -0.7 0.5 -1.3 0.9 -2 1.2 c -0.7 0.3 -1.3 0.5 -2.1 0.7 c -0.7 0.1 -1.4 0.2 -2.2 0.2 c -1.9 0 -3.5 -0.4 -4.9 -1.2 c -1.3 -0.8 -2.4 -1.8 -3.3 -3.1 c -0.8 -1.3 -1.5 -2.8 -1.9 -4.6 c -0.4 -1.7 -0.6 -3.6 -0.6 -5.5 c 0 -2.3 0.3 -4.4 0.8 -6.3 c 0.5 -1.9 1.3 -3.4 2.2 -4.7 c 1 -1.3 2.2 -2.3 3.6 -3 c 1.4 -0.7 3.1 -1.1 5 -1.1 c 0.7 0 1.4 0.1 2.1 0.2 c 0.7 0.1 1.3 0.4 2 0.8 s 1.4 0.8 2.1 1.4 c 0.7 0.6 1.5 1.3 2.4 2.1 v -2.8 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.1 0.3 -0.3 0.5 -0.4 c 0.2 -0.1 0.6 -0.2 1 -0.2 c 0.4 0 0.9 -0.1 1.5 -0.1 c 0.6 0 1.1 0 1.5 0.1 c 0.4 0 0.7 0.1 1 0.2 c 0.2 0.1 0.4 0.2 0.5 0.4 c 0.1 0.1 0.1 0.3 0.1 0.5 V 164.9 z M 427.2 137 c -1.1 -1.3 -2.1 -2.3 -3 -3 c -1 -0.7 -2 -1.1 -3 -1.1 c -1 0 -1.8 0.2 -2.5 0.7 c -0.7 0.5 -1.3 1.1 -1.7 1.9 c -0.4 0.8 -0.7 1.7 -0.9 2.7 c -0.2 1 -0.3 2 -0.3 3 c 0 1.1 0.1 2.2 0.3 3.2 c 0.2 1 0.5 2 0.9 2.8 c 0.4 0.8 0.9 1.4 1.6 1.9 c 0.7 0.5 1.5 0.7 2.5 0.7 c 0.5 0 1 -0.1 1.5 -0.2 c 0.5 -0.1 1 -0.4 1.5 -0.7 c 0.5 -0.3 1 -0.8 1.5 -1.3 c 0.5 -0.5 1.1 -1.2 1.7 -2 V 137 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 33.66 1.74)" clip-path="url(#CLIPPATH_53)"  >
+                            <clipPath id="CLIPPATH_53" >
+                                <rect transform="matrix(1 0 0 1 -54.35 -2)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-454.35, -141.7)" d="M 466.7 154.5 c 0 0.2 0 0.4 -0.1 0.5 c -0.1 0.1 -0.3 0.3 -0.5 0.4 c -0.2 0.1 -0.6 0.2 -1 0.2 c -0.4 0 -0.9 0.1 -1.5 0.1 c -0.6 0 -1.2 0 -1.6 -0.1 c -0.4 0 -0.7 -0.1 -1 -0.2 c -0.2 -0.1 -0.4 -0.2 -0.5 -0.4 c -0.1 -0.1 -0.1 -0.3 -0.1 -0.5 v -3 c -1.4 1.6 -2.9 2.7 -4.4 3.5 c -1.5 0.8 -3 1.2 -4.6 1.2 c -1.8 0 -3.3 -0.3 -4.5 -0.9 c -1.2 -0.6 -2.2 -1.4 -3 -2.4 c -0.8 -1 -1.3 -2.2 -1.6 -3.5 c -0.3 -1.3 -0.5 -3 -0.5 -5 v -16 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.1 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 0 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.1 0.2 0.3 0.2 0.5 v 14.8 c 0 1.4 0.1 2.4 0.3 3.1 c 0.2 0.7 0.4 1.3 0.8 1.9 c 0.4 0.5 0.8 0.9 1.4 1.2 c 0.6 0.3 1.2 0.4 2 0.4 c 0.9 0 1.9 -0.3 2.8 -1 c 0.9 -0.7 2 -1.7 3 -3 v -17.4 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.1 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 0 1.1 -0.1 1.8 -0.1 s 1.3 0 1.8 0.1 c 0.5 0 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.1 0.2 0.3 0.2 0.5 V 154.5 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 46.28 -1.39)" clip-path="url(#CLIPPATH_54)"  >
+                            <clipPath id="CLIPPATH_54" >
+                                <rect transform="matrix(1 0 0 1 -80.1 4.75)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-480.1, -134.95)" d="M 481.5 154.5 c 0 0.2 -0.1 0.4 -0.2 0.5 c -0.1 0.1 -0.3 0.3 -0.6 0.4 s -0.7 0.2 -1.1 0.2 c -0.5 0 -1.1 0.1 -1.8 0.1 c -0.7 0 -1.3 0 -1.8 -0.1 c -0.5 0 -0.8 -0.1 -1.1 -0.2 c -0.3 -0.1 -0.5 -0.2 -0.6 -0.4 c -0.1 -0.1 -0.2 -0.3 -0.2 -0.5 v -26.2 c 0 -0.2 0.1 -0.4 0.2 -0.5 c 0.1 -0.1 0.3 -0.3 0.6 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.5 0 1.1 -0.1 1.8 -0.1 c 0.7 0 1.3 0 1.8 0.1 c 0.5 0 0.8 0.1 1.1 0.2 c 0.3 0.1 0.5 0.2 0.6 0.4 c 0.1 0.1 0.2 0.3 0.2 0.5 V 154.5 z M 478.7 115.5 c 0.1 -0.2 0.3 -0.4 0.5 -0.6 c 0.2 -0.2 0.4 -0.3 0.7 -0.4 c 0.3 -0.1 0.7 -0.2 1.1 -0.2 c 0.4 0 1 -0.1 1.6 -0.1 c 0.9 0 1.6 0 2.1 0.1 c 0.5 0.1 0.9 0.2 1.1 0.3 c 0.2 0.1 0.3 0.3 0.3 0.5 c 0 0.2 -0.1 0.4 -0.3 0.6 l -5.7 6.8 c -0.2 0.2 -0.3 0.4 -0.5 0.5 c -0.2 0.1 -0.4 0.2 -0.6 0.3 c -0.2 0.1 -0.6 0.1 -0.9 0.2 c -0.4 0 -0.8 0.1 -1.4 0.1 c -0.7 0 -1.2 0 -1.6 -0.1 c -0.4 -0.1 -0.7 -0.2 -0.8 -0.3 c -0.2 -0.1 -0.2 -0.3 -0.2 -0.5 c 0 -0.2 0.1 -0.4 0.3 -0.7 L 478.7 115.5 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 54.07 -1.18)" clip-path="url(#CLIPPATH_55)"  >
+                            <clipPath id="CLIPPATH_55" >
+                                <rect transform="matrix(1 0 0 1 -96 4.3)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-496, -135.4)" d="M 500.2 151.7 c 0 0.8 -0.1 1.5 -0.2 2 c -0.1 0.5 -0.4 1 -0.7 1.3 c -0.3 0.3 -0.7 0.6 -1.3 0.7 c -0.5 0.1 -1.2 0.2 -2 0.2 s -1.5 -0.1 -2 -0.2 c -0.5 -0.1 -1 -0.4 -1.3 -0.7 c -0.3 -0.3 -0.5 -0.8 -0.7 -1.3 c -0.1 -0.5 -0.2 -1.2 -0.2 -2 c 0 -0.8 0.1 -1.5 0.2 -2.1 c 0.1 -0.6 0.3 -1 0.7 -1.3 c 0.3 -0.3 0.7 -0.6 1.3 -0.7 c 0.5 -0.1 1.2 -0.2 2 -0.2 s 1.5 0.1 2 0.2 c 0.5 0.1 1 0.4 1.3 0.7 c 0.3 0.3 0.5 0.8 0.7 1.3 C 500.1 150.2 500.2 150.9 500.2 151.7 M 499.3 143.1 c 0 0.2 -0.1 0.4 -0.2 0.5 c -0.1 0.2 -0.3 0.3 -0.5 0.4 c -0.2 0.1 -0.6 0.2 -1 0.2 c -0.4 0.1 -0.9 0.1 -1.5 0.1 c -0.6 0 -1.1 0 -1.6 -0.1 c -0.4 -0.1 -0.7 -0.1 -1 -0.2 c -0.2 -0.1 -0.4 -0.2 -0.5 -0.4 c -0.1 -0.2 -0.2 -0.3 -0.2 -0.5 l -0.8 -26.6 c 0 -0.3 0.1 -0.5 0.2 -0.7 c 0.1 -0.2 0.3 -0.4 0.6 -0.5 c 0.3 -0.1 0.7 -0.2 1.2 -0.3 c 0.5 -0.1 1.2 -0.1 2 -0.1 c 0.8 0 1.4 0 1.9 0.1 c 0.5 0.1 0.9 0.2 1.2 0.3 c 0.3 0.1 0.5 0.3 0.6 0.5 s 0.2 0.4 0.2 0.7 L 499.3 143.1 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 112.08 0.64)" clip-path="url(#CLIPPATH_56)"  >
+                            <clipPath id="CLIPPATH_56" >
+                                <rect transform="matrix(1 0 0 1 -214.39 0.37)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-614.39, -139.33)" d="M 666 139.4 c 0 7.8 0 15.7 0 23.5 c 0 5.1 -2.5 8.4 -7.4 10 c -10.2 3.3 -20.4 2.6 -30.6 0.3 c -8.4 -1.9 -16.6 -4.2 -25 -6.2 c -9.6 -2.2 -19.2 -3.5 -29 -1.3 c -1.8 0.4 -3.5 0.9 -5.3 1.5 c -3.7 1.2 -6 -0.4 -6 -4.2 c 0 -16 0 -32 0 -48 c 0 -3.9 2.7 -7.6 6.4 -8.9 c 7.9 -2.8 16.1 -3.2 24.3 -1.8 c 8.5 1.5 17 3.7 25.4 5.7 c 8.5 2.1 17 4.2 25.8 4.1 c 5 -0.1 9.9 -0.7 14.6 -2.4 c 0.6 -0.2 1.1 -0.4 1.7 -0.5 c 3 -0.7 4.9 0.7 5 3.8 c 0.1 4.2 0.1 8.3 0.1 12.5 C 666.1 131.4 666.1 135.4 666 139.4 L 666 139.4 z M 659.9 142.2 c 0 -3.8 0 -7.7 0 -11.5 c 0 -1.4 -0.6 -1.9 -2 -1.9 c -4.5 0.1 -7.4 -2.1 -8.6 -6.5 c -0.4 -1.5 -1.1 -2.3 -2.8 -2.2 c -6.2 0.3 -12.3 -0.4 -18.3 -1.8 c -8.8 -2 -17.5 -4.3 -26.3 -6.4 c -6.5 -1.5 -13.2 -2.5 -19.9 -2.2 c -1.3 0.1 -2.4 0.5 -2.6 1.9 c -1.1 5.1 -4.3 8.4 -8.8 10.8 c -1.4 0.7 -2 1.8 -2 3.4 c 0 7.3 0 14.7 0 22 c 0 1.9 0.3 2.1 2.2 2.1 c 4.2 0 7.2 2.3 8.3 6.3 c 0.6 2.3 0.9 2.2 3.3 2.4 c 5.4 0.4 10.9 0.5 16.2 1.6 c 8.6 1.7 17 4.1 25.5 6.2 c 7.3 1.8 14.7 2.9 22.3 2.6 c 1.3 -0.1 2.4 -0.3 2.7 -1.7 c 1.1 -5.1 4.4 -8.4 8.9 -10.7 c 1.3 -0.7 1.9 -1.8 1.9 -3.3 C 659.9 149.6 659.9 145.9 659.9 142.2" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 112.09 0.7)" clip-path="url(#CLIPPATH_57)"  >
+                            <clipPath id="CLIPPATH_57" >
+                                <rect transform="matrix(1 0 0 1 -214.4 0.25)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-614.4, -139.45)" d="M 614.5 119.7 c -11 0 -19.8 8.7 -19.8 19.7 c 0 10.9 8.7 19.8 19.6 19.8 c 10.9 0 19.7 -8.7 19.8 -19.6 C 634 128.6 625.3 119.8 614.5 119.7 M 612 148.3 c -1.4 0.6 -3.1 0.9 -5 0.9 c -1.6 0 -3.1 -0.2 -4.5 -0.5 c -0.3 -0.1 -0.5 -0.1 -0.7 -0.2 c -1.5 -0.4 -2.2 -2.1 -1.5 -3.5 l 0.1 -0.1 c 0.6 -1.1 1.9 -1.6 3.1 -1.2 c 1.4 0.5 2.8 0.8 4.2 0.8 c 0.8 0 1.4 -0.1 1.8 -0.3 c 0.4 -0.2 0.6 -0.5 0.6 -0.8 c 0 -0.3 -0.2 -0.6 -0.6 -0.8 c -0.4 -0.2 -1.1 -0.4 -2 -0.6 c -1.2 -0.3 -2.2 -0.6 -3.1 -1 c -0.8 -0.3 -1.5 -0.8 -2.1 -1.5 c -0.6 -0.7 -0.9 -1.6 -0.9 -2.7 c 0 -1.4 0.4 -2.6 1.1 -3.7 c 0.7 -1 1.8 -1.9 3.2 -2.4 c 1.4 -0.6 3.1 -0.9 5 -0.9 c 1.4 0 2.7 0.1 3.8 0.4 c 0.1 0 0.2 0 0.3 0.1 c 1.5 0.4 2.3 2.1 1.6 3.5 c -0.4 0.9 -1.3 1.4 -2.2 1.4 c -0.3 0 -0.5 0 -0.8 -0.1 c -0.1 0 -0.3 -0.1 -0.5 -0.1 c -0.9 -0.2 -1.8 -0.3 -2.7 -0.3 c -0.9 0 -1.5 0.1 -2 0.4 c -0.5 0.2 -0.7 0.5 -0.7 0.9 s 0.2 0.6 0.6 0.8 c 0.4 0.2 1.1 0.4 2.1 0.6 c 1.2 0.3 2.2 0.6 3 0.9 c 0.8 0.3 1.5 0.8 2.1 1.5 c 0.6 0.7 0.9 1.5 0.9 2.6 c 0 1.4 -0.4 2.6 -1.1 3.6 C 614.5 147 613.4 147.8 612 148.3 M 618.5 151.1 c -0.4 0.7 -1.1 1.1 -1.9 1.1 c -1.3 0 -2.2 -1 -2.2 -2.2 c 0 -0.3 0.1 -0.7 0.3 -1 l 9.9 -18.2 c 0.4 -0.7 1.1 -1.1 1.9 -1.1 c 1.6 0 2.7 1.8 1.9 3.2 L 618.5 151.1 z" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 127.89 3.15)" clip-path="url(#CLIPPATH_58)"  >
+                            <clipPath id="CLIPPATH_58" >
+                                <rect transform="matrix(1 0 0 1 -246.65 -5.05)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-646.65, -144.75)" d="M 647 138.2 c 3.6 0 6.2 2.4 6.2 5.8 c 0 3.9 -3.3 7.4 -6.9 7.3 c -3.4 -0.1 -6.3 -3.1 -6.2 -6.7 C 640.1 141 643.2 138.2 647 138.2" stroke-linecap="round" />
+                            </g>
+                                <g transform="matrix(0.49 0 0 0.46 96.04 -1.65)" clip-path="url(#CLIPPATH_59)"  >
+                            <clipPath id="CLIPPATH_59" >
+                                <rect transform="matrix(1 0 0 1 -181.65 5.3)" x="-400" y="-139.7" rx="0" ry="0" width="800" height="279.4" />
+                            </clipPath>
+                                    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,110,191); fill-rule: nonzero; opacity: 1;"  transform=" translate(-581.65, -134.4)" d="M 588.2 134.3 c 0 3.7 -3 6.6 -6.9 6.7 c -3.6 0.1 -6.2 -2.4 -6.2 -5.8 c 0 -3.9 3.2 -7.4 6.9 -7.4 C 585.3 127.8 588.2 130.8 588.2 134.3" stroke-linecap="round" />
+                            </g>
+                            </g>
+                            </g>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="tos">
+                    <p>Requisitos</p>
+                    <ul>
+                        <li>- Edad: 21 a 67 años.</li>
+                        <li>- DNI: vigente</li>
+
+                    </ul>
+                </div>
+            </form>
+
+        </section>
+        <div class="wrap-image f f-ww f-ac wrap-image-deuna">
+            <figure>
+                <a th:href="@{/}" class="logoLinkUrl">
+                    <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                        <img class="lazy logo lazy-logo-desktop"
+                             th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/acceso/branding/Prestifacil-pastilla-2.png'}"/>
+                        <img class="lazy logo lazy-logo-mobile" style="display: none"
+                             th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/acceso/branding/logo-prestifacil-pastilla-mobile.png'}"/>
+                    </th:block>
+                </a>
+                <img class="img-landing-background"
+                     src="https://solven-public.s3.amazonaws.com/img/acceso/branding/landing-acceso-solven.jpg"/>
+
+                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                    <div class="bg-degrade"></div>
+                </th:block>
+            </figure>
+            <div class="listado">
+                <ul class="list f f-ac f-jcsb">
+                    <li>Desde S/ 1 000 a S/ 6 500</li>
+                    <li>Tasas desde 49%</li>
+                    <li>De 12 a 24 cuotas</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!--  <div class="poweredBySolvenFirmaDesktop">
+              <svg class="poweredBySolven" viewBox="0 0 128 20">
+                  <path
+                          d="M2.7 5.3c.6 0 1 .1 1.5.2.4.1.7.3 1 .6.3.2.5.5.6.8.1.3.2.7.2 1 0 .4-.1.8-.2 1.1-.1.4-.3.7-.6.9-.3.2-.6.4-1 .6-.4.1-.9.2-1.4.2H1.6v3H0V5.3h2.7zm0 4.2c.3 0 .5 0 .7-.1.3-.1.5-.2.6-.3.1-.1.2-.3.3-.5.1-.2.1-.4.1-.6 0-.2 0-.4-.1-.6S4.2 7 4 6.9c-.1-.2-.3-.3-.5-.3-.2-.1-.5-.1-.8-.1H1.6v3h1.1zM9.3 7.6c.4 0 .8.1 1.2.2.4.1.7.3.9.6.3.3.5.6.6 1 .1.4.2.8.2 1.3s-.1.9-.2 1.3-.3.7-.6 1c-.3.3-.6.5-.9.6-.4.1-.8.2-1.2.2-.4 0-.9-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.1-.4-.2-.8-.2-1.3s.1-.9.2-1.3.3-.7.6-1c.2-.2.5-.4.9-.6.4-.1.8-.2 1.2-.2zm0 5c.5 0 .9-.2 1.1-.5.2-.3.4-.8.4-1.5 0-.6-.1-1.1-.4-1.5-.2-.3-.6-.5-1.1-.5-.5 0-.9.2-1.1.5-.2.5-.4.9-.4 1.6s.1 1.1.4 1.5c.3.3.6.4 1.1.4zM21.8 7.7l-1.9 6h-1.1c-.1 0-.2-.1-.3-.3L17.4 10c0-.1-.1-.2-.1-.3 0-.1-.1-.2-.1-.3 0 .1 0 .2-.1.4 0 .1-.1.2-.1.4l-1 3.2c0 .2-.1.3-.3.3h-1.1l-1.9-6h1.1c.1 0 .2 0 .3.1.1.1.1.1.1.2l.9 3.2c0 .2.1.3.1.5s.1.3.1.5c0-.2.1-.3.1-.5s.1-.3.2-.5l1-3.2c0-.1.1-.1.1-.2.1-.1.1-.1.2-.1h.6c.1 0 .2 0 .3.1l.2.2 1 3.2c.1.2.1.3.1.5s.1.3.1.5c0-.3.1-.7.2-1l.9-3.2c0-.1.1-.1.1-.2.1-.1.2-.1.2-.1h1.2zM23.6 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1s.4 0 .6-.1c.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1h-3.6zm2.7-.9c0-.2 0-.4-.1-.5 0-.2-.1-.3-.2-.5-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM30 8.7c.2-.4.4-.6.7-.8s.6-.3.9-.3c.3 0 .5.1.7.2l-.1 1.1c0 .1 0 .1-.1.1h-.7c-.2 0-.3 0-.4.1-.1 0-.2.1-.3.2l-.3.3c-.1.1-.1.3-.2.4v3.7h-1.4v-6h.8c.1 0 .3 0 .3.1s.1.1.1.3v.6zM34 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1H34zm2.7-.9c0-.2 0-.4-.1-.5-.1-.2-.1-.3-.2-.4-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM44.2 5v8.6h-.9c-.2 0-.3-.1-.4-.3l-.1-.6c-.2.3-.5.5-.8.7-.3.2-.7.3-1.1.3-.3 0-.6-.1-.9-.2-.3-.1-.5-.3-.7-.6-.2-.3-.3-.6-.5-1-.1-.4-.2-.8-.2-1.3 0-.4.1-.9.2-1.2.1-.4.3-.7.5-1 .2-.3.5-.5.8-.7.3-.2.7-.2 1.1-.2.3 0 .6.1.9.2.2.1.4.2.6.4V5h1.5zm-1.4 4.2c-.2-.2-.3-.3-.5-.4-.2-.1-.4-.1-.6-.1-.2 0-.4 0-.6.1-.2.1-.3.2-.4.4l-.3.6c-.1.3-.1.6-.1.9 0 .3 0 .6.1.9.1.2.1.4.2.6.1.2.2.3.4.3.2.1.3.1.5.1.3 0 .6-.1.8-.2.2-.1.4-.3.6-.5V9.2zM49.9 8.4c.2-.3.5-.5.8-.6.3-.1.6-.2 1-.2.3 0 .7.1.9.2.3.1.5.3.7.6.2.3.3.6.5.9.1.4.2.8.2 1.2 0 .5-.1.9-.2 1.3s-.3.7-.5 1c-.2.3-.5.5-.8.7s-.7.2-1 .2c-.2 0-.4 0-.5-.1-.2 0-.3-.1-.4-.2-.1-.1-.2-.1-.4-.2l-.3-.3-.1.4c0 .1-.1.2-.1.2-.1 0-.1.1-.2.1h-.9V5H50v3.4zm0 3.7c.2.2.3.3.5.4.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.2.5-.4l.3-.6c.1-.2.1-.6.1-.9 0-.7-.1-1.1-.3-1.4-.2-.3-.5-.4-.9-.4-.3 0-.5.1-.7.2-.2.1-.4.3-.6.5v2.6zM60.3 7.7l-3.2 7.6c0 .1-.1.2-.2.2-.1.1-.2.1-.3.1h-1.1l1.1-2.4-2.4-5.5h1.3c.1 0 .2 0 .3.1.1.1.1.1.1.2l1.3 3.1c0 .1.1.2.1.3 0 .1.1.2.1.3 0-.1.1-.2.1-.3 0-.1.1-.2.1-.3L58.8 8c0-.1.1-.1.2-.2s.2-.1.2-.1h1.1z"
+                          class="st2" />
+                  <g>
+                      <path
+                              d="M63.6 19.3v-2.7c.9.4 2.3.7 3.5.7 1.3 0 1.8-.4 1.8-1 0-.8-1.1-.9-2.6-1.4-1.5-.5-2.8-1.5-2.8-3.6 0-2.6 2-3.7 4.8-3.7 1.2 0 2.5.2 3.2.5v2.7c-.8-.2-1.8-.5-3-.5-1.1 0-1.6.3-1.6.8 0 .6.5.8 2.1 1.2 1.7.5 3.3 1.4 3.3 3.8 0 2.5-1.9 3.9-4.8 3.9-1.7 0-3-.3-3.9-.7M73.1 13.8c0-3.2 1.9-6.2 6-6.2 4 0 5.9 2.7 5.9 6.2 0 3.2-1.9 6.2-6 6.2-4 0-5.9-2.7-5.9-6.2m8.1 0c0-2.1-.6-3.5-2.1-3.5S77 11.6 77 13.8s.6 3.4 2.1 3.4 2.1-1.2 2.1-3.4M91.4 0H95l-7.3 20h-3.6zM92.9 7.8h3.9l1.7 6.4c.2.7.4 1.9.4 2 0-.2.3-1.4.4-2l1.7-6.4h3.8l-3.9 12h-4.2l-3.8-12zM104.7 13.8c0-3.3 1.9-6.2 5.8-6.2 4 0 5.3 2.7 5.3 5.7 0 .4 0 .8-.1 1.2h-7.2c0 1.7.7 2.7 2.8 2.7 1.5 0 2.8-.3 3.6-.7v2.8c-1.1.4-2.4.7-3.9.7-4.4 0-6.3-2.6-6.3-6.2m7.5-1.4v-.1c0-1-.5-2-1.7-2s-1.8.9-1.9 2.1h3.6zM117.1 7.8h3.6v.9c.7-.5 1.7-1.1 3.3-1.1 2.9 0 3.9 1.8 3.9 4.2v8h-3.7v-7.4c0-1.3-.4-1.9-1.7-1.9-.7 0-1.3.3-1.8.7v8.6H117v-12zM89.9 17.8c0-1.2.9-2.1 2.2-2.1 1.3 0 2.2.9 2.2 2.1s-.8 2.2-2.1 2.2-2.3-1-2.3-2.2"
+                              class="st2" />
+                  </g>
+              </svg>
+          </div>-->
+
+    </main>
+
+    <th:block>
+        <style>
+            @media only screen and (min-width: 500px) {
+                .modal .modal-dialog {
+                    max-width: 90%;
+                }
+            }
+
+            @media only screen and (min-width: 900px) {
+                .modal .modal-dialog {
+                    max-width: 70%;
+                }
+            }
+
+            @media only screen and (min-width: 1215px) {
+                .modal .modal-dialog {
+                    max-width: 55%;
+                }
+            }
+
+            @media only screen and (min-width: 625px) and ( max-width: 800px) {
+                #logoBAZ {
+                    display: flex !important;
+                }
+            }
+
+            @media only screen and ( max-width: 624px) {
+                #logoBAZ span img {
+                    display: none;
+                }
+            }
+
+            .modal-open {
+                overflow-x: hidden !important;
+                overflow-y: hidden !important;
+            }
+
+            .modal {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .modal {
+                background: rgba(0, 0, 0, 0.4);
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 1050;
+                display: none;
+                -webkit-overflow-scrolling: touch;
+                outline: 0;
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: flex-end;
+                padding: 1rem 1rem;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .modal-body {
+                position: relative;
+                padding: 15px;
+                line-height: 1.42857143;
+            }
+
+            .text-justify {
+                text-align: justify;
+            }
+
+            .modal-body p {
+                margin-bottom: 10px;
+                text-align: justify;
+                width: 100%;
+                display: flex;
+                font-size: 14px;
+            }
+
+            .modal ol, ul {
+                margin-top: 0;
+                margin-bottom: 10px;
+                padding-left: 2rem;
+            }
+
+            .modal li {
+                font-size: 14px;
+                margin-left: 10px;
+                /*list-style-type: disc;*/
+            }
+
+            #logoBAZ {
+                background-color: var(--primary-branding-color);
+                display: block;
+                margin-top: 20px;
+                margin-bottom: 30px;
+                text-align: left;
+                padding: 15px;
+                color: #FFF;
+                font-size: 25px;
+                font-weight: bold;
+            }
+        </style>
+        <div class="modal fade" id="modalAzteca" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             style="display: none;">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body text-justify">
+                        <th:block th:replace="politica-privacidad-modal :: politica-privacidad-modal"></th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <div class="azteca-footer"
+         style="text-align: center;background-color: #fff;width: 100%;align-items: center;flex: 1;min-width: 100%;justify-content: center;flex-direction: column;justify-content: center;margin-left: auto;margin-right: auto;display: none">
+        <div style="margin:10px 0; border-top: #000 2px solid; border-bottom: #000 2px solid;width: 100%;">
+            <table style="background-color:#fff" width="100%">
+                <tbody class="" style="width: 100%;">
+                <tr style="display: flex; flex-direction: row; justify-content:center; align-items: center">
+                    <!-- <td id="aztecaRowTCEA">
+                         <img src="https://solven-public.s3.amazonaws.com/img/alfin/PAGOS_TREA.png" alt="" style="max-width:150px;float:right;vertical-align:middle;"/>
+                     </td>-->
+                    <td style="max-width: 950px;padding:10px;font-size:11pt;text-align:left;">
+                        Para mayor información sobre tasas de interés, comisiones y gastos consulte en
+                        <a th:href="@{/}" target="_blank">www.alfinbanco.pe</a>
+                    </td>
+                    <td id="azteca-compromiso-base">
+                        <img src="https://solven-public.s3.amazonaws.com/img/alfin/pagos_sello_compromiso.png" alt=""
+                             style="max-width:125px;float:right;vertical-align:middle;padding:10px;"/>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</th:block>
+<th:block layout:fragment="js">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loanFormValidator = /*[[${userRegisterForm.validator.toJson(#locale)}]]*/ null;
+        var yearFrom = /*[[${yearFrom}]]*/;
+        var yearTo = /*[[${yearTo}]]*/;
+        var countryId = /*[[${@countryContextService.getCountryParamsByRequest(#httpServletRequest).id}]]*/;
+        var registerLoanUrl = /*[[@{/credito-de-consumo-5}]]*/;
+        var externalParams = /*[[${externalParams}]]*/;
+        var removeIframe = false;
+
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            dataLayer.push({'event': 'brandingLandingView'});
+        });
+
+        if (window.location !== window.parent.location) removeIframe = true;
+
+        if (removeIframe) {
+
+        }
+
+        function recursiveRemove() {
+            if (removeIframe) {
+                setTimeout(() => {
+                    if (document.querySelector(".is-iframe")) {
+                        removeIframeCss();
+                        removeIframe = false;
+                    } else recursiveRemove();
+                }, 1000);
+            }
+        }
+
+
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+
+</html>

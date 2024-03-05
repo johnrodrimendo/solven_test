@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <style>
+        .field{
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+        }
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var showFieldRucEsSalud = /*[[${showFieldRucEsSalud}]]*/;
+        var showFieldComapnyNameEsSalud = /*[[${showFieldRucEsSalud}]]*/;
+        var questionId = /*[[${questionId}]]*/;
+        /*]]>*/
+    </script>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q154-155" th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? 'entity-banbif-stylish' : ''">
+            <form id="questionForm" th:object="${form}" class="flex-form-map container px-0 py-0" style="max-width: 100%;">
+                <div class="container container-title container-title-address" style="width: 100%;">
+                    <div class="title-text" th:classappend="${questionId == 155 ? 'title-text-q155' : ''}">
+                        <p style="text-align: left; margin-bottom: 20px; font-weight: 600;padding-left: 0px;width: 100%;"  class="col-xs-12 col-md-3 text-description-address" >
+                            <b th:utext="${tittle}" style="margin-right: 20px;vertical-align: middle"></b>
+                            <label for="complete_info" th:if="${questionId == 155}" class="custom-check" style="display: inline-block;margin-bottom: 0;font-size: 16px">
+                                <span class="check-inner"><i class="icon icon-check"></i></span>
+                                <span class="check-label">Trabajo donde vivo</span>
+                                <input type="checkbox" class="real-check" id="complete_info" th:field="*{homeAddress}"/>
+                            </label>
+                        </p>
+<!--                        <p style="text-align: left; margin-bottom: 20px; font-weight: 600;" th:if="${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}"  class="col-xs-12" th:utext="${tittle}"></p>-->
+                    </div>
+                </div>
+                <div class="third" style="margin-bottom: 10px;" th:if="${questionId == 155}">
+                    <div class="" style="width: 100%">
+                        <div class="field inline col-xs-12 col-sm-12 col-md-4" th:if="${questionId == 155 AND showFieldRucEsSalud }">
+                            <small class="input-help" th:utext="'RUC empleador'" max="100"></small>
+                            <input id="ruc" th:field="*{ruc}" type="text" class="input-outline" placeholder="Ingresa tu ruc"/>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-12 col-sm-12 col-md-4" th:if="${questionId == 155 AND showFieldComapnyNameEsSalud }">
+                            <small class="input-help" th:utext="'Nombre/Razón social empleador'" max="100"></small>
+                            <input id="comanyName" th:field="*{companyName}" type="text" class="input-outline" placeholder="Ingresa tu razón social"/>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="third" style="margin-bottom: 10px;">
+                    <div class="" style="width: 100%">
+                        <div class="field inline col-xs-12 col-sm-12 col-md-4">
+                            <small class="input-help" th:utext="'Departamento'" ></small>
+                            <select th:field="*{departamento}" id="departamento" data-width="230" th:attr="data-placeholder='Seleccione'">
+                                <option value="" hidden="hidden"></option>
+                                <option th:each="top : ${topDepartments}" th:value="${top.id}" th:text="${top.name}"></option>
+                                <option value="null" disabled="disabled">----------</option>
+                                <option th:each="deparment : ${allDepartments}" th:value="${deparment.id}" th:text="${deparment.name}"></option>
+                            </select>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-12 col-sm-12 col-md-4">
+                            <small class="input-help" th:utext="'Provincia'" ></small>
+                            <select th:field="*{provincia}" id="provincia" data-width="230" th:attr="data-placeholder='Seleccione'"></select>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-12 col-sm-12 col-md-4">
+                            <small class="input-help" th:utext="'Distrito'" ></small>
+                            <select class="selec2-item" th:field="*{distrito}" id="district" data-width="230" th:attr="data-placeholder='Seleccione'"></select>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="third" style="margin-bottom: 10px;">
+                    <div class="" style="width: 100%">
+                        <div class="field inline col-xs-12 col-sm-12 col-md-2">
+                            <small class="input-help" th:utext="'Zona'" ></small>
+                            <select id="zoneType" th:field="*{zoneType}" data-width="230" th:attr="data-placeholder='Seleccione'">
+                                <option value="" hidden="hidden"></option>
+                                <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                    <option th:each="area : ${@catalogService.getAreaTypesAcceso()}" th:value="${area.id}" th:text="${area.name}"></option>
+                                </th:block>
+                                <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                    <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                        <option th:each="area : ${@catalogService.getAreaTypesAzteca()}" th:value="${area.id}" th:text="${area.name}"></option>
+                                    </th:block>
+                                    <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                        <option th:each="area : ${@catalogService.getAreaTypesBanBif()}" th:value="${area.id}" th:text="${area.name}"></option>
+                                    </th:block>
+                                </th:block>
+                            </select>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-12 col-sm-12 col-md-3">
+                            <small class="input-help" th:utext="'Nombre'" ></small>
+                            <input id="zoneName" th:field="*{zoneName}" type="text" class="input-outline" placeholder="Escribe tu zona"/>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-12 col-sm-12 col-md-2">
+                            <small class="input-help" th:utext="'Vía'" ></small>
+                            <select id="roadType" th:field="*{roadType}" data-width="230" th:attr="data-placeholder='Seleccione'">
+                                <option value="" hidden="hidden"></option>
+                                <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                    <option th:each="type : ${@catalogService.getStreetTypesAcceso()}"
+                                            th:value="${type.id}" th:text="${type.type}"></option>
+                                </th:block>
+                                <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                    <th:block th:if="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                        <option th:each="type : ${@catalogService.getStreetTypesAzteca()}"
+                                                th:value="${type.id}" th:text="${type.type}"></option>
+                                    </th:block>
+                                    <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                        <option th:each="type : ${@catalogService.getStreetTypesBanBif()}"
+                                                th:value="${type.id}" th:text="${type.type}"></option>
+                                    </th:block>
+                                </th:block>
+                            </select>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-12 col-sm-12 col-md-3">
+                            <small class="input-help" th:utext="'Nombre'" ></small>
+                            <input id="roadName" th:field="*{roadName}" type="text" class="input-outline" placeholder="Escribe tu dirección"/>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-6 col-sm-6 col-md-1">
+                            <small class="input-help" th:utext="'Nro'" ></small>
+                            <input id="houseNumber" th:field="*{houseNumber}" type="text" class="input-outline" />
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline col-xs-6 col-sm-6 col-md-1">
+                            <small class="input-help" th:utext="'Interior/Dept'" ></small>
+                            <input id="interior" th:field="*{interior}" type="text" class="input-outline" />
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="third">
+                    <div class="" style="width: 100%">
+                        <div class="field inline col-xs-12">
+                            <small class="input-help" th:utext="'Referencia'" max="100"></small>
+                            <input id="reference" th:field="*{reference}" type="text" class="input-outline" placeholder="Ingresa una referencia"/>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <th:block th:if="${questionId == 155 and showTermsAndConditions == true}">
+                    <div class="third">
+                        <div class="field inline field-col-3 col-xs-12">
+                            <label for="acceptedTyC" class="custom-check" style="display: block; margin-top: 10px; margin-bottom: 5px">
+                                <span class="check-inner"><i class="icon icon-check"></i></span>
+                                <span class="check-label">Declaro haber leído y aceptar las condiciones:</span>
+                                <input type="checkbox" class="real-check" id="acceptedTyC" th:field="*{acceptedTyC}"/>
+                            </label>
+                            <div class="errorContainer" style="text-align: left;margin-left: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="third">
+                        <div class="field inline field-col-3 col-xs-12" style="text-align: left; margin-left: 25px;">
+                            <p style="margin-top: 0;margin-bottom: 0">
+                                <small>
+                                    <a href="https://www.banbif.com.pe/Portals/0/HojaResumen/Resumen-tarjeta-de-credito-visa.pdf" target="_blank"
+                                       th:text="'- Ver Hoja Resumen del producto'" id="seeProductSummary" style="color: #26CAD3;font-weight: bold;"></a>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="third">
+                        <div class="field inline field-col-3 col-xs-12" style="text-align: left; margin-left: 25px;">
+                            <p style="margin-top: 0;margin-bottom: 0">
+                                <small>
+                                    <a href="https://www.banbif.com.pe/Personas/Tarjeta-de-Credito" target="_blank"
+                                       th:text="'- Información del producto'" id="seeProductInfo" style="color: #26CAD3;font-weight: bold;"></a>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="third">
+                        <div class="field inline field-col-3 col-xs-12" style="text-align: left; margin-left: 25px;">
+                            <p style="margin-top: 0;margin-bottom: 0">
+                                <small>
+                                    <a href="https://www.banbif.com.pe/Portals/0/PDF/Formularios%20Contractuales/Nuevo_contrato/Contrato-cuenta-corriente-especial-tarjeta-de-credito.pdf" target="_blank"
+                                       th:text="'- Contrato Cuenta Corriente Especial Tarjeta de Crédito'" id="seeContractInfo" style="color: #26CAD3;font-weight: bold;"></a>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="third">
+                        <div class="field inline field-col-3 col-xs-12" style="text-align: left;">
+                            <div class="q154" style="margin-top: 10px;">
+                                <div class="row">
+                                    <div class="col-lg-offset-2 col-lg-8">
+                                        <p style="text-align: left;">Elige la dirección de entrega:</p>
+                                    </div>
+                                    <div class="col-lg-offset-2 col-lg-8">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div id="btnHome" class="div-button">
+                                                    <table>
+                                                        <tr>
+                                                            <td style="padding: 10px">
+                                                                <label style="margin-bottom: 0px"><input type="radio" name="addressToSend" class="div-button-radio" value="H" checked="checked"/><span class="div-button-radio-span"></span></label>
+                                                            </td>
+                                                            <td>
+                                                                <div style="text-align: left;">
+                                                                    <div>
+                                                                        <span class="font-div-button">Enviar a dirección vivienda</span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div id="btnWorkplace" class="div-button">
+                                                    <table>
+                                                        <tr>
+                                                            <td style="padding: 10px">
+                                                                <label style="margin-bottom: 0px"><input type="radio" name="addressToSend" class="div-button-radio" value="J"/><span class="div-button-radio-span"></span></label>
+                                                            </td>
+                                                            <td>
+                                                                <div style="text-align: left;">
+                                                                    <div>
+                                                                        <span class="font-div-button">Enviar a dirección laboral</span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+                <div class="field inline field-button" th:classappend="${questionId == 155 ? 'button-q155' : ''}">
+                    <button id="sendButton" type="button" class="button bg-red buttonQ154" th:text="#{button.next}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript" th:if="${questionId == 155}">
+        /*<![CDATA[*/
+
+        $('#btnHome').click(function() {
+            $('input:radio[name="addressToSend"]').filter('[value="H"]').prop('checked', true);
+        });
+
+        $('#btnWorkplace').click(function() {
+            $('input:radio[name="addressToSend"]').filter('[value="J"]').prop('checked', true);
+        });
+
+
+        $('#complete_info').click(function () {
+            var $departameto = $('#departamento');
+            var $provincia = $('#provincia');
+            var $distric = $('#district');
+            if (this.checked) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "GET",
+                    success: function (data) {
+                        $('#manzana').val('');
+                        $('#lote').val('');
+                        var json = JSON.parse(data);
+                        if (json.roadType != null){
+                            $('#roadType option[value="'+json.roadType+'"]').prop('selected', true);
+                            $('#roadType').trigger('change.select2');
+                        }
+                        $('#roadType').val(json.roadType);
+                        if (json.roadName != null)
+                            $('#roadName').val(json.roadName);
+                        if (json.houseNumber != null)
+                            $('#houseNumber').val(json.houseNumber);
+                        if (json.zoneType != null){
+                            $('#zoneType option[value="'+json.zoneType+'"]').prop('selected', true);
+                            $('#zoneType').trigger('change.select2');
+                        }
+                        if (json.zoneName != null)
+                            $('#zoneName').val(json.zoneName);
+                        if (json.reference != null)
+                            $('#reference').val(json.reference);
+                        if (json.departamento != null){
+                            $('#departamento option[value="'+json.departamento+'"]').prop('selected', true);
+                            $departameto.trigger('change.select2');
+                        }
+                        if (json.provincia != null){
+                            if($('#provincia option[value="'+json.provincia+'"]').length > 0){
+                                $('#provincia option[value="'+json.provincia+'"]').prop('selected', true);
+                                $provincia.trigger('change.select2');
+                            }else{
+                                $provincia.html('<option value="' + json.provincia + '">' + json.provinciaLabel + '</option>');
+                                $('#provincia option[value="'+json.provincia+'"]').prop('selected', true);
+                                $provincia.trigger('change.select2');
+                            }
+
+                        }
+                        if (json.distrito != null){
+                            $distric.html('<option value="' + json.distrito + '">' + json.distritoLabel + '</option>');
+                            $('#district option[value="'+json.distrito+'"]').prop('selected', true);
+                            $distric.trigger('change.select2');
+                        }
+                        if (json.interior != null)
+                            $('#interior').val(json.interior);
+                        autocompletedPlace = true;
+                    }
+                }, "homeAddress");
+                $('.mask').remove();
+            }
+            $('#roadType,#zoneType,#departamento,#provincia,#district').on('select2:select', function(){
+                $('#complete_info').prop('checked', false);
+                $('#complete_info').checked();
+            });
+            $('#roadName,#houseNumber,#manzana,#lote,#zoneName,#reference,#postalCode').on('input', function(){
+                $('#complete_info').prop('checked', false);
+                $('#complete_info').checked();
+            });
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var jsonObj = /*[[${jsonLocationDetails}]]*/null;
+        if (jsonObj !== null) {
+            jsonObj = JSON.parse(/*[[${jsonLocationDetails}]]*/null);
+        }
+        if (jsonObj != null || (jsonObj !== null && typeof jsonObj === 'object' && Object.keys(jsonObj).length !== 0)) {
+            $('#departamento option[value="' + jsonObj.departamento + '"]').prop('selected', true);
+            $('#departamento').trigger('change.select2');
+
+            $('#provincia').html('<option value="' + jsonObj.provincia + '">' + jsonObj.provinciaLabel + '</option>');
+            $('#provincia option[value="' + jsonObj.provincia + '"]').prop('selected', true);
+            $('#provincia').trigger('change.select2');
+
+            $('#district').html('<option value="' + jsonObj.distrito + '">' + jsonObj.distritoLabel + '</option>');
+            $('#district option[value="' + jsonObj.distrito + '"]').prop('selected', true);
+            $('#district').trigger('change.select2');
+
+            if (jsonObj.zoneType != null){
+                $('#zoneType option[value="'+jsonObj.zoneType+'"]').prop('selected', true);
+                $('#zoneType').trigger('change.select2');
+            }
+
+            if (jsonObj.roadType != null){
+                $('#roadType option[value="'+jsonObj.roadType+'"]').prop('selected', true);
+                $('#roadType').trigger('change.select2');
+            }
+        }
+        questionFw.initializeFormInputs();
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').on('click', function(){
+            sendForm();
+        });
+
+        function sendForm(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(),
+                        {
+
+                        })
+                }, "");
+            }
+        }
+    </script>
+
+    <script th:inline="javascript" >
+        /*<![CDATA[*/
+
+        var $departameto = $('#departamento');
+        var $provincia = $('#provincia');
+        var $distric = $('#district');
+        var $zoneType = $('#zoneType');
+        var $zoneName = $('#zoneName');
+        var $roadType = $('#roadType');
+        var $roadName = $('#roadName');
+        var $reference = $('#reference');
+        var s = true;
+
+        $zoneName.focusout(function() {
+            $zoneName.val($zoneName.val().trim());
+        });
+
+        $roadName.focusout(function() {
+            $roadName.val($roadName.val().trim());
+        });
+
+        $reference.focusout(function() {
+            $reference.val($reference.val().trim());
+        });
+
+        function SearchInputSelect(){
+            window.setTimeout(function () {
+                $('.select2-search__field')[0].focus();
+            }, 0);
+        }
+
+        $departameto.on('select2:open', function(){
+            SearchInputSelect();
+        });
+
+        $provincia.on('select2:open', function(){
+            SearchInputSelect();
+        });
+
+        $distric.on('select2:open', function(){
+            SearchInputSelect();
+        });
+
+        $distric.on('select2:close', function(){
+            $zoneType.select2('open');
+        });
+
+        $zoneType.on('select2:open', function(){
+            SearchInputSelect();
+        });
+
+        $zoneType.on('select2:close', function(){
+            window.setTimeout(function () {
+                $zoneName.focus();
+            }, 100);
+
+        });
+
+        $roadType.on('select2:open', function(){
+            SearchInputSelect();
+        });
+
+        $roadType.on('select2:close', function(){
+            window.setTimeout(function () {
+                $roadName.focus();
+            }, 100);
+        });
+
+
+        $provincia.select2({
+            "language": {
+                "noResults": function () {
+                    return "No se encontró algún resultado";
+                }
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }
+        });
+
+        var changeDepartment = function() {
+            $departameto.attr('disabled', 'disabled');
+            $provincia.attr('disabled', 'disabled');
+            $distric.attr('disabled', 'disabled');
+            defaultAjax({
+                url: /*[[@{/address/province}]]*/null,
+                data: {
+                    departmentId: $departameto.val()
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var topProvince = arr.find(function (item) {return item.id == "01"});
+                    arr.splice(arr.indexOf(topProvince), 1);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    html += '<option value="' + topProvince.id + '">' + topProvince.name + '</option>';
+                    html += '<option value="null" disabled="disabled">----------</option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                    }
+                    $provincia.html(html);
+                    setTimeout(function() {
+                        $provincia.select2('open');
+                    }, 100);
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                },
+                complete: function() {
+                    $departameto.removeAttr('disabled');
+                    $provincia.removeAttr('disabled');
+                    $distric.removeAttr('disabled');
+                }
+            });
+        };
+
+        var changeProvince = function () {
+            $departameto.attr('disabled', 'disabled');
+            $provincia.attr('disabled', 'disabled');
+            $distric.attr('disabled', 'disabled');
+            defaultAjax({
+                url: /*[[@{/address/district}]]*/null,
+                data: {
+                    departmentId: $departameto.val(),
+                    provinceId: $provincia.val()
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                    }
+                    $distric.html(html);
+
+                    setTimeout(function() {
+                        $distric.select2('open');
+                    }, 100);
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                },
+                complete: function() {
+                    $departameto.removeAttr('disabled');
+                    $provincia.removeAttr('disabled');
+                    $distric.removeAttr('disabled');
+                }
+            });
+        };
+
+        $departameto.on('change', changeDepartment);
+        $provincia.on('change', changeProvince);
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${enableNavigatorLocation != null and  enableNavigatorLocation == true}">
+        /*<![CDATA[*/
+        // Browser geolocation
+        var browserLocation = /*[[${browserLocation}]]*/;
+        if (navigator.geolocation && !browserLocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    },
+                    error: function (xhr, errorJson) {
+                        return;
+                    }
+                }, "navlocation");
+            }, function (error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        console.log("User denied the request for Geolocation");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        console.log("Location information is unavailable");
+                        break;
+                    case error.TIMEOUT:
+                        console.log("The request to get user location timed out");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        console.log("Unknow geolocation error");
+                        break;
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</html>

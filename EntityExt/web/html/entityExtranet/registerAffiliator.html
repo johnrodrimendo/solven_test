@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)">
+<head>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <!--Ekko Lightbox For Images-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.css'}"
+          rel="stylesheet"/>
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet"
+          type="text/css"/>
+
+
+    <!-- Swipebox -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}"
+          rel="stylesheet"/>
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.js'}"></script>
+
+    <!-- Flot -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.resize.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.categories.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.pie.min.js'}"
+            type="text/javascript"></script>
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/css/bootstrap-datepicker3.min.css'}" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+
+    <!--TOKY-->
+    <script th:if="${@configuration.TOKY_ACTIVE()}">(function (v, p) {
+        var s = document.createElement('script');
+        s.src = 'https://app.toky.co/resources/widgets/toky-widget.js?v=' + v;
+        s.onload = function () {
+            Toky.load(p);
+        };
+        document.head.appendChild(s);
+    })('6800f1c', {
+        "$lang": "es",
+        "$username": "Solven",
+        "$bubble": false,
+        "$text": "Llámanos Gratis",
+        "$color": "#00aabb,#f7323f,#ffffff"
+    })
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(document).on('ready', function () {
+
+            var jsonValidator = createFormValidationJson(JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/), $('#createAffiliatorForm'));
+            console.log(jsonValidator);
+            $('#createAffiliatorForm').validateForm(jsonValidator);
+
+            $('#createLoanButton').click(function (event) {
+                console.log('create loan button clicked');
+                $('#createLoanButton').loading();
+                defaultAjax({
+                    url: /*[[@{/affiliators}]]*/null,
+                    type: 'POST',
+                    form: $('#createAffiliatorForm'),
+                    data: $('#createAffiliatorForm').serializeObject(),
+                    success: function (data) {
+                        $('#createLoanButton').unloading();
+                    },
+                    error: function () {
+                        $('#createLoanButton').unloading();
+                    }
+                });
+            });
+
+            $("select").keyup(function (e) {
+                if (e.keyCode == 13) $("#createLoanButton").click();
+            });
+
+            $("#docNumber").keyup(function (e) {
+                e.preventDefault();
+                if (e.keyCode == 13) $("#createLoanButton").click();
+            });
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block
+            th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='affiliator')"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold uppercase">Creación de solicitud del cliente</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <form id="createAffiliatorForm" role="form" class="form">
+                                        <div class="form-body" style="padding: 1em;">
+                                            <div class="form-group f1">
+                                                <label>Nombre de Comercio (*)</label>
+                                                <input type="text" name="name" id="name" class="form-control"
+                                                       placeholder=""/>
+                                            </div>
+
+                                            <div class="form-group f2">
+                                                <label>RUC</label>
+                                                <input type="text" name="ruc" id="ruc" class="form-control"
+                                                       placeholder=""/>
+                                            </div>
+
+                                            <div class="form-group f3">
+                                                <label>Correo (*)</label>
+                                                <input type="text" name="email" id="email" class="form-control"
+                                                       placeholder=""/>
+                                            </div>
+
+                                            <div class="form-group f4">
+                                                <label>Celular (*)</label>
+                                                <input type="text" name="phoneNumber" id="phoneNumber"
+                                                       class="form-control"
+                                                       placeholder=""/>
+                                            </div>
+
+                                            <div class="field inline  field-col-3 field-col-2 form-group f5">
+                                                <label>Departamento (*)</label>
+                                                <select name="departamento" id="departamento" data-width="230"  th:attr="data-placeholder=#{question.map.department}" class="form-control">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="deparment : ${@catalogService.getDepartments()}"
+                                                            th:value="${deparment.id}" th:text="${deparment.name}"></option>
+                                                </select>
+                                                <script th:inline="javascript">
+                                                    /*<![CDATA[*/
+
+                                                    $('#departamento').on('change', function () {
+                                                        var departmentId = $('#departamento').val();
+                                                        defaultAjax({
+                                                            url: /*[[@{/address/province}]]*/null,
+                                                            data: {
+                                                                departmentId: departmentId
+                                                            },
+                                                            type: 'POST',
+                                                            success: function (data) {
+                                                                var arr = JSON.parse(data);
+                                                                var html = '<option value="" hidden="hidden"></option>';
+                                                                var len = arr.length;
+                                                                for (var i = 0; i < len; i++) {
+                                                                    html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                                                                }
+                                                                $('#provincia').html(html);
+                                                            },
+                                                            error: function (data) {
+                                                                showErrorModal('Hubo un problema al obtener las provincias.');
+                                                            }
+                                                        });
+                                                    });
+                                                    /*]]>*/
+                                                </script>
+                                            </div>
+
+                                            <div class="field inline field-col-3 form-group f6">
+                                                <label>Provincia (*)</label>
+                                                <select name="provincia" id="provincia" data-width="230" th:attr="data-placeholder=#{question.map.province}" class="form-control"></select>
+                                                <script th:inline="javascript">
+                                                    /*<![CDATA[*/
+
+                                                    $('#provincia').on('change', function () {
+                                                        var departmentId = $('#departamento').val();
+                                                        var provinciaId = $('#provincia').val();
+                                                        defaultAjax({
+                                                            url: /*[[@{/address/district}]]*/null,
+                                                            data: {
+                                                                departmentId: departmentId,
+                                                                provinceId: provinciaId
+                                                            },
+                                                            type: 'POST',
+                                                            success: function (data) {
+                                                                var arr = JSON.parse(data);
+                                                                var html = '<option value="" hidden="hidden"></option>';
+                                                                var len = arr.length;
+                                                                for (var i = 0; i < len; i++) {
+                                                                    html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                                                                }
+                                                                $('#district').html(html);
+                                                            },
+                                                            error: function (data) {
+                                                                showErrorModal('Hubo un problema al obtener las provincias.');
+                                                            }
+                                                        });
+                                                    });
+                                                    /*]]>*/
+                                                </script>
+                                            </div>
+
+                                            <div class="field inline field-col-3 form-group f7">
+                                                <label>Distrito (*)</label>
+                                                <select name="distrito" id="district" data-width="230"  th:attr="data-placeholder=#{question.map.district}" class="form-control"></select>
+                                            </div>
+
+                                            <div class="form-group f8">
+                                                <label>Banco</label>
+                                                <select id="bankId" name="bankId" class="form-control">
+                                                    <option></option>
+                                                    <option th:each="bank : ${banks}"
+                                                            th:value="${bank.id}"
+                                                            th:text="${bank.name}"></option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group f9">
+                                                <label>Cuenta Bancaria</label>
+                                                <input type="text" name="bankAccountNumber" id="bankAccountNumber"
+                                                       class="form-control"
+                                                       placeholder=""/>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions" style="padding: 1em">
+                                            <button id="createLoanButton" type="button" class="btn red">Crear</button>
+                                        </div>
+
+                                        <div class="errorContainer"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / Top summary -->
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+</th:block>
+
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <title>P&aacute;gina no encontrada.</title>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+</head>
+<body>
+
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<th:block layout:fragment="content">
+    <div class="not-found">
+        <div class="container">
+            <div class="notFound-container">
+                <div class="hero-title">
+                    <img th:src="@{/img/examples/icons/404-icon.png}" alt="404"/>
+                    <div class="text">
+                        <h2>404<small class="text-lightblue">P&aacute;gina no encontrada.</small></h2>
+                        <p>Parece que te perdiste.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <!-- Header ends -->
+    <th:block th:replace="fragments/modalContactFragment :: modalContactFragment"></th:block>
+</th:block>
+
+</body>
+</html>

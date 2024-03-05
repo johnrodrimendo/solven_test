@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q45">
+            <p th:utext="#{questions.block.fundsDaily}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="centrado">
+                    <div>
+                        <div class="field field-amount inline">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                </div>
+                                <input type="text" class="input-outline amount-input" th:field="*{income}"/>
+                            </div>
+                            <small class="input-help">Dinero al final del d&iacute;a</small>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

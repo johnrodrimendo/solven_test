@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q33">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <p th:utext="#{questions.block.independentRUC}"></p>
+
+                <div class="display-block w-input-ruc">
+                    <div class="flex-form-map">
+                        <input type="text" class="input-outline" th:field="*{ruc}" pattern="[0-9]*" placeholder="Número RUC"/>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <span class="w-list">
+                        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                            <small class="input-help">Nro. de RUC</small>
+                        </th:block>
+                        <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                            <small class="input-help">NIT</small>
+                        </th:block>
+                        <label for="haventRUC" class="custom-check">
+                            <span class="check-inner"><i class="icon icon-check"></i></span>
+                            <span class="check-label"> No tengo</span>
+                            <input type="checkbox" class="real-check" id="haventRUC"/>
+                        </label>
+                    </span>
+                </div>
+                <div class="display-block">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <small style="font-size: .65em;margin-top: 10px;" class="display-block text-black" th:utext="#{questions.block.companyRUC.small2}"></small>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var ruc = $('#ruc');
+        var haventRUC = $('#haventRUC');
+
+        setTimeout(function () {
+            ruc.focus();
+        }, 310);
+
+        var enabled = false;
+        haventRUC.click(function () {
+            if (enabled == true) {
+                ruc.prop('disabled', true).toggleClass('disabled');
+            }
+            else {
+                ruc.prop('disabled', false).toggleClass('disabled');
+            }
+            enabled = true;
+
+        });
+
+        $("#haventRUC").click(function () {
+            if ($(this).is(':checked')) {
+                ruc.val('');
+                ruc.focus();
+                ruc.prop('disabled', true);
+                $('#questionForm').data('validatorJson').rules.ruc.required = false;
+                $('#questionForm').data('validatorJson').rules.ruc.maxlength = 0;
+                $('#questionForm').data('validatorJson').rules.ruc.minlength = 0;
+            } else {
+                ruc.prop('disabled', false);
+                ruc.val('');
+                ruc.focus();
+                $('#questionForm').data('validatorJson').rules.ruc.required = true;
+                $('#questionForm').data('validatorJson').rules.ruc.maxlength = 11;
+                $('#questionForm').data('validatorJson').rules.ruc.minlength = 11;
+            }
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+
+
+        $('#sendButton').click(function () {
+            var valid;
+            if ($('#haventRUC').prop('checked')) {
+                valid = true;
+            } else {
+                valid = $('#questionForm').valid();
+            }
+            if (valid) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {haventRuc: $('#haventRUC').prop('checked')})
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="alfin_insurance">
+    <th:block>
+        <style>
+
+            .description-container-insurance{
+                display: flex;
+                width: 100%;
+                align-items: center;
+            }
+
+            .description-container-insurance-img{
+                width: 20%;
+                text-align: center;
+            }
+
+            .description-container-insurance-img img{
+                height: auto;
+                max-width: 100%;
+                max-height: 70px;
+            }
+
+            .description-container-insurance-detail{
+                flex : 1;
+                margin-left: 32px;
+            }
+
+            .insurance-type-selector-container-footer{
+                margin-top: 18vh;
+            }
+
+            @media only screen and (min-width: 480px) and (min-height: 720px){
+                .wrap-pages .loan-process {
+                    min-height: calc(80vh - 100px);
+                }
+            }
+
+            :root {
+                --branding-loading-color: #26CAD3;
+                --branding-second-color: #FFA100;
+            }
+            .caja-semaforo {
+                display: block;
+            }
+
+            .caja-porcentaje {
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            .progress-bar {
+                height: 120px;
+                border-radius: 24px;
+                width: 40%;
+                margin: 0 auto;
+                float: none;
+            }
+
+            .progress-bar--gradient {
+                background: linear-gradient(to right, red 0, red 30%, orange 50%, yellowgreen 85%, green 100%);
+                border-radius: 5px;
+                height: inherit;
+                width: 100%;
+                display: flex;
+            }
+
+            .progress-bar--progress {
+                /*min-width: 48px;*/
+                min-width: 0px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .progress-bar--progress-selector {
+                display: block;
+                color: white;
+                /*padding: 0 .625rem;*/
+                background: var(--branding-loading-color);
+                width: 3px;
+                height: 125px;
+            }
+
+            .progress-bar--progress-value {
+                margin-bottom: 140px;
+                margin-right: -25px;
+                color: var(--branding-loading-color);
+            }
+
+            .progress-bar--not-progress {
+                flex-grow: 1;
+                /* 	flex-shrink: 1; */
+                height: inherit;
+                background: #ccc;
+                border-end-end-radius: 5px;
+                border-start-end-radius: 5px;
+                /* 	border-top-right-radius: 24px;
+                    border-bottom-right-radius: 24px; */
+            }
+
+            .panel-group .panel + .panel {
+                margin-top: 0px !important;
+            }
+
+            .panel-default > .panel-heading {
+                color: #333333;
+                background-color: #ffffff;
+                border-color: #ffffff;
+            }
+
+            .panel-heading {
+                padding: 15px 15px;
+            }
+
+            .circle {
+                background: var(--branding-loading-color);
+                color: white;
+                display: block;
+                font-weight: normal;
+                line-height: 1.6em;
+                text-align: center;
+                margin-right: 5px;
+                width: 1.6em;
+                height: 1.6em;
+                border-radius: 0.8em;
+            }
+
+            .lista > li {
+                margin-left: 35px;
+                margin-right: 30px;
+            }
+
+            .panel {
+                border: none;
+                border-bottom: 1px #ddd solid;
+            }
+
+            .panel-title {
+                display: flex;
+            }
+
+            .panel-title > a {
+                display: block;
+                line-height: 1.6em;
+                width: 90%;
+            }
+
+            .active-collapse {
+                background-color: #fa461621 !important;
+                color: var(--branding-loading-color) !important;
+                font-weight: bold;
+            }
+
+            .panel-heading .accordion-toggle:before {
+                content: "";
+                display: block;
+                height: 15px;
+                width: 15px;
+                background-size: 15px 15px;
+                background-image: url("https://solven-public.s3.amazonaws.com/img/iconos_extranet/arrow-down-sign-to-navigate.svg");
+                background-repeat: no-repeat;
+                float: right;
+                transform: rotate(-180deg);
+                margin-top: 5px;
+            }
+
+            .panel-heading .accordion-toggle.collapsed:before {
+                transform: rotate(0deg);
+            }
+
+            .btn-outline {
+                border: 1px solid var(--branding-loading-color) !important;
+                background-color: white !important;
+                color: var(--branding-loading-color) !important;
+            }
+
+            .btn-green{
+                background: var(--branding-loading-color);
+                color: rgb(255, 255, 255);
+            }
+
+            .btn-green:disabled{
+                background: var(--branding-loading-color) !important;
+                opacity: 0.5;
+                cursor: default;
+                box-shadow: none;
+            }
+            .btn-green:disabled:hover{
+                box-shadow: none;
+            }
+
+            .btn-outline:disabled {
+                border: 1px solid var(--branding-loading-color) !important;
+                background-color: white !important;
+                color: var(--branding-loading-color) !important;
+                cursor: default;
+                box-shadow: none;
+                opacity: 0.5;
+            }
+            .btn-outline:disabled:hover {
+                box-shadow: none;
+            }
+
+            .panel-group {
+                text-align: start;
+                width: 50%;
+                margin: 0 auto;
+            }
+
+            @media only screen and (max-width: 900px) {
+                .progress-bar {
+                    width: 50%;
+                }
+
+                .panel-group {
+                    width: 70%;
+                }
+
+                .insurance-type-selector-container-footer{
+                    margin-top: 12vh;
+                }
+            }
+
+            @media only screen and (max-width: 750px) {
+                .progress-bar {
+                    width: 60%;
+                }
+
+                .panel-group {
+                    width: 80%;
+                }
+
+                .insurance-type-selector-container-footer{
+                    margin-top: 7vh;
+                }
+            }
+
+            @media only screen and (max-width: 550px) {
+                .progress-bar {
+                    width: 70%;
+                }
+
+                .panel-group {
+                    width: 90%;
+                }
+
+                .insurance-type-selector-container-footer{
+                    margin-top: 3vh;
+                }
+
+                .description-container-insurance-img{
+                    padding-left: 5px;
+                    padding-right: 5px;
+                }
+            }
+
+            .mb-10 {
+                margin-bottom: 10px !important;
+            }
+
+            .icon-list {
+                width: 18px !important;
+                margin-right: 7px;
+                height: 20px;
+                vertical-align: middle !important;
+            }
+
+            .actions button{
+                min-height: 54px;
+                padding-top: 2px;
+                padding-bottom: 2px;
+            }
+
+            /*radio butom */
+            .container-radio {
+                display: block;
+                position: relative;
+                padding-left: 30px;
+                margin-bottom: 12px;
+                cursor: pointer;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            /* Hide the browser's default radio button */
+            .container-radio input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+            }
+
+            /* Create a custom radio button */
+            .checkmark {
+                position: absolute;
+                top: 3px;
+                left: 0;
+                height: 18px;
+                width: 18px;
+                border: 2px solid #D6D8DD;
+                background: white;
+                border-radius: 50%;
+            }
+
+            /* On mouse-over, add a grey background color */
+            .container-radio:hover input ~ .checkmark {
+                border: 5px solid white;
+                background-color: var(--branding-loading-color) !important;
+            }
+
+            /* When the radio button is checked, add a blue background */
+            .container-radio input:checked ~ .checkmark {
+                border: 5px solid white;
+                background-color: var(--branding-loading-color) !important;
+            }
+
+            /* Create the indicator (the dot/circle - hidden when not checked) */
+            .checkmark:after {
+                content: "";
+                position: absolute;
+                display: none;
+            }
+
+            /* Show the indicator (dot/circle) when checked */
+            .container-radio input:checked ~ .checkmark:after {
+                display: none;
+            }
+
+            /* Style the indicator (dot/circle) */
+            .container-radio .checkmark:after {
+                top: 9px;
+                left: 9px;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: white;
+            }
+
+
+        </style>
+        <div class="offer-title">
+            <h2>Elige el seguro que deseas asociado</h2>
+            <span class="line"></span>
+        </div>
+        <div class="caja-porcentaje">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <label class="container-radio">
+                                <input type="radio" id="desgravament1" name="desgramament" value="1"/>
+                                <span class="checkmark"></span>
+                            </label>
+                            <a id="panel1" class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                               data-parent="#accordion" href="#collapseOne" aria-expanded="false"
+                               aria-controls="collapseOne">
+                                <span>Seguro Protección Familiar</span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            <div class="description-container-insurance">
+                                <div class="description-container-insurance-detail">
+                                    Te damos una mano otorgándote cobertura y asistencia médica a ti y a
+                                    tus seres queridos en caso de accidente o muerte accidental.
+                                </div>
+                                <div class="description-container-insurance-img">
+                                    <a href="https://solven-public.s3.amazonaws.com/public_contracts/alfin/CERTIFICADO+-Familia+protegida.pdf" download="true" target="_blank">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/download_pdf_insurance.png" alt=""/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title">
+                            <label class="container-radio">
+                                <input type="radio" id="desgravament2" name="desgramament" value="2"/>
+                                <span class="checkmark"></span>
+                            </label>
+                            <a id="panel2" class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                               data-parent="#accordion" href="#collapseTwo" aria-expanded="false"
+                               aria-controls="collapseTwo">
+                                Seguro Desgravamen sin Devolución
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                            <div class="description-container-insurance">
+                                <div class="description-container-insurance-detail">
+                                    En caso llegues a faltar, libera a tú familia de toda responsabilidad económica
+                                    con el seguro de desgravamen.
+                                    Protege a tú familia de toda responsabilidad económica en caso de fallecimiento natural,
+                                    o por accidente, o por invalidez total o permanente.
+                                </div>
+                                <div class="description-container-insurance-img">
+                                    <a href="https://solven-public.s3.amazonaws.com/public_contracts/alfin/CERTIFICADO+ALFIN_Seg+Desgravamen+sin+devolucion.pdf" download="true" target="_blank">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/download_pdf_insurance.png" alt=""/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
+                            <label class="container-radio">
+                                <input type="radio" id="desgravament3" name="desgramament" value="3"/>
+                                <span class="checkmark"></span>
+                            </label>
+                            <a id="panel3" class="collapsed accordion-toggle" role="button" data-toggle="collapse"
+                               data-parent="#accordion" href="#collapseThree" aria-expanded="false"
+                               aria-controls="collapseThree">
+                                Seguro Desgravamen con Devolución.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingThree">
+                        <div class="panel-body">
+                            <div class="description-container-insurance">
+                                <div class="description-container-insurance-detail">
+                                    Con el seguro de desgravamen con devolución protege a tu familia en caso fallezcas y
+                                    si no ocurre ningún imprevisto te devolveremos tú dinero durante el plazo del seguro.
+                                    Protege tus deudas financieras en caso de fallecimiento natural o por accidente,
+                                    o por invalidez total o permanente y ahorra a la vez con el seguro de desgravamen
+                                    con devolución.
+                                </div>
+                                <div class="description-container-insurance-img">
+                                    <a href="https://solven-public.s3.amazonaws.com/public_contracts/alfin/CERTIFICADO+Banco+Alfin+Desgravamen+con+devoluci%C3%B3n.pdf" download="true" target="_blank">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/download_pdf_insurance.png" alt=""/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="width: 100%; text-align: center">
+            <button id="sendInsuranceType" type="button" class="button bg-red">Continuar</button>
+        </div>
+        <div class="offer-container insurance-type-selector-container-footer" th:if="${@brandingService.isBranded(#httpServletRequest)}">
+            <div class="sponsored-by" th:if="${entityProductParam.offerLegalFooter != null}">
+                <small th:utext="${entityProductParam.getOfferLegalFooterReplaced(null, @utilService)}"></small>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#accordion > .panel').on('show.bs.collapse', function (e) {
+                $('.panel-heading').removeClass("active-collapse");
+                $(this).find('.panel-heading').addClass("active-collapse");
+            });
+
+            $("#desgravament1").click(function(e) {
+                $("#collapseTwo").collapse("hide");
+                $("#collapseThree").collapse("hide");
+                $("#collapseOne").collapse("show");
+            });
+            $("#desgravament2").click(function(e) {
+                $("#collapseOne").collapse("hide");
+                $("#collapseThree").collapse("hide");
+                $("#collapseTwo").collapse("show");
+            });
+            $("#desgravament3").click(function(e) {
+                $("#collapseOne").collapse("hide");
+                $("#collapseTwo").collapse("hide");
+                $("#collapseThree").collapse("show");
+            });
+
+            $("#panel1").click(function(e) {
+                $("#collapseTwo").collapse("hide");
+                $("#collapseThree").collapse("hide");
+                $("#collapseOne").collapse("show");
+                var block = document.getElementById('desgravament1');
+                block.checked = true;
+            });
+            $("#panel2").click(function(e) {
+                $("#collapseOne").collapse("hide");
+                $("#collapseThree").collapse("hide");
+                $("#collapseTwo").collapse("show");
+                var block = document.getElementById('desgravament2');
+                block.checked = true;
+            });
+            $("#panel3").click(function(e) {
+                $("#collapseOne").collapse("hide");
+                $("#collapseTwo").collapse("hide");
+                $("#collapseThree").collapse("show");
+                var block = document.getElementById('desgravament3');
+                block.checked = true;
+            });
+
+            $('#sendInsuranceType').on('click', function (e) {
+                e.preventDefault();
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendInsuranceType'),
+                    type: "POST",
+                    data: {
+                        insuranceType: $('input[name=desgramament]:checked').val()
+                    },
+                    success: function () {
+                        questionFw.refreshQuestion();
+                    }
+                }, "insuranceType");
+            });
+            /*]]>*/
+        </script>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <!-- update -->
+    <th:block
+            th:if="${@brandingService.getEntityBranding(#httpServletRequest) == null and entity != T(com.affirm.common.model.catalog.Entity).ABACO}">
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var google_conversion_id = 810768831;
+            var google_conversion_label = "AetmCJaSqYABEL-zzYID";
+            var google_remarketing_only = false;
+            /* ]]> */
+
+        </script>
+        <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+        </script>
+        <noscript>
+            <div style="display:inline;">
+                <img height="1" width="1" style="border-style:none;" alt=""
+                     src="//www.googleadservices.com/pagead/conversion/810768831/?label=AetmCJaSqYABEL-zzYID&amp;guid=ON&amp;script=0"/>
+            </div>
+        </noscript>
+    </th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q50">
+
+            <th:block th:if="${showAztecaInsuranceSelection != null and showAztecaInsuranceSelection}">
+                <th:block th:replace="this :: alfin_insurance"></th:block>
+            </th:block>
+
+            <div id="form_date" th:if="${showFirstDueDate != null and showFirstDueDate}">
+                <div class="offer-title">
+                    <h2 th:if="${loanApplication.entityUserId == null}" th:text="#{questions.title.date}"></h2>
+                    <h2 th:if="${loanApplication.entityUserId != null}" th:text="#{questions.title.date.entityUser(${person?.getFirstName()})}"></h2>
+                    <span class="line"></span>
+                </div>
+                <div class="form-group">
+                    <div class="field inline">
+                        <input type="text" id="getDatetimepicker" class="input-outline "/>
+                    </div>
+                    <button id="sendFirstDueDate" type="button" class="button bg-red">Continuar</button>
+                </div>
+                <div id="datetimepicker12"></div>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var minDate = [[${minDate}]];
+                    var maxDate = [[${maxDate}]];
+                    var enableDates = [[${enableDates}]];
+                    var defaultSelectedDate = [[${selectedDate}]];
+                    moment.locale("es");
+                    var jsonDatePicker = {
+                        format: 'DD/MM/YYYY',
+                        inline: true,
+                        sideBySide: true,
+                        locale: 'es'
+                    };
+                    if (minDate != null && maxDate != null) {
+                        jsonDatePicker.minDate = moment(minDate, "DD/MM/YYYY");
+                        jsonDatePicker.maxDate = moment(maxDate, "DD/MM/YYYY");
+                        jsonDatePicker.defaultDate = moment(minDate, "DD/MM/YYYY");
+                    }
+                    if (enableDates != null) {
+                        for (i = 0; i < enableDates.length; i++) {
+                            enableDates[i] = moment(enableDates[i], "DD/MM/YYYY");
+                        }
+                        jsonDatePicker.enabledDates = enableDates;
+                        jsonDatePicker.defaultDate = moment(defaultSelectedDate, "DD/MM/YYYY");
+                    }
+                    $('#datetimepicker12').datetimepicker(jsonDatePicker);
+                    $('#getDatetimepicker').val(jsonDatePicker.defaultDate.format("DD/MM/YYYY"));
+                    $('#datetimepicker12').on('dp.change', function (event) {
+                        var formatted_date = event.date.format("DD/MM/YYYY");
+                        $('#getDatetimepicker').val(formatted_date);
+                        if (event.date) {
+                            console.log('Date chosen: ' + event.date.format());
+                        }
+                    });
+                    $(document).on("click", "td.day", function () {
+                        if (!$(this).hasClass('disabled')) {
+                            console.log('esta deshabilitado');
+                        }
+                    });
+                    $('#sendFirstDueDate').on('click', function (e) {
+                        e.preventDefault();
+                        questionFw.ajaxToCurrentQuestionController({
+                            button: $('#sendFirstDueDate'),
+                            type: "POST",
+                            data: {
+                                firstDueDate: $('#getDatetimepicker').val()
+                            },
+                            success: function () {
+                                questionFw.refreshQuestion();
+                            }
+                        }, "firstDueDate");
+                    });
+
+                    /*]]>*/
+                </script>
+            </div>
+            <!-- pantalla de ofertas -->
+            <div class="offer-container"  th:classappend="${@brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL ? 'bds-offers' : ''}" th:if="${(showFirstDueDate == null or !showFirstDueDate) and (showAztecaInsuranceSelection == null or !showAztecaInsuranceSelection)}">
+                <div>
+                    <div th:if="${offers.size()==1 AND !@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                        <p class="offer-title" th:text="#{questions.50.offer.single.title(${personName != null and !personName.isEmpty() ? personName : 'Hola'})}"></p>
+                    </div>
+                    <div th:if="${offers.size()>1 AND !@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                        <p class="offer-title" th:text="#{questions.50.offer.title(${personName != null and !personName.isEmpty() ? personName : 'Hola'})}"></p>
+                    </div>
+                    <div th:if="${offers.size()>=1 AND @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                        <p class="offer-title" th:text="#{questions.50.offer.title.nameend(${personName != null and !personName.isEmpty() ? personName : ' el cliente'})}"></p>
+                    </div>
+
+
+
+                    <div th:if="${@brandingService.isBranded(#httpServletRequest)}" class="call-offer-modal">
+                        <div th:if="${offers.size()==1}">
+                            <th:block th:switch="${@brandingService.getEntityBranding(#httpServletRequest).entity.id}">
+                                <th:block th:case="${T(com.affirm.common.model.catalog.Entity).COMPARTAMOS}">
+                                    <span th:text="${'Compartamos Financiera tiene una oferta para ti.'}"></span>
+                                </th:block>
+                                <th:block th:case="${T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}">
+                                    <!--NO MESSAGE-->
+                                </th:block>
+                                <th:block th:case="${T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                                    <!--NO MESSAGE-->
+                                </th:block>
+                                <th:block th:case="*">
+                                    <span th:text="${'Esta es la mejor oferta que ' +  entity?.shortName + ' tiene para ti.'}"></span>
+                                </th:block>
+                            </th:block>
+                        </div>
+                        <div th:unless="${offers.size()==1}">
+                            <th:block th:switch="${@brandingService.getEntityBranding(#httpServletRequest).entity.id}">
+                                <th:block th:case="${T(com.affirm.common.model.catalog.Entity).COMPARTAMOS}">
+                                    <span th:text="${'Compartamos Financiera tiene estas ofertas para ti. Elige la que se adecue a tus necesidades.'}"></span>
+                                </th:block>
+                                <th:block th:case="${T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}">
+                                    <!--NO MESSAGE-->
+                                </th:block>
+                                <th:block th:case="${T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                                    <!--NO MESSAGE-->
+                                </th:block>
+                                <th:block th:case="*">
+                                    <th:block th:if="${T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                        <span th:text="${'Selecciona la que más te convenga.'}"></span>
+                                    </th:block>
+                                    <th:block th:unless="${T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                        <span th:text="${'Estas son las ofertas que ' +  entity?.shortName + ' tiene para ti. Selecciona la que más te convenga.'}"></span>
+                                    </th:block>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div th:unless="${@brandingService.isBranded(#httpServletRequest)}" class="call-offer-modal">
+                        <div th:if="${offersDiff==null and onlineDisbursement==false}">
+                            <small class="text-black" th:utext="#{questions.50.offer.how.we.choose}"></small>
+                            <a href="#" id="show_offer" th:utext="#{static.offer.subtittle}"> </a>
+                        </div>
+                        <div th:if="${offersDiff!=null}">
+                            <small class="text-black"
+                                   th:utext="#{questions.50.offer.next.offer(${offersDiff})}"></small>
+                        </div>
+                        <div th:if="${onlineDisbursement==true}">
+                            <small class="text-black" th:utext="#{questions.50.offer.online.disbursement}"></small>
+                        </div>
+                    </div>
+
+                </div>
+                <ul class="owl-carousel" id="offer-carousel" th:if="${!showTarjetasPeruanasOffer}">
+                    <li class="select-offer" th:each="offer : ${offers}"
+                        th:attr="data-offer-id=${offer.id}, data-offer-color=${offer.loanOfferOrder % 3 == 0 ? 'green':offer.loanOfferOrder % 3 == 1 ? 'red' : offer.loanOfferOrder % 3 == 2 ? 'blue':''}"
+                        th:classappend="${offer.loanOfferOrder % 3 == 0? 'offer-green':(offer.loanOfferOrder % 3 == 1? 'offer-red' :(offer.loanOfferOrder % 3 == 2? 'offer-blue':''))}">
+                        <a href="#" class="best-offer">
+                            <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO and showDiscountData}">
+                                <div class="descuento">
+                                    <div class="des_title">50%</div>
+                                    <div class="des_descrip">dscto.</div>
+                                    <script>
+                                        /*<![CDATA[*/
+                                        $(".q50 .descuento").addClass("stage-descuento");
+                                        /*]]>*/
+                                    </script>
+                                </div>
+                            </th:block>
+                            <div class="box-b"
+                                 th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'box-b' }">
+                                <th:block th:if="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_LIBRE_DISPONIBILIDAD}">
+                                    <th:block th:switch="${offer.loanOfferOrder}">
+                                        <h3 th:case="0">Oferta 4</h3>
+                                        <h3 th:case="1">Oferta 3</h3>
+                                        <h3 th:case="2">Oferta 2</h3>
+                                        <h3 th:case="3">Oferta 1</h3>
+                                    </th:block>
+                                </th:block>
+                                <th:block th:if="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA or offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_ONLINE}">
+                                    <h3>
+                                        <th:block th:text="${offer.installments}"></th:block>
+                                        <th:block th:text="${offer.installments > 1} ? #{label.months} : #{label.installment}"></th:block>
+                                    </h3>
+                                </th:block>
+                                <th:block th:unless="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA or offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_ONLINE}">
+                                    <th:block th:if="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}">
+                                        <h3 th:text="${offer.loanOfferOrder % 3 == 0? 'Mayor Plazo':(offer.loanOfferOrder % 3 == 1? 'Aprobado' :(offer.loanOfferOrder % 3 == 2? 'Recomendado':''))}">
+                                            = APROBADO</h3>
+                                    </th:block>
+                                    <th:block th:unless="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_LIBRE_DISPONIBILIDAD or offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}">
+                                        <h3 th:text="${offer.loanOfferOrder % 3 == 0? '+ Plazo':(offer.loanOfferOrder % 3 == 1? '= Similar' :(offer.loanOfferOrder % 3 == 2? '+ Dinero':''))}">
+                                            = Similar</h3>
+                                    </th:block>
+                                </th:block>
+                                <th:block th:switch="${offer.loanOfferOrder}" th:if="${offer.entityProductParameterId != T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_LIBRE_DISPONIBILIDAD}">
+                                    <th:block
+                                            th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                                        <span th:case="2" th:utext="#{loanOffer.offerDineroAR}"></span>
+                                        <span th:case="3" th:utext="#{loanOffer.offerPlazoAR}"></span>
+                                        <span th:case="*" th:utext="#{loanOffer.offerSimilarAR}"></span>
+                                    </th:block>
+                                    <th:block
+                                            th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                                        <span th:case="2" th:utext="#{loanOffer.offerDinero}"></span>
+                                        <span th:case="3" th:utext="#{loanOffer.offerPlazo}"></span>
+                                        <span th:case="*" th:utext="#{loanOffer.offerSimilar}"></span>
+                                    </th:block>
+
+                                </th:block>
+                                <p>
+                                    <span class="prefix-top" th:text="${offer.currency?.symbol}"></span>
+                                    <span class="amount"
+                                          th:text="${@utilService.integerOnlyMoney(offer?.ammount,offer.currency)}"></span>
+                                </p>
+                            </div>
+                            <div class="box-c2">
+                                <div class="bloc first">
+                                    <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO and showDiscountData}">
+                                        <div class="amount-tach" th:text="${@utilService.integerMoneyFormat(offer.offerSchedule.get(3).installmentAmount, offer?.currency)}"></div>
+                                    </th:block>
+                                    <div class="amount" th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB)}"
+                                         th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'amount' }">
+                                        <div class="top" th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+
+                                            <span th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}"
+                                                  th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule.get(0).installmentAmount, offer?.currency)}">
+                                            </span>
+                                            <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO and showDiscountData}">
+                                                <sup class="sup-desktop">*</sup>
+                                            </th:block>
+                                            <span th:if="${offer.entityId != T(com.affirm.common.model.catalog.Entity).ACCESO}"
+                                                  th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></span>
+                                            /
+                                            <span th:text="${offer.installments}"></span>
+                                            <span th:text="${offer.installments > 1} ? #{label.months} : #{label.installment}"></span>
+                                        </div>
+                                        <div class="top" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                                            <span>1era cuota - <span class="first_installment_amount" th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule?.get(0)?.installmentAmount, offer?.currency)}"></span></span>
+                                            <br/>
+                                            <span>Cuotas 2 a <span class="installments_count" th:text="${offer?.installments}"></span> - <span class="not_first_installment_amount" th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule?.get(1)?.installmentAmount, offer?.currency)}"></span></span>
+                                        </div>
+                                    </div>
+                                    <div class="percent"
+                                         th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'percent' }">
+                                        <!--                                        CHANGE WITH th:swicth when more or th:block by entity-->
+                                        <th:block
+                                                th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB)}">
+                                            <div class="top">
+                                                <span th:text="#{contract.text.tem}"></span>
+                                                <span th:text="${@utilService.percentFormat(offer.monthlyRate * 100.0,offer.currency)}"></span>
+                                            </div>
+                                        </th:block>
+                                        <th:block
+                                                th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB)}">
+                                            <div class="top">
+                                                <span th:text="#{contract.text.tea}"></span>
+                                                <th:block
+                                                        th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                                    <span th:text="${@utilService.percentFormat(offer.nominalAnualRate,offer.currency)}"></span>
+                                                </th:block>
+                                                <th:block
+                                                        th:unless="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                                    <span th:text="${@utilService.percentFormat(offer.effectiveAnualRate,offer.currency)}"></span>
+                                                </th:block>
+                                            </div>
+                                            <div class="bottom">
+                                                <span th:text="#{contract.text.tcea}"></span>
+                                                <span th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate,offer.currency)}"></span>
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                    <th:block th:if="${aztecaInsuranceName != null}">
+                                        <div class="percent" style="border-top: 1px solid #fff;font-size: 12px;padding-top: 6px;">
+                                            <div class="top">
+                                                <span>Seguro</span>
+                                                <span th:text="${aztecaInsuranceName}"></span>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                    <th:block
+                                            th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                                        <div class="percent"
+                                             th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'percent' }">
+                                            <div class="top">
+                                                <span th:text="#{contract.text.efectiveanualrate}"></span>
+                                                <span th:text="${@utilService.percentFormat(offer.effectiveAnualRate)}"></span>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+                            <th:block
+                                    th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                <div class="cft">
+                                    <span th:text="#{contract.text.tcea}"></span>
+                                    <span th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate,offer.currency)}"></span>
+                                </div>
+                            </th:block>
+                            <th:block th:if="${@brandingService.getEntityBranding(#httpServletRequest) != null and @brandingService.getEntityBranding(#httpServletRequest).entity.id == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                                <div class="button bg-red go">¡Acepto!</div>
+                            </th:block>
+                            <th:block th:unless="${@brandingService.getEntityBranding(#httpServletRequest) != null and @brandingService.getEntityBranding(#httpServletRequest).entity.id == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                                <div class="button bg-red go">¡La quiero!</div>
+                                <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO and showDiscountData}">
+                                    <p class="text-danger" th:text=" '*Primeras 3 cuotas con 50% descuento, luego ' + ${@utilService.integerMoneyFormat(offer.offerSchedule.get(3).installmentAmount, offer?.currency)}"></p>
+                                </th:block>
+                            </th:block>
+                        </a>
+                        <div class="button calendar-button" th:attr="data-offer-id=${offer?.id}">
+                            <th:block th:if="${differentEntityProductParams}">
+                                <th:block
+                                        th:if="${offer.entityProductParam.disbursementType == offer.entityProductParam.DISBURSEMENT_TYPE_DEPOSIT}">
+                                    <img src="https://s3.amazonaws.com/solven-public/img/icons/transfer-online.png"
+                                         class="type-icon" data-toggle="tooltip" data-placement="bottom"
+                                         title="Transferencia Online"/>
+                                </th:block>
+                                <th:block
+                                        th:if="${offer.entityProductParam.disbursementType == offer.entityProductParam.DISBURSEMENT_TYPE_RETIREMNT}">
+                                    <img src="https://s3.amazonaws.com/solven-public/img/icons/retiro-agencia.png"
+                                         class="type-icon" data-toggle="tooltip" data-placement="bottom"
+                                         title="Retiro en Agencia"/>
+                                </th:block>
+                            </th:block>
+                            <div class="wsi">
+                                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                     width="20px" height="20px" viewBox="0 0 488.152 488.152" style="enable-background:new 0 0 488.152 488.152;"
+                                     xml:space="preserve">
+                                    <g>
+                                        <path d="M177.854,269.311c0-6.115-4.96-11.069-11.08-11.069h-38.665c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                            c0,6.123,4.961,11.079,11.074,11.079h38.665c6.12,0,11.08-4.956,11.08-11.079V269.311L177.854,269.311z"/>
+                                        <path d="M274.483,269.311c0-6.115-4.961-11.069-11.069-11.069h-38.67c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                            c0,6.123,4.961,11.079,11.074,11.079h38.67c6.108,0,11.069-4.956,11.069-11.079V269.311z"/>
+                                        <path d="M371.117,269.311c0-6.115-4.961-11.069-11.074-11.069h-38.665c-6.12,0-11.08,4.954-11.08,11.069v38.66
+                                            c0,6.123,4.96,11.079,11.08,11.079h38.665c6.113,0,11.074-4.956,11.074-11.079V269.311z"/>
+                                        <path d="M177.854,365.95c0-6.125-4.96-11.075-11.08-11.075h-38.665c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                            c0,6.119,4.961,11.074,11.074,11.074h38.665c6.12,0,11.08-4.956,11.08-11.074V365.95L177.854,365.95z"/>
+                                        <path d="M274.483,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                            c0,6.119,4.961,11.074,11.074,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95z"/>
+                                        <path d="M371.117,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.12,0-11.08,4.95-11.08,11.075v38.653
+                                            c0,6.119,4.96,11.074,11.08,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95L371.117,365.95z"/>
+                                        <path d="M440.254,54.354v59.05c0,26.69-21.652,48.198-48.338,48.198h-30.493c-26.688,0-48.627-21.508-48.627-48.198V54.142
+                                            h-137.44v59.262c0,26.69-21.938,48.198-48.622,48.198H96.235c-26.685,0-48.336-21.508-48.336-48.198v-59.05
+                                            C24.576,55.057,5.411,74.356,5.411,98.077v346.061c0,24.167,19.588,44.015,43.755,44.015h389.82
+                                            c24.131,0,43.755-19.889,43.755-44.015V98.077C482.741,74.356,463.577,55.057,440.254,54.354z M426.091,422.588
+                                            c0,10.444-8.468,18.917-18.916,18.917H80.144c-10.448,0-18.916-8.473-18.916-18.917V243.835c0-10.448,8.467-18.921,18.916-18.921
+                                            h327.03c10.448,0,18.916,8.473,18.916,18.921L426.091,422.588L426.091,422.588z"/>
+                                        <path d="M96.128,129.945h30.162c9.155,0,16.578-7.412,16.578-16.567V16.573C142.868,7.417,135.445,0,126.29,0H96.128
+                                            C86.972,0,79.55,7.417,79.55,16.573v96.805C79.55,122.533,86.972,129.945,96.128,129.945z"/>
+                                        <path d="M361.035,129.945h30.162c9.149,0,16.572-7.412,16.572-16.567V16.573C407.77,7.417,400.347,0,391.197,0h-30.162
+                                            c-9.154,0-16.577,7.417-16.577,16.573v96.805C344.458,122.533,351.881,129.945,361.035,129.945z"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <span>Ver cronograma</span>
+                        </div>
+                    </li>
+                    <th:block th:if="${showSimulatedOffer}" th:with="offer=null">
+                        <th:block th:replace="this :: question_50_simulated_offer"></th:block>
+                    </th:block>
+                </ul>
+
+                <ul class="owl-carousel"  id="offer-carousel" th:if="${showTarjetasPeruanasOffer}">
+                    <li class="select-offer">
+                        <div id="card-page">
+                            <div class="card-sub-page">
+                                <img id="cardPage1" src="/img/cardpage1.svg"/>
+                                <img id="cardPage2" class="cardPage-hidde" src="/img/cardpage2.svg"/>
+
+                                <div class="card-color">
+                                    <p class="card-text"> Elige un Color: </p>
+                                    <div id="cardColor-1" class="cirle-color" data-value="green">
+                                        <div class="card-1"></div>
+                                    </div>
+                                    <div id="cardColor-2" class="cirle-color" data-value="purple">
+                                        <div class="card-2"></div>
+                                    </div>
+                                </div>
+                                <button class="button bg-red confirm-card-option" th:attr="data-offer-id=${offers.get(0).id}">&iexcl;La Quiero&#33;</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="box-offert" th:each="offer : ${offers}" >
+                    <div class="bg-red box-offert-title">
+
+                        <th:block th:if="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_LIBRE_DISPONIBILIDAD}">
+                            <th:block th:switch="${offer.loanOfferOrder}">
+                                <p th:case="0">Oferta 4</p>
+                                <p th:case="1">Oferta 3</p>
+                                <p th:case="2">Oferta 2</p>
+                                <p th:case="3">Oferta 1</p>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO and showDiscountData}">
+                            <div class="descuento">
+                                <div class="des_title">50%</div>
+                                <div class="des_descrip">dscto.</div>
+                            </div>
+                        </th:block>
+                        <th:block th:if="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}">
+                            <p th:text="${offer.loanOfferOrder % 3 == 0? 'Mayor Plazo':(offer.loanOfferOrder % 3 == 1? 'Aprobado' :(offer.loanOfferOrder % 3 == 2? 'Recomendado':''))}">
+                                = APROBADO</p>
+                        </th:block>
+                        <th:block th:unless="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_BANBIF_LIBRE_DISPONIBILIDAD or offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}">
+                            <th:block th:if="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA or offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_ONLINE}">
+                                <th:block th:text="${offer.installments}"></th:block>
+                                <th:block th:text="${offer.installments > 1} ? #{label.months} : #{label.installment}"></th:block>
+                            </th:block>
+                            <th:block th:unless="${offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA or offer.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_ONLINE}">
+                                <p th:text="${offer.loanOfferOrder % 3 == 0? '+ Plazo':(offer.loanOfferOrder % 3 == 1? '= Similar' :(offer.loanOfferOrder % 3 == 2? '+ Dinero':''))}">
+                                    = Similar</p>
+                            </th:block>
+                        </th:block>
+                        <p th:if="${offer.entityProductParameterId != T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}" class="box-offert-title-recommended">Oferta recomendada
+                            <svg viewBox="0 0 150 150">
+                                <path
+                                        d="M75 15a60 60 0 1 0 60 60 60 60 0 0 0-60-60zm33.67 44.31l-38.6 39.42a5.73 5.73 0 0 1-4.07 1.73 5.75 5.75 0 0 1-4.07-1.69L41.37 78.24a5.75 5.75 0 0 1 8.13-8.13l16.42 16.43 34.54-35.27a5.75 5.75 0 1 1 8.21 8z"
+                                        fill="#fff" data-name="Capa 1" />
+                                <path fill="none" d="M0 0h150v150H0z" />
+                            </svg>
+                        </p>
+                    </div>
+                    <div class="box-offert-body">
+                        <div class="box-offert-body-left">
+                            <div class="box-offert-body-left-paragraph">
+                                <p class="box-offert-body-parragraph-title">MONTO</p>
+                                <div class="box-offert-body-parragraph-descrip box-offert-body-parragraph-descrip_first">
+                                    <span th:text="${offer.currency?.symbol}"></span>
+                                    <span th:text="${@utilService.integerOnlyMoney(offer?.ammount,offer.currency)}">
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="box-offert-body-left-paragraph">
+                                <p class="box-offert-body-parragraph-title">PLAZO</p>
+                                <div class="box-offert-body-parragraph-descrip"
+                                     th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'amount' }">
+                                    <span th:text="${offer.installments}"></span>
+                                    <span th:text="${offer.installments > 1} ? #{label.months} : #{label.installment}"></span>
+                                </div>
+                            </div>
+                            <div class="box-offert-body-left-paragraph">
+                                <p class="box-offert-body-parragraph-title">CUOTA</p>
+
+                                <div class="box-offert-body-parragraph-descrip"
+                                     th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'amount' }">
+
+
+                                    <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                        <div class="dsc-flx">
+                                            <span th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}"
+                                                  th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule.get(0).installmentAmount, offer?.currency)}"></span>
+                                            <sup class="sup-mobile" th:if="${showDiscountData}">*</sup>
+                                        </div>
+                                        <span th:if="${offer.entityId != T(com.affirm.common.model.catalog.Entity).ACCESO}"
+                                              th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></span>
+                                        <span th:if="${showDiscountData}" class="text-tachado" th:text="${@utilService.integerMoneyFormat(offer.offerSchedule.get(3).installmentAmount, offer?.currency)}"></span>
+                                    </th:block>
+
+                                    <th:block th:unless="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                        <span th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}"
+                                              th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule.get(0).installmentAmount, offer?.currency)}"></span>
+                                        <span th:if="${offer.entityId != T(com.affirm.common.model.catalog.Entity).ACCESO}"
+                                              th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}">
+                                        </span>
+                                    </th:block>
+
+                                </div>
+                            </div>
+                        </div>
+                        <th:block th:if="${aztecaInsuranceName != null}">
+                            <div class="box-offert-body-left">
+                                <div class="box-offert-body-left-paragraph" style="margin-right: 0px;padding-right: 0px;">
+                                    <p class="box-offert-body-parragraph-title">SEGURO</p>
+                                </div>
+                                <div class="box-offert-body-left-paragraph">
+                                    <div class="box-offert-body-parragraph-descrip amount" style="font-weight: normal;">
+                                        <span th:text="${aztecaInsuranceName}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                        <div class="box-offert-body-right main-buttons">
+                            <div class="bg-t button bg-details calendar-button" th:attr="data-offer-id=${offer?.id}"> Ver
+                                detalles
+                            </div>
+                            <div class="button bg-red btn-go" th:attr="data-offer-id=${offer.id}">¡La quiero!</div>
+                        </div>
+                        <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO and showDiscountData}">
+                            <p class="text-danger" th:text=" '*Primeras 3 cuotas con 50% descuento, luego ' + ${@utilService.integerMoneyFormat(offer.offerSchedule.get(3).installmentAmount, offer?.currency)}"></p>
+                        </th:block>
+                    </div>
+                </div>
+                <div class="box-offert-edit">
+                    <th:block th:if="${showSimulatedOffer}" th:with="offer=null">
+                        <th:block th:replace="this :: question_50_simulated_offer_mobile"></th:block>
+                    </th:block>
+                </div>
+
+                <!--BUTTON-->
+                <!--                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">-->
+                <!--                    <th:block th:if="${@brandingService.getEntityBranding(#httpServletRequest).entity.id == T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}">-->
+                <!--                        <div class="expiration-date">-->
+                <!--                            <button id="btnBackToFirstDueDate" class="button bg-red">Volver a fecha de vencimiento</button>-->
+                <!--                        </div>-->
+                <!--                    </th:block>-->
+                <!--                </th:block>-->
+                <div class="w">
+                    <!--<div class="s"></div>-->
+                    <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                        <th:block th:if="${@brandingService.getEntityBranding(#httpServletRequest).entity.id != T(com.affirm.common.model.catalog.Entity).CREDIGOB}">
+                            <div class="sponsored-by first"
+                                 th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'sponsored-by first branding-by' : 'sponsored-by first'}">
+                                <div class="box-sponsor isbranded">
+                                    <th:block th:if="${!differentEntityProductParams}">
+                                        <th:block
+                                                th:if="${entityProductParam.disbursementType == entityProductParam.DISBURSEMENT_TYPE_DEPOSIT}">
+                                            <img src="https://s3.amazonaws.com/solven-public/img/icons/transfer-online.png"
+                                                 class="type-icon" data-placement="bottom" title="Transferencia Online"/>
+                                            <small class="online" th:utext="#{label.processType.online}"></small>
+                                        </th:block>
+                                        <th:block
+                                                th:if="${entityProductParam.disbursementType == entityProductParam.DISBURSEMENT_TYPE_RETIREMNT}">
+                                            <img src="https://s3.amazonaws.com/solven-public/img/icons/retiro-agencia.png"
+                                                 class="type-icon" data-placement="bottom" title="Retiro en Agencia"/>
+                                            <small class="online" th:text="#{label.processType.manualAgencia}"></small>
+                                        </th:block>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </th:block>
+                    </th:block>
+                    <th:block th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                        <div class="sponsored-by first">
+                            <div class="box-sponsor">
+                                <small>Financiado por</small>
+                                <img th:src="${offers?.get(0).entity.logoUrl}"/>
+                                <th:block th:if="${!differentEntityProductParams}">
+                                    <small th:if="${entityProductParam.disbursementType == entityProductParam.DISBURSEMENT_TYPE_DEPOSIT}"
+                                           class="online" th:utext="#{label.processType.online}"></small>
+                                    <small th:if="${(entityProductParam.disbursementType == entityProductParam.DISBURSEMENT_TYPE_RETIREMNT) and (offers?.get(0).entity.id != T(com.affirm.common.model.catalog.Entity).BANBIF)}"
+                                           class="online" th:text="#{label.processType.manualAgencia}"></small>
+                                </th:block>
+                            </div>
+                        </div>
+                    </th:block>
+                    <div class="w-rejectOffers" >
+                        <a th:if="${showRejectionLink}" id="rejectOffers" class="button bg-black">No es la oferta que necesito</a>
+                    </div>
+                </div>
+                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                    <div class="sponsored-by" th:if="${entityProductParam.offerLegalFooter != null}">
+                        <small th:utext="${entityProductParam.getOfferLegalFooterReplaced(offers[0], @utilService)}"></small>
+                    </div>
+                </th:block>
+                <th:block th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                    <div class="sponsored-by" th:if="${entityProductParam.offerLegalFooter != null}">
+                        <small th:utext="${entityProductParam.getOfferLegalFooterReplaced(offers[0], @utilService)}"></small>
+                    </div>
+                </th:block>
+            </div>
+
+        </div>
+    </div>
+    <th:block th:each="offer : ${offers}" th:if="${!showTarjetasPeruanasOffer}">
+        <th:block th:replace="this :: offerSchedule"></th:block>
+    </th:block>
+
+    <script th:inline="javascript" th:if="${showTarjetasPeruanasOffer}">
+        /*<![CDATA[*/
+
+        var cardcheck = $('.cirle-color');
+        var cardPage1 = $('#cardPage1');
+        var cardPage2 = $('#cardPage2');
+        var selectedColor;
+        cardcheck.on("click",function(){
+            if($(this).attr('id') == 'cardColor-2') {
+                cardPage1.addClass('cardPage-hidde');
+                cardPage2.removeClass('cardPage-hidde');
+            } else if($(this).attr('id') == 'cardColor-1'){
+                cardPage1.removeClass('cardPage-hidde');
+                cardPage2.addClass('cardPage-hidde');
+            }
+            selectedColor = $(this).data('value');
+        });
+        $('#cardColor-1').click();
+        $('.confirm-card-option').click(function(){
+            selectOffer($(this).data('offer-id'), selectedColor);
+        });
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var showAztecaLegalFooter = /*[[ ${showAztecaLegalFooter} ]]*/false;
+        if(showAztecaLegalFooter) $("div.azteca-footer").addClass("azteca-footer-visible");
+        function mediaQuery(x) {
+            if (x.matches) { // If media query matches
+                $(".forms").closest(".q50").parent().removeClass('questions-section');
+                $(".box-offert").eq(0).addClass("box-first-offert");
+                $(".box-offert").eq(1).addClass("box-last-offert");
+                $(".box-offert").eq(2).addClass("box-last-offert");
+                $(".box-offert").eq(3).addClass("box-last-offert");
+                $(".box-offert").eq(4).addClass("box-last-offert");
+            }
+            else {
+                $(".forms").closest(".q50").parent().addClass('questions-section');
+            }
+        }
+
+        $(document).ready(function(){
+            if(showAztecaLegalFooter) $("section.loan-process").addClass("azteca-offer-loan-process");
+        })
+        var x = window.matchMedia("(max-width: 800px)")
+        mediaQuery(x) // Call listener function at run time
+        x.addListener(mediaQuery)
+
+        var q50 = $('.q50');
+        var shouldOpenScheduleOnClickOffer = [[${shouldOpenScheduleOnClickOffer}]];
+        q50.closest('.loan-process').find('.adviser-section').addClass('show-img').removeAttr('style');
+        q50.closest('.wrap-pages').addClass('load-question-50');
+        q50.closest('body').removeClass('body-efl');
+        $('.calendar-button').click(function (e) {
+            e.stopPropagation();
+            $('#offerScheduleModal' + $(this).data('offer-id')).modal('show');
+        });
+        $(".btn-go").click(function(event){
+            console.log("modal")
+
+            confirmOfferModal($(this).data('offer-id'));
+
+        })
+        $('.bg-details').click(function (e) {
+            e.stopPropagation();
+            $('#offerScheduleModal' + $(this).data('offer-id')).modal('show');
+        });
+
+        if ($('.offer-container').length) {
+            $('.best-offer,.button-simular').not('#simulated-offer').click(function (event) {
+                event.stopPropagation();
+                event.preventDefault();
+                if(shouldOpenScheduleOnClickOffer){
+                    $('#offerScheduleModal' + $(this).closest('.select-offer').data('offer-id')).modal('show');
+                }else{
+                    confirmOfferModal($(this).closest('.select-offer').data('offer-id'));
+                }
+            });
+            $('.schedule-modal-accept-offer,.confirm-modal-accept-offer').click(function () {
+                $(this).closest('.modal').modal('hide');
+                var offerId = $(this).closest('.modal').data('offer-id');
+                var bestOfferElement = $(".best-offer[data-offer-id='" + offerId + "']")
+                bestOfferElement.addClass('offer-selected-' + bestOfferElement.data('offer-color'));
+                selectOffer(offerId);
+                $('.sello').hide();
+            });
+        }
+        function selectOffer(offerId, selectedColor) {
+            $("div.azteca-footer").removeClass("azteca-footer-visible");
+            if(showAztecaLegalFooter) $("section.loan-process").removeClass("azteca-offer-loan-process");
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    selectedOffer: offerId,
+                    selectedColor: selectedColor
+                },
+                success: function () {
+                    questionFw.refreshQuestion();
+                }
+            }, "");
+        }
+        $('#show_offer').on('click', function (event) {
+            event.preventDefault();
+            openOfferModal();
+        });
+        $('#rejectOffers').on('click', function (event) {
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    selectedOffer: -1
+                },
+                success: function () {
+                    questionFw.refreshQuestion();
+                }
+            }, "");
+        });
+        function openOfferModal() {
+            $("#offer_modal").modal('show');
+        }
+
+        function confirmOfferModal(offerId) {
+            $('#confirmOfferModal' + offerId).modal('show');
+        }
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        $('#btnBackToFirstDueDate').on('click', function(event) {
+            event.preventDefault();
+
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {},
+                success: function () {
+                    questionFw.refreshQuestion();
+                }
+            }, "backToFirstDueDate");
+        })
+        /*]]>*/
+
+    </script>
+    <script th:inline="javascript">
+
+        function sealDynamicReposition() {
+            var distanceFromTopToCarousel = $('#offer-carousel').offset() ? $('#offer-carousel').offset().top : 0;
+            var distanceFromTopToQuestionProgress = $('.adviser-section').offset() ? $('.adviser-section').offset().top :;
+            var progressQuestionHeight = $('#progressQuestion').height() || 0;
+            var totalDistanceFromTop = distanceFromTopToCarousel - distanceFromTopToQuestionProgress;
+            if(window.innerWidth >= 568) {
+                $('.sello').css('top', progressQuestionHeight + 'px');
+            } else {
+                $('.sello').css('top', totalDistanceFromTop + 'px');
+            }
+        }
+
+        window.addEventListener('resize', sealDynamicReposition, false);
+
+        $(document).ready(function () {
+            setTimeout(sealDynamicReposition, 0);
+        });
+    </script>
+    <script th:inline="javascript" th:if="${offers}">
+        /*<![CDATA[*/
+
+        try {
+            var isPushSupported = OneSignal.isPushNotificationsSupported();
+            console.log("pussh ? ", isPushSupported)
+            if (isPushSupported) {
+                var tags = {
+                    user_name: /*[[ ${personName} ]]*/null,
+                    current_question: questionFw.currentQuestion,// PARA LAS SIGUIENTES PREGUNTAS LO UNICO QUE DEBERIA CAMBIAR SERIA current_question
+                    loan_id: /*[[ ${loanApplication.id} ]]*/null,
+                    loan_offers: /*[[ ${offers.size()} ]]*/null,
+                };
+                var entity = /*[[ ${entity} ]]*/null;
+                tags.entity_name = entity !== null ? entity.shortName : null;
+
+                OneSignal.sendTags(tags, function (sent) {
+                    console.log('Tags sent ' + JSON.stringify(sent));// TODO HIDE
+                });
+                if (showHttpPrompt) {
+                    OneSignal.showHttpPrompt({force: true});// SLIDE PROMPT
+                } else {
+                    OneSignal.registerForPushNotifications();// NATIVE PROMPT
+                }
+            }
+        }catch(error){
+            console.error('OneSignal not available / Adblocker On?')
+        }
+        /*]]>*/
+    </script>
+
+
+</th:block>
+<th:block th:fragment="offerSchedule">
+    <div th:id="'offerScheduleModal' + ${offer?.id}" class="modal fade"
+         tabindex='-1' th:attr="data-offer-id=${offer.id}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Cronograma de pagos preliminar</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <th:block th:with="fdlmSaldoTotal=${fdlmSaldoTotal}"
+                              th:replace="fragments/modalScheduleFragment :: modalSchedule(laoanApplication=${loanAppplication}, offer=${offer}, person=${person})"></th:block>
+                    <div class="offer-container">
+                        <div class="sponsored-by" th:if="${offer?.entityProductParam?.offerScheduleLegalFooter != null}">
+                            <small th:utext="${offer?.entityProductParam?.offerScheduleLegalFooter}"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions text-center" style="padding: 0 0 1.5em 0">
+                    <th:block th:if="${loanApplication?.entityId == null or offer.entityId == T(com.affirm.common.model.catalog.Entity).FINANSOL or offer.entityId == T(com.affirm.common.model.catalog.Entity).PRISMA}">
+                        <button type="button" class="button red-button" data-dismiss="modal" th:onclick="${'confirmOfferModal(' + offer?.id +')'}"> Aceptar Oferta
+                        </button>
+                    </th:block>
+                    <th:block th:unless="${loanApplication?.entityId == null or offer.entityId == T(com.affirm.common.model.catalog.Entity).FINANSOL or offer.entityId == T(com.affirm.common.model.catalog.Entity).PRISMA}">
+                        <button type="button" class="button red-button schedule-modal-accept-offer" data-dismiss="modal"> Aceptar Oferta
+                        </button>
+                    </th:block>
+                    <button type="button" class="button black-button" data-dismiss="modal">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:id="'confirmOfferModal' + ${offer?.id}" class="modal fade "
+         tabindex="-1" role="dialog" aria-labelledby="confirmOfferModal" th:attr="data-offer-id=${offer.id}">
+        <div class="modal-dialog" role="edit">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Oferta Seleccionada</h4>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div class="wrapper">
+                            <ul>
+                                <th th:if="${offer?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}">
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Monto Aprobado :</strong>
+                                        <span th:text="${@utilService.integerMoneyFormat(offer?.ammount,offer.currency)}"></span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Adm. de plataforma :</strong>
+                                        <span th:text="${@utilService.integerMoneyFormat(offer?.totalCommission / 1.19, offer?.currency)}"></span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>I.V.A. adm. de plataforma :</strong>
+                                        <span th:text="${@utilService.integerMoneyFormat(offer?.totalCommission / 1.19 * 0.19, offer?.currency)}"></span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Monto a financiar :</strong>
+                                        <span th:text="${@utilService.integerMoneyFormat(offer?.loanCapital, offer?.currency)}"></span>
+                                    </li>
+                                    <li th:if="${fdlmSaldoTotal}" style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Monto a financiar :</strong>
+                                        <span th:text="${@utilService.doubleMoneyFormat(fdlmSaldoTotal, offer?.currency)}"></span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Valor a entregar :</strong>
+                                        <span th:text="${@utilService.integerMoneyFormat(offer?.ammount, offer?.currency)}"></span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+
+                                        <strong>Cuota mensual :</strong>
+                                        <span th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Cantidad de cuotas :</strong>
+                                        <span>
+                                            <th:block th:text="${offer.installments}"></th:block>
+                                            <th:block th:text="${offer.installments > 1} ? #{label.months} : #{label.installment}"></th:block>
+                                        </span>
+                                    </li>
+                                    <li style="align-items:center;margin-bottom: 10px;">
+                                        <strong>Tasa Efectiva anual :</strong>
+                                        <span th:text="${@utilService.percentFormat(offer.effectiveAnualRate,offer.currency)}"></span>
+                                    </li>
+                                </th>
+                                <th th:unless="${offer?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_FDLM}">
+                                    <li><strong>Monto de crédito:</strong> <span
+                                            th:text="${@utilService.integerMoneyFormat(offer?.ammount,offer.currency)}"></span>
+                                    </li>
+                                    <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                        <li><strong>Cuota promedio:</strong> <span
+                                                th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></span>
+                                        </li>
+                                    </th:block>
+                                    <th:block th:unless="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                        <li><strong>Cuota mensual:</strong> <span
+                                                th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></span>
+                                        </li>
+                                    </th:block>
+                                    <th:block th:if="${loanApplication.firstDueDate != null}">
+                                        <li><strong>Fecha 1era cuota:</strong>
+                                            <span th:text="${@utilService.dateFormat(loanApplication?.firstDueDate)}"></span>
+                                        </li>
+                                    </th:block>
+
+                                    <li><strong>Cantidad de cuotas:</strong>
+                                        <span>
+                                            <th:block th:text="${offer.installments}"></th:block>
+                                            <th:block
+                                                    th:text="${offer.installments > 1} ? #{label.months} : #{label.installment}">
+                                            </th:block>
+                                        </span></li>
+
+                                    <th:block
+                                            th:if="${offer?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_CREDIGOB_PROOVEDOR_ESTADO}">
+                                        <li>
+                                            <strong>TEM:</strong> <span
+                                                th:text="${@utilService.percentFormat(offer?.monthlyRate * 100.0,offer.currency)}"></span>
+                                        </li>
+                                    </th:block>
+                                    <th:block
+                                            th:unless="${offer?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_CREDIGOB_PROOVEDOR_ESTADO}">
+                                        <li
+                                                th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                            <strong th:text="#{contract.text.tea} + ':'"></strong> <span
+                                                th:text="${@utilService.percentFormat(offer.nominalAnualRate,offer.currency)}"></span>
+                                        </li>
+                                        <li
+                                                th:unless="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                            <strong th:text="#{contract.text.tea} + ':'"></strong> <span
+                                                th:text="${@utilService.percentFormat(offer.effectiveAnualRate,offer.currency)}"></span>
+                                        </li>
+                                        <li><strong th:text="#{contract.text.tcea} + ':'"></strong> <span
+                                                th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate,offer.currency)}"></span>
+                                        </li>
+                                    </th:block>
+
+                                    <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).FINANSOL}">
+                                        <li>Acepto ser socio de la COOPAC FINANSOL y pagar la inscripción correspondiente (S/ 10) y el primer aporte social (S/ 20)</li>
+                                    </th:block>
+                                    <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).PRISMA}">
+                                        <li>Acepto ser socio de la COOPAC MF PRISMA y pagar los valores correspondientes a S/ 25 por inscripción y S/10 como primer aporte, los cuales serán abonados en agencia y los siguientes aportes estarán incluidos en las cuotas.</li>
+                                    </th:block>
+                                </th>
+
+                            </ul>
+                            <div class="w-btn">
+                                <button th:if="${@brandingService.isBranded(#httpServletRequest)}" class="btn black-button" data-dismiss="modal">Volver</button>
+                                <button th:unless="${@brandingService.isBranded(#httpServletRequest)}" class="btn bg-black" data-dismiss="modal">Volver</button>
+                                <button class="btn bg-red confirm-modal-accept-offer">Confirmar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:fragment="question_50_simulated_offer_mobile">
+    <div class="box-offert a-medidad" th:attr="data-offer-id=${offer?.id}, data-offer-color='blue'">
+        <div class="box-offert-title" >
+            <p>A Medida</p>
+        </div>
+        <div id="simulated-offer" class="box-offert-body" >
+            <div class="box-offert-body-left">
+                <div class="box-offert-body-left-paragraph">
+                    <div class="title-offert" style="display:flex;justify-content: space-around;">
+                        <p class="box-offert-body-parragraph-title">MONTO</p>
+                        <p class="box-offert-body-parragraph-title">PLAZO</p>
+
+                    </div>
+
+                    <div class="box-offert-body-parragraph-descrip box-offert-body-parragraph-descrip_first">
+                        <form id="simulatedOfferForm" autocomplete="off">
+                            <div class=" frm_edit">
+                                <div class="amount_edit">
+                                    <span>$</span>
+                                    <input name="amount" class="input-simular-2 simular-amount-2" type="text"
+                                           placeholder="" th:value="${simulatedOfferForm.amount}"
+                                           maxlength="9" />
+                                </div>
+                                /
+                                <div class="month_edit">
+                                    <input name="installments" class="input-simular-2 simular-installments-2" type="text" placeholder="" th:value="${simulatedOfferForm.installments}" maxlength="2" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="box-offert-body-left-paragraph">
+                    <p class="box-offert-body-parragraph-title">CUOTA</p>
+
+                    <div class="box-offert-body-parragraph-descrip">
+                                    <span class="not_first_installment_amount-2"
+                                          th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule?.get(1)?.installmentAmount, offer?.currency)}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-offert-body-right">
+                <div class="button bg-details calendar-button-2" th:attr="data-offer-id=${offer?.id}"> Ver detalles </div>
+                <a class="button bg-red go button-simular-2">¡Simular!</a>
+                <a class="button bg-red go button-wanted-2" style="display: none" th:attr="data-offer-id=${offer?.id}">¡La quiero!</a>
+            </div>
+        </div>
+
+        <th:block th:if="${offer != null}">
+            <th:block th:replace="this :: offerSchedule"></th:block>
+        </th:block>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                $('.simular-installments-2').forceIntegerOnly(true, 1, 72);
+
+                function maskNumbersBDS() {
+                    $('.simular-amount-2').maskNumber({
+                        thousands: '.',
+                        integer: true
+                    });
+                }
+
+                maskNumbersBDS();
+
+                var pastAmount = 0;
+                var pastInstallments = 0;
+
+                var canSimulate = /*[[${offer != null}]]*/ ;
+                if (canSimulate) {
+                    $('.button-simular-2').hide();
+                    $('.button-wanted-2').show();
+                }
+
+                function setInputSimularChangeEvent() {
+                    $(".input-simular-2").change(function () {
+                        var newAmount = $('.simular-amount-2').val();
+                        var newInstallments = $('.simular-installments-2').val();
+                        var changed = false;
+                        if (pastAmount != newAmount) {
+                            pastAmount = newAmount;
+                            changed = true;
+                        }
+                        if (pastInstallments != newInstallments) {
+                            pastInstallments = newInstallments;
+                            changed = true;
+                        }
+                        if (changed) {
+                            $('.button-simular-2').show();
+                            $('.button-wanted-2').hide();
+                        }
+                    });
+                }
+                setInputSimularChangeEvent();
+
+                function setButtonSimularClickEvent() {
+                    $('.button-simular-2').click(function (event) {
+                        event.preventDefault();
+
+                        var amount = $('.simular-amount-2').val().replace(/[.]/g, '');
+                        var installments = $('.simular-installments-2').val();
+
+                        if (amount === '') {
+                            showErrorModal('El campo monto es requerido.');
+                            return;
+                        } else if (installments === '') {
+                            showErrorModal('El campo meses es requerido.');
+                            return;
+                        }
+
+                        $('.button-simular-2').loading('', 2);
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "POST",
+                            data: {
+                                amount: amount,
+                                installments: $('.simular-installments-2').val(),
+                                mobile: true
+                            },
+                            success: function (data) {
+                                $('.button-simular-2').unloading();
+                                $('.a-medidad')
+                                    .hide(); // OCULTO TARJETA. PARA EVITAR FLASHEO DE BRANDEADO
+                                $('.a-medidad').append(
+                                    data); // AGREGO LA RESPUESTA AL CONTENEDOR
+                                updateSimulatedOffer
+                                (); // BRANDEA Y SETEA DENUEVO EVENTOS EN BOTONES
+                                $('.a-medidad').parent().html($('.a-medidad')
+                                    .get(1)
+                                ); // TOMO EL SEGUNDO ELEMENTO (RSPTA DE AJAX) Y REESCRIBO EL HTML
+                                setInputSimularChangeEvent
+                                (); // VUELVO A SETEAR EVENTO EN INPUT PARA SIMULAR
+                                setButtonSimularClickEvent
+                                (); // VUELVO A SETEAR EVENTO EN BOTON SIMULAR
+
+                                maskNumbersBDS();
+
+                                var newAmount = $('.simular-amount-2').val();
+                                newAmount = newAmount.replace(new RegExp("^(\\d{" + (
+                                    newAmount.length % 3 ? newAmount.length %
+                                        3 : 0) + "})(\\d{3})", "g"), "$1 $2").replace(
+                                    /(\d{3})+?/gi, "$1 ").trim();
+                                $('.simular-amount-2').val(newAmount.replace(/\s/g, '.'));
+                            },
+                            error: function () {
+                                $('.button-simular-2').unloading();
+                            }
+                        }, "simulateOffer");
+                    });
+                }
+                setButtonSimularClickEvent();
+
+                function updateSimulatedOffer() {
+                    $('.button-wanted-2').css('background-color', $cadena_colorweb);
+
+                    setTimeout(function () {
+                        updateBranding();
+
+                        // VUELVO A SETEAR EVENTO CLICK CRONOGRAMA
+                        $('.a-medidad .button-wanted-2, .a-medidad .calendar-button-2').click(
+                            function (e) {
+                                var offerId = $(this).data('offer-id') || $(this).parent().parent()
+                                    .data('offer-id');
+                                $('#offerScheduleModal' + offerId).modal('show');
+                            });
+
+                        // ELIMINO MODALES CON ID QUE TERMINEN EN [OFFERID] SI YA EXISTIAN
+                        $('#questionModals [id$=' + $('.a-medidad').data('offer-id') + ']')
+                            .remove();
+
+                        // INSERTO NUEVOS MODALES
+                        $('.a-medidad .modal').appendTo('#questionModals');
+
+                        // VUELVO A SETEAR EVENTO OFERTA LA QUIERO
+                        $('.schedule-modal-accept-offer,.confirm-modal-accept-offer').click(
+                            function () {
+                                $(this).closest('.modal').modal('hide');
+                                var offerId = $(this).closest('.modal').data('offer-id');
+                                var bestOfferElement = $(".best-offer[data-offer-id='" + offerId +
+                                    "']")
+                                bestOfferElement.addClass('offer-selected-' + bestOfferElement.data(
+                                    'offer-color'));
+                                selectOffer(offerId);
+                                $('.sello').hide();
+                            });
+                    }, 0);
+                }
+            })();
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+<th:block th:fragment="question_50_simulated_offer">
+    <li class="select-offer select-simulate"
+        th:attr="data-offer-id=${offer?.id}, data-offer-color='blue'"
+        th:classappend="'offer-red'">
+        <div id="simulated-offer" class="best-offer best-offer-custom">
+            <div class="box-b">
+                <h3>A medida</h3>
+                <span><br/></span>
+                <form id="simulatedOfferForm" autocomplete="off">
+                    <div class=" frm_edit">
+                        <div class="amount_edit">
+                            <span>$</span>
+                            <input name="amount" class="input-simular simluar-amount" type="text" placeholder=""
+                                   th:value="${simulatedOfferForm.amount}" maxlength="9"/>
+                        </div>
+                        /
+                        <div class="month_edit">
+                            <input name="installments" class="input-simular simular-installments" type="text" placeholder=""
+                                   th:value="${simulatedOfferForm.installments}" maxlength="2"/>
+                            <span>meses</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="box-c2">
+                <div class="bloc first">
+                    <div class="amount arg">
+                        <div class="top">
+                            <span>
+                                1era cuota - <span class="first_installment_amount"
+                                                   th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule?.get(0)?.installmentAmount, offer?.currency)}"></span>
+                            </span><br/>
+                            <span>
+                                Cuotas 2 a <span class="installments_count"
+                                                 th:text="${offer?.installments}"></span> - <span
+                                    class="not_first_installment_amount"
+                                    th:text="${@utilService.doubleMoneyFormat(offer?.offerSchedule?.get(1)?.installmentAmount, offer?.currency)}"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bloc-seconds">
+                        <div class="percent"
+                             th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'percent' }">
+                            <div class="top">
+                                <span th:text="#{contract.text.tea}"></span>
+                                <th:block
+                                        th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                    <span th:text="${@utilService.percentFormat(offer?.nominalAnualRate,offer?.currency)}"></span>
+                                </th:block>
+                                <th:block
+                                        th:unless="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                    <span th:text="${@utilService.percentFormat(offer?.effectiveAnualRate,offer?.currency)}"></span>
+                                </th:block>
+                            </div>
+                            <div class="bottom">
+                                <span th:text="#{contract.text.tcea}"></span>
+                                <span th:text="${@utilService.percentFormat(offer?.effectiveAnnualCostRate,offer?.currency)}"></span>
+                            </div>
+                        </div>
+                        <th:block
+                                th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                            <div class="percent"
+                                 th:classappend="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'arg' : 'percent' }">
+                                <div class="top">
+                                    <span th:text="#{contract.text.efectiveanualrate}"></span>
+                                    <span th:text="${@utilService.percentFormat(offer?.effectiveAnualRate)}"></span>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+                <th:block
+                        th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                    <div class="cft">
+                        <span th:text="#{contract.text.tcea}"></span>
+                        <span th:text="${@utilService.percentFormat(offer?.effectiveAnnualCostRate,offer?.currency)}"></span>
+                    </div>
+                </th:block>
+            </div>
+            <a class="button bg-red go button-simular">¡Simular!</a>
+            <a class="button bg-red go button-wanted" style="display: none">¡La quiero!</a>
+        </div>
+        <div class="button calendar-button" th:attr="data-offer-id=${offer?.id}">
+            <th:block th:if="${differentEntityProductParams}">
+                <th:block
+                        th:if="${offer?.entityProductParam.disbursementType == offer?.entityProductParam.DISBURSEMENT_TYPE_DEPOSIT}">
+                    <img src="https://s3.amazonaws.com/solven-public/img/icons/transfer-online.png"
+                         class="type-icon" data-toggle="tooltip" data-placement="bottom"
+                         title="Transferencia Online"/>
+                </th:block>
+                <th:block
+                        th:if="${offer?.entityProductParam.disbursementType == offer?.entityProductParam.DISBURSEMENT_TYPE_RETIREMNT}">
+                    <img src="https://s3.amazonaws.com/solven-public/img/icons/retiro-agencia.png"
+                         class="type-icon" data-toggle="tooltip" data-placement="bottom"
+                         title="Retiro en Agencia"/>
+                </th:block>
+            </th:block>
+            <div class="wsi">
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="20px" height="20px" viewBox="0 0 488.152 488.152"
+                     style="enable-background:new 0 0 488.152 488.152;"
+                     xml:space="preserve">
+                                        <g>
+                                            <path d="M177.854,269.311c0-6.115-4.96-11.069-11.08-11.069h-38.665c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                                c0,6.123,4.961,11.079,11.074,11.079h38.665c6.12,0,11.08-4.956,11.08-11.079V269.311L177.854,269.311z"/>
+                                            <path d="M274.483,269.311c0-6.115-4.961-11.069-11.069-11.069h-38.67c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                                c0,6.123,4.961,11.079,11.074,11.079h38.67c6.108,0,11.069-4.956,11.069-11.079V269.311z"/>
+                                            <path d="M371.117,269.311c0-6.115-4.961-11.069-11.074-11.069h-38.665c-6.12,0-11.08,4.954-11.08,11.069v38.66
+                                                c0,6.123,4.96,11.079,11.08,11.079h38.665c6.113,0,11.074-4.956,11.074-11.079V269.311z"/>
+                                            <path d="M177.854,365.95c0-6.125-4.96-11.075-11.08-11.075h-38.665c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                                c0,6.119,4.961,11.074,11.074,11.074h38.665c6.12,0,11.08-4.956,11.08-11.074V365.95L177.854,365.95z"/>
+                                            <path d="M274.483,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                                c0,6.119,4.961,11.074,11.074,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95z"/>
+                                            <path d="M371.117,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.12,0-11.08,4.95-11.08,11.075v38.653
+                                                c0,6.119,4.96,11.074,11.08,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95L371.117,365.95z"/>
+                                            <path d="M440.254,54.354v59.05c0,26.69-21.652,48.198-48.338,48.198h-30.493c-26.688,0-48.627-21.508-48.627-48.198V54.142
+                                                h-137.44v59.262c0,26.69-21.938,48.198-48.622,48.198H96.235c-26.685,0-48.336-21.508-48.336-48.198v-59.05
+                                                C24.576,55.057,5.411,74.356,5.411,98.077v346.061c0,24.167,19.588,44.015,43.755,44.015h389.82
+                                                c24.131,0,43.755-19.889,43.755-44.015V98.077C482.741,74.356,463.577,55.057,440.254,54.354z M426.091,422.588
+                                                c0,10.444-8.468,18.917-18.916,18.917H80.144c-10.448,0-18.916-8.473-18.916-18.917V243.835c0-10.448,8.467-18.921,18.916-18.921
+                                                h327.03c10.448,0,18.916,8.473,18.916,18.921L426.091,422.588L426.091,422.588z"/>
+                                            <path d="M96.128,129.945h30.162c9.155,0,16.578-7.412,16.578-16.567V16.573C142.868,7.417,135.445,0,126.29,0H96.128
+                                                C86.972,0,79.55,7.417,79.55,16.573v96.805C79.55,122.533,86.972,129.945,96.128,129.945z"/>
+                                            <path d="M361.035,129.945h30.162c9.149,0,16.572-7.412,16.572-16.567V16.573C407.77,7.417,400.347,0,391.197,0h-30.162
+                                                c-9.154,0-16.577,7.417-16.577,16.573v96.805C344.458,122.533,351.881,129.945,361.035,129.945z"/>
+                                        </g>
+                                    </svg>
+            </div>
+            <span>Ver cronograma</span>
+        </div>
+        <th:block th:if="${offer != null}">
+            <th:block th:replace="this :: offerSchedule"></th:block>
+        </th:block>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            $('.simular-installments').forceIntegerOnly(true, 1, 72);
+
+            function maskNumbersBDS() {
+                $('.simluar-amount').maskNumber({
+                    thousands: '.',
+                    integer: true
+                });
+            }
+
+            maskNumbersBDS();
+
+            var pastAmount = 0;
+            var pastInstallments = 0;
+
+            var canSimulate = /*[[${offer != null}]]*/;
+            if (canSimulate) {
+                $('.select-simulate').find(".button-simular").hide();
+                $('.select-simulate').find(".button-wanted").show();
+            }
+
+            function setInputSimularChangeEvent() {
+                $(".input-simular").change(function () {
+                    var newAmount = $('.simluar-amount').val();
+                    var newInstallments = $('.simular-installments').val();
+                    var changed = false;
+                    if (pastAmount != newAmount) {
+                        pastAmount = newAmount;
+                        changed = true;
+                    }
+                    if (pastInstallments != newInstallments) {
+                        pastInstallments = newInstallments;
+                        changed = true;
+                    }
+                    if (changed) {
+                        $('.select-simulate').find(".button-simular").show();
+                        $('.select-simulate').find(".button-wanted").hide();
+                    }
+                });
+            }
+            setInputSimularChangeEvent();
+
+            function setButtonSimularClickEvent() {
+                $('.button-simular').click(function (event) {
+                    event.preventDefault();
+
+                    var amount = $('.simluar-amount').val().replace(/[.]/g, '');
+                    var installments = $('.simular-installments').val();
+
+                    if (amount === '') {
+                        showErrorModal('El campo monto es requerido.');
+                        return;
+                    } else if (installments === '') {
+                        showErrorModal('El campo meses es requerido.');
+                        return;
+                    }
+
+                    $('.button-simular').loading('', 2);
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        data: {
+                            amount: amount,
+                            installments: $('.simular-installments').val()
+                        },
+                        success: function (data) {
+                            $('.button-simular').unloading();
+                            $('.select-simulate').hide();// OCULTO TARJETA. PARA EVITAR FLASHEO DE BRANDEADO
+                            $('.select-simulate').append(data);// AGREGO LA RESPUESTA AL CONTENEDOR
+                            updateSimulatedOffer();// BRANDEA Y SETEA DENUEVO EVENTOS EN BOTONES
+                            $('.select-simulate').parent().html($('.select-simulate').get(1));// TOMO EL SEGUNDO ELEMENTO (RSPTA DE AJAX) Y REESCRIBO EL HTML
+                            setInputSimularChangeEvent();// VUELVO A SETEAR EVENTO EN INPUT PARA SIMULAR
+                            setButtonSimularClickEvent();// VUELVO A SETEAR EVENTO EN BOTON SIMULAR
+
+                            maskNumbersBDS();
+
+                            var newAmount = $('.simluar-amount').val();
+                            newAmount = newAmount.replace(new RegExp("^(\\d{" + (newAmount.length%3?newAmount.length%3:0) + "})(\\d{3})", "g"), "$1 $2").replace(/(\d{3})+?/gi, "$1 ").trim();
+                            $('.simluar-amount').val(newAmount.replace(/\s/g, '.'));
+                        }, error: function(){
+                            $('.button-simular').unloading();
+                        }
+                    }, "simulateOffer");
+                });
+            }
+            setButtonSimularClickEvent();
+
+            function updateSimulatedOffer() {
+                $('.select-simulate .button-wanted').css('background-color',  $cadena_colorweb);
+
+                setTimeout(function() {
+                    updateBranding();
+
+                    // VUELVO A SETEAR EVENTO CLICK CRONOGRAMA
+                    $('.select-simulate .button-wanted, .select-simulate .calendar-button').click(function (e) {
+                        var offerId = $(this).data('offer-id') || $(this).parent().parent().data('offer-id');
+                        $('#offerScheduleModal' + offerId).modal('show');
+                    });
+
+                    // ELIMINO MODALES CON ID QUE TERMINEN EN [OFFERID] SI YA EXISTIAN
+                    $('#questionModals [id$=' + $('.select-simulate').data('offer-id') + ']').remove();
+
+                    // INSERTO NUEVOS MODALES
+                    $('.select-simulate .modal').appendTo('#questionModals');
+
+                    // VUELVO A SETEAR EVENTO OFERTA LA QUIERO
+                    $('.schedule-modal-accept-offer,.confirm-modal-accept-offer').click(function () {
+                        $(this).closest('.modal').modal('hide');
+                        var offerId = $(this).closest('.modal').data('offer-id');
+                        var bestOfferElement = $(".best-offer[data-offer-id='" + offerId + "']")
+                        bestOfferElement.addClass('offer-selected-' + bestOfferElement.data('offer-color'));
+                        selectOffer(offerId);
+                        $('.sello').hide();
+                    });
+                }, 0);
+            }
+            /*]]>*/
+        </script>
+    </li>
+</th:block>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationWizardTemplate" th:with="step = 2">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="head">
+    <!--Range slider-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/js/ion.rangeSlider.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.skinNice.css'}"/>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!--Own-->
+    <script th:inline="javascript" charset="ISO-8859-1">
+        /*<![CDATA[*/
+        var errorMessage = /*[[${errorMessage}]]*/null;
+        var searchBrowserLocation = /*[[${searchBrowserLocation}]]*/false;
+
+        $(document).ready(function () {
+
+            if (errorMessage != null) {
+                $('#errorModal').find('p').html(errorMessage);
+                $('#errorModal').modal('show');
+            }
+
+            //Set the validations
+            var validator = /*[[${loanApplicationStep2Form.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                console.log(validator);
+                var jsonValidator = JSON.parse(validator);
+
+                $('#frmRegister').validateForm(createFormValidationJson(jsonValidator, $('#frmRegister')));
+            }
+
+            //Get the geolocation
+            if (navigator.geolocation && searchBrowserLocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+                $('#geopositionErrorModal').find('p').html(/*[[#{registerLoanForm2.browserGeolocation.notEnalbled}]]*/);
+                $('#geopositionErrorModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                });
+            }
+//            else {
+//                $('#geopositionErrorModal').find('p').html(/*[[#{registerLoanForm2.browserGeolocation.notSupported}]]*/);
+//                $('#geopositionErrorModal').modal({
+//                    backdrop: 'static',
+//                    keyboard: true
+//                });
+//            }
+
+            //Set the dinamic elements
+            $('#department').on('change', function () {
+                $.getJSON(/*[[@{/catalog/provinces/json}]]*/, {departmentId: $(this).val()}, function (data) {
+
+                    console.log('Department value: ' + $('#department').val())
+                    console.log('Province value: ' + $('#province').val())
+//                    var placeholder = /*[[#{form.field.province.placeholder}]]*/;
+                    var placeholder = "";
+                    var options = '<option value="" hidden="hidden">' + placeholder + '</option>';
+                    for (var x = 0; x < data.length; x++) {
+                        options += '<option value="' + data[x]['id'] + '" ' + '>' + data[x]['name'] + '</option>';
+                    }
+                    $('#province').html(options);
+                    $('#province').change();
+                });
+            });
+            $('#province').on('change', function () {
+                $.getJSON(/*[[@{/catalog/districts/json}]]*/, {
+                    departmentId: $('#department').val(),
+                    provinceId: $(this).val()
+                }, function (data) {
+//                    var placeholder = /*[[#{form.field.district.placeholder}]]*/;
+                    var placeholder = "";
+                    var options = '<option value="" hidden="hidden">' + placeholder + '</option>';
+                    for (var x = 0; x < data.length; x++) {
+                        options += '<option value="' + data[x]['id'] + '">' + data[x]['name'] + '</option>';
+                    }
+                    $('#district').html(options);
+                });
+
+            });
+
+            $('#btnSubmit').click(function (e) {
+                e.preventDefault();
+                if ($('#frmRegister').valid()) {
+                    $('#loading-ajax').removeClass('loading-ajax-invisible');
+                    $('#loading-ajax').addClass('loading-ajax-visible');
+                    $('#text-button').text('Espere...');
+                    $(this).prop('disabled', true);
+                    defaultAjax({
+                        url: /*[[@{/loanapplication/addressInformation/__${loanAplicationToken}__}]]*/null,
+                        type: 'POST',
+                        form: $('#frmRegister'),
+                        data: $('#frmRegister').serializeObject(),
+                        error: function(){
+                            $('#loading-ajax').addClass('loading-ajax-invisible');
+                            $('#loading-ajax').removeClass('loading-ajax-visible');
+                            $('#text-button').text('Continuar');
+                            $(this).prop('disabled', false);
+                        }
+                    });
+                }
+            });
+
+//			$('#department').change();
+            configureSummaryPanel([
+                $('#streetType'), $('#streetName'), $('#streetNumber'), $('#interior'), $('#detail'), $('#department'), $('#province'), $('#district')
+            ]);
+            initSummaryPanel();
+        });
+
+        function showPosition(position) {
+            $('#geopositionErrorModal').modal('hide');
+            $.ajax({
+                url: /*[[@{/loanapplication/addressInformation/browserLocation/__${loanAplicationToken}__}]]*/null,
+                type: 'POST',
+                data: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                },
+                success: function (result) {
+                },
+                error: function (result) {
+                    console.log('Error guardando browser location')
+                }
+            });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    $('#geopositionErrorModal').find('p').html(/*[[#{registerLoanForm2.browserGeolocation.notEnalbled}]]*/);
+                    $('#geopositionErrorModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    });
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    console.log("Unavailable position")
+                    break;
+                case error.TIMEOUT:
+                    console.log("Timeout getting the position")
+                    break;
+                case error.UNKNOWN_ERROR:
+                    console.log("Unknow error")
+                    break;
+            }
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="contentTab2">
+    <!--/*<nav class="navbar navbar-default navbar-fixed-top" style="padding-right: 20px" onload="loadLoanApplication();">-->
+    <!--<div class="navbar-right  navbar-text container-fluid"-->
+    <!--th:with="initialForm=${@loanApplicationDAO.getUserLoanInitialForm(@loanApplicationService.getLoanApplicationIdFromLoanAplicationToken(loanAplicationToken))}">-->
+    <!--<div>-->
+    <!--<label>Monto: </label>-->
+    <!--<span id="navBarLoanAmmount" th:text="${initialForm.loanApplicationAmmount}"></span>-->
+    <!--</div>-->
+    <!--<div style="display: inline;">-->
+    <!--<label>Plazos: </label>-->
+    <!--<span id="navBarLoanInstallments"-->
+    <!--th:text="${initialForm.loanApplicationInstallemnts != null?initialForm.loanApplicationInstallemnts:'Adelanto'}"></span>-->
+    <!--</div>-->
+    <!--<span style="visibility: hidden" id="navBarShorTermDays"-->
+    <!--th:text="${initialForm.loanApplicationShorTermDays}"></span>-->
+    <!--<button class="btn btn-info btn-sm" style="display: inline;" onclick="openUpdateoanApplicationModal()">-->
+    <!--Editar-->
+    <!--</button>-->
+    <!--</div>-->
+    <!--</nav> */-->
+
+    <div id="registerLoanForm2">
+
+        <form role="form" action="#" th:object="${loanApplicationStep2Form}" id="frmRegister" autocomplete="on">
+
+            <!-- DIRECTION PANEL -->
+            <div id="directionPanel" class="panel panel-default summarypanel">
+                <div class="panel-body">
+                    <div class="summarypanel-tittle">
+                        <h4>Direcci&oacute;n</h4>
+                    </div>
+                    <div class="summarypanel-summary">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.streetType}"></label>
+                                        <span id="streetTypeSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.streetName}"></label>
+                                        <span id="streetNameSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.streetNumber}"></label>
+                                        <span id="streetNumberSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.address.interior}"></label>
+                                        <span id="interiorSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.address.detail}"></label>
+                                        <span id="detailSummaryPanel"></span>
+                                    </li>
+
+                                </ul>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.department}"></label>
+                                        <span id="departmentSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.province}"></label>
+                                        <span id="provinceSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.district}"></label>
+                                        <span id="districtSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summarypanel-body">
+                        <div class="inputs-wrapper">
+                            <div class="cl wp">
+                                <div class="fields" th:classappend="*{validator.streetType.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="streetType"
+                                               th:text="#{form.field.streetType}"/>
+                                        <select th:field="*{streetType}" class="form-control">
+                                            <option value="" hidden="hidden"></option>
+                                            <option th:each="type : ${@catalogService.getStreetTypes()}"
+                                                    th:value="${type.id}"
+                                                    th:text="${type.type}"></option>
+                                        </select>
+                                        <small class="help-block muted">Ej: Av.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields" th:classappend="*{validator.streetName.hasErrors?'has-error':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="streetName" th:text="#{form.field.streetName}"/>
+                                        <input type="text" th:field="*{streetName}" class="form-control input-email" />
+                                        <small class="help-block muted">Ej: Angamos Oeste</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields" th:classappend="*{validator.streetNumber.hasErrors?'has-error':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="streetNumber"
+                                               th:text="#{form.field.streetNumber}"/>
+                                        <input type="text" th:field="*{streetNumber}" class="form-control tidy-input-number" />
+                                        <small class="help-block muted">Ej: 2061</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields" th:classappend="*{validator.interior.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="interior" th:text="#{form.field.address.interior}"/>
+                                        <input type="text" th:field="*{interior}"
+                                               class="form-control tidy-input-number"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.interior.hasErrors}"
+                                              th:text="*{validator.interior.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: 401</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields" th:classappend="*{validator.detail.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="detail" th:text="#{form.field.address.detail}"/>
+                                        <input type="text" th:field="*{detail}"
+                                               class="form-control large-input"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.detail.hasErrors}"
+                                              th:text="*{validator.detail.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Santa Cruz</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl nml">
+                                <div class="fields" th:classappend="*{validator.department.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="department" th:text="#{form.field.department}"></label>
+                                        <select th:field="*{department}" class="form-control input-cities">
+                                            <!--<option value="" th:text="#{form.field.department.placeholder}"-->
+                                            <!--hidden="hidden"></option>-->
+                                            <option value="" hidden="hidden"></option>
+                                            <option th:each="department : ${@catalogService.getDepartments()}"
+                                                    th:value="${department.id}"
+                                                    th:text="${department.name}"></option>
+                                        </select>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message" th:if="*{validator.department.hasErrors}" th:text="*{validator.department.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Lima</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl nml">
+                                <div class="fields" th:classappend="*{validator.province.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="province" th:text="#{form.field.province}"></label>
+                                        <select th:field="*{province}" class="form-control input-cities">
+                                            <option value="" hidden="hidden"></option>
+                                            <option th:if="*{department != null}"
+                                                    th:each="province : ${@catalogService.getProvinces(loanApplicationStep2Form.department)}"
+                                                    th:value="${province.id}" th:text="${province.name}"></option>
+                                        </select>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message" th:if="*{validator.province.hasErrors}" th:text="*{validator.province.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Lima</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields" th:classappend="*{validator.district.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="district" th:text="#{form.field.district}"></label>
+                                        <select th:field="*{district}" class="form-control input-cities">
+                                            <option value="" hidden="hidden"></option>
+                                            <option th:if="*{province != null}"
+                                                    th:each="district : ${@catalogService.getDistricts(loanApplicationStep2Form.department, loanApplicationStep2Form.province)}"
+                                                    th:value="${district.id}" th:text="${district.name}"></option>
+                                        </select>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message" th:if="*{validator.district.hasErrors}" th:text="*{validator.district.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Miraflores</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="btnSubmit" type="submit" class="button red-button">
+                    <div id="loading-ajax" class="loading-ajax-invisible">
+                        <div class="sk-circle">
+                            <div class="sk-circle1 sk-child"></div>
+                            <div class="sk-circle2 sk-child"></div>
+                            <div class="sk-circle3 sk-child"></div>
+                            <div class="sk-circle4 sk-child"></div>
+                            <div class="sk-circle5 sk-child"></div>
+                            <div class="sk-circle6 sk-child"></div>
+                            <div class="sk-circle7 sk-child"></div>
+                            <div class="sk-circle8 sk-child"></div>
+                        </div>
+                        <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                    <span id="text-button">Continuar</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="geopositionErrorModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,103 @@
+@import "app/vendors/bourbon/bourbon";
+@import "app/base/typography";
+@import "app/base/mixins";
+@import "app/base/variables";
+@import "app/base/icons";
+@import "app/base/classes";
+
+
+.pdfViewer {
+  background: $black_color_main;
+  width: 100%;
+}
+
+.pdfViewer .pdf-bar {
+  background: $red-1;
+  bottom: 13px;
+  display: none;
+  left: 0;
+  margin: 0 auto;
+  padding: 0.5em;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  width: 100%;
+  z-index: 1;
+}
+
+.pdfViewer .actions-pdf {
+  bottom: 15%;
+  position: fixed;
+  right: 5%;
+  z-index: 9999999;
+}
+
+.pdfViewer .actions-pdf .circle {
+  @include border-radius(50%);
+  background: $black-5;
+  color: $black_color_main;
+  display: block;
+  height: 42px;
+  margin: 0.5em 0;
+  text-align: center;
+  width: 42px;
+}
+
+.pdfViewer .actions-pdf .circle .icon:before {
+  font-size: 2em;
+}
+
+.pdfViewer .pdf-container {
+  margin: 0 auto;
+  max-width: 1024px;
+}
+
+.zoom-options {
+  align-items: center;
+  display: none;
+  flex-direction: column;
+  height: auto;
+  justify-content: center;
+  padding: 0.5em;
+  position: absolute;
+  right: 0;
+  top: 33vh;
+  z-index: 1;
+}
+
+.zoom-options button {
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  height: 50px !important;
+  justify-content: center;
+  max-height: 50px !important;
+  min-width: 50px !important;
+  padding: 0 5px;
+}
+
+.zoom-options .zoominbutton {
+  font-size: 3rem;
+  margin-bottom: 2.5rem;
+}
+
+.zoom-options .zoomoutbutton {
+  font-size: 4rem;
+}
+
+@media only screen and (min-width:1286px) {
+  .zoom-options {
+    right: 2.5% !important;
+  }
+}
+
+@media only screen and (min-width:749px) and (max-width:1285px) {
+  .zoom-options{
+    right: -2.5%;
+  }
+}
+@media only screen and (max-height:700px) {
+  .zoom-options {
+    top: 27vh !important;
+  }
+}

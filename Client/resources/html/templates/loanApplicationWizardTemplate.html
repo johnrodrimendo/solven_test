@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <title>Solven | El cr&eacute;dito que mereces.</title>
+    <meta name="author" content="javiereat@gmail.com"/>
+    <meta name="description" content="Solven"/>
+    <meta name="keywords" content="Solven"/>
+    <meta name="Resource-type" content="Document"/>
+
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}"/>
+
+    <style th:inline="text">
+        @font-face {
+            font-family: "Solven Icons";
+            font-style: normal;
+            font-weight: normal;
+            src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")
+        }
+    </style>
+
+    <!-- Common scritps and css -->
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/css/bootstrap.css'}"/>
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/animate/animate.css'}"/>
+
+
+    <!--[if IE]>
+    <script type="text/javascript">
+        var console = {
+            log: function () {
+            }
+        };
+    </script>
+    <![endif]-->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Variable globales
+        var system = {
+            contextPath : /*[[ ${#httpServletRequest.getContextPath()} ]]*/
+        };
+        /*]]>*/
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+    <!--Botstrap material-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/js/bootstrap.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/js/material.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/css/bootstrap-material-design.css'}"/>
+
+    <!-- noUiSlider -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/wnumb-1.0.2/wNumb.js'}"></script>
+
+    <!--Moment-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment-with-locales.min.js'}"></script>
+
+    <!--StandoutMe-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/standoutme/js/standoutme.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/standoutme/css/standoutme.css'}"/>
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <!-- Detect Mobile -->
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+
+    <!--own-->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/application.css}"/>
+    <script th:src="@{/js/util.js}"></script>
+    <!--Sweet Alerts -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.min.js'}"></script>
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.css'}"/>
+    <style>
+        .form-group .help-block {
+            position: static;
+        }
+
+        .muted {
+            color: #777 !important;
+        }
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var updModalLoanProductId =
+        /*[[ ${loanApplicationUpdateAmountForm.updModalLoanProductId} ]]*/
+        var jsonUpdModalFormValidation;
+        var jsonProductTraditional = {
+            maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).TRADITIONAL).getMaxAmount()} ]]*/,
+            minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).TRADITIONAL).getMinAmount()} ]]*/
+        };
+        var jsonProductShortTerms = {
+            maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMaxAmount()} ]]*/,
+            minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMinAmount()} ]]*/
+        };
+        var productAdelantoId = /*[[ ${T(com.affirm.common.model.catalog.Product).SHORT_TERM} ]]*/
+
+                $(document).ready(function () {
+                    updateBranding();
+
+//            var updModalValidator = /*[[${loanApplicationUpdateAmountForm.validator.toJson(#locale)}]]*/null;
+//            if (updModalValidator != null) {
+//                var jsonValidator = JSON.parse(updModalValidator);
+//                jsonUpdModalFormValidation = createFormValidationJson(jsonValidator, $('#frmUpdateLoanApplication'));
+//                $('#frmUpdateLoanApplication').validateForm(jsonUpdModalFormValidation);
+//            }
+                    $('#min').text('S/. ' + thousandWithSpace(jsonProductTraditional.minValue));
+                    $('#max').text('S/. ' + thousandWithSpace(jsonProductTraditional.maxValue));
+
+                    $('#privateMonthSection').css({'display': 'block'});
+
+                    // Amount
+                    var amountSlider = document.getElementById('updModalLoanAmmount-slider'),
+                            amountInput = document.getElementById('updModalLoanAmmount-input'),
+                            amountLabel = document.getElementById('updModalLoanAmmount-label');
+
+                    noUiSlider.create(amountSlider, {
+                        start: 5000,
+                        step: 100,
+                        connect: 'lower',
+                        range: {
+                            'min': jsonProductTraditional.minValue,
+                            'max': jsonProductTraditional.maxValue
+                        },
+                        format: wNumb({
+                            decimals: 0,
+                            thousand: ' ',
+                            prefix: 'S/. '
+                        })
+                    });
+
+                    amountSlider.noUiSlider.set(toNumberString($('#navBarLoanInstallments').text()));
+
+                    amountSlider.noUiSlider.on('update', function (values, handle) {
+                        amountInput.value = toNumberString(values[handle]);
+                        amountLabel.innerHTML = values[handle];
+                    });
+
+                    amountInput.addEventListener('change', function () {
+                        amountSlider.noUiSlider.set([null, this.value]);
+                    });
+
+                    // Period
+                    var periodSlider = document.getElementById('updModalLoanInstallemnts-slider'),
+                            periodInput = document.getElementById('updModalLoanInstallemnts-input'),
+                            periodLabel = document.getElementById('updModalLoanInstallemnts-label'),
+                            periodMonthsEndDate = document.getElementById('updModalLoanPeriodEndDate-finish'),
+                            periodFinish;
+
+                    noUiSlider.create(periodSlider, {
+                        start: 12,
+                        step: 1,
+                        connect: 'lower',
+                        range: {
+                            'min': 2,
+                            'max': 36
+                        },
+                        format: wNumb({
+                            decimals: 0,
+                            thousand: ' ',
+                            postfix: ' meses'
+                        })
+                    });
+
+                    periodSlider.noUiSlider.set(toNumberString($('#navBarShorTermDays').text()));
+                    periodSlider.noUiSlider.on('update', function (values, handle) {
+                        periodInput.value = toNumberString(values[handle]);
+                        periodLabel.innerHTML = values[handle];
+                        periodFinish = getFinishDate(toNumberString(values[handle]), 'month');
+                        periodMonthsEndDate.innerHTML = 'Finaliza (' + periodFinish + ')';
+                    });
+
+                    $('#editLoanAmmountLink').click(function (event) {
+                        $('#loading-ajax').addClass('loading-ajax-invisible');
+                        $('#loading-ajax').removeClass('loading-ajax-visible');
+                        $('#text-button').text('Guardar');
+                        console.log(updModalLoanProductId);
+                        event.preventDefault();
+                        openUpdateoanApplicationModal();
+                    });
+
+                    $("#updModalLoanInstallemnts").change();
+                    $.material.init({
+                        validate: false
+                    });
+
+
+                    //=== Edit amount from modal === //
+
+                    var updatableMonths = $('#updModalLoanAmmount-input');
+
+                    updatableMonths.forceLettersOnly('^[0-9 ()]+$', true, 3, 5);
+
+                    $('.edit-amount').on('click', function (event) {
+                        event.preventDefault();
+
+                        labelMonths.hide();
+                        updatableMonths.css({'display': 'block'});
+                        updatableMonths.focus();
+                        updatableMonths.standOut();
+                        $('.edit-amount').css({'display': 'none'});
+                    });
+
+                    updatableMonths.on('blur', function (e) {
+                        e.preventDefault();
+                        updatableMonths.standOff();
+                        labelMonths.show();
+                        labelMonths.html('S/. ' + thousandWithSpace(updatableMonths.val()));
+                        amountSlider.noUiSlider.set(updatableMonths.val());
+                        updatableMonths.css({'display': 'none'});
+                        $('.edit-amount').css({'display': 'block'});
+                    });
+
+                    updatableMonths.on('keyup', function (e) {
+                        e.preventDefault();
+                        if (e.keyCode == 13) {
+                            updatableMonths.standOff();
+                            labelMonths.show();
+                            labelMonths.html('S/. ' + thousandWithSpace(updatableMonths.val()));
+                            amountSlider.noUiSlider.set(updatableMonths.val());
+                            updatableMonths.css({'display': 'none'});
+                            $('.edit-amount').css({'display': 'block'});
+                        }
+                    });
+
+                });
+
+        function getFinishDate(ends, dateFormat) {
+            moment.locale('es');
+            if (dateFormat == 'day') {
+                return moment().add(ends, dateFormat).format('DD MMMM YYYY');
+            }
+            return moment().add(ends, dateFormat).format('MMMM YYYY');
+
+        }
+
+        function toNumberString(number) {
+            return Number(number.replace(/[^0-9]/g, ''));
+        }
+
+        function openUpdateoanApplicationModal() {
+
+            $("#updModalLoanInstallemnts").change();
+
+            $('#updateLoanApplicationModal').modal({backdrop: 'static', keyboard: false, show: true});
+        }
+
+        function updateLoanApplication() {
+//            if ($('#frmUpdateLoanApplication').valid()) {
+            $('#navBarLoanInstallments').text($('#updModalLoanAmmount-label').text());
+            if (updModalLoanProductId != productAdelantoId) {
+                $('#navBarShorTermDays').text('(' + $('#updModalLoanInstallemnts-label').text() + ')');
+            } else {
+                $('#navBarShorTermDays').text('(' + $('#updModalLoanShorTermDays-label').text() + ')');
+            }
+
+            defaultAjax({
+                url: /*[[@{/loanapplication/__${loanAplicationToken}__/update/json}]]*/,
+                type: 'POST',
+                data: {
+                    ammount: $('#updModalLoanAmmount-input').val(),
+                    installments: $('#updModalLoanInstallemnts-input').val() == -1 ? '' : $('#updModalLoanInstallemnts-input').val(),
+                    days: $('#updModalLoanShorTermDays-input').val() == -1 ? '' : $('#updModalLoanShorTermDays-input').val()
+                },
+                success: function (data) {
+                    $('#loading-ajax').removeClass('loading-ajax-invisible');
+                    $('#loading-ajax').addClass('loading-ajax-visible');
+                    $('#text-button').text('Espere...');
+
+                    var jsonData = JSON.parse(data);
+                    $('#loanApplicationHeaderSummary').html(jsonData.message);
+                    $('#updateLoanApplicationModal').modal('hide');
+                }
+            });
+//            }
+        }
+
+        function permitOnlyNumbers(element) {
+            element.on('keypress keyup blur', function (event) {
+                $(this).val($(this).val().replace(/[^\d].+/, ""));
+                if ((event.which < 48 || event.which > 57)) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+
+
+    <th:block layout:fragment="head"/>
+    <noscript>
+        <div class="javascript-disabled" style="background: #34465d;color: white;padding: 1em;text-align: center;">
+            <p class="no-javascript">Ups! para poder navegar correctamente en nuestra plataforma necesitas activar javascript. <a rel="noopener noreferrer" href="http://www.enable-javascript.com/es/" target="_blank"> Click aqu&iacute;</a></p>
+        </div>
+    </noscript>
+    <script>
+        var $buoop = {vs:{i:10,f:-4,o:-4,s:7,c:-4},api:4};
+        function $buo_f(){
+            var e = document.createElement("script");
+            e.src = "//browser-update.org/update.min.js";
+            document.body.appendChild(e);
+        };
+        try {document.addEventListener("DOMContentLoaded", $buo_f,false)}
+        catch(e){window.attachEvent("onload", $buo_f)}
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var $buoop = {vs:{i:9,f:-4,o:-4,s:7,c:-4},api:4};
+        function $buo_f(){
+            var e = document.createElement("script");
+            e.src = "//browser-update.org/update.min.js";
+            document.body.appendChild(e);
+        };
+        try {document.addEventListener("DOMContentLoaded", $buo_f,false)}
+        catch(e){window.attachEvent("onload", $buo_f)}
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var browser = navigator.appName;
+        var ver = navigator.appVersion;
+        var version = ver.substring(0, ver.indexOf(' '));
+
+        if (browser == "Internet Explorer") {
+            if (version <= "9.0") {
+                window.location = "http://outdatedbrowser.com/es";
+            }
+        }
+        if (browser == "Safari") {
+            if (version <= "6.0") {
+                window.location = "http://outdatedbrowser.com/es";
+            }
+        }
+        if (browser == "Firefox") {
+            if (version <= "5.0") {
+                window.location = "http://outdatedbrowser.com/es";
+            }
+        }
+        if (browser == "Chrome") {
+            if (version <= "15.0") {
+                window.location = "http://outdatedbrowser.com/es";
+            }
+        }
+        if (browser == "Opera") {
+            if (version <= "11.10") {
+                window.location = "http://outdatedbrowser.com/es";
+            }
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<!-- header -->
+<div th:replace="fragments/headers :: loanApplicationWizardHeader" th:remove="tag"></div>
+<!-- /header -->
+
+<div id="aff-template-pages-wizard">
+    <div class="container">
+        <div class="tab-content" id="affirm-template-tabs">
+            <div layout:fragment="content"/>
+        </div>
+    </div>
+</div>
+
+<!-- footer -->
+<div th:replace="fragments/footers :: footerDefault"></div>
+<!-- /footer -->
+
+<div id="updateLoanApplicationModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-lightblue-header">
+                <button type="button" class="closeRoundButton" data-dismiss="modal" aria-hidden="true"><i class="icon close-icon"></i></button>
+                <h2 id="header-text" style="display: block;">Actualiza tu solicitud</h2>
+            </div>
+            <div class="modal-body">
+                <form role="form" action="#" th:object="${loanApplicationUpdateAmountForm}" method="post"
+                      id="frmUpdateLoanApplication" autocomplete="off">
+                    <div class="upd-section">
+                        <div class="row">
+                            <!-- Month section -->
+                            <div class="col-md-7">
+                                <div class="slider-section" style="text-align: left">
+                                    <label for="updModalLoanAmmount-input">&iquest;Cu&aacute;nto dinero necesitas?</label>
+                                    <div id="updModalLoanAmmount-slider"></div>
+                                    <div class="values">
+                                        <div class="min-value normal-number" id="min">S/ 1 000</div>
+                                        <div class="max-value normal-number" id="max">S/ 25 000</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="square-found editable">
+                                    <h4 id="updModalLoanAmmount-label" class="bold-number"></h4>
+                                    <a href="#" class="icon edit-icon edit-amount" rel="nofollow" title="Editar"></a>
+                                    <input type="text" th:field="*{updModalLoanAmmount}" name="updModalLoanAmmount"
+                                           id="updModalLoanAmmount-input" class="editAmount-home no-spin"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="privateMonthSection">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="slider-section" style="text-align: left">
+                                        <label for="updModalLoanInstallemnts-input">&iquest;En que periodo?</label>f
+                                        <div id="updModalLoanInstallemnts-slider"></div>
+                                        <div class="values">
+                                            <div class="min-value normal-number">2 meses</div>
+                                            <div class="max-value normal-number">36 meses</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="square-found editable">
+                                        <h4 id="updModalLoanInstallemnts-label" class="bold-number"></h4>
+                                        <span id="updModalLoanPeriodEndDate-finish"></span>
+                                    </div>
+                                    <input type="text" id="updModalLoanInstallemnts-input"
+                                           name="updModalLoanInstallemnts" class="slider" style="display: none"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="privateDaySection">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="slider-section">
+                                        <label for="updModalLoanShorTermDays-input">&iquest;En que periodo?</label>
+                                        <div id="updModalLoanShorTermDays-slider"></div>
+                                        <div class="values">
+                                            <div class="min-value normal-number">2 d&iacute;as</div>
+                                            <div class="max-value normal-number">30 d&iacute;as</div>
+                                        </div>
+                                        <input th:field="*{updModalLoanShorTermDays}" type="text"
+                                               id="updModalLoanShorTermDays-input"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="square-found editable">
+                                        <h4 id="updModalLoanShorTermDays-label" class="bold-number"></h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- <div id="loanShortTermDaysDiv" class="form-group" style="display: none">
+
+                        <div class="slider-section">
+                            <span th:text="#{registerForm.loanApplicationInstallments.shortTerm.label}"></span>
+                            <div id="updateDays-slider"></div>
+                            <div class="values">
+                                <div class="min-value normal-number">2 d&iacute;as</div>
+                                <div class="max-value normal-number">30 d&iacute;as</div>
+                            </div>
+                        </div>
+
+                        <label for="updModalLoanShorTermDays" th:text="#{registerForm.loanApplicationInstallments.shortTerm.label}"></label>
+                        <input th:field="*{updModalLoanShorTermDays}" type="text" class="form-control"/>
+                    </div> -->
+                </form>
+            </div>
+            <div class="modal-footer actions" style="padding: 1.5em;">
+                <button type="button" class="button red-button" onclick="updateLoanApplication()">
+                    <div id="loading-ajax" class="loading-ajax-invisible">
+                        <div class="sk-circle">
+                            <div class="sk-circle1 sk-child"></div>
+                            <div class="sk-circle2 sk-child"></div>
+                            <div class="sk-circle3 sk-child"></div>
+                            <div class="sk-circle4 sk-child"></div>
+                            <div class="sk-circle5 sk-child"></div>
+                            <div class="sk-circle6 sk-child"></div>
+                            <div class="sk-circle7 sk-child"></div>
+                            <div class="sk-circle8 sk-child"></div>
+                        </div>
+                        <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                    <span id="text-button">Guardar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="errorModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- script type="text/javascript" th:src="@{/js/affirm-forms.js}"></script //-->
+<!-- script type="text/javascript" th:src="@{/js/affirm.js}"></script //-->
+<!-- BootBox -->
+<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootbox/bootbox.min.js'}"></script>
+</body>
+</html>

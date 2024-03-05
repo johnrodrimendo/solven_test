@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>S. pendientes de Firma</title>
+
+    <!-- TableFilter -->
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Solicitudes</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Pendientes de Firma</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Pendientes de Firma</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'"
+                                       href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button-clean'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Limpiar Filtros</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/loanApplication/pendingsignature/list}">
+                                    <div class="form-row">
+                                        <!-- Fecha de registro -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Fecha registro</b><br />Desde</label>
+                                                <input id="creationFromFilter" name="creationFrom" type="text" class="form-control form-control-sm" placeholder="Desde" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationToFilter" name="creationTo" type="text" class="form-control form-control-sm" placeholder="Hasta" />
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var creationFromFilter = $('#creationFromFilter');
+                                                var creationToFilter = $('#creationToFilter');
+                                                datepicker(creationFromFilter);
+                                                datepicker(creationToFilter);
+                                                function datepicker( obj ){
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+                                                creationFromFilter.on('change', function () {
+                                                    creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <!-- Monto solicitado -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Monto solicitado</b><br />Desde</label>
+                                                <input id="amountFromFilter" name="amountFrom" type="text" class="form-control form-control-sm"/>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="amountToFilter" name="amountTo" type="text" class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                        <!-- DNI -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>DNI</label>
+                                            <input name="document_number" type="text" class="form-control form-control-sm"/>
+                                        </div>
+                                        <!-- Empleador -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Empleador</label>
+                                            <select name="reason" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona Empleador</option>
+                                                <option th:each="employer : ${@catalogService.getEmployers()}" th:value="${employer.id}" th:text="${employer.name}"></option>
+                                            </select>
+                                        </div>
+                                        <!-- Financiador -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Financiador</label>
+                                            <select name="entity" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona financiador</option>
+                                                <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(wrapper?.results)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: list(wrapper=${wrapper})"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <table id="tableResults" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>País</th>
+            <th></th>
+            <th>Fecha</th>
+            <th>Solicitud</th>
+            <th>Estado</th>
+            <th>Tipo doc.</th>
+            <th>Numero doc.</th>
+            <th>Nombre completo</th>
+            <th>Zona</th>
+            <th>Actividad</th>
+            <th>Producto</th>
+            <th>Monto solicitado</th>
+            <th>Oferta</th>
+            <th>Cluster</th>
+            <th>Origen</th>
+            <th>Asignado</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+            <tr th:each="loan, iterPSignature : ${wrapper?.results}"
+                th:style="'background-color:'+${loan?.lineColor}">
+                <td th:text="${loan?.rowNumber}"></td>
+                <td>
+                    <div class="choose-country">
+                        <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+                    </div>
+                </td>
+                <td>
+                    <i class="fa fa-clock-o" aria-hidden="true" th:style="'color:'+${loan?.ballColor}"/>
+                </td>
+                <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.updatedTime,loan?.country?.id.intValue())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.updatedTime)}"></td>
+                <td>
+                    <a th:href="@{/person(personId=${loan?.personId}, tab='credits')}" th:text="${loan?.code}"></a>
+                </td>
+                <td th:text="${loan?.status?.status}"></td>
+                <td th:text="${loan?.documentType?.name}"></td>
+                <td th:text="${loan?.documentNumber}"></td>
+                <td th:text="${loan.getFullName()}"></td>
+                <td th:text="${loan?.ubigeo?.getDepartment()?.getName()}"></td>
+                <td th:text="${loan?.activityType?.type}"></td>
+                <td th:text="${loan?.productCategory?.category}"></td>
+                <td class="numeric" th:text="${loan?.getLoanApplicationAmmount(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+                <td>
+                    <table th:if="${loan?.offers != null}">
+                        <tr th:each="offer : ${loan.offers}">
+                            <td th:if="${offer?.selected}" class="numeric" th:text="${offer?.getLoanOfferDescription(@utilService, loan?.country?.id)}"></td>
+                        </tr>
+                    </table>
+                </td>
+                <td th:text="${loan?.cluster}"></td>
+                <td th:text="${loan?.getOriginName()}"></td>
+                <td th:text="${loan?.getAnalystFullName()}"></td>
+                <td><a target="_blank" th:href="@{/loanApplication/viewasclient(loanApplicationId=${loan?.id},userId=${loan?.userId},personId=${loan?.personId})}">Ver como cliente</a></td>
+            </tr>
+        </tbody>
+    </table>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+            UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+
+</html>

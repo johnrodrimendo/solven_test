@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="wrap-progressbar">
+            <ul role="progressbar" aria-busy="true" aria-label="Loading domino shop" class="g-progressbar">
+                <li role="presentation"></li>
+                <li role="presentation"></li>
+                <li role="presentation"></li>
+                <li role="presentation"></li>
+                <li role="presentation"></li>
+                <li role="presentation"></li>
+                <li role="presentation"></li>
+            </ul>
+            <p>Estamos revisando cuál es la mejor oferta de crédito disponible para tu próximo auto.<span> Esto puede demorar hasta 30 segundos...</span>
+            </p>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        sendPost();
+
+        function sendPost() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "GET",
+                showLoadingBar: false,
+                success: function (data) {
+                    if (data == null || data == '') {
+                        setTimeout(function () {
+                            sendPost();
+                        }, 1000);
+                    } else {
+                        questionFw.replaceQuestionContent(data);
+                        questionFw.refreshAmountAndInstallments();
+                    }
+                }
+            }, "offers");
+        }
+
+
+        /*marioccarloss*/
+        $('.show_offer').on('click', function (event) {
+            event.preventDefault();
+            self.openOfferModal();
+        });
+        this.openOfferModal = function () {
+            //$('#offer_modal').modal({backdrop: 'static', keyboard: false, show: true});
+            $(".offer_modal").modal('show');
+            //$('#offer_modal').html('');
+        };
+        /*]]>*/
+
+    </script>
+</th:block>
+
+<th:block th:fragment="question_81_offers">
+    <div id="offer_car" class="questions-section animated fadeInRight">
+        <div class="forms q50">
+            <div class="offer-container wrap-offer-car">
+                <div>
+                    <p class="offer-title" th:text="#{title.offer}"></p>
+                    <div class="call-offer-modal">
+                        <div th:if="${offers.size()==1}">
+                            <span th:text="${'Esta es la mejor oferta que ' +  entity?.shortName + ' tiene para ti.'}"></span>
+                        </div>
+                        <div th:unless="${offers.size()==1}">
+                            <span th:text="${'Estas son las ofertas que ' +  entity?.shortName + ' tiene para ti. Selecciona la que más te convenga.'}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="owl-carousel" id="offer-carousel">
+                    <li class="select-offer" th:each="offer,iter : ${offers}"
+                        th:attr="data-offer-id=${offer.id}"
+                        th:classappend="${iter.index == 0 ? 'offer-red' : (iter.index == 1 ? 'offer-green' : 'offer-blue')}">
+                        <div class="best-offer" th:attr="data-offer-id=${offer.id}">
+
+                            <div class="box-a">
+                                <div class="bar-offer"></div>
+                                <span class="bar-iso">
+                                    <img th:src="${loanApplication?.vehicle?.brand?.image}" alt=""/>
+                                </span>
+                                <a class="btn-download-credit" target="_blank"
+                                   th:href="@{/__${@evaluationController.URL}__/question/81/certificadoPreaprobacion/__${offer.id}__(token=${token})}">
+                                    <i class="icons-s-download"></i>
+                                </a>
+                            </div>
+
+                            <div class="box-b">
+                                <div class="cnt-img">
+                                    <img th:src="${loanApplication?.vehicle?.vehicleDetails[0]?.image[0]}" alt=""/>
+                                </div>
+                                <div class="cnt-price">
+                                    <span class="amount"
+                                          th:text="${@utilService.in tegerMoneyFormat(offer?.installmentAmountAvg)}"></span>
+                                    <span class="month" th:text="${'/' + offer.installments + ' meses'}"></span>
+                                </div>
+                                <div class="cnt-prom">
+                                    <span class="month"> Monto de crédito : </span>
+                                    <span th:text="${offer?.currency?.symbol + ' '}"></span>
+                                    <span class="month"
+                                          th:text="${@utilService.integerOnlyMoney(offer?.ammount)}"></span>
+                                </div>
+                            </div>
+
+                            <div class="box-c2">
+                                <div class="bloc first">
+                                    <div class="amount">
+                                        <div class="top">
+                                            <span>Cuota inicial - </span>
+                                            <span th:text="${offer?.downPaymentCurrency?.symbol}"></span>
+                                            <span th:text="${@utilService.integerOnlyMoney(offer.downPayment)}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="percent">
+                                        <div class="top">
+                                            <span th:text="#{contract.text.tea}"></span>
+                                            <span th:text="${@utilService.percentFormat(offer.effectiveAnualRate)}"></span>
+                                        </div>
+                                        <div class="bottom">
+                                            <span th:text="#{contract.text.tcea}"></span>
+                                            <span th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate)}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="button bg-red go">¡La quiero!</div>
+
+                        </div>
+
+                        <div class="button calendar-button"
+                             th:attr="data-offer-id=${offer?.id}">
+                            <div class="wsi">
+                                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                     width="20px" height="20px" viewBox="0 0 488.152 488.152" style="enable-background:new 0 0 488.152 488.152;"
+                                     xml:space="preserve">
+                                    <g>
+                                        <path d="M177.854,269.311c0-6.115-4.96-11.069-11.08-11.069h-38.665c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                            c0,6.123,4.961,11.079,11.074,11.079h38.665c6.12,0,11.08-4.956,11.08-11.079V269.311L177.854,269.311z"/>
+                                        <path d="M274.483,269.311c0-6.115-4.961-11.069-11.069-11.069h-38.67c-6.113,0-11.074,4.954-11.074,11.069v38.66
+                                            c0,6.123,4.961,11.079,11.074,11.079h38.67c6.108,0,11.069-4.956,11.069-11.079V269.311z"/>
+                                        <path d="M371.117,269.311c0-6.115-4.961-11.069-11.074-11.069h-38.665c-6.12,0-11.08,4.954-11.08,11.069v38.66
+                                            c0,6.123,4.96,11.079,11.08,11.079h38.665c6.113,0,11.074-4.956,11.074-11.079V269.311z"/>
+                                        <path d="M177.854,365.95c0-6.125-4.96-11.075-11.08-11.075h-38.665c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                            c0,6.119,4.961,11.074,11.074,11.074h38.665c6.12,0,11.08-4.956,11.08-11.074V365.95L177.854,365.95z"/>
+                                        <path d="M274.483,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.113,0-11.074,4.95-11.074,11.075v38.653
+                                            c0,6.119,4.961,11.074,11.074,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95z"/>
+                                        <path d="M371.117,365.95c0-6.125-4.961-11.075-11.069-11.075h-38.67c-6.12,0-11.08,4.95-11.08,11.075v38.653
+                                            c0,6.119,4.96,11.074,11.08,11.074h38.67c6.108,0,11.069-4.956,11.069-11.074V365.95L371.117,365.95z"/>
+                                        <path d="M440.254,54.354v59.05c0,26.69-21.652,48.198-48.338,48.198h-30.493c-26.688,0-48.627-21.508-48.627-48.198V54.142
+                                            h-137.44v59.262c0,26.69-21.938,48.198-48.622,48.198H96.235c-26.685,0-48.336-21.508-48.336-48.198v-59.05
+                                            C24.576,55.057,5.411,74.356,5.411,98.077v346.061c0,24.167,19.588,44.015,43.755,44.015h389.82
+                                            c24.131,0,43.755-19.889,43.755-44.015V98.077C482.741,74.356,463.577,55.057,440.254,54.354z M426.091,422.588
+                                            c0,10.444-8.468,18.917-18.916,18.917H80.144c-10.448,0-18.916-8.473-18.916-18.917V243.835c0-10.448,8.467-18.921,18.916-18.921
+                                            h327.03c10.448,0,18.916,8.473,18.916,18.921L426.091,422.588L426.091,422.588z"/>
+                                        <path d="M96.128,129.945h30.162c9.155,0,16.578-7.412,16.578-16.567V16.573C142.868,7.417,135.445,0,126.29,0H96.128
+                                            C86.972,0,79.55,7.417,79.55,16.573v96.805C79.55,122.533,86.972,129.945,96.128,129.945z"/>
+                                        <path d="M361.035,129.945h30.162c9.149,0,16.572-7.412,16.572-16.567V16.573C407.77,7.417,400.347,0,391.197,0h-30.162
+                                            c-9.154,0-16.577,7.417-16.577,16.573v96.805C344.458,122.533,351.881,129.945,361.035,129.945z"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <span>Ver cronograma</span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="wrap-sponsored">
+                    <div class="sponsored-by">
+                        <hr class="divisor-thin"/>
+                        <div class="box-sponsor">
+                            <small>Financiado por</small>
+                            <img th:src="${offers?.get(0).entity.logoUrl}" alt=""/>
+                            <small th:if="${entityProductParam.signatureType == entityProductParam.CONTRACT_TYPE_DIGITAL}"
+                                   class="online" th:text="#{label.processType.online}"></small>
+                            <small th:if="${entityProductParam.signatureType == entityProductParam.CONTRACT_TYPE_MANUAL}"
+                                   class="online" th:text="#{label.processType.manual}"></small>
+                        </div>
+                    </div>
+                    <div class="sponsored-by" th:if="${entityProductParam.offerLegalFooter != null}">
+                        <small th:utext="${entityProductParam.getOfferLegalFooterReplaced(offers[0], @utilService)}"></small>
+                    </div>
+                    <div class="error" th:if="${false and downPayment > loanApplication?.downPayment}">
+                        <p>La inicial debe ser de al menos de : <span th:text="${downPayment}"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:each="offer : ${offers}" th:id="'offerScheduleModal' + ${offer?.id}" class="modal fade"
+         tabindex='-1' th:attr="data-offer-id=${offer.id}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Cronograma de pagos preliminar</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+
+                <div class="modal-middle">
+                    <th:block
+                            th:replace="fragments/modalScheduleFragment :: modalSchedule(laoanApplication=${loanAppplication}, offer=${offer}, person=${person})"></th:block>
+                </div>
+                <div class="actions text-center" style="padding: 0 0 1.5em 0">
+                    <button type="button" class="button red-button schedule-modal-accept-offer"
+                            data-dismiss="modal">
+                        Aceptar Oferta
+                    </button>
+                    <button type="button" class="button black-button"
+                            data-dismiss="modal">
+                        Volver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var q50 = $('.q50');
+        q50.closest('.loan-process').find('.adviser-section').addClass('show-img').removeAttr('style');
+
+        $('.btn-download-credit').on('click', function (e) {
+            e.stopPropagation();
+        });
+
+        $('.calendar-button').click(function (e) {
+            e.stopPropagation();
+            //debugger;
+            $('#offerScheduleModal' + $(this).data('offer-id')).modal('show');
+        });
+
+        if ($('.offer-container').length) {
+            $('.best-offer').click(function () {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {
+                        selectedOffer: $(this).data('offer-id')
+                    },
+                    success: function () {
+                        questionFw.refreshQuestion();
+                    }
+                }, "");
+            });
+            $('.schedule-modal-accept-offer').click(function () {
+                var offerId = $(this).closest('.modal').data('offer-id');
+                var bestOfferElement = $(".best-offer[data-offer-id='" + offerId + "']")
+                bestOfferElement.addClass('offer-selected-' + bestOfferElement.data('offer-color'));
+                selectOffer(offerId);
+            });
+        }
+
+        function selectOffer(offerId) {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    selectedOffer: offerId
+                },
+                success: function () {
+                    $("div.azteca-footer").removeClass("azteca-footer-visible");
+                    questionFw.refreshQuestion();
+                }
+            }, "");
+        }
+
+        /*]]>*/
+
+    </script>
+</th:block>
+
+</html>

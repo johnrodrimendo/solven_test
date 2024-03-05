@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q136">
+            <p th:utext="#{questions.block.onlyAmount}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <div class="centrado">
+                    <div>
+                        <div class="field field-amount inline" id="divAmountBDS">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                </div>
+                                <input type="text" class="input-outline amount-input" th:field="*{amount}" maxlength="9"/>
+                            </div>
+                            <small class="input-help">Monto a solicitar</small>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer">
+                        <span id="amount-error" class="help-block help-block-error" style="display: none;"></span>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="data-q136">
+            <div class="modal-q136">
+                <div class="modal-middle">
+                    <table class="modal-table">
+                        <tr>
+                            <th colspan="3">Caracter&iacute;sticas del Pr&eacute;stamo</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>M&iacute;nimo</th>
+                            <th>M&aacute;ximo</th>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><strong>Cliente Sancor</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Montos</strong></td>
+                            <td th:text="${@utilService.integerMoneyFormat(sancorMinAmount, @countryContextService.getCountryParamsByRequest(#httpServletRequest).currency)}"></td>
+                            <td th:text="${@utilService.integerMoneyFormat(sancorMaxAmount, @countryContextService.getCountryParamsByRequest(#httpServletRequest).currency)}"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Plazos</strong></td>
+                            <td th:text="${sancorMinInstallments}"></td>
+                            <td th:text="${sancorMaxInstallments}"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tasas</strong></td>
+                            <td th:text="${@utilService.percentFormat(sancorMinRateCommission)}"></td>
+                            <td th:text="${@utilService.percentFormat(sancorMaxRateCommission)}"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><strong>No Cliente Sancor</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Montos</strong></td>
+                            <td th:text="${@utilService.integerMoneyFormat(noSancorMinAmount, @countryContextService.getCountryParamsByRequest(#httpServletRequest).currency)}"></td>
+                            <td th:text="${@utilService.integerMoneyFormat(noSancorMaxAmount, @countryContextService.getCountryParamsByRequest(#httpServletRequest).currency)}"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Plazos</strong></td>
+                            <td th:text="${noSancorMinInstallments}"></td>
+                            <td th:text="${noSancorMaxInstallments}"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tasas</strong></td>
+                            <td th:text="${@utilService.percentFormat(noSancorMinRateCommission)}"></td>
+                            <td th:text="${@utilService.percentFormat(noSancorMaxRateCommission)}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).COMPARTAMOS)}">
+            <ul class="list-mount">
+                <li>1. El monto máximo es de S/ 10 000</li>
+                <li>2. El plazo máximo es de 12 meses</li>
+            </ul>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // LA RAZON DE LA VALIDACION EN FRONT ES PORQUE BDS QUIERE MOSTRAR EL MONTO CON PUNTUACION Y LA VALIDACION EN BCK NO PUEDE CON PUNTOS
+        var formValidationJson = JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/);
+        var maxAmount = formValidationJson.amount.maxValue;
+        var minAmount = formValidationJson.amount.minValue;
+
+        $('#amount').maskNumber({
+            thousands: '.',
+            integer: true
+        });
+        setTimeout(function () {
+            $('#amount').focus();
+        }, 400);
+        $('#sendButton').click(function () {
+            if ($('#amount').val() === '') {
+                $('#divAmountBDS').addClass('has-error field-error');
+                $('#amount-error').show().text('El campo monto es requerido.');
+                return;
+            }
+
+            var valueFormat = $('#amount').val();
+            var value = $('#amount').val().replace(/[.]/g, '');
+
+            if (value < minAmount) {
+                $('#divAmountBDS').addClass('has-error field-error');
+                $('#amount-error').show().text('Este valor no puede ser menor a $ ' + minAmount);
+            } else if (value > maxAmount){
+                $('#divAmountBDS').addClass('has-error field-error');
+                $('#amount-error').show().text('Este valor no puede ser mayor a $ ' + maxAmount);
+            } else {
+                $('#divAmountBDS').removeClass('has-error field-error');
+                $('#amount-error').hide();
+
+                $('#amount').val(value);
+
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+
+                $('#amount').val(valueFormat);
+            }
+        });
+        /*]]>*/
+    </script>
+
+</th:block>
+</html>

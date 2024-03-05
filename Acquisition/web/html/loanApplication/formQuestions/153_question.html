@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q153">
+
+            <div style="max-width: 700px;text-align: left;margin: 0 auto;">
+                <p style="font-size:19px">Declaraci&oacute;n de Asegurabilidad</p>
+                <p>Al continuar usted declara que no ha padecido alguna de las siguientes enfermedades:
+                <span style="display: block;margin: 5px 0;line-height: 1.5;max-width: 600px;width: 100%;">C&aacute;ncer, Leucemia, VIH Sida, Insuficiencia Renal Cr&oacute;nica, 
+                    Esclerosis M&uacute;ltiple, Infarto al miocardio, Cirrosis, 
+                    Enfisema Pulmonar, Derrame Cerebral.</span>
+                <span>Adem&aacute;s declara no tener una limitaci&oacute;n f&iacute;sica.</span>
+                </p>
+                <div style="text-align: center;display: flex;justify-content: space-around;max-width: 600px; width: 100%;">
+                    <button id="dontAceptButton" type="button" class="button bg-white" style="border: 1px solid rgb(135, 32, 117);color: rgb(135, 32, 117);max-width: 160px;width: 100%;">No acepto</button>
+                    <button id="aceptButton" type="button" class="button bg-red" style="max-width: 160px;width: 100%;">Acepto</button>
+                </div>
+            
+            </div>
+           
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#dontAceptButton').on('click', function(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $(this),
+                    type: "POST",
+                    data: {acept: false}
+                }, "");
+            }
+        });
+        $('#aceptButton').on('click', function(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $(this),
+                    type: "POST",
+                    data: {acept: true}
+                }, "");
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

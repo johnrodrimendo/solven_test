@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<div>
+
+    <!-- MODALS -->
+    <th:block th:fragment="registerDisbursementModal">
+        <div class="modal-body">
+            <form role="form" action="#" id="frmRegisterDisbursementModal"
+                  th:object="${registerDisbursementForm}" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="disbursementDate">Fecha de Desembolso</label>
+                            <input type="text" th:field="*{disbursementDate}" class="form-control"/>
+                            <div class="errorContainer">
+                                <span class="help-block form-field-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="paymentType">Tipo de Pago</label>
+                            <select class="form-control" th:field="*{paymentType}">
+                                <option value="T">Transferencia</option>
+                                <option value="C">Cheque</option>
+                            </select>
+                            <div class="errorContainer">
+                                <span class="help-block form-field-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="paymentCheckNumberDiv" class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="paymentCheckNumber">Número de Cheque</label>
+                            <input type="text" th:field="*{paymentCheckNumber}" class="form-control"/>
+                            <div class="errorContainer">
+                                <span class="help-block form-field-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="signatureSysuser">Firmante</label>
+                            <select class="form-control" th:field="*{signatureSysuser}">
+                                <option th:each="sysuser : ${@sysUserDao.getDisbursementSigners()}"
+                                        th:value="${sysuser.id}" th:text="${sysuser.getFullName()}"></option>
+                            </select>
+                            <div class="errorContainer">
+                                <span class="help-block form-field-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var validator = /*[[${registerDisbursementForm.validator.toJson(#locale)}]]*/null;
+                if (validator != null) {
+                    console.log(validator);
+                    var jsonValidator = JSON.parse(validator);
+                    jsonFormValidation = createFormValidationJson(jsonValidator, $('#frmRegisterDisbursementModal'));
+                    $frmRegisterDisbursementModalValidator = $('#frmRegisterDisbursementModal').validateForm(jsonFormValidation);
+                }
+
+                $('#paymentType').change(function () {
+                    if ($(this).val() == 'C') {
+                        $('#paymentCheckNumberDiv').show(300);
+                    } else {
+                        $('#paymentCheckNumberDiv').hide(300);
+                    }
+                });
+                $('#paymentType').change();
+
+                $('#disbursementDate').datepicker({
+                    autoclose: true,
+                    toggleActive: true,
+                    format: "dd/mm/yyyy",
+                    endDate: "0d",
+                    defaultDate: new Date(),
+                });
+                /*]]>*/
+            </script>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-info" th:onclick="'registerDisbursement(['+${creditsId}+'])'">Guardar
+            </button>
+        </div>
+    </th:block>
+
+</div>
+</body>
+</html>

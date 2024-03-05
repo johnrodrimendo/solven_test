@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Pendientes de Firma</title>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Resultado busqueda</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Loan Applications</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(searchResult?.loanApplications)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Solicitud</th>
+                                            <th>Fecha</th>
+                                            <th>Producto</th>
+                                            <th>Estado</th>
+                                            <th>Tipo doc.</th>
+                                            <th>Numero doc.</th>
+                                            <th>Nombre completo</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="loan, iterLoanSearch : ${searchResult?.loanApplications}">
+                                            <td th:text="${iterLoanSearch.count}"></td>
+                                            <td>
+                                                <a th:href="@{${'/person'}(personId=${loan?.personId}, tab='applications', applicationId=${loan?.code.substring(8)})}"
+                                                   th:text="${loan?.code}"></a></td>
+                                            <td th:text="${@utilService.datetimeShortFormat(loan?.laRegisterDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.laRegisterDate)}"></td>
+                                            <td th:text="${loan?.productCategory?.category}"></td>
+                                            <td th:text="${loan?.status?.status}"></td>
+                                            <td th:text="${loan?.documentType?.name}"></td>
+                                            <td th:text="${loan?.documentNumber}"></td>
+                                            <td th:text="${loan.getFullName()}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Credits</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(searchResult?.credits)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <!--en pendientes de desembolso... columnas: Crédito, Fecha de firma, Tipo y Nro de dcoouemnto, Banco, Cuenta, CCI-->
+                                            <th>#</th>
+                                            <th>Crédito</th>
+                                            <th>Fecha de Firma</th>
+                                            <th>Producto</th>
+                                            <th>Estado</th>
+                                            <th>Tipo Doc.</th>
+                                            <th>Número Doc.</th>
+                                            <th>Nombre Completo</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="credit, iterCreditSearch : ${searchResult?.credits}">
+                                            <td th:text="${iterCreditSearch.count}"></td>
+                                            <td><a th:href="@{${'/person'}(personId=${credit?.personId}, tab='credits', creditCode=${credit?.code})}"
+                                                   th:text="${credit?.code}"></a></td>
+                                            <td th:text="${@utilService.datetimeShortFormat(credit?.signatureDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.signatureDate)}"></td>
+                                            <td th:text="${credit?.product?.name}"></td>
+                                            <td th:text="${credit?.status?.status}"></td>
+                                            <td th:text="${credit?.personDocumentType?.name}"></td>
+                                            <td th:text="${credit?.personDocumentNumber}"></td>
+                                            <td th:text="${credit?.getFullName()}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+
+</html>

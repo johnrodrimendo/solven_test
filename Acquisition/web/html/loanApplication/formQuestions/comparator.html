@@ -1,0 +1,351 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>Comparador</title>
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!-- reCaptcha -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function () {
+            $('#helpSign').on('click', function (event) {
+                event.preventDefault();
+                $('#hlp-modal').modal({backdrop: 'static', keyboard: false, show: true});
+            });
+            $("select").each(function () {
+                $(this).select2({
+                    minimumResultsForSearch: -1,
+                    placeholder: $(this).data('placeholder'),
+                    width: $(this).data('width') + 'px'
+                });
+            });
+            $('.details').on('click', function (e) {
+
+                if ($(this).attr('data-target') != 'open') {
+                    $(this).closest('tr').find('.image').addClass('block-hidden');
+                    $(this).closest('tr').find('.description').removeClass('block-hidden');
+                    $(this).attr('data-target', 'open');
+                } else {
+                    $(this).closest('tr').find('.image').removeClass('block-hidden');
+                    $(this).closest('tr').find('.description').addClass('block-hidden');
+                    $(this).attr('data-target', 'close');
+                }
+
+            });
+
+            var i = 0;
+            $('.see-more').on('click', function(e){
+                e.preventDefault();
+                if (i == 0) {
+                    $(this).closest('.offers-list').find('.block-toggle').addClass('open');
+                    $(this).closest('.offers-list').find('.bottom .icon').removeClass('icon-bullet-down');
+                    $(this).closest('.offers-list').find('.bottom .icon').addClass('icon-bullet-up');
+                    i = 1;
+                } else {
+                    $(this).closest('.offers-list').find('.block-toggle').removeClass('open');
+                    $(this).closest('.offers-list').find('.bottom .icon').removeClass('icon-bullet-up');
+                    $(this).closest('.offers-list').find('.bottom .icon').addClass('icon-bullet-down');
+                    i = 0;
+                }
+
+            });
+        });
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<th:block layout:fragment="content">
+
+    <div class="comparator">
+        <div class="container">
+            <div class="comparator-wrap">
+                <div class="panel-top">
+                    <div class="head">
+                        <div th:if="${personName != null}">
+                            <h3><i class="icon" th:classappend="${iconClass}"></i><div class="inline"><span class="text-lightblue" th:text="${personName} + ','"></span> compara cr&eacute;ditos r&aacute;pido y f&aacute;cil</div></h3>
+                        </div>
+                        <div th:unless="${personName != null}">
+                            <h3><i class="icon" th:classappend="${iconClass}"></i> <div class="inline">Compara cr&eacute;ditos r&aacute;pido y f&aacute;cil</div></h3>
+                        </div>
+                    </div>
+                    <div class="filters">
+                        <form id="updateForm" th:object="${form}">
+                            <div class="row">
+                                <div class="col-lg-7 cl-md-7 col-sm-7">
+                                    <div class="field field-amount-small inline">
+                                        <div class="wrap-field">
+                                            <small class="input-help">Monto a solicitar</small>
+                                            <div class="box-icon prefix-box tiny-input">
+                                                <span class="prefix">S/</span>
+                                            </div>
+                                            <input type="text" class="input-outline-small amount-input" th:field="*{amount}"/>
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                    <div class="field field-amount inline">
+                                        <small class="input-help">Plazo (meses)</small>
+                                        <input type="text" class="input-outline-small tiny-input" th:field="*{installments}"/>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                    <!--<div class="field inline">-->
+                                    <!--<small class="input-help">&nbsp;</small>-->
+                                    <!--<select data-width="200">-->
+                                    <!--<option value="1">Años</option>-->
+                                    <!--<option value="2">Meses</option>-->
+                                    <!--</select>-->
+                                    <!--</div>-->
+                                    <div class="field inline">
+                                        <small class="input-help">Considerar tasas</small>
+                                        <label class="h-input-radio without-border"
+                                               th:classappend="*{rateType == 2 ? 'radio-selected' : ''}">
+                                            <input type="radio" name="rateType" value="2" th:checked="*{rateType == 2}"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Max.</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <label class="h-input-radio without-border"
+                                               th:classappend="*{rateType == 1 ? 'radio-selected' : ''}">
+                                            <input type="radio" name="rateType" value="1" th:checked="*{rateType == 1}"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Min.</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <label class="h-input-radio without-border"
+                                               th:classappend="*{rateType == 3 ? 'radio-selected' : ''}"
+                                               th:if="${comparison.selfEvaluationId != null}">
+                                            <input type="radio" name="rateType" value="3" th:checked="*{rateType == 3}"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Personalizada</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 cl-md-5 col-sm-5 npl">
+                                    <div class="note-blue">
+                                        <small class="text-black" th:utext="#{comparator.filter.action(@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__/__${T(com.affirm.acquisition.controller.EvaluationController).URL}__(agentSelected=${comparison?.agent?.id})})}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <script th:inline="javascript">
+                            /*<![CDATA[*/
+                            $('#updateForm').validateForm(createFormValidationJson(JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/), $('#updateForm')));
+                            $('.input-radio, .h-input-radio').radio();
+                            $('#updateForm').find('input[type=radio]').change(function(){
+                                callUpdateForm();
+                            });
+                            $('#updateForm').find('input[type=text]').blur(function(){
+                                callUpdateForm();
+                            });
+
+                            function callUpdateForm(){
+                                if ($('#updateForm').valid()) {
+                                    var url = /*[[ @{/__${T(com.affirm.acquisition.controller.ComparisonController).URL}__/updateComparisonResult} ]]*/;
+                                    $('#results-container').defaultLoad(url, null, function(){
+                                    }, 'POST', $.extend($('#updateForm').serializeObject(), {token: [[${token}]]}));
+                                }
+                            }
+                            /*]]>*/
+                        </script>
+                    </div>
+                </div>
+                <div class="comparision-details" id="results-container">
+                    <th:block th:replace="this :: resultsContent"></th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="hlp-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+        <div class="modal-dialog" role="help">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Preg&uacute;ntanos algo</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <div class="contact-form">
+                            <form th:object="${processContactForm}" id="contactForm">
+                                <div id="response-block"></div>
+                                <div class="field">
+                                    <input type="text" th:field="*{contactFullName}" class="input-outline"
+                                           placeholder="Nombre completo"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <input autocorrect="off" autocapitalize="none" type="text"
+                                           th:field="*{contactEmail}" class="input-outline"
+                                           placeholder="Correo electr&oacute;nico"/>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field">
+                                    <textarea th:field="*{contactMessage}" class="input-outline" rows="5"
+                                              placeholder="Mensaje..."></textarea>
+                                    <div class="errorContainer text-left"></div>
+                                </div>
+                                <div class="field text-center">
+                                    <div class="g-recaptcha"
+                                         th:attr="data-sitekey=${@configuration.invisibleCaptchaPublicKey()}"
+                                         data-callback="submit" data-size="invisible"></div>
+                                    <button class=" button bg-red" id="sendMessage">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+</th:block>
+
+<th:block th:fragment="resultsContent">
+    <th:block th:if="${not #lists.isEmpty(comparisonResults)}">
+        <ul>
+            <th:block th:each="result : ${comparisonResults}">
+                <li class="offers-list" th:classappend="${result.canApplyOnlineSolven() ? 'enabled' : '' }">
+                    <div class="top-bar">
+                        <div class="bar"></div>
+                    </div>
+                    <div class="block">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-sm-2 column">
+                                <img th:src="${result?.bank?.logoUrl}" th:alt-title="${result?.bank?.name}"/>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-5 column">
+                                <div class="desc-wrap">
+                                    <div class="desc">
+                                        <h3 th:text="${result?.bank?.name}"></h3>
+                                        <small class="text-lightblue" th:text="${result.product != '' ? '(' + result.product + ')' : ''}"></small>
+                                    </div>
+                                    <div class="rates">
+                                        <ul>
+                                            <li><i class="icon icon-bullet-fill-right text-lightblue"></i><span>Cuota: </span><span th:text="${@utilService.doubleMoneyFormat(result.monthlyPaymentAvg)}"></span></li>
+                                            <li><i class="icon icon-bullet-fill-right text-lightblue"></i><span>Pago total: </span> <span th:text="${@utilService.doubleMoneyFormat(result.totalPayment)}"></span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3 column">
+                                <ul class="specs">
+                                    <li>
+                                        <p>TEA: <span th:text="${@utilService.percentFormat(result.effectiveAnualRate)}"></span></p>
+                                    </li>
+                                    <li>
+                                        <p>TCEA: <span th:text="${@utilService.percentFormat(result.effectiveAnualCostrate * 100)}"></span></p>
+                                    </li>
+                                    <li>
+                                        <p>Cargos mensuales: <span th:text="${@utilService.integerMoneyFormat(result.monthlyCostsAvg)}"></span></p>
+                                    </li>
+                                    <li>
+                                        <p>Desgravamen: <span th:text="${@utilService.integerMoneyFormat(result.insurancePaymentAvg)}"></span></p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 column">
+                                <div class="btn-wrap">
+                                    <th:block th:switch="${result.canApplyOnlineSolven()}">
+                                        <button th:case="true" class="button-small bg-red apply-result-button" th:attr="data-bank=${result.fundableBankComparisonCategory?.bank?.id},data-comparison-category=${result.fundableBankComparisonCategory?.comparisonCategory?.id}"><span th:text="#{comparator.button.giveit}"></span> <i class="icon icon-bullet-right"></i></button>
+                                        <button th:case="false" class="button-small bg-red btn-disabled" disabled="disabled"><small class="text-small">Muy pronto</small></button>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block-toggle" id="more-specs" th:if="false">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur deserunt earum, eveniet ipsam quia quos reprehenderit voluptas. Accusamus alias aperiam architecto cum iusto, officiis optio, quisquam reiciendis sit, tempora vel.
+                    </div>
+                    <div class="bottom text-center">
+                        <a th:if="false" href="#" id="see-more" class="see-more text-black">M&aacute;s informaci&oacute;n <i class="icon icon-bullet-down"></i></a>
+                    </div>
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        scanDisableButtons();
+
+                        $('.apply-result-button').click(function(){
+                            defaultAjax({
+                                url: /*[[@{/__${T(com.affirm.acquisition.controller.ComparisonController).URL}__/applyForResult}]]*/,
+                                type: 'POST',
+                                data:{
+                                    token: [[${token}]],
+                                    bankId: $(this).data('bank'),
+                                    comparisonCategoryId: $(this).data('comparison-category')
+                                }
+                            })
+                        });
+                        /*]]>*/
+                    </script>
+                </li>
+            </th:block>
+        </ul>
+        <div class="block text-center">
+            <a id="viewMoreButton" href="javascript:;" class="anchor-button bg-red">Ver m&aacute;s</a>
+        </div>
+        <br/><br/>
+    </th:block>
+    <div class="empty-offer" th:if="${#lists.isEmpty(comparisonResults)}">
+        <p>¡Lo sentimos mucho! En este momento no encontramos productos de acuerdo a tu perfil. Esperamos poder ayudarte muy pronto.</p>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var offset = 10;
+        $('#viewMoreButton').click(function(){
+            var url = /*[[ @{/__${T(com.affirm.acquisition.controller.ComparisonController).URL}__/moreResults} ]]*/;
+            defaultAjax({
+                url: url,
+                type: 'GET',
+                data: {token: [[${token}]], offset: offset, rateType: [[${rateType}]]},
+                success: function(data) {
+                    var newLis = $("<div>").append($.parseHTML(data)).find('.offers-list');
+                    if(newLis.length > 0){
+                        $('#results-container > ul').append(newLis);
+                        offset += 10;
+                    }else{
+                        $('#viewMoreButton').remove();
+                    }
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+
+</th:block>
+
+</body>
+</html>

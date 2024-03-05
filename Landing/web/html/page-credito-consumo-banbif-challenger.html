@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <th:block layout:fragment="title-pe">
+        <title>Solicita aquí tu Tarjeta de Crédito | Banbif </title>
+    </th:block>
+    <th:block layout:fragment="title-ar">
+        <title>Solicita aquí tu Tarjeta de Crédito | Banbif </title>
+    </th:block>
+
+
+    <meta name="viewport" content="width=device-width" />
+
+
+    
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} != null" id="favicon" rel="icon" type="image/x-icon" th:href="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)}" />
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} == null" id="favicon" rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    
+    <script th:inline="javascript">
+        let primaryLoadingColor = [[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#26CAD3')}]];
+        let rootVarLoading = document.createElement('style');
+        rootVarLoading.type = 'text/css';
+        rootVarLoading.innerHTML = `:root {--loading-page-color: ${primaryLoadingColor}; --loading-color: ${primaryLoadingColor}}`;
+        document.getElementsByTagName('head')[0].appendChild(rootVarLoading);
+    </script>
+
+
+    <th:block layout:fragment="css">
+        <style>
+            body {
+                font-family: 'Lato', sans-serif;
+            }
+
+            @media only screen and (min-width: 960px) {
+                .document-row{
+                    align-items: flex-end !important;
+                }
+            }
+
+        </style>
+        <link rel="stylesheet" th:href="@{/css/branding.css}" />
+        <style>
+
+            .gradient-background{
+                width: 85%;
+                position: absolute;
+                height: 100vh;
+            }
+            .column-container{
+                display: flex;
+                flex-direction: column;
+                max-width: 35%;
+            }
+            .wrap-image{
+                width: 100% !important;
+            }
+            .bg-degrade{
+                display: none;
+            }
+            .wrap-image img.bg{
+                transform: translate(-50%, -50%) scale(1);
+                min-width: 100%;
+            }
+            .wrap{
+                z-index: 4;
+                height: 60vh;
+            }
+
+            .img-landing-background{
+                min-height: 100vh;
+                min-width: 100vw;
+                z-index: -1;
+                max-width: 100%;
+                height: 100vh;
+                object-fit: cover;
+                object-position: left;
+            }
+            .logo-landing-banbif-mobile{
+                display: none;
+                left: 1rem;
+                position: absolute;
+                top: 1.5rem;
+                width: 170px;
+                z-index: 3;
+            }
+
+            .form-container{
+                max-width: 560px;
+                margin-left: auto;
+                margin-right: 5rem;
+                z-index: 3;
+                display: flex;
+                align-items: center;
+                margin-top: calc(12%);
+                transform: translateY(-12%);
+            }
+
+            .custom-form{
+                background: #f9f9f9d6;
+                border-radius: 1.5rem;
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+            .tos{
+                margin: 0;
+                width: 100%;
+            }
+            .frm-l5 .ds-fl .field{
+                margin-left: 0px;
+                padding-right: 0px;
+            }
+
+            .custom-form-headline{
+                text-align: left !important;
+                font-size: 2.2rem !important;
+                font-weight: bold !important;
+                text-transform: uppercase;
+                color: var(--primary-branding-color);
+            }
+            .color-principal{
+                color: var(--primary-branding-color) !important;
+            }
+            .custom-header{
+                margin-left: 0px;
+                margin-right: 0px;
+                max-width: 100%;
+                width: 100% !important;
+                background: transparent !important;
+                color: #FA4616;
+                border: none;
+                margin-top: 10vh;
+            }
+            span.select2, #documentNumber{
+                background-color: white;
+            }
+            .tos-mobile-container{
+                background-color: white;
+                display: none;
+            }
+            .tos-mobile-container > .tos {
+                padding: 10px;
+            }
+            .custom-form-headline-mobile{
+                display: none;
+            }
+            .poweredBySolvenFirma{
+                display: block;
+                position: absolute;
+                bottom: 5px;
+                z-index: 2;
+            }
+            .poweredBySolven{
+                fill: white !important;
+            }
+
+            .exclusivo-online{
+                display: block;
+                position: absolute;
+                bottom: 5px;
+                z-index: 2;
+                justify-content: flex-start;
+                width: 100%;
+                padding: 0.5rem 0;
+            }
+
+            .exclusivo-online img {
+                width: 9rem;
+                display: block;
+                margin-left: calc(50% + 11rem);
+                transform: translateX(-50%);
+            }
+
+            .texto-izquierdo{
+                display: block;
+                position: absolute;
+                bottom: 0px;
+                z-index: 2;
+                justify-content: flex-start;
+                padding-bottom: 0.5rem;
+                left: 3rem;
+            }
+
+            .texto-izquierdo img {
+                display: block;
+                margin-right: 10px;
+            }
+
+            .c-full select, .c-full .select2{
+                flex-grow: unset !important;
+                width: calc(30% - .25rem) !important;
+                min-width: 70px;
+                max-width: 70px;
+            }
+            #btnReview{
+                width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+                background: #FFB81C;
+            }
+            #loanForm{
+                padding-top: 3rem;
+            }
+            .section-footer {
+                background: #f9f9f9;
+            }
+
+            section h2::after{
+                display: none;
+            }
+            .select2-selection__arrow {
+                display: none !important;
+            }
+            body{
+                background-color: #00a8ff;
+            }
+
+            .img-background-desktop .column-container img:nth-child(2),
+            .img-background-mobile .column-container img:nth-child(2)
+            {
+                max-width: 125px;
+                margin-top: 4vh;
+            }
+            @media screen and (min-width: 1200px){
+                .custom-form-headline{
+                  /*  margin-bottom: 2rem !important;*/
+                }
+            }
+            @media screen and (max-height: 662px){
+                /*.img-background-desktop img:nth-child(2){*/
+                /*    max-width: 65% !important;*/
+                /*}*/
+                /*.img-background-desktop{*/
+                /*    padding-top: 1rem !important;*/
+                /*}*/
+
+            }
+            @media screen and (min-width: 1200px) and (max-height: 650px) {
+                .custom-header{
+                    margin-top: 20vh;
+                }
+                #btnReview{
+                    width: 100%;
+                }
+            }
+            .section-footer {
+                padding-top: 2rem;
+                padding-left: 10rem;
+                padding-right: 10rem;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .compromise-img-mobile{
+                width: auto;
+                height: 72px;
+                background-size: 80px;
+                background-repeat: no-repeat;
+                float: left;
+            }
+
+            .info-container {
+                background-color: #a7a9ac;
+                padding: 10px 1.5rem;
+                color: white;
+                font-weight: normal;
+                text-align: center;
+                font-size: 18px;
+                border-radius: 16px;
+                margin-left: 7.5px;
+                margin-right: 7.5px;
+            }
+
+            .footer-container-legacy{
+                margin-top: 20px;  margin-bottom: 20px;display: flex;
+            }
+            .footer-left-container{
+                width: 50%;
+                text-align: end;
+                display: flex;
+                padding-right: 20px;
+            }
+            .footer-right-container{
+                width: 50%;width: 50%;padding-right: 7rem;display: flex;justify-content: center;align-items: center;
+            }
+            .select2-container--default.select2-container--disabled .select2-selection--single{
+                background-color: transparent;
+            }
+            .img-background-mobile{
+               display: none;
+            }
+            .img-background-desktop{
+                position: absolute;
+                left: 2.8rem;
+                /*top: calc(3rem + 50px);*/
+                display: flex;
+                flex-direction: column;
+                width: calc(100% - 560px - 9rem);
+               /* max-height: 83vh;*/
+               /* height: 83vh;*/
+                height: 100%;
+                padding-top: 2rem;
+                display: flex;
+                flex-direction: row;
+            }
+            .img-background-desktop div.gradient-container{
+                max-width: 65%;
+                display: flex;
+                position: relative;
+            }
+            .img-background-desktop .gradient-container{
+                max-width: 65%;
+            }
+            .img-background-desktop div.gradient-container img:first-child{
+                max-width: 100%;
+                z-index: 1;
+            }
+            /*.img-background-desktop div.gradient-container img:nth-child(2){*/
+            /*    max-width: 100%;*/
+            /*    position: absolute;*/
+            /*    height: 100%;*/
+            /*    width: 100%;*/
+            /*    z-index: 0;*/
+            /*}*/
+            .img-background-desktop img{
+                /*max-width: 45%;*/
+                /*object-fit: scale-down;*/
+                /*object-position: left;*/
+            }
+            @media screen and (min-width: 1200px) and (max-height: 600px) {
+                .custom-header{
+                    margin-top: 0px;
+                }
+                .custom-header h2{
+                    padding-bottom: 0px;
+                }
+                #loanForm{
+                    padding-top: 1rem;
+                }
+            }
+            @media screen and (min-width: 960px) and (max-width: 1023px) {
+                .banbif-entity{
+                    min-height: 90%;
+                }
+                .custom-header{
+                    margin-top: 5vh;
+                }
+                #loanForm{
+                    margin-top: 3vh;
+                }
+            }
+            @media only screen and ( max-width: 1410px) {
+                .img-background-desktop .gradient-container{
+                    display: none !important;
+                }
+                .gradient-background{
+                    display: none;
+                }
+                .img-background-desktop .column-container{
+                    max-width: 100%;
+                }
+                .img-background-desktop .column-container .text-img-container {
+                    max-width: 300px
+                }
+            }
+
+            /*mobile*/
+            @media screen and (min-width: 1150px) {
+
+                .form h2 {
+                    margin: auto auto 1rem auto!important;
+                }
+
+                #loanForm {
+                    padding: 30px;
+                }
+
+                .form .f-ww {
+                    margin-bottom:15px !important;
+                }
+            }
+            @media screen and (max-width: 1150px) {
+                main{
+                    padding-top: 420px;
+                }
+
+                .lazy-logo-desktop {
+                    display: none !important;
+                }
+
+                .frm-l5 .ds-col {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                }
+
+                .frm-l5 .c-right {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                }
+
+                main.loaded {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+
+                .frm-l5 .ds-col-bottom {
+
+                    max-width: 100% !important;
+                    width: 100% !important;
+                }
+
+
+                .img-background-mobile{
+                    position: absolute;left: 1rem; top: 5rem;display: flex;
+                    flex-direction: row;
+                    max-width: calc(100% - 2rem);
+                    max-height: 60vh;
+                }
+                .img-background-mobile .gradient-container,
+                .img-background-mobile .column-container
+                {
+                    width: 50%;
+                }
+
+                .img-background-mobile .gradient-container img{
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+                .img-background-desktop{
+                    display: none;
+                }
+                .c-full{
+                    margin: 0rem 0rem;
+                }
+
+                .frm-l5 .ds-col{
+                    min-width: unset;
+                }
+                .logo-landing-banbif-mobile{
+                    display: block;
+                }
+                .custom-form-headline-mobile{
+                    margin-top: 0px !important;
+                }
+                main.banbif-entity{
+                    /*background: url("https://solven-public.s3.amazonaws.com/img/banbif/bnn_puntostc_challenger_mobile.png");*/
+                    background-size: cover;
+                    background-position: revert;
+                    height: calc(100% - 100px);
+                    min-height: 720px
+                }
+                .form-container{
+                    width: 100%;
+                    max-width: 100%;
+                    margin-left: auto;
+                    margin-right: auto;
+                    max-height: 100%;
+                    display: inline-block;
+                    align-self: flex-end;
+                }
+                #loanForm{
+                    margin-bottom: 0px;
+                    /*border-bottom-left-radius: 0px;
+                    border-bottom-right-radius: 0px;*/
+                    padding-top: 2rem;
+                    justify-content: center;
+                }
+                .tos-mobile-container{
+                    display: block;
+                }
+                #loanForm .tos{
+                    display: none;
+                }
+                .poweredBySolvenFirma{
+                    display: none;
+                }
+                /*.custom-form-headline-mobile{*/
+                /*    display: block;*/
+                /*    color: #00a8ff;*/
+                /*    font-size: 25px !important;*/
+                /*    font-weight: bold !important;*/
+                /*    text-align: left !important;*/
+                /*    text-transform: uppercase;*/
+                /*    margin-bottom: 0px;*/
+                /*}*/
+                .custom-form-headline{
+                    display: none;
+                }
+                .custom-header{
+                    display: none;
+                }
+                #loanForm{
+                    margin-top: unset;
+                    margin-bottom: 0px;
+                    background: #f9f9f9a6;
+                    max-height: 420px;
+                    min-height: 420px;
+                    padding-bottom: 15px;
+
+                }
+                .section-footer{
+                    /*width: calc(100% - 2rem);*/
+                    width: 100%;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                    margin-top: 7rem;
+                }
+                #loanForm,.section-footer{
+                    background: #f9f9f9;
+                }
+                .footer-container-legacy{
+                    margin-top: 5px;
+                    margin-bottom: 5px;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .footer-left-container{
+                    text-align: end;
+                    width: 100%;
+                    display: flex;
+                    padding-right: 0px;
+            }
+                .footer-left-container .compromise-img-mobile{
+                    margin-left: 0px !important;
+                }
+
+            .footer-right-container{
+                width: 100%;
+                padding-right: 0rem;
+                display: flex;
+                padding-left: 0px;
+                padding-right: 0px;
+                font-size: 12px;
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+                .bono{
+                    display: none;
+                }
+            }
+
+
+
+            @media screen and (max-width: 700px) {
+                main.banbif-entity{
+                    /*background: url("https://solven-public.s3.amazonaws.com/img/banbif/bnn_puntostc_challenger_mobile.png");*/
+                    background-size: cover;
+                    background-position: center;
+                }
+                .c-full select, .c-full .select2{
+                    flex-grow: unset !important;
+                    width: calc(30% - .25rem) !important;
+                    min-width: 70px !important;
+                }
+            }
+            @media screen and (min-width: 840px) and  (max-width: 959px){
+                .img-background-mobile{
+                    max-height: 55vh;
+                }
+                .img-background-mobile .text-img-container{
+                    max-width: 282px;
+                }
+
+                .img-background-mobile .column-container img:nth-child(2){
+                    margin-top: 2vh;
+                }
+            }
+            @media screen and (min-width: 521px) and  (max-width: 670px){
+                .img-background-mobile{
+                 /*   margin-top: 2.5vh;*/
+                }
+            }
+            @media screen and (max-width: 520px) {
+                .img-background-mobile .gradient-container{
+                    display: none;
+                }
+                .img-background-mobile .column-container{
+                    width: 100%;
+                    max-width: unset;
+                }
+                .img-background-mobile .text-img-container{
+                    width: 100%;
+                    max-width: 280px;
+                    margin-top: 40px;
+                }
+                .img-background-mobile .column-container img:nth-child(2){
+                    display: none;
+                }
+            }
+            @media screen and (max-width: 500px) {
+                .form-container{
+                    max-width: 100%;
+                    width: 100%;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                .c-full select, .c-full .select2{
+                    flex-grow: unset !important;
+                    width: calc(30% - .25rem) !important;
+                    min-width: 70px !important;
+                }
+                .gradient-container{
+                    display: none;
+                }
+            }
+
+             @media screen and (max-width: 1380px) {
+                .img-landing-background{
+                    display: none;
+                }
+
+                 .exclusivo-online{
+                     display: none;
+                 }
+                 .bono{
+
+                 }
+                 .form-container{
+
+                 }
+                 .texto-izquierdo{
+                     display: none;
+                 }
+            }
+            .headline {
+                margin-bottom: 0px;
+            }
+
+            .headline-mobile-banbif{
+                color: white;
+            }
+
+            .row-icon-mobile{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                background-color: #20A6FF;
+                width: 275px;
+            }
+
+            .box-icon-mobile{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+            }
+
+            .brand_logo_mobile {
+                position: relative;
+                display: flex !important;
+                align-items: center;
+                width: 100%;
+                padding: 0px 1rem;
+                min-height: 248px;
+                flex-direction: column;
+                align-items: flex-start;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                justify-content: space-around;
+                background-color: #20A6FF;
+            }
+
+            .font-bold{
+                font-weight: bold;
+            }
+
+            .circle{
+                width: 8px;
+                background-color: white;
+                height: 8px;border-radius: 50%;
+                margin-right: 10px;
+            }
+
+            .bono{
+                margin-bottom: 2rem;
+            }
+            @media screen and (max-height: 1000px) {
+
+                .form-container{
+
+                }
+            }
+
+            @media screen and (max-height: 970px) {
+
+                .form-container{
+                    margin-top: 10rem;
+                }
+
+                .texto-izquierdo img{
+                    height: 850px;
+                }
+            }
+            @media screen and (max-height: 950px) {
+
+                .texto-izquierdo img{
+                    height: 800px;
+                }
+            }
+            @media screen and (max-height: 900px) {
+
+                .texto-izquierdo img{
+                    height: 750px;
+                }
+                .form-container{
+                    margin-top: 8rem;
+                }
+            }
+
+            @media screen and (max-height: 850px) {
+
+                .form-container{
+                    margin-top: 7rem;
+                }
+                .bono {
+                  /*  margin-top: 4rem;*/
+                    margin-bottom: 0rem;
+                }
+                .texto-izquierdo img{
+                    height: 700px;
+                }
+            }
+
+            @media screen and (max-height: 825px) {
+
+                .exclusivo-online{
+                    display: none;
+                }
+            }
+
+            @media screen and (max-height: 800px) {
+                .bono {
+                  /*  margin-top: 2rem;*/
+                    margin-bottom: 0rem;
+                }
+
+                .texto-izquierdo img{
+                    height: 650px;
+                }
+            }
+            @media screen and (max-height: 750px) {
+                .bono {
+                    /*  margin-top: 2rem;
+                      margin-bottom: 1rem;*/
+                }
+
+                .texto-izquierdo img{
+                    height: 600px;
+                }
+                .form-container{
+                    margin-top: 5rem;
+                }
+            }
+
+
+        </style>
+        <script defer="true" type="text/javascript" th:src="@{/js/landing5.js}"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/ ! function (t) {
+                "use strict";
+                t.loadCSS || (t.loadCSS = function () {});
+                var e = loadCSS.relpreload = {};
+                if (e.support = function () {
+                    var e;
+                    try {
+                        e = t.document.createElement("link").relList.supports("preload")
+                    } catch (t) {
+                        e = !1
+                    }
+                    return function () {
+                        return e
+                    }
+                }(), e.bindMediaToggle = function (t) {header-desktop_fdlm2
+                    var e = t.media || "all";
+
+                    function a() {
+                        t.media = e
+                    }
+                    t.addEventListener ? t.addEventListener("load", a) : t.attachEvent && t.attachEvent("onload",
+                        a), setTimeout(function () {
+                        t.rel = "stylesheet", t.media = "only x"
+                    }), setTimeout(a, 3e3)
+                }, e.poly = function () {
+                    if (!e.support())
+                        for (var a = t.document.getElementsByTagName("link"), n = 0; n < a.length; n++) {
+                            var o = a[n];
+                            "preload" !== o.rel || "style" !== o.getAttribute("as") || o.getAttribute(
+                                "data-loadcss") || (o.setAttribute("data-loadcss", !0), e.bindMediaToggle(o))
+                        }
+                }, !e.support()) {
+                    e.poly();
+                    var a = t.setInterval(e.poly, 500);
+                    t.addEventListener ? t.addEventListener("load", function () {
+                        e.poly(), t.clearInterval(a)
+                    }) : t.attachEvent && t.attachEvent("onload", function () {
+                        e.poly(), t.clearInterval(a)
+                    })
+                }
+                "undefined" != typeof exports ? exports.loadCSS = loadCSS : t.loadCSS = loadCSS
+            }("undefined" != typeof global ? global : this);
+            var primaryColor = /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#00c8d3')}]]*/ ,
+                mobileHeaderBackgroundColor = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).mobileHeaderBackgroundColor}]]*/ ,
+                mobileHeaderTextColor = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).mobileHeaderTextColor}]]*/ ,
+                fav_icon = /*[[${@brandingService.getEntityBrandingFavIcon(#httpServletRequest, 'https://s3.amazonaws.com/solven-public/img/icons/favicon/favicon.png')}]]*/ ,
+                isBranded = /*[[${@brandingService.isBranded(#httpServletRequest)}]]*/ ,
+                entityBrandingLoanLanding = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale)}]]*/,
+                primaryColorBg = "linear-gradient(to bottom, #33486f4D 0%," + primaryColor + "4D 100%)";
+            if(entityBrandingLoanLanding != null){
+                var customStyle = document.createElement('style');
+                customStyle.type = 'text/css';
+                customStyle.innerHTML = `
+                    :root {
+                        --primary-branding-color: ${primaryColor};
+                    }
+                    `;
+                if(entityBrandingLoanLanding.fontFamily) customStyle.innerHTML += `* {font-family: ${entityBrandingLoanLanding.fontFamily} !important;} \n`;
+                if(entityBrandingLoanLanding.hideTitlePoints) customStyle.innerHTML += `section h2::after {content: none !important} \n`;
+                if(entityBrandingLoanLanding.hidePoweredBy) customStyle.innerHTML += `.poweredBySolven {visibility: hidden;!important} \n`;
+                if(entityBrandingLoanLanding.customColorForHeadlineText) customStyle.innerHTML += `.custom-form-headline, .header.brand-bg-p h2 {color:${entityBrandingLoanLanding.customColorForHeadlineText} !important; }\n`;
+                if(entityBrandingLoanLanding.hideTagsLines) $("ul.list").hide();
+                if(entityBrandingLoanLanding.customColorForHeadlineUnderline) customStyle.innerHTML += `.header-title-mobile h2 {border-color:${entityBrandingLoanLanding.customColorForHeadlineUnderline} !important; }\n`;
+                document.getElementsByTagName('head')[0].appendChild(customStyle);
+            }
+            document.addEventListener('DOMContentLoaded', function (event) {
+                document.querySelector('.bg-degrade').style.background = primaryColorBg;
+                document.querySelector('.header').style.borderColor = primaryColor;
+                document.querySelector('#btnReview').style.background = "#FFB81C";
+                document.querySelector('.tos').style.borderColor = primaryColor;
+                if(entityBrandingLoanLanding != null){
+                    if(entityBrandingLoanLanding.showTagLineAsColumns) $("#tagLineContainer").addClass("brand-column");
+                    if(entityBrandingLoanLanding.customColorForFormButton) document.querySelector('#btnReview').style.background = entityBrandingLoanLanding.customColorForFormButton;
+                    if(entityBrandingLoanLanding.customColorForHeadlineUnderline) document.querySelector('header.f').style.borderColor = entityBrandingLoanLanding.customColorForHeadlineUnderline;
+                }
+                var chk = document.querySelectorAll(".icon-checkbox a");
+                chk[0].style.color = primaryColor;
+                chk[1].style.color = primaryColor;
+            });
+            /*]]>*/
+        </script>
+    </th:block>
+</head>
+
+<body style="overflow-y: hidden">
+
+<th:block layout:fragment="content">
+    <div id="loading-screen" style="height: 100%;">
+        <div class="process-loading-container circle-progress-question" style="position: initial !important;">
+            <div class="loading-content">
+                <div class="sk-circle">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <main class="f toload banbif-entity landing-default">
+
+       <!-- <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/degradado-min.png" alt="" class="gradient-background"/>-->
+
+        <a th:href="@{/}">
+            <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                <img class="lazy logo logo-landing-banbif-mobile"
+                     th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/banbif/logo_banbif_white.png'}" />
+            </th:block>
+        </a>
+
+        <div class="img-background-mobile">
+
+            <div class="brand_logo_mobile">
+                <h2 style="font-weight: 300 !important; margin-top: 15px;" class="headline headline-mobile-banbif">Solicita tu <span class="font-bold">Tarjeta de Crédito</span> y
+                    <br/>Participa del sorteo de:
+                    <br/>
+                </h2>
+                <h2 style="font-weight: 300 !important; margin-top: 5px;" class="headline headline-mobile-banbif">
+                    <div style="font-size: 30px" class="font-bold">
+                        <div style="margin-bottom: -10px;">Vacaciones soñadas</div>
+                        <div>en MIAMI</div>
+                    </div>
+                    <div style="display: flex; margin-top: 5px;">
+                        <div class="circle"></div>
+                        <div class="circle"></div>
+                        <div class="circle"></div>
+                    </div>
+                </h2>
+                <div style="margin-top: 15px;" class="row-icon-mobile">
+                    <div class="box-icon-mobile">
+                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_6/mano.png" alt="" style="width: 50px" />
+                        <h5 class="headline headline-mobile-banbif">PASO 1</h5>
+                        <h5 class="headline headline-mobile-banbif">Obtén tu tarjeta</h5>
+                        <h5 class="headline headline-mobile-banbif">de credito</h5>
+                    </div>
+                    <div class="box-icon-mobile">
+                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_6/laptop.png" alt="" style="width: 50px"/>
+                        <h5 class="headline headline-mobile-banbif">PASO 2</h5>
+                        <h5 class="headline headline-mobile-banbif">Inscríbete</h5>
+                        <h5 class="headline headline-mobile-banbif"><a target="_blank" href="https://forms.gle/9nU66wAcXRJNhkrr7">aquí</a></h5>
+                    </div>
+                    <div class="box-icon-mobile">
+                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_6/maleta.png" alt="" style="width: 50px"/>
+                        <h5 class="headline headline-mobile-banbif">SORTEO</h5>
+                        <h5 class="headline headline-mobile-banbif">23/11/2021</h5>
+                    </div>
+
+                </div>
+            </div>
+            <div class="column-container">
+                <!--<img class="text-img-container" src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/texto.png" alt=""/>
+                <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/exclusivo+online.png" alt=""/>-->
+            </div>
+            <div class="gradient-container">
+               <!-- <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/arte-min.png" alt=""/>-->
+            </div>
+        </div>
+
+        <div class="img-background-desktop">
+            <img class="text-img-container" src="https://solven-public.s3.amazonaws.com/img/banbif/landing_6/texto-lado+izquierdo-modificado.png" alt=""/>
+               <!-- <div class="column-container">
+                    <img class="text-img-container" src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/texto.png" alt=""/>
+                    <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/exclusivo+online.png" alt=""/>
+                </div>
+                <div class="gradient-container">
+                       <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_banbif_16_06/arte-min.png" alt=""/>
+                   </div>-->
+           </div>
+
+           <section style="display: block" class="form-container">
+
+               <div class="bono">
+                   <img  src="https://solven-public.s3.amazonaws.com/img/banbif/landing_7/bono+200.png" alt=""/>
+               </div>
+
+               <form class="f f-ww-custom form frm-l5 custom-form" id="loanForm" onsubmit="return false;">
+
+                   <h2 class="custom-form-headline">
+                       SOLICITA TU TARJETA <br/> 100% EN LÍNEA
+                   </h2>
+
+                   <h2 class="custom-form-headline-mobile">
+                       SOLICITA TU TARJETA <br/> 100% EN LÍNEA
+                   </h2>
+
+                   <div class="ds-fl ds-col flex-direction-column" style="margin-left: 0px;margin-right: 0px;">
+                       <div class="field c-full f f-ww  field-full">
+                           <label for="docType" th:utext="#{question.branding.documentNumber}"></label>
+                           <select id="docType" name="docType" class="custom-select ignore_validation" disabled=""
+                                   data-placeholder="DNI">
+                               <option value="" hidden="hidden">DNI</option>
+                               <option value="1" selected="true">DNI</option>
+                               <option value="2">CE</option>
+                           </select>
+                           <input id="documentNumber" name="documentNumber" placeholder="Escribe tu número de documento" type="text" autocorrect="off"
+                                  autocapitalize="none" />
+                           <div class="errorContainer" style="width: 100%"></div>
+                       </div>
+                   </div>
+
+                   <div class="ds-fl ds-col flex-direction-column" style="margin-left: 0px;margin-right: 0px;">
+                       <div class="field c-full f f-ww  field-full">
+                           <label for="email">¿Cu&aacute;l es tu correo electr&oacute;nico?</label>
+                           <input type="text" id="email" placeholder="nombre@dominio.com"
+                                  name="email"  style="background-color: white"/>
+                           <div class="errorContainer" style="width: 100%"></div>
+                       </div>
+                   </div>
+
+                   <div class="ds-fl ds-col flex-direction-column" style="margin-left: 0px;margin-right: 0px;">
+                       <div class="field c-full f f-ww  field-full">
+                           <label for="phone">¿Cu&aacute;l es tu n&uacute;mero de celular?</label>
+                           <input type="text" id="phone" placeholder="Mínimo 9 caracteres" name="phone" style="background-color: white"/>
+                           <div class="errorContainer" style="width: 100%"></div>
+                       </div>
+                   </div>
+
+                   <div class="ds-fl ds-col flex-direction-column">
+                       <div class="field c-full f f-ww field-full" style="margin-bottom: 0px !important;">
+                           <input type="checkbox" id="acceptAgreement" name="acceptAgreement" />
+                           <label for="acceptAgreement" class="icon-checkbox acceptAgreement">
+                                                   <span class="check-label">Acepto el uso de <a
+                                                           target="_blank" class="color-principal"
+                                                           href="https://solven-public.s3.amazonaws.com/documents/banbif/FORMATO_NO_PRESENCIAL-CLAUSULA_INFORMACION_Y_CONSENTIMIENTO_PARA_TRATAMIENTO_DATOS_PERSONALESv3.pdf">mis datos personales.</a></span>
+                           </label>
+                           <div class="errorContainer"></div>
+                       </div>
+                   </div>
+
+                   <div class="ds-fl ds-col-bottom">
+                       <div class="c-i f f-ww btnReviewContainer" style="margin-left: auto;margin-right: auto;margin-top: 1rem;margin-bottom: 1rem!important;width: 100%!important">
+                           <th:block th:switch="${@brandingService.isBranded(#httpServletRequest)}">
+                               <th:block th:case="true">
+                                   <th:block th:switch="${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).formButtonText != null}">
+                                       <th:block th:case="true">
+                                           <button id="btnReview" class="btn bg-blue-1" style="display: flex;justify-content: center;align-items: center;" th:utext="${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).formButtonText}"></button>
+                                       </th:block>
+                                       <th:block th:case="false">
+                                           <button id="btnReview" class="btn bg-blue-1">Consultar</button>
+                                       </th:block>
+                                   </th:block>
+                               </th:block>
+                           </th:block>
+                       </div>
+                   </div>
+                   <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+   <!--                    <div class="tos">-->
+<!--                        <p-->
+<!--                                th:utext="${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).entityBrandingRequirement.title}">-->
+<!--                        </p>-->
+<!--                        <p><strong-->
+<!--                                th:text="${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).entityBrandingRequirement.boldText}"></strong>-->
+<!--                        </p>-->
+<!--                        <ul>-->
+<!--                            <li th:each="item : ${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).entityBrandingRequirement.list}"-->
+<!--                                th:text="${item}"></li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
+                </th:block>
+            </form>
+
+        </section>
+        <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+
+          <div style="" class="texto-izquierdo">
+                <img  src="https://solven-public.s3.amazonaws.com/img/banbif/landing_7/texto-lado+izquierdo.png" alt=""/>
+            </div>
+
+            <div style="" class="exclusivo-online">
+                <img  src="https://solven-public.s3.amazonaws.com/img/banbif/landing_7/exclusivo+online.png" alt=""/>
+            </div>
+            <div class="poweredBySolvenFirma">
+                <svg class="poweredBySolven" viewBox="0 0 128 20">
+                    <path
+                            d="M2.7 5.3c.6 0 1 .1 1.5.2.4.1.7.3 1 .6.3.2.5.5.6.8.1.3.2.7.2 1 0 .4-.1.8-.2 1.1-.1.4-.3.7-.6.9-.3.2-.6.4-1 .6-.4.1-.9.2-1.4.2H1.6v3H0V5.3h2.7zm0 4.2c.3 0 .5 0 .7-.1.3-.1.5-.2.6-.3.1-.1.2-.3.3-.5.1-.2.1-.4.1-.6 0-.2 0-.4-.1-.6S4.2 7 4 6.9c-.1-.2-.3-.3-.5-.3-.2-.1-.5-.1-.8-.1H1.6v3h1.1zM9.3 7.6c.4 0 .8.1 1.2.2.4.1.7.3.9.6.3.3.5.6.6 1 .1.4.2.8.2 1.3s-.1.9-.2 1.3-.3.7-.6 1c-.3.3-.6.5-.9.6-.4.1-.8.2-1.2.2-.4 0-.9-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.1-.4-.2-.8-.2-1.3s.1-.9.2-1.3.3-.7.6-1c.2-.2.5-.4.9-.6.4-.1.8-.2 1.2-.2zm0 5c.5 0 .9-.2 1.1-.5.2-.3.4-.8.4-1.5 0-.6-.1-1.1-.4-1.5-.2-.3-.6-.5-1.1-.5-.5 0-.9.2-1.1.5-.2.5-.4.9-.4 1.6s.1 1.1.4 1.5c.3.3.6.4 1.1.4zM21.8 7.7l-1.9 6h-1.1c-.1 0-.2-.1-.3-.3L17.4 10c0-.1-.1-.2-.1-.3 0-.1-.1-.2-.1-.3 0 .1 0 .2-.1.4 0 .1-.1.2-.1.4l-1 3.2c0 .2-.1.3-.3.3h-1.1l-1.9-6h1.1c.1 0 .2 0 .3.1.1.1.1.1.1.2l.9 3.2c0 .2.1.3.1.5s.1.3.1.5c0-.2.1-.3.1-.5s.1-.3.2-.5l1-3.2c0-.1.1-.1.1-.2.1-.1.1-.1.2-.1h.6c.1 0 .2 0 .3.1l.2.2 1 3.2c.1.2.1.3.1.5s.1.3.1.5c0-.3.1-.7.2-1l.9-3.2c0-.1.1-.1.1-.2.1-.1.2-.1.2-.1h1.2zM23.6 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1s.4 0 .6-.1c.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1h-3.6zm2.7-.9c0-.2 0-.4-.1-.5 0-.2-.1-.3-.2-.5-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM30 8.7c.2-.4.4-.6.7-.8s.6-.3.9-.3c.3 0 .5.1.7.2l-.1 1.1c0 .1 0 .1-.1.1h-.7c-.2 0-.3 0-.4.1-.1 0-.2.1-.3.2l-.3.3c-.1.1-.1.3-.2.4v3.7h-1.4v-6h.8c.1 0 .3 0 .3.1s.1.1.1.3v.6zM34 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1H34zm2.7-.9c0-.2 0-.4-.1-.5-.1-.2-.1-.3-.2-.4-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM44.2 5v8.6h-.9c-.2 0-.3-.1-.4-.3l-.1-.6c-.2.3-.5.5-.8.7-.3.2-.7.3-1.1.3-.3 0-.6-.1-.9-.2-.3-.1-.5-.3-.7-.6-.2-.3-.3-.6-.5-1-.1-.4-.2-.8-.2-1.3 0-.4.1-.9.2-1.2.1-.4.3-.7.5-1 .2-.3.5-.5.8-.7.3-.2.7-.2 1.1-.2.3 0 .6.1.9.2.2.1.4.2.6.4V5h1.5zm-1.4 4.2c-.2-.2-.3-.3-.5-.4-.2-.1-.4-.1-.6-.1-.2 0-.4 0-.6.1-.2.1-.3.2-.4.4l-.3.6c-.1.3-.1.6-.1.9 0 .3 0 .6.1.9.1.2.1.4.2.6.1.2.2.3.4.3.2.1.3.1.5.1.3 0 .6-.1.8-.2.2-.1.4-.3.6-.5V9.2zM49.9 8.4c.2-.3.5-.5.8-.6.3-.1.6-.2 1-.2.3 0 .7.1.9.2.3.1.5.3.7.6.2.3.3.6.5.9.1.4.2.8.2 1.2 0 .5-.1.9-.2 1.3s-.3.7-.5 1c-.2.3-.5.5-.8.7s-.7.2-1 .2c-.2 0-.4 0-.5-.1-.2 0-.3-.1-.4-.2-.1-.1-.2-.1-.4-.2l-.3-.3-.1.4c0 .1-.1.2-.1.2-.1 0-.1.1-.2.1h-.9V5H50v3.4zm0 3.7c.2.2.3.3.5.4.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.2.5-.4l.3-.6c.1-.2.1-.6.1-.9 0-.7-.1-1.1-.3-1.4-.2-.3-.5-.4-.9-.4-.3 0-.5.1-.7.2-.2.1-.4.3-.6.5v2.6zM60.3 7.7l-3.2 7.6c0 .1-.1.2-.2.2-.1.1-.2.1-.3.1h-1.1l1.1-2.4-2.4-5.5h1.3c.1 0 .2 0 .3.1.1.1.1.1.1.2l1.3 3.1c0 .1.1.2.1.3 0 .1.1.2.1.3 0-.1.1-.2.1-.3 0-.1.1-.2.1-.3L58.8 8c0-.1.1-.1.2-.2s.2-.1.2-.1h1.1z"
+                            class="st2" />
+                    <g>
+                        <path
+                                d="M63.6 19.3v-2.7c.9.4 2.3.7 3.5.7 1.3 0 1.8-.4 1.8-1 0-.8-1.1-.9-2.6-1.4-1.5-.5-2.8-1.5-2.8-3.6 0-2.6 2-3.7 4.8-3.7 1.2 0 2.5.2 3.2.5v2.7c-.8-.2-1.8-.5-3-.5-1.1 0-1.6.3-1.6.8 0 .6.5.8 2.1 1.2 1.7.5 3.3 1.4 3.3 3.8 0 2.5-1.9 3.9-4.8 3.9-1.7 0-3-.3-3.9-.7M73.1 13.8c0-3.2 1.9-6.2 6-6.2 4 0 5.9 2.7 5.9 6.2 0 3.2-1.9 6.2-6 6.2-4 0-5.9-2.7-5.9-6.2m8.1 0c0-2.1-.6-3.5-2.1-3.5S77 11.6 77 13.8s.6 3.4 2.1 3.4 2.1-1.2 2.1-3.4M91.4 0H95l-7.3 20h-3.6zM92.9 7.8h3.9l1.7 6.4c.2.7.4 1.9.4 2 0-.2.3-1.4.4-2l1.7-6.4h3.8l-3.9 12h-4.2l-3.8-12zM104.7 13.8c0-3.3 1.9-6.2 5.8-6.2 4 0 5.3 2.7 5.3 5.7 0 .4 0 .8-.1 1.2h-7.2c0 1.7.7 2.7 2.8 2.7 1.5 0 2.8-.3 3.6-.7v2.8c-1.1.4-2.4.7-3.9.7-4.4 0-6.3-2.6-6.3-6.2m7.5-1.4v-.1c0-1-.5-2-1.7-2s-1.8.9-1.9 2.1h3.6zM117.1 7.8h3.6v.9c.7-.5 1.7-1.1 3.3-1.1 2.9 0 3.9 1.8 3.9 4.2v8h-3.7v-7.4c0-1.3-.4-1.9-1.7-1.9-.7 0-1.3.3-1.8.7v8.6H117v-12zM89.9 17.8c0-1.2.9-2.1 2.2-2.1 1.3 0 2.2.9 2.2 2.1s-.8 2.2-2.1 2.2-2.3-1-2.3-2.2"
+                                class="st2" />
+                    </g>
+                </svg>
+            </div>
+        </th:block>
+
+        <div class="wrap-image f f-ww f-ac wrap-image-deuna">
+            <figure>
+                <a th:href="@{/}">
+                    <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                        <img class="lazy logo lazy-logo-desktop"
+                             th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/banbif/logo_banbif_white.png'}" />
+                        <img class="lazy logo lazy-logo-mobile" style="display: none"
+                             th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/banbif/logo_banbif_white.png'}" />
+                    </th:block>
+                </a>
+                <!--backgroundImage-->
+               <img class="img-landing-background" src="https://solven-public.s3.amazonaws.com/img/banbif/landing_7/Banbif-landing-7_fondo.png"/>
+
+                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                    <div class="bg-degrade"></div>
+                </th:block>
+            </figure>
+        </div>
+    </main>
+
+    <th:block>
+        <style>
+            @media only screen and (min-width: 500px) {
+                .modal .modal-dialog {
+                    max-width: 90%;
+                }
+            }
+
+            @media only screen and (min-width: 900px) {
+                .modal .modal-dialog {
+                    max-width: 70%;
+                }
+            }
+
+            @media only screen and (min-width: 1215px) {
+                .modal .modal-dialog {
+                    max-width: 55%;
+                }
+            }
+
+            @media only screen and (min-width: 625px) and ( max-width: 800px) {
+                #logoBAZ {
+                    display: flex !important;
+                }
+            }
+
+            @media only screen and ( max-width: 430px) {
+                .c-full {
+                    margin-bottom: 1rem !important;
+                }
+            }
+
+
+            .modal-open{
+                overflow-x: hidden !important;
+                overflow-y: hidden !important;
+            }
+
+            .modal {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            .modal {
+                background: rgba(0,0,0,0.4);
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 1050;
+                display: none;
+                -webkit-overflow-scrolling: touch;
+                outline: 0;
+            }
+            .modal-header{
+                display: flex;
+                justify-content: flex-end;
+                padding: 1rem 1rem;
+                border-bottom:1px solid #e5e5e5;
+            }
+            .modal-body {
+                position: relative;
+                padding: 15px;
+                line-height: 1.42857143;
+            }
+            .text-justify {
+                text-align: justify;
+            }
+            .modal-body p {
+                margin-bottom: 10px;
+                text-align: justify;
+                width: 100%;
+                display: flex;
+                font-size: 14px;
+            }
+            .modal ol, ul {
+                margin-top: 0;
+                margin-bottom: 10px;
+                padding-left: 2rem;
+            }
+            .modal li {
+                font-size: 14px;
+                margin-left: 10px;
+                list-style-type: disc;
+            }
+            #logoBAZ {
+                background-color: #0d6f4a;
+                display: block;
+                margin-top: 20px;
+                margin-bottom: 30px;
+                text-align: left;
+                padding: 15px;
+                color: #FFF;
+                font-size: 25px;
+                font-weight: bold;
+            }
+        </style>
+
+        <div class="section-footer">
+            <div class="info-container">Conoce nuestra Tarjeta Banbif Cero Membresía <a
+                    href="https://www.banbif.com.pe/Personas/Tarjeta-de-Credito/Cero-Membresia" target="_blank"
+                    style="text-decoration: underline">aquí</a></div>
+            <div class="container-example-explain">
+                <div class="footer-container-legacy">
+                    <div class="footer-left-container">
+                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/capsula-tc-m.png" alt="" id="" class="compromise-img-mobile"
+                             style="margin-left: auto"/>
+                    </div>
+                    <div class="footer-right-container">
+                        <p style="text-align: justify;">El cálculo de la TCEA corresponde a un patrón estandarizado de
+                            comparación de costos
+                            y se presenta a través de este ejemplo que considera los parámetros previstos en el Anexo
+                            1-A de la resolución SBS N° 3274-2017.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="description-example">
+                <p>
+                    Umbral mínimo de amortización de capital del pago mínimo: US$ 10. No considera deuda anterior. El cálculo de la TCEA corresponde a un patrón estandarizado de comparación de costos y se presenta a través de este ejemplo que considera los parámetros previstos en el Anexo 1-A de la Resolución SBS N° 3274-2017. De no pagar por lo menos el Pago Mínimo dentro de la fecha límite de pago se cobrará el interés compensatorio efectivo anual hasta la fecha de pago más la tasa de interés moratoria nominal anual de 12.51% en soles o 9.90% en dólares por cada día de retraso. Estas tasas de interés compensatoria y moratoria podrán ser modificadas por el Banco Central de Reserva del Perú conforme a lo dispuesto en el artículo 6 de la Ley 28587, el artículo 51 del Decreto Ley 26123 y la circular 0008-2021-BCRP. El Interés compensatorio será cobrado hasta la fecha de pago y las exoneraciones de cobro de intereses, así como las tasas preferenciales ofrecidas, solo aplicarán mientras el cliente se encuentre al día en el pago de sus obligaciones. TCEA (Tasa de Costo Efectivo Anual), TEA (Tasa de Interés compensatoria Efectiva Anual) y Tasa de interés moratorio nominal anual calculadas a 360 días. ITF de 0.005%, según D.S No150-2007-EF.
+                </p>
+                <br/>
+                <p>
+                    Se podrá elegir libremente contratar el seguro de desgravamen con BanBif o directamente con una empresa de seguros de su libre elección. Mayor información sobre seguros, derecho de endoso y su procedimiento, en nuestra página web: www.banbif.com.pe, en: Nuestrosproductos/Seguros/Seguros asociados a la Contratación de un Producto.
+                </p>
+                <br/>
+                <p>
+                    Te informamos que la tarjeta de crédito BanBif cuenta con servicios adicionales de disposición de efectivo, compras por internet, compras en el exterior y sobregiro, los cuales estarán deshabilitados al momento de la emisión. Podrás habilitar estos servicios en cualquier momento mediante nuestros diferentes canales de atención como: HOLAbank (banca digital de BanBif) previa afiliación, Banca Telefónica o cualquiera de nuestras oficinas a nivel nacional. Para mayor información sobre beneficios, riesgos y condiciones de estos servicios, ingresar en: www.banbif.com.pe/Personas/Nuestros productos/Tarjetas /Tarjeta de Crédito Clásica (o cualquier otra tarjeta del portafolio) /Información de interés/ Información sobre tu tarjeta: Máxima Seguridad.
+                </p>
+                <br/>
+                <p>
+                    <b>Tarjeta de Crédito:</b>  Emisión de la tarjeta de crédito sujeta a verificaciones domiciliarias y laborales conformes, a la suscripción de los documentos contractuales y solo en caso se mantengan las condiciones crediticias que motivaron su aprobación. Su calificación deberá ser 100% normal en el sistema financiero. No aplica en caso de haber contratado un crédito con BanBif u otra entidad financiera en los últimos 45 días hábiles, o haya tenido una tarjeta de crédito cancelada en los últimos 12 meses. BanBif se reserva el derecho a otorgar el crédito si, por algún motivo, varían de modo adverso su situación financiera, nivel de endeudamiento o su calidad crediticia; así como las condiciones del mercado financiero, políticas, económicas, legales y/o en general las circunstancias bajo las cuales fue aprobada la presente oferta. La decisión posterior de no otorgar el crédito, no le generará derecho a reclamar suma alguna en su favor por ningún concepto ni al pago de indemnización o penalidad alguna por parte de BanBif.
+                </p>
+                <br/>
+                <p>
+                    La comisión de membresía podrá ser exonerada solo si el cliente registra consumos acumulados por un monto mínimo de S/1.00 para las Tarjetas Clásica, Oro, Mastercard Platinum, Platinum, Signature e Infinite. Dichos consumos deberán realizarse hasta el cierre de cada periodo de facturación, durante todos los meses, previo al cobro de la comisión por Membresía Anual. Los consumos que se registren en dólares americanos serán contabilizados también para llegar al monto mínimo de consumos acumulados, considerando el equivalente en soles al tipo de cambio venta SBS que rija el día en que se realizó el consumo. Para llegar al monto mínimo de consumo son válidos todos los consumos que se realicen con la tarjeta del titular y sus adicionales. No aplica para el cálculo de exoneración de membresía lo siguiente: las disposiciones de efectivo, consumos en casinos, compra de deuda ni pago de impuestos. Si el cliente registró una mora a lo largo del año, previo al cobro de la comisión de Membresía anual, no calificará en ésta política de exoneración.
+                </p>
+                <br/>
+                <p>
+                    Descuentos CLUB HOLA: Encuentra los descuentos en establecimientos afiliados al Club Hola en : https://www.clubhola.pe/<br/>
+                    Ver condiciones del programa de puntos BanBif en "http:// www. banbif. com. pe/ personas/ tarjeta-de-credito/ puntos-banbif
+                </p>
+                <br/>
+                <p>
+                    <b>( **)Condiciones de hasta S/400 :</b><br/>
+                    <b>Condiciones generales:</b> Beneficio exclusivo para Tarjetas de Crédito BanBif Clásica Internacional, Oro, Mastercard Platinum, Platinum, Signature e Infinite solicitadas y emitidas durante la vigencia de la promoción y que no hayan tenido una tarjeta de crédito cancelada en los últimos 12 meses. La cuenta tarjeta debe estar en situación activa.
+                </p>
+                <br/>
+                <p>
+                    <b>Condiciones del bono de S/200 en puntos BanBif web:</b>  Válido para Tarjetas de Crédito BanBif solicitadas a través de la web banbif.solven.pe/tarjeta-de-credito, emitidas del 01 de enero 2023 al 31 de diciembre de 2023 y que cumplan las condiciones generales. El bono de S/ 200 en puntos BanBif se reflejara en el día 45 de emitida la tarjeta de crédito. Ver condiciones del programa de puntos BanBif en "http:// www. banbif. com. pe/ personas/ tarjeta-de-credito/ puntos-banbif“. En caso realices una nueva solicitud o culmines tu solicitud a través de otros canales de atención que no sea la página web, este premio quedará sin efecto.
+                </p>
+                <br/>
+                <p>
+                    <b>Condiciones de Bono de Bienvenida de hasta S/200 en puntos BanBif:</b> Válido para tarjetas de crédito nuevas emitidas del 01 de enero de 2022 al 31 de diciembre de 2023. Participan Tarjetas de Crédito BanBif en situación activa que realicen consumos por montos iguales o superiores a la meta de consumo según tipo de tarjeta. La meta según tipo de tarjeta será indicada en la web https://banbif.solven.pe/tarjeta-de-credito al momento de visualizar la oferta de la tarjeta, dicha meta deberá cumplirse dentro de los treinta (30) días calendario posteriores a la fecha de activación de la tarjeta. El Bono de hasta S/200 en Puntos BanBif se reflejará en el estado de cuenta subsiguiente al mes de finalizada la promoción. No se consideran consumos a las disposiciones de efectivo, transacciones de cargos recurrentes, consumos en casinos, desembolsos de + efectivo, compra de deuda, pago de servicios, ni el pago de deberes tributarios en general (SUNAT, SAT, etc.). La vigencia de la promoción depende de la fecha de activación de la tarjeta participante. Ver condiciones del Programa de Puntos en www. banbif. com. pe/ Nuestros productos/Otros servicios/Puntos BanBif.
+                </p>
+                <br/>
+                <p>
+                    <b>(***) Beneficios brindados por Mastercard:</b><br/>
+                    <b>Condiciones de Cupón de Pedidos Ya:</b>  Vigencia del 18 de julio 2023 al 14 de agosto de 2023. Beneficio exclusivo para Tarjetas de Crédito BanBif Mastercard Platinum solicitadas y emitidas durante la vigencia de la promoción y que no hayan tenido una tarjeta de crédito cancelada en los últimos 12 meses. La cuenta tarjeta debe estar en situación activa. Válido para Tarjetas de Crédito BanBif Mastercard Platinum solicitadas a través de la web banbif.solven.pe/tarjeta-de-crédito, emitidas durante la vigencia, activadas hasta el 29 de agosto de 2023 y que cumplan las condiciones generales. Válido exclusivamente para tarjetas solicitadas a través de la web banbif.solven.pe/tarjeta-de-crédito. El Cupón de S/ 70 de <b>PedidosYa</b> se brindará a los clientes que hayan solicitado y activado la tarjeta de Crédito Mastercard  en las fechas indicadas líneas arriba. Los cupones de <b>PedidosYa</b> serán enviados al cliente mediante un email al correo electrónico registrado en BanBif en un máximo de 30 días calendarios después de haberse identificado como ganador y serán válidos para su uso hasta el 31 de diciembre 2023. <b>Premios:</b> Se otorgarán cupones para “PedidosYa” a los primeros 700 clientes que adquieran y activen la tarjeta BanBif Mastercard Platinum de acuerdo con el proceso establecido. Los cupones no podrán ser intercambiados por ningún otro premio ni sustituidos por efectivo u otros productos o servicios. El Banco se reserva el derecho de modificar, suspender o cancelar la campaña en cualquier momento sin previo aviso. En caso realices una nueva solicitud o culmines tu solicitud a través de otros canales de atención que no sea la página web, este premio quedará sin efecto.
+                </p>
+                <br/>
+                <p>
+                    <b>Estacionamiento Vip Jockey Plaza:</b>  Válido del 01 de enero 31 de diciembre del 2023. Estacionamiento gratis en Zona VIP Mastercard Black presentando tu voucher de compra de S/50 o más. Exclusivamente para tarjetas Platinum, para conocer los términos y condiciones de este beneficio el cliente podrá ingresar a https://www.mastercard.com.pe/es-pe/consumidores/conozca-nuestras-ofertas-y-promociones/jockey-plaza.html
+                </p>
+                <br/>
+                <p>
+                    <b>50% de descuento en HBO:</b>  Beneficio ofrecido por Mastercard. Los clientes de Mastercard que se suscriban a HBO Max con una tarjeta de crédito de Mastercard entre el 1 de agosto de 2022 y el 15 de agosto de 2023 pueden calificar para recibir un descuento del cincuenta por ciento (50%) sobre el precio mensual actual de HBO Max al Plan de suscripción estándar durante los primeros 3 meses. Oferta disponible solo en hbomax.com y solo en Perú. Debe ser un nuevo suscriptor de HBO MAX, mayor de 18 años o la mayoría de edad legal, y canjear su código de oferta antes del 31 de agosto de 2023. Después de su período de suscripción con descuento de 3 meses, su suscripción se renovará automáticamente cada mes al precio de suscripción vigente en ese momento para el plan de suscripción estándar mensual en el territorio correspondiente, de forma recurrente, a menos que cancele antes de la renovación. Para cancelar su suscripción, consulte Suscripción en su configuración de HBO Max. Si cancela su suscripción, continuará teniendo acceso a HBO Max por el resto del tiempo que ya pagó. Si cambia su plan durante su período promocional de 3 meses, puede perder el beneficio de su oferta promocional. No se puede combinar con ninguna otra oferta de HBO Max. Este es un código promocional, no para reventa, no tiene valor en efectivo, de un solo uso, intransferible y no puede ser reemplazado en caso de pérdida o robo. Mayor información en https://elevate.mastercard.com/benefit/product/176691/hbo-max-peru?ac=hbomax-PE
+                </p>
+                <br/>
+                <p>
+                    Información sobre los costos de nuestro producto Tarjeta de Crédito disponible en las oficinas de atención al público a través del tarifario y en nuestra página web: www. banbif. com. pe, a través de información de Interés, link “Tarifario General. MKT: 04.01.23
+                </p>
+            </div>
+        </div>
+    </th:block>
+</th:block>
+<th:block layout:fragment="js">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loanFormValidator = /*[[${userRegisterForm.validator.toJson(#locale)}]]*/ null;
+        var yearFrom = /*[[${yearFrom}]]*/ ;
+        var yearTo = /*[[${yearTo}]]*/ ;
+        var countryId = /*[[${@countryContextService.getCountryParamsByRequest(#httpServletRequest).id}]]*/ ;
+        var registerLoanUrl = /*[[@{/tarjeta-de-credito}]]*/ ;
+        var externalParams = /*[[${externalParams}]]*/ ;
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            dataLayer.push({'event':'brandingLandingViewA'});
+        });
+
+        var credito = document.getElementById('btnShow');
+        var field = document.querySelectorAll('.field');
+        var innerBanner = document.querySelector(".inner-contain-banner");
+        var btnValid = document.querySelectorAll('.btn-valid');
+
+
+        function fieldError() {
+            for (i = 0; i < field.length; i++) {
+                console.log("field", field[i]);
+                if (field) {
+                    innerBanner.style.height = "100%"
+                    break
+                }
+            }
+        }
+
+        btnReview.addEventListener("click", fieldError)
+
+        credito.addEventListener('click', showFrom);
+
+        // var searchParams = new URLSearchParams(window.location.search);
+        // var hasParams = searchParams.has('consumoTrue')
+        // searchParams.toString();
+        // if (hasParams) {
+        //     showFrom();
+        // }
+
+        //ALWAYS SHOW FORM
+
+        showFrom();
+
+
+
+        document.getElementById('referrerPersonId').value = searchParams.get('referrerPersonId');
+
+
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+
+</html>

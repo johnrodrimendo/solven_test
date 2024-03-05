@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <div class="questions-section animated fadeInRight">
+            <div class="forms">
+                <p th:utext="#{questions.block.calculatingResult(${person.getFirstName() != null and !person.getFirstName().isEmpty() ? person.getFirstName() : 'Hola'})}"></p>
+                <div class="calculation-response">
+                    <div class="result">
+                        <div class="stars">
+                            <!-- positive, negative -->
+                            <h3 class="positive"
+                                th:text="${'¡' + selfEvaluation.getScoreLabel() + '!'}"></h3>
+                            <i class="icon icon-star star-1"></i>
+                            <i class="icon icon-star star-2"></i>
+                            <i class="icon icon-star star-3"></i>
+                            <i class="icon icon-star star-4"></i>
+                            <i class="icon icon-star star-5"></i>
+                        </div>
+                        <div class="actions" th:if="${selfEvaluation.score != null and selfEvaluation.score > 1}">
+                            <a href="#" id="applyButton" class="anchor-button bg-red">Solicita tu cr&eacute;dito
+                                aquí</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="divisor-bottom"/>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var calification = /*[[ ${selfEvaluation.score} ]]*/;
+            $(function () {
+                for (var i = 0; i <= calification; i++) {
+                    $('.star-' + i).addClass('positive');
+                }
+            });
+            /*]]>*/
+
+        </script>
+        <script th:inline="javascript" th:if="${selfEvaluation.score != null and selfEvaluation.score > 1}">
+            /*<![CDATA[*/
+            function readCookie(name) {
+                var n = name + "=";
+                var cookie = document.cookie.split(';');
+                for (var i = 0; i < cookie.length; i++) {
+                    var c = cookie[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1, c.length);
+                    }
+                    if (c.indexOf(n) == 0) {
+                        return c.substring(n.length, c.length);
+                    }
+                }
+                return null;
+            }
+
+            $('#applyButton').click(function () {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    button: $('#applyButton'),
+                    data: $.extend($('#questionForm').serializeObject(), {
+                        source: readCookie("utm_source"),
+                        medium: readCookie("utm_medium"),
+                        campaign: readCookie("utm_campaign"),
+                        term: readCookie("utm_term"),
+                        content: readCookie("utm_content"),
+                        gclid: readCookie('gclid')
+                    })
+                }, "loanApplication");
+            });
+            /*]]>*/
+
+        </script>
+    </th:block>
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <div class="questions-section animated fadeInRight qs-arg">
+            <div class="forms">
+                <p th:utext="#{questions.block.calculatingResult(${person.getFirstName() != null and !person.getFirstName().isEmpty() ? person.getFirstName() : 'Hola'})}"></p>
+                <div class="calculation-response">
+                    <div class="result">
+                        <div class="stars">
+                            <h3 class="positive" th:text="${selfEvaluation.getScoreLabel()}"></h3>
+                        </div>
+                        <p th:utext="${selfEvaluation.getScoreMessage()}"></p>
+                        <div class="actions">
+                            <a href="#" id="applyButton" class="anchor-button bg-red commingsoon">Solicitá tu préstamo
+                                aquí</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="divisor-bottom"/>
+    </th:block>
+
+
+</th:block>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q152">
+            <p th:utext="#{questions.block.professionSectoresOcupation}"></p>
+            <div class="field inline">
+                <select id="professionOcupation" name="professionOcupation"
+                    th:attr="data-placeholder=#{question.map.profession}">
+                    <option value="" hidden="hidden">Profesi&oacute;n</option>
+                    <option th:each="professionOcupation: ${professionOcupations}" th:value="${professionOcupation?.id}"
+                            th:text="${professionOcupation?.occupation}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="field inline">
+                <select id="profession" name="profession" th:attr="data-placeholder=#{question.map.sector}">
+                    <option value="" hidden="hidden">Sector</option>
+                    <option th:each="profession : ${professions}"
+                            th:value="${profession.id}" th:text="${profession.profession}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="field inline">
+                <select data-width="245" id="ocupation" name="ocupation" th:attr="data-placeholder=#{question.map.charge}">
+                    <th:block th:each="ocupation : ${occupations}">
+                        <option value="" hidden="hidden">Ocupación</option>
+                        <option th:value="${ocupation.id}" th:text="${ocupation.ocupation}"></option>
+                    </th:block>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="field inline field-button">
+                <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').on('click', function(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

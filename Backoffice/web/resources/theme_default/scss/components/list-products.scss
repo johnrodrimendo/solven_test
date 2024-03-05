@@ -1,0 +1,119 @@
+.list-products{
+    li{
+        width: 50%;
+        text-align: center;
+        padding: .5rem;
+        margin-bottom: 1rem;
+        article{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            >a{
+                order: -1;
+            }
+            figure{
+                position: relative;
+                width: 10rem;
+                height: 10rem;
+                margin: 0 auto 1rem auto;
+                overflow: hidden;
+                transform: perspective(1000px);
+                transition: all .3s ease;
+            }
+            img{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100%;
+                height: auto;
+                max-height: none;
+                max-width: none;
+                min-width: 101%;
+                min-height: 100%;
+                transform: translate(-50%,-50%) scale(1);
+                object-fit: cover;
+            }
+            h2,strong{
+                width: 100%;
+                line-height: 1.25;
+                font-weight: 400;
+                text-transform: none;
+            }
+            h2{
+                font-size: .88rem;
+                margin-bottom: .5rem;
+            }
+            strong{
+                font-size: 1.25rem;
+                font-weight: 700;
+                transition: all .3s ease;
+            }
+            span{
+                width: 50px;
+                height: 50px;
+                background-color: $colorred;
+                color: #FFF;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 5rem;
+                font-size: .75rem;
+                font-weight: 600;
+                position: absolute;
+                top: -1rem;
+                right: 1rem;
+                transform: perspective(1000px);
+                transition: all .3s ease;
+            }
+        }
+        &:hover{
+            figure{
+                transform: perspective(1000px) scale(1.14);
+            }
+            h2{
+                color: #656565;
+            }
+            strong{
+                color: $colorred;
+            }
+            span{
+                transform: perspective(1000px) scale(1.1);
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 769px){
+    .list-products{
+        li{
+            width: 25%;
+            article{
+                figure{
+                    width: 12rem;
+                    height: 12rem;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 960px){
+    .list-products{
+        li{
+            article{
+                figure{
+                    width: 14rem;
+                    height: 14rem;
+                }
+                h2{
+                    font-size: 1.2rem;
+                }
+                strong{
+                    font-size: 1.5rem;
+                }
+            }
+        }
+    }
+}

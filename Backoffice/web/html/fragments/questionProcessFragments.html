@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+<body>
+
+<th:block th:fragment="questionsModalShell">
+
+    <div id="asistedQuestionModal" class="modal fade">
+        <div style="width: 90%" class="modal-dialog">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="questionsModal">
+    <div class="modal-body">
+        <div class="row">
+            <th:block th:each="item : ${categoriesWrappers}" th:with="categoryEditable=${item.key == currentCategory}">
+                <div class="category-node" th:attr="data-category-id=${item.key}" th:classappend="${categoryClasses.get(item.key)}" style="position: relative">
+                    <h2 th:text="${categoryNames.get(item.key)}"></h2>
+                    <div class="row">
+                        <th:block th:replace="this :: questionDiv(treeQuestion=${item.value})"></th:block>
+                    </div>
+                </div>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    (function() {
+                        var categoryId = [[${item.key}]];
+                        var loanApplicationId = [[${loanApplication.id}]];
+                        var questionCategoryFlow = new QuestionCategoryFlow([[${item.key}]], [[${loanApplication.id}]], $('.category-node[data-category-id='+[[${item.key}]]+']'), [[${categoryEditable}]]);
+                        questionCategoryFlow.loadQuestionsContent();
+                    })();
+                    /*]]>*/
+                </script>
+            </th:block>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="questionDiv">
+    <th:block th:if="${treeQuestion != null}">
+        <div class="col-md-4 question-node" th:attr="data-question-id=${treeQuestion.processQuestion.id},data-answered-question=${answeredQuestion and (treeQuestion.childs == null or treeQuestion.childs.isEmpty()) ? false : answeredQuestion},data-params=${treeQuestion.params?.toString()}"></div>
+        <th:block th:if="treeQuestion.childs != null" th:each="question  : ${treeQuestion.childs}">
+            <th:block th:if="${question != null}">
+                <th:block th:replace="this :: questionDiv(treeQuestion=${question})"></th:block>
+            </th:block>
+        </th:block>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="categorySaveButonDiv">
+    <div class="col-md-3 button-node">
+        <button type="button" class="btn green send-button-category" th:attr="data-category-id=${categoryId}" >Guardar categoria</button>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('.send-button-category[data-category-id=' + [[${categoryId}]] + ']').on('click', function(){
+                var categoryFlow = getQuestionCategoryFlowByCategorId([[${categoryId}]]);
+
+                // Before save, check if the current questino of the loan app is  the same as the first question
+                categoryFlow.saveQuestions();
+            })
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+</body>
+</html>

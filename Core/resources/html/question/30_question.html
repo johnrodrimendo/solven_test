@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:utext="#{questions.block.netoIncome}"></p>
+            
+            <div class="form-group">
+                <small th:utext="#{questions.help.netoIncome}"></small>
+                <div class="input-group">
+                    <span class="input-group-addon" th:text="${loanApplication.country.currency.symbol}"></span>
+                    <input class="form-control" type="text" th:field="*{income}"/>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="mt-checkbox">
+                    <input type="checkbox" class="variableIncome"/> Recibo adem&aacute;s un salario variable.
+                    <span></span>
+                </label>
+            </div>
+
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return $.extend(questionFlow.getFormElement().serializeObject(), {
+                    variableIncome: questionFlow.find('.variableIncome').is(':checked')
+                });
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

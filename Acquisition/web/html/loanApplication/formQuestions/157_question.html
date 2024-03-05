@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q11 form-q-11" th:if="${isApproved}">
+            <p><b>Un asesor de Prestamype te contactar&aacute; en m&aacute;ximo 2 d&iacute;as h&aacute;biles al tel&eacute;fono que registraste para continuar con tu solicitud de cr&eacute;dito.</b></p>
+            <p>Evita registrar una solicitud en su plataforma para no ocasionar demoras en el proceso.</p>
+            <img src="https://solven-public.s3.amazonaws.com/img/finansol/logo_verde_fondo_blanco.png" style="width: 300px;"/>
+        </div>
+        <div class="forms q11 form-q-11" th:unless="${isApproved}">
+            <p>Lamentablemente en este momento no calificas para el producto de pr&eacute;stamo con garant&iacute;a hipotecaria,<br/>te contactaremos apenas tengamos un producto para ti.</p>
+        </div>
+    </div>
+</th:block>
+</html>

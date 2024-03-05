@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/companyTemplate">
+<head>
+
+    <title>Adelantos</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            $('.payment-amount').blur(function () {
+                if ($(this).val() == "") {
+                    $(this).val("0");
+                }
+                updateRow($(this).closest('tr'));
+                updateTotals($(this).closest('.employer-imputator-table'));
+            });
+            $('.payment-amount').each(function () {
+                $(this).forceDoubleOnly(true, 0, parseFloat($(this).closest('tr').data('total-pending-amount')));
+            });
+
+            $('#payment-button').click(function () {
+
+                registerPayments($('.employer-imputator-table'));
+            });
+
+            initialize();
+
+
+
+            $('#search').keyup(function(){
+                searchRow($(this).val());
+            });
+
+        });
+
+        function searchRow(search) {
+
+            if ($.isNumeric(search)) {
+
+                $('.rowImputator .byDocument').each(function(){
+
+                    if ($(this).text().search(new RegExp(search, "i")) < 0) {
+                        $(this).closest('.rowImputator').fadeOut();
+
+                        // Show the list item if the phrase matches and increase the count by 1
+                    } else {
+                        $(this).closest('.rowImputator').show();
+                    }
+                });
+
+            } else {
+
+                $('.rowImputator .byName').each(function(){
+
+                    if ($(this).text().toLowerCase().search(new RegExp(search.toLowerCase(), "i")) < 0) {
+                        $(this).closest('.rowImputator').fadeOut();
+
+                        // Show the list item if the phrase matches and increase the count by 1
+                    } else {
+                        $(this).closest('.rowImputator').show();
+                    }
+                });
+
+            }
+
+        }
+
+        function setAmountsToPay() {
+            $('.employer-imputator-table-row').each(function () {
+                $(this).find('.payment-amount').val(parseFloat($(this).data('total-pending-amount')).toFixed(2).replace(",", "."))
+            })
+        }
+
+        function updateRow(rowElement) {
+            // update the row data
+            var totalAmount = parseFloat(rowElement.data('total-pending-amount'));
+            var paymentAmount = parseFloat(rowElement.find('.payment-amount').val().replace(",", "."));
+            rowElement.find('.amount-subtraction').html("S/ " + (totalAmount - paymentAmount).toFixed(2).replace(",", "."));
+            rowElement.find('.amount-subtraction').data("value", totalAmount - paymentAmount);
+            rowElement.find('.amount-subtraction').removeClass('font-red font-green-jungle');
+            rowElement.find('.amount-subtraction').addClass(totalAmount - paymentAmount > 0 ? 'font-red' : 'font-green-jungle');
+        }
+
+        function updateTotals(tableElement) {
+            var totalAmountSubtraction = 0.0;
+            tableElement.find('.amount-subtraction').each(function (index) {
+                totalAmountSubtraction = totalAmountSubtraction + $(this).data("value");
+            });
+            $('.total-amount-subtraction').html("S/ " + totalAmountSubtraction.toFixed(2).replace(",", "."))
+
+            var totalPaymentAmount = 0.0;
+            tableElement.find('.payment-amount').each(function (index) {
+                totalPaymentAmount = totalPaymentAmount + parseFloat($(this).val().replace(",", "."));
+            });
+            $('.total-payment-amount').html("S/ " + totalPaymentAmount.toFixed(2).replace(",", "."))
+            $('.total-payment-amount').data("value", totalPaymentAmount)
+
+            enableDisableButton(tableElement);
+        }
+
+        function enableDisableButton(tableElement){
+            if($('.total-payment-amount').data("value") > tableElement.data('total-payment-available-amount')){
+                $('#payment-button').prop('disabled', true);
+                $('.total-payment-amount').css({background: "#ffc3cb"});
+                $('#payment-button-message').html("El monto que quieres pagar no cuadra con tu monto disponible");
+            }else{
+                $('#payment-button').prop('disabled', false);
+                $('.total-payment-amount').css({background: ""});
+                $('#payment-button-message').html("");
+            }
+        }
+
+        function initialize() {
+            // Set the value of the inputs
+            setAmountsToPay();
+
+            // Se the value of the rows
+            $('.employer-imputator-table').each(function () {
+                $(this).find('.employer-imputator-table-row').each(function () {
+                    updateRow($(this));
+                });
+                updateTotals($(this));
+            });
+        }
+
+        function registerPayments(tableElement) {
+            debugger
+            var jsonPost = [];
+            tableElement.find('.employer-imputator-table-row').each(function () {
+                jsonPost[jsonPost.length] = {
+                    personId: $(this).data("person-id"),
+                    paymentAmount: parseFloat($(this).find('.payment-amount').val().replace(",", "."))
+                }
+            });
+
+            var totalAmountToPay = 0;
+            for (i = 0; i < jsonPost.length; i++) {
+                totalAmountToPay += jsonPost[i].paymentAmount;
+            }
+            if (totalAmountToPay > tableElement.data("total-pending-amount")) {
+                showErrorModal("El monto a pagar es mayor que la deuda total");
+                return;
+            }
+
+            swal({
+                title: "&iquest;Est&aacute;s seguro?",
+                text: "No podr&aacute;s revertir los cambios.",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#F7323F",
+                confirmButtonText: "¡Sí, imputar!",
+                closeOnConfirm: false
+            },
+            function(){
+                defaultAjax({
+                    url: /*[[@{/imputador}]]*/,
+                    type: 'POST',
+                    data: {
+                        multiPaymentJson: JSON.stringify(jsonPost)
+                    },
+                    success: function (data) {
+                        location.reload();
+                    }
+                })
+            });
+        }
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <th:block th:replace="fragments/headers :: companyDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetCompanySidebar(currentPage='imputator')"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <span class="active">Imputador</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <i class="icon-note font-dark"></i>
+                        <span class="caption-subject bold uppercase"> Imputador</span>
+                    </div>
+                    <div class="actions">
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <small>Deuda total</small>
+                                        <h3 class="font-red-haze" style="font-size: 30px;">
+                                            <span>S/</span>
+                                            <span data-counter="counterup"
+                                                   th:attr="data-value=${@utilService.doubleFormat(payment.stats.totalPendinAmount)}">
+                                            </span>
+                                        </h3>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-calculator"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 bordered">
+                                <div class="display">
+                                    <div class="number">
+                                        <small>Deposito disponible</small>
+                                        <h3 class="font-green-sharp" style="font-size: 30px;">
+                                            <span>S/</span>
+                                            <span data-counter="counterup"
+                                                   th:attr="data-value=${@utilService.doubleFormat(payment.getTotalSurplusAmount()+payment.getTotalPaymentAmount())}">
+                                            </span>
+                                        </h3>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sample_1_2_wrapper" class="dataTables_wrapper" th:if="${payment.credits != null}">
+                        <div class="pull-right search">
+                            <input class="form-control" id="search" type="text" placeholder="Buscar"/>
+                        </div>
+                        <div style="clear: both;"></div>
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-checkable order-column dataTable employer-imputator-table"
+                                   id="sample_1_2" role="grid" aria-describedby="sample_1_2_info"
+                                   th:attr="data-total-pending-amount=${payment.stats.totalPendinAmount},data-total-payment-available-amount=${@utilService.doubleFormat(payment.getTotalSurplusAmount()+payment.getTotalPaymentAmount())}">
+                                <thead>
+                                <tr role="row">
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 200px;">
+                                        Tipo documento
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 200px;">
+                                        N&uacute;mero documento
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Nombre Completo
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 110px;">
+                                        Cantidad cr&eacute;ditos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;width: 196px;">
+                                        Monto total
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending"
+                                        style="background:#32c5d2;color: white;text-align:center;width: 187px;">
+                                        Pdte. pago
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending"
+                                        style="text-align:center;width: 187px;">
+                                        Pagos a imputar
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending"
+                                        style="text-align:center;width: 187px;">
+                                        Saldo
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr role="row
+" th:each="personCredits : ${payment.personCredits}"
+                                    class="employer-imputator-table-row rowImputator"
+                                    th:attr="data-total-pending-amount=${personCredits.getCreditsTotalPendingAmount()},data-person-id=${personCredits.personId}">
+                                    <td style="padding:1em;text-align:left;" th:text="${personCredits.docType.name}">
+                                    </td>
+                                    <td class="byDocument" th:text="${personCredits.docNumber}">
+                                    </td>
+                                    <td class="byName" th:text="${personCredits.getFullName()}">
+                                    </td>
+                                    <td style="text-align:center;" th:text="${personCredits.credits.size()}">
+                                    </td>
+                                    <td style="text-align:center;"
+                                        th:text="${@utilService.doubleMoneyFormat(personCredits.getCreditsTotalAmount())}">
+                                    </td>
+                                    <td style="background:#c3eef1;text-align:center;" class="pending-amount"
+                                        th:text="${@utilService.doubleMoneyFormat(personCredits.getCreditsTotalPendingAmount())}">
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <div id="form">
+                                            <div class="form-group"
+                                                 style="margin:0 auto;width: 120px;">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"
+                                                          id="sizing-addon1">S/</span>
+                                                    <input type="text"
+                                                           class="form-control payment-amount"
+                                                           aria-describedby="sizing-addon1"
+                                                           th:value="${@utilService.doubleFormat(personCredits.amountToPay)}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="text-align:center;" class="amount-subtraction">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4"></td>
+                                    <td style="text-align: right"><b>TOTAL</b></td>
+                                    <td style="text-align: center" class="total-pending-amount"
+                                        th:text="${@utilService.doubleMoneyFormat(payment.stats.totalPendinAmount)}"></td>
+                                    <td style="text-align: center;" class="total-payment-amount"></td>
+                                    <td style="text-align: center;" class="total-amount-subtraction"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: right">
+                            <span class="list-group-item list-group-item-danger" id="payment-button-message" style="background:none;border:0;
+                            display: inline-block;margin-top:.5em;margin-right: 1em;padding:0;vertical-align: top;"></span>
+                            <button id="payment-button" type="button" class="btn red">
+                                Imputar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" class="forms q156" autocomplete="off">
+            <div class="field_content">
+                <p style="min-width: 410px;">&#191;Tienes un inmueble que puedes colocar en garant&iacute;a? <br/> <span style="font-size: 13px;">(Puede ser tuyo o de tus garantes)</span></p>
+                <div class="wrap-radios">
+                    <div class="field inline">
+                        <div class="field_content">
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertyGuarantee" type="radio" value="true"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>Si</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertyGuarantee" type="radio" value="false"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>No</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="field_content">
+                <p style="min-width: 410px;">&#191;La propiedad est&aacute; registrada en SUNARP? <br/> <span style="font-size: 13px;">(con partida en Registros Públicos)</span></p>
+                <div class="wrap-radios">
+                    <div class="field inline">
+                        <div class="field_content">
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertySunarp" type="radio" value="true"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>Si</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertySunarp" type="radio" value="false"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>No</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="field_content">
+                <p style="min-width: 410px;">&#191;La propiedad est&aacute; en cerro o cerca a falda de cerro?</p>
+                <div class="wrap-radios">
+                    <div class="field inline">
+                        <div class="field_content">
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertyNearHill" type="radio" value="true"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>Si</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertyNearHill" type="radio" value="false"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>No</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="field_content">
+                <p style="min-width: 410px;">&#191;La propiedad tiene pista asfaltada y vereda?</p>
+                <div class="wrap-radios">
+                    <div class="field inline">
+                        <div class="field_content">
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertyHasSidewalk" type="radio" value="true"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>Si</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="input-radio input-outline form-control">
+                                <input name="propertyHasSidewalk" type="radio" value="false"/>
+                                <div class="option-wrapper">
+                                    <div class="iconic-option-inner">
+                                        <h5>No</h5>
+                                        <div class="radio"></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field inline r-field">
+                <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+        </form>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var validator = $('#questionForm').data('validatorJson')
+        $('#questionForm').validateForm(validator);
+
+        $('#sendButton').click(function () {
+
+            var filledForm = {
+                propertyGuarantee: $('input[name=propertyGuarantee]:checked').val(),
+                propertySunarp: $('input[name=propertySunarp]:checked').val(),
+                propertyNearHill: $('input[name=propertyNearHill]:checked').val(),
+                propertyHasSidewalk: $('input[name=propertyHasSidewalk]:checked').val()
+            };
+
+            if($('#questionForm').valid()){
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: filledForm
+                }, "");
+            }
+        });
+
+
+        $('.input-radio').on("click",function() {
+            $(this).closest('.field').find('.input-radio').removeClass("radio-border");
+            $(this).addClass("radio-border");
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

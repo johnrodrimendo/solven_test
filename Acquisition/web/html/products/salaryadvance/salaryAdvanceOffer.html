@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+            type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+            type="text/javascript"></script>
+    <!-- / CounterUp -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/imgprogress/imgProgress.js'}"></script>
+    <!-- PDF JS -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/pdfJs2/pdf.js'}"></script>
+
+    <!-- reCaptcha -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var maxCommission = /*[[${maxCommission}]]*/;
+        var minCommission = /*[[${minCommission}]]*/;
+
+        var loanApplicationRegisterType = /*[[ ${loanApplicationRegisterType} ]]*/;
+        var loanApplicationRegisterTypeDNI = /*[[ ${T(com.affirm.common.model.catalog.LoanApplicationRegisterType).DNI} ]]*/;
+        var url = /*[[ ${@catalogService.getHiddenAssistant().avatarUrl} ]]*/;
+
+        var isWeekday = /*[[ ${isWeekday} ]]*/
+
+
+        // Only numbers
+        var offerMinValue = /*[[${offer.minAmmount.intValue()}]]*/;
+        var offerMaxValue = /*[[${offer.maxAmmount.intValue()}]]*/;
+
+                $(document).on('ready', function () {
+
+                    $('#helpSign').on('click', function (event) {
+                        event.preventDefault();
+                        $('#hlp-modal').modal({backdrop: 'static', keyboard: false, show: true});
+                    });
+
+                    var size = 130;
+                    if ($(window).width() <= 1280 && $(window).width() > 768) {
+                        size = 100;
+                    } else if ($(window).width() <= 768) {
+                        size = 60;
+                    }
+
+                    $('.avatar-advisor').doOnce(function () {
+                        $(".avatar-advisor").imgProgress({
+
+                            // path to the image
+                            img_url: url,
+
+                            // size in pixels
+                            size: size,
+
+                            // bar size
+                            barSize: 10,
+
+                            // background color
+                            backgroundColor: '#BEEFF2',
+
+                            // foreground color
+                            foregroundColor: '#26CAD3',
+
+                            // CSS background-size property
+                            backgroundSize: 'cover',
+
+                            // current percentage value
+                            percent: 5
+
+                        });
+                    });
+
+
+                    $('label.custom-check').on('change', '.real-check', function () {
+                        $(this).checked();
+                    });
+
+
+                    $('#amountAdelanto').forceIntegerOnly(true, offerMinValue, offerMaxValue);
+                    $('#phoneNumber').forceLettersOnly("^[0-9 ()]+$", true, 9, 9);
+                    $('#smsToken').forceLettersOnly("^[0-9 ()]+$", true, 4, 4);
+
+                    // Get the geolocation
+                    var browserLocation = /*[[${browserLocation}]]*/;
+                    if (!browserLocation && navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            defaultAjax({
+                                url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/browserLocation/}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    latitude: position.coords.latitude,
+                                    longitude: position.coords.longitude
+                                },
+                                success: function (result) {
+                                },
+                                error: function (result) {
+                                    console.log('Error saving browser location')
+                                }
+                            });
+                        }, function (error) {
+                            switch (error.code) {
+                                case error.PERMISSION_DENIED:
+                                    console.log("User denied the request for Geolocation");
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    console.log("Location information is unavailable");
+                                    break;
+                                case error.TIMEOUT:
+                                    console.log("The request to get user location timed out");
+                                    break;
+                                case error.UNKNOWN_ERROR:
+                                    console.log("Unknow geolocation error");
+                                    break;
+                            }
+                        });
+                    }
+
+                    <!-- Read contract-->
+                    $('#contract').on('click', function (event) {
+                        event.preventDefault();
+                        $('#contractButton').hide();
+                        $('#contractModal').modal({backdrop: 'static', keyboard: false, show: true});
+                        $('.contract-scroll').loadingContent();
+                        debugger;
+                        updateCommissionRange();
+                        calculateComission(true);
+                        defaultAjax({
+                            url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer/updateOffer}]]*/null,
+                            type: 'POST',
+                            data: {
+                                amount: $('#amountAdelanto').val(),
+                                commission: $('#commissionAdelanto').val()
+                            },
+                            success: function (data) {
+                                renderContract();
+                                $('.contract-scroll').addClass('bg-black');
+                            }
+                        });
+                    });
+
+                    $('.contract-scroll').bind('scroll', chk_scroll);
+
+                    $('#contractButton').on('click', function () {
+                        $('#contractModal').modal('hide');
+                        $('#contract').prop('checked', true);
+                        $('#contract').change();
+                    });
+
+                    <!-- Modal comparision -->
+                    $('#openModalComparision').on('click', function (event) {
+                        event.preventDefault();
+                        $('#comparisionModal').modal({backdrop: 'static', keyboard: false, show: true});
+                    });
+                    <!-- / Modal comparision -->
+
+                    <!-- / Slider -->
+
+
+                    <!-- Toggle  -->
+                    $('#expand').on('click', function () {
+
+                        $('.toggle').toggle();
+
+                    });
+                    <!-- / Toggle -->
+
+                    <!-- Change amount -->
+
+                    var amount = $('#amountAdelanto');
+
+                    $('.edit-amount').on('click', function (event) {
+
+                        event.preventDefault();
+
+                        $(this).fadeOut();
+
+                        amount.val('');
+                        setTimeout(function () {
+                            amount.focus();
+                        }, 300);
+
+                        amount.addClass('focused');
+                        amount.attr('disabled', false);
+
+                    });
+
+                    amount.on('blur', function (event) {
+                        if($(this).val() % 50 != 0){
+                            $(this).val(Math.ceil($(this).val()/50)*50);
+                        }
+                        if($(this).val() < offerMinValue){
+                            $(this).val(offerMinValue);
+                        }
+
+                        updateCommissionRange();
+                        calculateComission(true);
+                        event.preventDefault();
+                        amount.removeClass('focused');
+                        amount.attr('disabled', true);
+                        $('.edit-amount').fadeIn();
+                    });
+
+                    amount.on('keypress', function (event) {
+                        if (event.which == 13) {
+                            if($(this).val() % 50 != 0){
+                                $(this).val(Math.ceil($(this).val()/50)*50);
+                            }
+                            if($(this).val() < offerMinValue){
+                                $(this).val(offerMinValue);
+                            }
+
+                            updateCommissionRange();
+                            calculateComission(true);
+                            event.preventDefault();
+                            amount.removeClass('focused');
+                            amount.attr('disabled', true);
+                            $('.edit-amount').fadeIn();
+                        }
+                    });
+
+                    <!-- /  Change amount -->
+
+                    <!-- Formula -->
+                    // Commission live change
+                    $('#commissionAdelanto').bind('keyup mouseup', function () {
+                        calculateComission(true);
+                    });
+
+
+                    $('#spinner-down').find('.icon-bullet-down').addClass('disabled-control');
+                    $('#spinner-up').on('click', function (event) {
+                        event.preventDefault();
+                        var newCommission = parseFloat($('#commissionAdelanto').val()) + 0.5;
+                        if (newCommission > maxCommission) {
+                            $('#spinner-up').find('.icon-bullet-up').addClass('disabled-control');
+                            return;
+                        } else {
+                            $('#spinner-down').find('.icon-bullet-down').removeClass('disabled-control');
+                            disableChecks();
+                            $('#commissionAdelantoText').text(newCommission.toFixed(2));
+                            $('#commissionAdelanto').val(newCommission);
+                            calculateComission(true);
+                        }
+                    });
+
+                    $('#spinner-down').on('click', function (event) {
+                        event.preventDefault();
+                        var newCommission = parseFloat($('#commissionAdelanto').val()) - 0.5;
+                        if (newCommission < minCommission) {
+                            $('#spinner-down').find('.icon-bullet-down').addClass('disabled-control');
+                            return;
+                        } else {
+                            disableChecks();
+                            $('#spinner-up').find('.icon-bullet-up').removeClass('disabled-control');
+                            $('#commissionAdelantoText').text(newCommission.toFixed(2));
+                            $('#commissionAdelanto').val(newCommission);
+                            calculateComission(true);
+                        }
+                    });
+
+                    <!-- Submit -->
+                    $('.button').on('click', function (event) {
+
+                        event.preventDefault();
+
+
+
+                        switch ($(this).data('target')) {
+
+                            case '#cellphone-block':
+                                var elem = $(this);
+                                if (!$('#contract').prop('checked') && !$('#terms').prop('checked')) {
+                                    elem.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">Para continuar, acepta el contrato de cr&eacute;dito,  los Términos y Condiciones y la Pol&iacute;tica de Privacidad.</span>');
+                                    return;
+                                } else if (!$('#contract').prop('checked')) {
+                                    elem.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">Para continuar, acepta el contrato de cr&eacute;dito.</span>');
+                                    return;
+                                } else if (!$('#terms').prop('checked')) {
+                                    elem.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.</span>');
+                                    return;
+                                } else if (!isWeekday) {
+                                    swal({
+                                                title: "Aviso importante",
+                                                text: "Debido a restricciones en los horarios para realizar transferencias, haremos el desembolso de lunes a viernes de 9:00 a 18:30hs.",
+                                                type: "info",
+                                                html: true,
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#F7323F',
+                                                cancelButtonText: "Cancelar",
+                                                cancelButtonColor: '#3F3B3B',
+                                                confirmButtonText: "¡Estoy de acuerdo!",
+                                                closeOnConfirm: true
+                                            },
+                                            function () {
+                                                $('#response-block').html('');
+
+                                                elem.loading('', 2);
+
+                                                defaultAjax({
+                                                    url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer}]]*/null,
+                                                    type: 'POST',
+                                                    data: {
+                                                        amount: $('#amountAdelanto').val(),
+                                                        commission: $('#commissionAdelanto').val()
+                                                    },
+                                                    success: function (data) {
+                                                        elem.unloading();
+                                                        $('#offer-block').addClass('block-hidden');
+                                                        $('.adviser-section, .divisor-bottom').removeClass('block-hidden');
+                                                        //validation here
+                                                        if (loanApplicationRegisterType == loanApplicationRegisterTypeDNI) {
+                                                            $('#email-block').removeClass('block-hidden');
+                                                        } else {
+                                                            $('#cellphone-block').removeClass('block-hidden');
+                                                        }
+                                                    },
+                                                    error: function () {
+                                                        elem.unloading();
+                                                    }
+                                                });
+                                            });
+                                } else {
+                                    elem.closest('.block').find('.errorContainer').html('');
+
+                                    elem.loading('', 2);
+
+                                    defaultAjax({
+                                        url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer}]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            amount: $('#amountAdelanto').val(),
+                                            commission: $('#commissionAdelanto').val()
+                                        },
+                                        success: function (data) {
+                                            elem.unloading();
+                                            $('#offer-block').addClass('block-hidden');
+                                            $('.adviser-section').removeClass('block-hidden');
+                                            //validation here
+                                            if (loanApplicationRegisterType == loanApplicationRegisterTypeDNI) {
+                                                $('#email-block, .divisor-bottom').removeClass('block-hidden');
+                                            } else {
+                                                $('#cellphone-block').removeClass('block-hidden');
+                                            }
+                                        },
+                                        error: function () {
+                                            elem.unloading();
+                                        }
+                                    });
+                                }
+                                break;
+
+                            case '#pin-block':
+                                var elm = $(this);
+                                if ($('#phoneNumber').val().length == 9 && isValidCellphone($('#phoneNumber').val())) {
+                                    elm.loading('', 2);
+                                    defaultAjax({
+                                        url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer/sendvalidation}]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            cellphone: $('#phoneNumber').val()
+                                        },
+                                        success: function (data) {
+                                            elm.closest('.block').find('.errorContainer').html('');
+                                            elm.unloading();
+
+                                            $('#cellphone-block').addClass('block-hidden');
+                                            $('#pin-block').removeClass('block-hidden');
+                                        },
+                                        error: function () {
+                                            elm.unloading();
+                                        }
+                                    });
+                                } else {
+                                    elm.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">Ingresa un tel&eacute;fono v&aacute;lido.</span>');
+                                }
+
+
+                                break;
+                            case '#email-block':
+                                var elm = $(this);
+                                if (isEmail($('#email').val())) {
+                                    elm.loading('', 2);
+                                    defaultAjax({
+                                        url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer/sendvalidation}]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            email: $('#email').val()
+                                        },
+                                        success: function (data) {
+                                            elm.closest('.block').find('.errorContainer').html('');
+                                            elm.unloading();
+                                            $('#email-block').addClass('block-hidden');
+                                            $('#success-message').html(successAjaxMessage('Te enviamos un email con el link para acceder a tu crédito. Puede tardar unos segundos.'))
+                                        },
+                                        error: function (xhr, err) {
+                                            elm.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">' + err.message + '</span>');
+                                            elm.unloading();
+                                            return false;
+                                        }
+                                    });
+                                } else {
+                                    elm.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">Ingresa un email v&aacute;lido.</span>');
+                                }
+
+
+                                break;
+                            case 'applyOffert':
+                                var elm = $(this);
+                                if ($('#smsToken').val().length == 4) {
+                                    elm.loading('', 2);
+                                    defaultAjax({
+                                        url: /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer/validate}]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            authToken: $('#smsToken').val()
+                                        },
+                                        success: function (data) {
+                                            elm.unloading();
+                                        },
+                                        error: function () {
+                                            elm.unloading();
+                                        }
+                                    });
+                                } else {
+                                    elm.closest('.block').find('.errorContainer').html('<span class="help-block help-block-error">Ingresa un PIN v&aacute;lido.</span>');
+                                }
+
+                                break;
+                        }
+
+                    });
+
+                    var resendButtonToken = $('#resendToken');
+                    resendButtonToken.on('click', function (event) {
+                        event.preventDefault();
+                        defaultAjax({
+                            url: /*[[@{/loanapplication/__${loanApplicationToken}__/resendSmsToken}]]*/,
+                            type: 'POST',
+                            success: function (data) {
+                                resendButtonToken.fadeOut();
+//                        $('.responseResend').html('Te hemos reenviado el PIN');
+                                setTimeout(function () {
+                                    resendButtonToken.fadeIn();
+//                            $('.responseResend').html('');
+                                }, 30000);
+                            }
+                        });
+
+                    });
+
+                    updateCommissionRange();
+                    calculateComission(true);
+
+                    <!-- counterUp -->
+                    counterUpInit();
+                    <!-- / counterUp -->
+
+                });
+
+        function disableChecks() {
+            $('#contract, #terms').attr('checked', false);
+        }
+
+        function updateCommissionRange() {
+            var entityRates = JSON.parse(/*[[${@utilService.toJson(rates)}]]*/null);
+            var rate;
+            for (i = 0; i < entityRates.length; i++) {
+                if ($('#amountAdelanto').val() <= entityRates[i].maxAmountCommission) {
+                    if (rate == null || rate.maxAmountCommission > entityRates[i].maxAmountCommission) {
+                        rate = entityRates[i];
+                    }
+                }
+            }
+
+            //debugger;
+            var newMinCommission = rate.commission;
+            var newMaxCommission = rate.commission * 2;
+
+            if (newMinCommission != minCommission || newMaxCommission != maxCommission) {
+                $('#commissionAdelanto').val(newMinCommission.toFixed(2))
+                $('#commissionAdelantoText').text(newMinCommission.toFixed(2))
+                $('#commissionAdelantoText').data('value', newMinCommission.toFixed(2))
+                $('#commissionAdelantoText').attr('data-value', newMinCommission.toFixed(2))
+                //debugger;
+            }
+            minCommission = newMinCommission;
+            maxCommission = newMaxCommission;
+        }
+
+        function calculateComission(shouldUpdateTcea) {
+
+            var total = (Number($('#amountAdelanto').val()) + Number($('#commissionAdelanto').val()));
+
+            $('#totalAmount').html(total.toFixed(2));
+        }
+
+
+        function chk_scroll(e) {
+            var elem = $(e.currentTarget);
+            if (Math.round(elem[0].scrollHeight - elem.scrollTop()) == elem.outerHeight()) {
+                $('#contractButton').fadeIn();
+                $('#contractButton').enableButton();
+            }
+        }
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function renderContract() {
+            var pdfViewer;
+            var url = /*[[@{/salaryadvanceloanapplication/__${loanApplicationToken}__/offer/contract}]]*/;
+
+            pdfjsLib.getDocument(url).promise
+                    .then(function (pdf) {
+                        pdfViewer = pdf;
+                        // Get div#container and cache it for later use
+                        rendering(pdfViewer)
+                    });
+
+        }
+
+        function rendering(pdf) {
+            var container = document.getElementById("contract-scroll");
+            container.innerHTML = "";
+
+            // Loop from 1 to total_number_of_pages in PDF document
+            for (var i = 1; i <= pdf.numPages; i++) {
+
+                // Get desired page
+                pdf.getPage(i).then(function (page) {
+
+                    var div = document.createElement("div");
+
+                    // Set id attribute with page-#{pdf_page_number} format
+                    div.setAttribute("id", "page-" + (page.pageIndex + 1));
+
+                    // This will keep positions of child elements as per our needs
+                    div.setAttribute("style", "position: relative");
+
+                    // Append div within div#container
+                    container.appendChild(div);
+
+                    // Create a new Canvas element
+                    var canvas = document.createElement("canvas");
+
+                    // Append Canvas within div#page-#{pdf_page_number}
+                    div.appendChild(canvas);
+
+                    var context = canvas.getContext('2d');
+
+
+                    var viewport = page.getViewport(1);
+                    var scale = container.clientWidth / viewport.width;
+                    console.log('scale ' + scale);
+                    viewport = page.getViewport(scale);
+
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    // Render PDF page
+                    var x = page.render(renderContext);
+                });
+            }
+        }
+        /*]]>*/
+    </script>
+
+</head>
+<body th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: processHeader"></th:block>
+</th:block>
+<!-- Header ends -->
+<!-- Content -->
+<th:block layout:fragment="content">
+
+    <section class="loan-process page-offer">
+        <div class="container">
+            <div class="adviser-section animated block-hidden">
+                <div class="avatar-progress">
+                    <div class="avatar-advisor"></div>
+                </div>
+                <div class="horizontal-line"></div>
+            </div>
+            <div class="questions-section animated fadeInRight">
+                <div class="block forms" id="offer-block">
+                    <div class="offer-title">
+                        <h2 th:utext="#{title.advancement}"></h2>
+                        <span class="line"></span>
+                    </div>
+                    <div class="offer-container" id="proceso-adelanto-sueldo">
+                        <ul>
+                            <li class="best-offer salary-advance-offer">
+                                <div class="box-a"><div class="bar-offer"></div><span class="bar-iso"><i class="icon icon-solven-iso"></i></span></div>
+                                <div class="box-b">
+                                    <h3 >Adelanto de sueldo</h3>
+                                    <span class="ps">Edita la cantidad que quieres adelantar y solicítalo ahora.</span>
+                                    <div class="wrap-amount">
+                                        <ul>
+                                            <li>
+                                                <h4 class="amount"><span class="currency">S/ </span> <span class="amount-value"
+                                                                                                           th:text="${@utilService.doubleFormat(offer.maxAmmount)}"></span>
+                                                    <div class="text-lightblue">/</div>
+                                                </h4>
+                                                <small class="display-block input-help">Monto m&aacute;ximo</small>
+                                            </li>
+                                            <li>
+                                                <h4 class="amount"><span class="currency">S/ </span> <span id="totalAmount"
+                                                                                                           class="amount-value"
+                                                                                                           th:text="${@utilService.doubleFormat(offer.ammount+minCommission)}"></span>
+                                                </h4>
+                                                <small class="display-block input-help">Monto + Comisi&oacute;n</small>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="box-c adelanto">
+                                    <ul class="offer-info">
+                                        <li>
+                                            <div class="field-wrapper">
+                                                <span class="prefix">S/</span>
+                                                <input type="text" th:value="${offer.ammount.intValue()}" id="amountAdelanto" class="input-outline"
+                                                       disabled="disabled"/>
+                                                <a href="#" class="icon icon-edit edit-amount"></a>
+                                            </div>
+                                            <small class="display-block input-help">Adelanto</small>
+                                        </li>
+                                        <li class="text-white">+</li>
+                                        <li>
+                                            <div class="input-controls-label">
+                                                <span class="currency">S/</span>
+                                                <h3><span id="commissionAdelantoText"
+                                                                                            class="amount"
+                                                                                            th:attr="data-value=${@utilService.doubleFormat(minCommission)}"
+                                                                                            th:text="${@utilService.doubleFormat(minCommission)}"></span>
+                                                </h3>
+                                                <input type="hidden" name="" id="commissionAdelanto"
+                                                       th:value="${@utilService.doubleFormat(minCommission)}"/>
+                                                <div class="controls">
+                                                    <button class="up" id="spinner-up"><i class="icon icon-bullet-up"></i>
+                                                    </button>
+                                                    <button class="down" id="spinner-down"><i class="icon icon-bullet-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="display-block input-help" th:text="#{label.offer.commission}"></small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="terms-block">
+                        <label for="contract" class="custom-check">
+                            <span class="check-inner">
+                                <i class="icon icon-check"></i>
+                            </span>
+                            <span class="check-label" th:text="#{label.offer.contract}"></span>
+                            <input type="checkbox" class="real-check" id="contract"/>
+                        </label>
+                        <br/>
+                        <label for="terms" class="custom-check">
+                            <span class="check-inner">
+                                <i class="icon icon-check"></i>
+                            </span>
+                            <span class="check-label" th:utext="#{label.terms}"></span>
+                            <input type="checkbox" class="real-check" id="terms"/>
+                        </label>
+                    </div>
+                    <div class="errorContainer"></div>
+                    <div class="actions-center">
+                        <button class="button bg-red" th:text="#{button.next}" data-target="#cellphone-block"></button>
+                    </div>
+                </div>
+                <div id="cellphone-block" class="block block-hidden">
+                    <p>Ingresa tu n&uacute;mero de celular<b
+                            th:text="${phoneNumber != null ? ' ' + phoneNumber + '. ' : '.'}"></b> Te enviaremos un PIN
+                        de verificaci&oacute;n.</p>
+                    <div class="field inline">
+                        <input type="text" class="input-outline cellphone-input" id="phoneNumber"/>
+                        <small class="input-help">N&uacute;mero de celular</small>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button bg-red" th:text="#{button.next}" data-target="#pin-block"></button>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+                <div id="pin-block" class="block block-hidden">
+                    <p>Ingresa el PIN de 4 d&iacute;gitos que enviamos a tu celular.</p>
+                    <div class="field inline">
+                        <input type="text" class="input-outline pin-input" id="smsToken"/>
+                        <small class="display-block"><a href="#" id="resendToken" class="text-lightblue"><i
+                                class="icon icon-reload"></i> Reenviar</a></small>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button bg-red" th:text="#{button.next}" data-target="applyOffert"></button>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+                <div id="email-block" class="block block-hidden">
+                    <p>Ingresa tu correo electr&oacute;nico.</p>
+                    <div class="field inline">
+                        <input type="text" class="input-outline fullname-input" id="email" autocorrect="off" autocapitalize="none"/>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button bg-red" th:text="#{button.next}" data-target="#email-block"></button>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div id="success-message"></div>
+            </div>
+            <hr class="divisor-bottom block-hidden"/>
+        </div>
+    </section>
+
+    <!-- Offert Alternative -->
+    <!--<div class="offert-alternative">
+        <div class="container">
+            <div class="offert-box">
+                <h2 class="title-home">Adelanto de sueldo</h2>
+                <div class="amount-container">
+                    &lt;!&ndash;<p class="sub-text slider-section">(No encontrar&aacute;s nada m&aacute;s econ&oacute;mico que Solven..., &iquest;tienes
+                        dudas?
+                        Compara
+                        <a href="#" id="openModalComparision" class="text-red"><b>aqu&iacute;</b></a>).</p>&ndash;&gt;
+
+                    <div class="box-soft" id="expand">
+                        <div class="top">
+                            <p>Nuestra comisión siempre es menor que en los bancos.<i class="icon bullet-down-icon"></i></p>
+                            <small class="toggle animated fadeIn">(y no evaluamos tu situación crediticia)</small>
+                        </div>
+                        <div class="middle toggle animated fadeIn">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 column">
+                                    <ul>
+                                        <li>
+                                            <p><span>Banco 1</span><span class="underline"> +55.83%</span></p>
+                                        </li>
+                                        <li>
+                                            <p><span>Banco 2</span><span class="underline">+57.20%</span></p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6 col-md-6 column">
+                                    <ul>
+                                        <li>
+                                            <p><span>Banco 3</span><span class="underline">+82.66%</span></p>
+                                        </li>
+                                        <li>
+                                            <p><span>Banco 4</span><span class="underline">+265.32%</span></p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom toggle animated fadeIn">
+                            <small class="red-text">*</small>
+                            <small>Calculado en base a un adelanto a 10 días por S/ 750</small>
+                        </div>
+                    </div>
+
+                    <form action="">
+                        <br/>
+                        <div class="row main-slider slider-section">
+                            <div class="col-lg-6 col-md-6 .col-sm-6 col-xs-12">
+                                <div class="bar-slider slider-section">
+                                    <p>¿Cuánto dinero necesitas?</p>
+                                    <div id="sliderAmount"></div>
+                                    <div class="values">
+                                        <small style="color: #34465d;" class="min-value"
+                                               th:text="'Mín. '+${@utilService.integerMoneyFormat(offer.minAmmount.intValue())}"></small>
+                                        <small style="color: #34465d;" class="max-value"
+                                               th:text="'Máx. '+${@utilService.integerMoneyFormat(offer.maxAmmount.intValue())}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 .col-sm-6 col-xs-12 right">
+                                <div class="field slider-section">
+                                    <div class="field-wrapper">
+                                        <span class="prefix">S/</span>
+                                        <input type="text" th:value="${offer.ammount.intValue()}" id="amountAdelanto"
+                                               disabled="disabled"/>
+                                        <a href="#" class="icon edit-icon edit-amount"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resume-section">
+                            <div class="box-detail">
+                                <span class="prefix">S/ </span>
+                                <h3 id="salaryAmount" th:text="${offer.ammount.intValue()}"></h3>
+                                <small class="small-text">Adelanto</small>
+                            </div>
+                            <span class="sm">+</span>
+                            <div class="box-detail centered">
+                                <span class="prefix">S/ </span>
+                                <h3 id="commissionAdelantoText" data-counter="counterup"
+                                    th:attr="data-value=${@utilService.doubleFormat(minCommission)}"
+                                    th:text="${@utilService.doubleFormat(minCommission)}"></h3>
+                                <input type="hidden" name="" id="commissionAdelanto"
+                                       th:value="${@utilService.doubleFormat(minCommission)}"/>
+                                <div class="spinners">
+                                    <button id="spinner-up"><i class="icon bullet-up-icon"></i></button>
+                                    <button id="spinner-down"><i class="icon bullet-down-icon"></i></button>
+                                </div>
+                                <span class="small-text"><span class="important-bullet slider-section">*</span> Comisi&oacute;n</span>
+                            </div>
+                            <span class="sm">=</span>
+                            <div class="box-detail">
+                                <span class="prefix red-text">S/ </span>
+                                <h3 id="totalAmount" class="red-text bigAmount"
+                                    th:text="${@utilService.doubleFormat(offer.ammount+minCommission)}">2525</h3>
+                                <span class="small-text last-sub">Pago total</span>
+                                &lt;!&ndash;<span class="very-small-text">(TCEA <span id="tceaPercentage"&ndash;&gt;
+                                &lt;!&ndash;th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate)}"></span>)</span>&ndash;&gt;
+                            </div>
+                            <p class="important-info slider-section"><span class="important-bullet">*</span> Esta comisi&oacute;n
+                                cubre
+                                nuestros costos (incluye IGV). Puedes aumentarla si crees que es justo pagar un poco m&aacute;s, &iexcl;te
+                                lo agradeceremos!
+                            </p>
+                        </div>
+                        <div class="field phoneSection">
+                            <p>Ingresa tu n&uacute;mero de celular<b
+                                    th:text="${phoneNumber != null ? phoneNumber + '. ' : '.'}"></b> Te enviaremos un PIN
+                                de verificaci&oacute;n.</p>
+                            <div class="field-wrapper">
+                                <input type="text" id="phoneNumber" data-selected="true"/>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                        <div class="field pinSection">
+                            <p>Ingresa el PIN de 4 d&iacute;gitos que enviamos a tu celular.</p>
+                            <div class="field-wrapper">
+                                <input type="text" class="align-center" id="smsToken"/>
+                                <div class="errorContainer"></div>
+                                <small><a href="#" id="resendToken">Reenviar</a></small>
+                            </div>
+                        </div>
+
+                        <div class="field emailSection">
+                            <p>Ingresa tu correo electr&oacute;nico.</p>
+                            <div class="field-wrapper">
+                                <input type="text" class="align-center input-email" id="email"/>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+
+                        <div class="field slider-section terms-section">
+                            <div class="field-wrapper">
+                                <label for="contract" class="terms-text">
+                                    <input type="checkbox" id="contract"/>
+                                    <span>Acepto el contrato del cr&eacute;dito y autorizo el descuento por planilla.</span>
+                                </label>
+                                <label for="terms" class="terms-text">
+                                    <input type="checkbox" id="terms"/>
+                                    <span>Acepto los <a rel="noopener noreferrer" th:href="@{/terminos-y-condiciones}" target="_blank">T&eacute;rminos y Condiciones</a> y la <a
+                                            th:href="@{/politica-de-privacidad}" target="_blank" rel="noopener noreferrer">Pol&iacute;tica de Privacidad</a>.</span>
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="block" id="response-block"></div>
+
+                        <div class="field buttons">
+                            <button class="button red-button slider-section" data-target="phoneSection">Solicitar
+                            </button>
+                            <button class="button red-button phoneSection" data-target="pinSection">Enviar</button>
+                            <button class="button red-button emailSection" data-target="emailSection">Enviar</button>
+                            <br class="phoneSection"/>
+                            <br class="phoneSection"/>
+                            <a href="#" class="phoneSection" id="resetForm"><i class="icon back-icon"></i> Volver a
+                                calcular</a>
+                            <button class="button red-button pinSection" data-target="applyOffert">Verificar</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>-->
+    <!-- / Offert Alternative -->
+
+    <!-- Modal Comparision -->
+    <div id="comparisionModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-lightblue-header">
+                    <button type="button" class="closeRoundButton" data-dismiss="modal" aria-hidden="true"><i
+                            class="icon close-icon"></i></button>
+                    <h2 id="header-text" style="display: block;">Comisi&oacute;n convertida en TCEA</h2>
+                </div>
+                <div class="loading">
+                    <div class="modal-body">
+                        <div class="tableContent">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr class="align-center">
+                                        <th style="text-align: center;"></th>
+                                        <th style="text-align: center;">21 d&iacute;as</th>
+                                        <th style="text-align: center;">18 d&iacute;as</th>
+                                        <th style="text-align: center;">15 d&iacute;as</th>
+                                        <th style="text-align: center;">12 d&iacute;as</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="success-row">
+                                        <td class="big-text"><span>Solven</span></td>
+                                        <td class="big-text"><span>43.44%</span></td>
+                                        <td class="big-text"><span>52.32%</span></td>
+                                        <td class="big-text"><span>65.68%</span></td>
+                                        <td class="big-text"><span>87.95%</span></td>
+                                    </tr>
+                                    <tr style="background: #f9f9fb;">
+                                        <td style="text-align: left;"><span>Banco 1</span><br/>
+                                            <small class="text-red">Solven</small>
+                                        </td>
+                                        <td><p>67.36%</p>
+                                            <small class="text-red">23.93% menos</small>
+                                        </td>
+                                        <td><p>82.39%</p>
+                                            <small class="text-red">30.07% menos</small>
+                                        </td>
+                                        <td><p>105.72%</p>
+                                            <small class="text-red">40.04% menos</small>
+                                        </td>
+                                        <td><p>146.48%</p>
+                                            <small class="text-red">58.53% menos</small>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f9f9fb;">
+                                        <td style="text-align: left;"><span>Banco 2</span><br/>
+                                            <small class="text-red">Solven</small>
+                                        </td>
+                                        <td><p>73.57%</p>
+                                            <small class="text-red">30.14% menos</small>
+                                        </td>
+                                        <td><p>90.41%</p>
+                                            <small class="text-red">38.09% menos</small>
+                                        </td>
+                                        <td><p>116.81%</p>
+                                            <small class="text-red">51.13% menos</small>
+                                        </td>
+                                        <td><p>163.63%</p>
+                                            <small class="text-red">75.68% menos</small>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f9f9fb;">
+                                        <td style="text-align: left;"><span>Banco 3</span><br/>
+                                            <small class="text-red">Solven</small>
+                                        </td>
+                                        <td><p>67.18%</p>
+                                            <small class="text-red">23.75% menos</small>
+                                        </td>
+                                        <td><p>82.12%</p>
+                                            <small class="text-red">29.80% menos</small>
+                                        </td>
+                                        <td><p>105.30%</p>
+                                            <small class="text-red">39.61% menos</small>
+                                        </td>
+                                        <td><p>145.68%</p>
+                                            <small class="text-red">57.73% menos</small>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f9f9fb;">
+                                        <td style="text-align: left;"><span>Banco 4</span><br/>
+                                            <small class="text-red">Solven</small>
+                                        </td>
+                                        <td><p>116.11%</p>
+                                            <small class="text-red">72.67% menos</small>
+                                        </td>
+                                        <td><p>145.68%</p>
+                                            <small class="text-red">93.37% menos</small>
+                                        </td>
+                                        <td><p>193.99%</p>
+                                            <small class="text-red">128.31% menos</small>
+                                        </td>
+                                        <td><p>284.77%</p>
+                                            <small class="text-red">196.82% menos</small>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content"></div>
+            </div>
+        </div>
+    </div>
+    <!-- / Modal  -->
+
+    <!-- Modal Contract -->
+    <div id="contractModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Lee tu contrato</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div id="contract-scroll" class="contract-scroll"></div>
+                    <div class="actions text-center">
+                        <br/>
+                        <small class="input-help text-center">Revisa tu contrato hasta el final para poder aceptarlo.</small>
+                        <br/>
+                        <button class="button bg-red btn-disabled" disabled="disabled" id="contractButton">
+                            Acepto el contrato
+                        </button>
+                    </div>
+                </div>
+                <div class="content"></div>
+            </div>
+        </div>
+    </div>
+    <!-- / Modal  -->
+
+    <!-- Footer begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <!-- Footer ends -->
+
+</th:block>
+<!-- /Content -->
+
+
+</body>
+</html>

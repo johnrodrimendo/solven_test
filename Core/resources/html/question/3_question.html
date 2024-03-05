@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:if="${isSelfEvaluation}" th:utext="#{questions.block.willLike}"></p>
+            <p th:if="${isEvaluation}" th:utext="#{questions.block.willLikeEvaluation}"></p>
+
+            <div class="form-group col-md-12">
+                <select th:field="*{loanReasonId}" class="form-control">
+                    <option value="" hidden="hidden"></option>
+                    <option th:each="reason : ${@catalogService.getLoanApplicationReasonsVisible(#locale)}"
+                            th:value="${reason?.id}" th:text="${reason?.reason}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

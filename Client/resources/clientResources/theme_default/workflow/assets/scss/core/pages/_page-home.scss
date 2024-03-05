@@ -1,0 +1,4159 @@
+.main-banner{
+	position: relative;
+	min-height: 100%;
+	min-height: 100vh;
+	height: 100%;
+	height: 100vh;
+	width: 100vh;
+	width: 100%;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+    background: linear-gradient(to bottom, #3c495a 0%, #6c739d 100%);
+    //quede en el merge
+    flex-direction: column;
+    flex-wrap: wrap;
+    >*{
+        width: 100%;
+    }
+	&.bgblogdetail{
+		article{
+			time{
+				width: 70px !important;
+				overflow: hidden !important;
+				height: 16px !important;
+				display: block !important;
+				text-align: left !important;
+			}
+		}
+	}
+    /*por culpa del nuevo mensaje*/
+    .message{
+        font-size: 16px;
+        color: #ffffff;
+        position: absolute;
+        bottom: 110px;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3686274509803922);
+        font-weight: bold;
+        border-radius: 6px;
+        letter-spacing: 0.015rem;
+
+
+        opacity: 0;
+        transform: translateY(100px);
+        transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 1200ms;
+        &:after{
+            content: '';
+            width: 100%;
+            position: absolute;
+            bottom: -3.5px;
+            left: 0;
+            right: 0;
+            background: #989898;
+            height: 1px;
+            margin: 0 auto;
+        }
+    }
+
+
+    /***/
+
+    .left-x{
+        animation: left-x cubic-bezier(0.26, 1.48, 0.47, 0.96) infinite;
+    }
+	article{
+		color: #fff;
+		margin-top: auto;
+		position: relative;
+		z-index: 12;
+
+		max-width: 1200px;
+		width: 90%;
+		margin-left: 0;
+		margin-right: 0;
+        #chooseBrand{
+            &.sooner{
+                &:hover, &:active{
+                    position: relative;
+                    &:after{
+                        color: #ffffff;
+                        content: '¡Muy Pronto!';
+                        display: block;
+                        font-family: 'Lato Bold', sans-serif;
+                        font-size: .75em;
+                        left: 0;
+                        margin: 0 auto;
+                        padding: .25em;
+                        position: absolute;
+                        right: 0;
+                        text-align: center;
+                        top: -22px;
+                        width: 100%;
+                    }
+                }
+                
+            }
+        }
+
+		h1{
+			font-family: $lato-black;
+			font-size: 40px;
+			text-transform: uppercase;
+			max-width: 600px;
+			margin-bottom: 5px;
+            text-shadow: 0 1px 4px rgba(60, 64, 68, 0.4);
+
+            /*
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 500ms;
+            */
+
+            @media screen and (max-width: 1366px){
+                font-size: 32px;
+	            max-width: 450px;
+            }
+
+			&:after{
+				content: "\e900";
+				@include icon();
+				display: block;
+				width: 100%;
+				letter-spacing: 2px;
+				margin-bottom: 10px;
+				font-size: 210px;
+				height: 20px;
+				line-height: 10px;
+    			margin-left: -8px;
+
+				text-shadow: none;
+			}
+		}
+
+		>p{
+			//font-family: $lato-bold;
+			max-width: 400px;
+			margin-bottom: 30px;
+            text-shadow: 0px 1px 4px rgba(60, 64, 68, 0.4);
+
+            font-weight: 600;
+            letter-spacing: 0.2px;
+
+            /*
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 800ms;
+            */
+		}
+
+		>span{
+            /*
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 900ms;
+            */
+			a{
+				color: $green;
+			}
+		}
+
+		.list-products{
+			max-width: 450px;
+			margin-right: auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+            /*Juan*/
+
+            //margin-bottom: 130px;
+            margin-bottom: 40px;
+
+            /**/
+			li{
+                transition: all .3s ease;
+				.product{
+					cursor: pointer;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					flex-direction: column;
+					font-size: 16px;
+                    position: relative;
+                    text-shadow: 0px 1px 4px rgba(60, 64, 68, 0.4);
+                    span{
+                        text-align: center;
+
+                        opacity: 0;
+                        transform: translateY(100px);
+                        transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 900ms;
+                    }
+					span, &:before{
+						color: rgba(255, 255, 255, 0.85);
+                        //color: #fff;
+
+					}
+					&:before{
+						display: block;
+						font-size: 100px;
+						line-height: 0.8;
+						height: 80px;
+
+                        opacity: 0;
+                        transform: scale(0.4);
+                        transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 900ms;
+					}
+					&:hover{
+						span, &:before{
+							color: #FFFFFF;
+                            transition: all .38s ease ;
+						}
+						&:before{
+
+						}
+					}
+
+					&.icon-adelanto-sueldo{
+						&:before{
+							font-size: 90px;
+						}
+					}
+				}
+                .sooner{
+                    &:hover, &:active{
+                        &:after{
+                            color: #DE777F;
+                            content: '¡Muy Pronto!';
+                            display: block;
+                            font-family: 'Lato Bold', sans-serif;
+                            font-size: .75em;
+                            left: 0;
+                            margin: 0 auto;
+                            padding: .25em;
+                            position: absolute;
+                            right: 0;
+                            text-align: center;
+                            top: -14px;
+                            width: 100%;
+                        }
+                    }
+                }
+
+				&:hover{
+                    transform: scale(1.1);
+                    .product{
+                        &:before, span{
+                            color: #fff;
+                        }
+                    }
+                }
+			}
+		}
+
+        .form-container, .actions{
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 990ms;
+
+            .block{
+                display: flex;
+                justify-content:flex-start;
+                align-items: center;
+                flex-wrap: wrap;
+                .field{
+                    margin-right: 8px;
+                    margin-bottom: 5px;
+                    &:last-child{
+                        margin-right: 0px;
+                    }
+                }
+                .display-block{
+                    display: block;
+                    width: 100%;
+                    margin-bottom: 5px;
+	                background-color: transparent;
+	                padding-left: 0;
+	                padding: 0;
+                }
+                .display-target{
+                    color: #26cad3;
+                }
+                input.input-landing {
+                    font-size: 1em;
+                    transition: all 300ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 10ms;
+                }
+                .document-input-landing{
+                    width: 130px;
+                }
+                .document-input-landing-ce{
+                    width: 150px;
+                }
+                #docNumber{
+                    &:focus{
+                        border: 2px solid #26cad3;
+                    }
+                }
+            }
+
+            .block-hidden {
+                @include animation('fadeOut 2.3s');
+                display: none;
+            }
+        }
+
+	}
+
+    .dotted-autoevaluacion{
+        color: #FFF;
+        text-align: center;
+        z-index: 12;
+        margin-bottom: 40px;
+        a{
+            font-size: .85rem;
+            position: relative;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+            max-width: 120px;
+            margin: 0 auto;
+            &:after{
+                display: block;
+                content: '---------------';
+                font-size: 1rem;
+                line-height: .5;
+            }
+        }
+    }
+
+	.list-benefits{
+		color: #fff;
+		margin-top: auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		z-index: 1;
+		width: 90%;
+		max-width: 1200px;
+		li{
+			padding: 40px 0;
+		}
+	}
+
+	img{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 100%;
+		width: 100vh;
+		height: auto;
+		max-height: none;
+		max-width: none;
+		min-height: 100%;
+		min-width: 101%;
+		transform: translate(-50%,-50%) scale(1.05);
+		
+		object-fit: cover;
+        //transition: 5000ms cubic-bezier(0.3, 0, 0.7, 1) 0ms;
+		&#bannerPrincipal{
+            @media screen and (max-height: 600px){
+                //top: 55%;
+            }
+		}
+	}
+	
+	.icon-bottom{
+		height: 45px;
+		width: 45px;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		font-size: 0px;
+		text-shadow: 0px 1px 1px #ccc;
+		margin: 0 auto;
+		background-color: transparent;
+		color: #FFFFFF;
+        z-index: 2;
+        position: relative;
+        margin-bottom: 20px;
+
+		&:before{
+            animation: bounce 2s infinite;
+			font-size: 24px;
+            width: 45px;
+            height: 45px;
+            display: block;
+            position: absolute;
+            top: 12px;
+            left: 0;
+            right: 0;
+		}
+	}
+
+    &:before{
+        content: '';
+        display: block;
+        width: 100%;
+        height: 300px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 5px;
+        background: rgba(60,64,68,1);
+        background: -moz-linear-gradient(top, rgba(60,64,68,1) 0%, rgba(53,110,115,0.4) 60%, rgba(38,202,211,0) 100%);
+        background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(60,64,68,1)), color-stop(60%, rgba(53,110,115,0.4)), color-stop(100%, rgba(38,202,211,0)));
+        background: -webkit-linear-gradient(top, rgba(60,64,68,1) 0%, rgba(53,110,115,0.4) 60%, rgba(38,202,211,0) 100%);
+        background: -o-linear-gradient(top, rgba(60,64,68,1) 0%, rgba(53,110,115,0.4) 60%, rgba(38,202,211,0) 100%);
+        background: -ms-linear-gradient(top, rgba(60,64,68,1) 0%, rgba(53,110,115,0.4) 60%, rgba(38,202,211,0) 100%);
+        background: linear-gradient(to bottom, rgba(60,64,68,1) 0%, rgba(53,110,115,0.4) 60%, rgba(38,202,211,0) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3c4044', endColorstr='#26cad3', GradientType=0 );
+    }
+
+	/****** Adelanto Sueldo ******/
+
+	&.main-adelanto-sueldo{
+        article{
+            margin-bottom: 0px !important;
+            h1{
+                max-width: 350px !important;
+            }
+            p{
+                max-width: 480px !important;
+            }
+        }
+        .list-benefits{
+            z-index: 4;
+        }
+        .icon-bottom{
+            z-index: 5;
+        }
+		input.input-landing{
+			height: 40px;
+		}
+		button.button{
+			height: 40px;
+			min-width: 140px;
+		}
+		.select2 .selection .select2-selection{
+			height: 40px;
+		}
+		.select2 .selection .select2-selection .select2-selection__rendered{
+			line-height: 35px;
+		}
+		
+		&.main-credito-consumo{
+			article{
+				h1{
+					max-width: 580px !important;
+                    padding-top: 2rem;
+				}
+				p{
+					max-width: 540px!important;
+				}
+			}
+		}
+    }
+
+    &.loadedmain{
+        .message{
+            //opacity: 1;
+            //transform: translateY(0px);
+        }
+        article{
+            h1{
+                animation-name: bounceInRight;
+                animation-delay: .2s;
+            }
+            p{
+                //opacity: 1;
+                //transform: translateY(0px);
+                animation-name: bounceInDown;
+                animation-delay: .5s;
+            }
+            .message{
+                //opacity: 1;
+                //transform: translateY(0px);
+            }
+            .list-products{
+                li{
+                    animation-name: bounceInUp;
+                    .product{
+                        &:before{
+                            opacity: 1;
+                            transform: scale(1.0);
+                        }
+                        span{
+                            opacity: 1;
+                            transform: translateY(0px);
+                        }
+                    }
+                    &:nth-child(1){
+                        animation-delay: 1s;
+                    }
+                    &:nth-child(2){
+                        animation-delay: 1.10s;
+                    }
+                    &:nth-child(3){
+                        animation-delay: 1.20s;
+                    }
+                }
+            }
+
+            >span{
+                opacity: 1;
+                transform: translateX(0px);
+            }
+
+            .form-container,.actions{
+                opacity: 1;
+                transform: translateX(0px);
+            }
+
+			.actions{
+				small{
+					display: block;
+					margin-top: 10px;
+                    background-color: transparent !important;
+                    padding: 0;
+				}
+			}
+
+        }
+        img{
+            transform: translate(-50%,-50%) scale(1);
+        }
+    }
+
+
+}
+
+
+
+#action_preEvaluation_open{
+    display: none;
+}
+
+.credito-consumo{
+
+    #header nav>ul.list>li {
+        margin-right: .75rem;
+    }
+    #available-languages{
+        margin-right: 1rem;
+    }
+    &.v5{
+        #action_preEvaluation_open, #action_preEvaluation{
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size:0;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+
+            opacity: 0;
+            &:before,&:after,span{
+                content: '';
+                width: 30px;
+                height: 3px;
+                margin-bottom: 2px;
+                margin-right: auto;
+                background-color: #FFFFFF;
+            }
+            &:before{
+                transform: none;
+            }
+            span{
+                display: block;
+                margin-bottom: 2px;
+            }
+            &:after{
+                transform: none;
+            }
+        }
+
+        #action_preEvaluation_open{
+            opacity: 1;
+            position: absolute;
+            top: 2px;
+            right: 0;
+            z-index: 9999;
+        }
+        #mainWrap{
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            >*{
+                transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96);
+            }
+            .main-banner{
+                //margin-right: 0;
+            }
+            h2{
+                //text-transform: uppercase;
+                //font-family: "Lato-Black",sans-serif;
+                //margin-bottom: 2rem;
+                margin-bottom: 0;
+                font-weight: bold;
+                text-transform: uppercase;
+                line-height: 1.35;
+                font-size: 1.2rem;
+                border-bottom: 1px solid $lightblue-1;
+                padding-bottom: 1rem;
+                margin-top: 8rem;
+                margin-right: auto;
+                margin-left: 6%;
+            }
+            #form_preEvaluation{
+                background-color: #FFF;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                width: 540px;
+                height: 100%;
+                position: absolute;
+                top:0;
+                right: -560px;
+                flex-direction: column;
+                form{
+                    //max-width: 280px;
+                    //margin: 0 auto;
+                    max-width: 100%;
+                    margin: 0 auto;
+                    display: flex;
+                    flex-wrap: wrap;
+                    width: 90%;
+                    align-items: flex-start;
+                    margin-top: 3rem;
+                    margin-bottom: auto;
+                    .q{
+                        display: flex;
+                        flex-wrap: wrap;
+                        margin-bottom: 1.1rem;
+                        max-width: 230px;
+                        margin-right: 5%;
+                        &.field-error{
+                            border: none;
+                        }
+                        >p{
+                            margin-bottom: 4px;
+                            width: 100%;
+                            font-size: .85rem;
+                        }
+                        .errorContainer{
+                            background: none;
+                        }
+                        &:nth-child(2n){
+                            margin-right: 0;
+                        }
+
+
+                        .field-3{
+                            display: flex;
+                            flex-wrap: nowrap;
+                            flex-direction: row;
+                            input{
+                                padding: .35em .5em .5em .5em;
+                                text-align: center;
+                                width: 28%;
+                                @media screen and (max-width: 90px){
+                                    width: 29%;
+                                }
+                                &#birthDay{
+                                    z-index: 1;
+                                }
+                                &#birthMonth{
+                                    z-index: 2;
+                                    margin-left: -3px;
+                                }
+                                &#birthYear{
+                                    margin-left: -3px;
+                                    z-index: 3;
+                                }
+                                &#birthDay, &#birthMonth, &#birthYear{
+                                    &:focus{
+                                        z-index: 4;
+                                    }
+                                }
+                            }
+                        }
+                        .inline{
+                            &.inline-phone{
+                                display: flex;
+                                justify-content: space-between;
+                                .input-code{
+                                    width: 70px;
+                                }
+                                .input-phone{
+                                    width: -webkit-calc(100% - 75px);
+                                    width: calc(100% - 75px);
+                                }
+                            }
+                        }
+
+                        .field-birthdate{
+                            .field{
+                                &.field-error{
+                                    border: none !important;
+                                    input{
+                                        border-color: #DE777F;
+                                    }
+                                }
+                            }
+                        }
+
+
+                        .w-reason{
+                            .field-error{
+                                border: none !important;
+                                .select2{
+                                    border: 2px solid #DE777F;
+                                    overflow: hidden;
+                                    border-radius: 5px;
+                                }
+                            }
+                        }
+                    }
+                    .errorContainer{
+                        width: 100%;
+                        font-size: .75em;
+                        span{
+                            color: #DE777F;
+                        }
+                    }
+                    .line{
+                        width: 100%;
+                        background-color: $lightblue-1;
+                        height: 1px;
+                        margin: 1rem auto;
+                    }
+                    input{
+                        background-color: #FFFFFF;
+                    }
+                    .input-outline, .box-icon, .wsi{
+                        height: 36px;
+                    }
+                    .input-outline{
+                        margin-left: 0;
+                    }
+                    .has-error, .field-error{
+                        border: 2px solid #DE777F;
+                        overflow: hidden;
+                        border-radius: 5px;
+                    }
+                    .box-icon{
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 46px;
+                        font-weight: bold;
+                        span{
+                            margin: auto;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    }
+                    .cellphone-input {
+                        width: 230px;
+                    }
+                    .wrap-field{
+                        //max-width: 280px;
+                        max-width: 238px;
+                        display: flex;
+                        flex-wrap: wrap;
+                        //padding-right: 10px;
+                        padding-right: 0;
+                    }
+                    .wsi{
+                        fill: #7a7f8c;
+                        background: #D6D8DD;
+                        border: 2px solid #D6D8DD;
+                        border-radius: 5px 0 0 5px;
+                        width: 45px;
+                        flex-shrink: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        svg{
+                            width: 18px;
+                        }
+                    }
+                    .amount{
+                        //max-width: 150px;
+                        max-width: 230px;
+                        .input-outline{
+                            width: calc( 100% - 46px );
+                            width: -webkit-calc( 100% - 46px );
+                        }
+
+                    }
+                    .field-email{
+                        width: -webkit-calc( 100% - 45px );
+                        width: calc( 100% - 45px );
+                    }
+                    #email{
+                        border-radius: 0 5px 5px 0;
+                        width: 100%;
+                    }
+                    #docNumber{
+                        //width: 120px;
+                        width: 144px;
+                    }
+                    .months{
+                        max-width: 80px;
+                        >*{
+                            width: 100%;
+                        }
+                    }
+                    .w{
+                        display: flex;
+                        margin-bottom: 0;
+                        .select2{
+                            margin-right: 5px;
+                        }
+                        .codarea{
+                            //width: 80px;
+                            //margin-right: 5px;
+                        }
+                        .cellphone{
+                            //width: 144px;
+                        }
+                    }
+                    .w-cellphone{
+                        width: 100%;
+                        input{
+                            width: 100%;
+                        }
+                    }
+                    small{
+                        background: transparent;
+                        color: #7A808D;
+                        padding: 0;
+                        margin-bottom: 0;
+                        font-size: .55em;
+                        line-height: 1.5em;
+                        margin-top: 0;
+                        text-align: left;
+                        display: block;
+                        width: 100%;
+                    }
+                    .select2-selection{
+                        height: 36px;
+                    }
+                    .select2-selection__rendered{
+                        line-height: 30px;
+                    }
+                    .list-reason{
+                        display: flex;
+                        li{
+                            flex-grow: 1;
+                            width: -webkit-calc( 16.666% - 4px );
+                            width: calc( 16.666% - 4px );
+                            margin: 0 2px;
+                            figure{
+                                padding:0;
+                                margin: 0 auto;
+                            }
+                            img{
+                                width: 30px;
+                                height: 30px;
+                            }
+                            .input-radio{
+                                width: auto;
+                                border: none;
+                                padding: 0;
+                                border-radius: 0;
+                            }
+                            h5{
+                                text-transform: unset;
+                            }
+                        }
+                    }
+                    .iconic-option-inner{
+                        text-align: center;
+                    }
+                    .option-wrapper{
+                        border: 2px solid #D6D8DD;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        padding: .5em;
+                        transition: all 0.3s ease;
+                        position: relative;
+                    }
+                    .radio{
+                        width: 15px;
+                        height: 15px;
+                    }
+                    .w-btn{
+                        position: relative;
+                        display: flex;
+                        justify-content: center;
+                        border-top: 1px solid #ccc;
+                        border-top: none;
+                        padding:0;
+                        margin: 1.25rem 0 0 auto;
+                        .g-btn{
+                            margin-right: 0;
+                            margin-left: auto;
+                        }
+
+                        .acceptAgreement{
+                            position: relative;
+                            font-size: 14px;
+                            padding-left: 22px;
+                            width: 100%;
+                            display: flex;
+                            .check-inner{
+                                position: absolute;
+                                top: 2px;
+                                left: 0;
+                                z-index: 2;
+                                &.checked{
+                                    background: #26CAD3;
+                                    border-color: #26CAD3;
+                                    color: white;
+                                    .icon_check{
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 50%;
+                                        transform: translate(-50%,-50%);
+                                        &:after{
+                                            content: 'L';
+                                            transform: scaleX(-1) rotate(-35deg);
+                                            font-size: 12px;
+                                            color: #fff;
+                                            display: block;
+                                        }
+                                    }
+                                }
+
+                            }
+                            .check-label{
+                                line-height: 1.25;
+                                display: block;
+                                a{
+                                    font-weight: bold;
+                                }
+                            }
+                        }
+
+                        &.w-terms{
+                            .field-error{
+                                border: none !important;
+                                .check-inner{
+                                    border: 2px solid #DE777F;
+                                }
+                            }
+                        }
+                    }
+                    .tos{
+                        font-size: 12px;
+                        margin-top: 5rem;
+                        border-top: 1px solid #ccc;
+                        padding-top: 1rem;
+                        line-height: 1.2;
+                        p{
+                            margin-bottom: 5px;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.main-open{
+            #action_preEvaluation{
+                opacity: 1;
+                &:before, &:after,span{
+                    background-color: $black_color_main;
+                }
+                &:before{
+                    transform: rotate(40deg) translateY(2px);
+                }
+                &:after{
+                    transform: rotate(-40deg) translateY(-3px);
+                }
+                span{
+                    display: none;
+                }
+            }
+            #header{
+                width: -webkit-calc( 100% - 100px );
+                width: calc( 100% - 380px );
+                nav{
+                    display: none;
+                }
+                &.sticky-header{
+                    width: 100%;
+                    nav{
+                        display: block;
+                    }
+                }
+            }
+            #mainWrap{
+                >*{
+                    flex-grow: 1;
+                    align-items: stretch;
+                }
+                .main-banner{
+                    margin-right: 540px;
+                    >*{
+                        max-width: 768px;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+                    #down{
+                        margin-right: 20%;
+                    }
+                }
+                #form_preEvaluation{
+                    right: 0;
+                }
+            }
+        }
+    }
+}
+
+.credito-consumo.v5 #mainWrap #form_preEvaluation form .input-outline{
+
+    &#documentNumber, &#installments{
+        min-width: 100%;
+        width: 100%;
+    }
+}
+.credito-consumo.v5 #mainWrap #form_preEvaluation form .q{
+    .inline-installments{
+        width: 100%;
+    }
+}
+
+
+.vflex{
+    display: flex;
+
+    .wsi{
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+        border-radius: 100%;
+        transition: all .3s ease;
+        width: 36px;
+        height: 36px;
+        overflow: hidden;
+        margin-left: auto;
+
+
+        &:hover{
+            box-shadow: 0 0.5rem 0.975rem 0 rgba(0,0,0,0.25);
+        }
+    }
+}
+#viewmore{
+    fill: $red-1;
+}
+
+.sec-press{
+	height: 140px;
+	padding: 20px 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+    z-index: 1;
+    background-color: #FFFFFF;
+
+	.slider-press{
+		display: flex;
+		justify-content: space-between;
+        //justify-content: flex-start;
+		align-items: center;
+
+		li{
+            width: 25%;
+			img{
+				display: block;
+				margin: 0px auto;
+				width: 200px;
+				height: auto;
+				opacity: .5;
+				filter: grayscale(100%);
+				transition: all 200ms ease;
+
+
+                margin: 0;
+                text-align: left;
+				&.owl-lazy{
+					opacity: .5 !important;
+				}
+			}
+			&:after{
+				content: '';
+				background-color: $red-1;
+				height: 6px;
+				left: 0;
+				right: 0;
+				transform: skew(0deg);
+				transition: width 0.5s ease;
+				width: 0;
+				display: block;
+				margin: 0 auto;
+
+                margin: 0;
+			}
+			&:hover{
+				img{
+					opacity: 1;
+					filter: grayscale(0);
+					&.owl-lazy{
+						opacity: 1 !important;
+					}
+				}
+				&:after{
+					transform: skew(28deg);
+					width: 180px;
+				}
+			}
+		}
+
+        .owl-nav{
+            display: block;
+            .owl-prev, .owl-next{
+                font-size: 0;
+                width: 35px;
+                height: 35px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: absolute;
+                top: 50%;
+                color: #B5B9C1;
+                &:before{
+                    content: "\e93b";
+                    font-size: 20px;
+                    transition: all .3s ease;
+                    @include icon();
+                }
+                &:hover, &:active{
+                    &:before{
+                        transform: scale(0.8);
+                    }
+                }
+            }
+            .owl-prev{
+                left: 0px;
+                transform: translateY(-50%) rotate(90deg);
+            }
+            .owl-next{
+                right: 0px;
+                transform: translateY(-50%) rotate(-90deg);
+            }
+        }
+	}
+}
+
+.sec-entities{
+    text-align: center;
+    .gwr{
+        max-width: 1290px;
+        width: 97%;
+        position: relative;
+    }
+    .bg{
+        transform: scale(-1) translateY(2px);
+        width: 120%;
+    }
+    .solven01{
+        position: absolute;
+        right: 0;
+        top: -80px;
+        transform: scale(-1);
+        opacity: .68;
+        z-index: -1;
+    }
+    .solven02{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+    h3{
+        font-size: 30px;
+        font-family: "Lato-Black",sans-serif;
+        max-width: 600px;
+        display: block;
+        margin: 4rem auto 3rem auto;
+        &:after{
+            content: "..............";
+            color: #F7323F;
+            display: block;
+            margin: 10px auto 0 auto;
+            font-size: 37px;
+            letter-spacing: 2px;
+            height: 35px;
+            line-height: 0px;
+        }
+    }
+    ul{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 0 auto;
+        li{
+            width: 20%;
+            margin-bottom: 1.5rem;
+            img{
+                height: auto;
+                margin: 0 auto;
+                display: block;
+                width: 70%;
+                filter: grayscale(1);
+                transition: all .3s ease;
+                opacity: .72;
+            }
+            &:hover{
+                img{
+                    filter: grayscale(0);
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+
+
+.sec-benefits{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+    z-index: 1;
+    position: relative;
+	>article{
+		text-align: center;
+		padding: 80px 0;
+		position: relative;
+		width: 100%;
+		h2{
+			font-size: 30px;
+			font-family: $lato-black;
+			max-width: 600px;
+			margin: 0 auto;
+
+            opacity: 0;
+            transition: all 900ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 400ms;
+            transform: translateY(80px);
+			&:after{
+				content: "\e900";
+				@include icon();
+				display: block;
+				color: $red-1;
+				letter-spacing: 2px;
+				margin: 20px auto 30px auto;
+				font-size: 210px;
+				height: 20px;
+				line-height: 10px;
+    			margin-left: -8px;
+
+			}
+		}
+		p{
+			font-size: 20px;
+			font-family: $lato-light;
+
+            opacity: 0;
+            transition: all 900ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 600ms;
+            transform: translateY(80px);
+
+		}
+		.solven01, .solven02{
+			position: absolute;
+			z-index: -1;
+		}
+		.solven01{
+			bottom: 0px;
+			left: 0;
+
+		}
+		.solven02{
+			top: 50%;
+			transform: translateY(-50%);
+			right: 0px;
+		}
+	}
+
+	.list-steps{
+		background-color: $lightblue-2;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 120px 0px 70px 0;
+		text-align: center;
+		position: relative;
+		.solven03{
+			position: absolute;
+			bottom: 0;
+			left: 38%;
+		}
+		li{
+			padding: 0 40px;
+			z-index: 1;
+			article{
+				background-color: #fff;
+				box-shadow: 0px 4px 12px rgba(80, 80, 80, .5);
+				border-radius: 8px;
+				padding: 70px 20px 20px 20px;
+				max-width: 350px;
+				min-height: 200px;
+				position: relative;
+				width: 100%;
+
+                opacity: 0;
+                transform: translateY(100px);
+
+				h3{
+					font-size: 16px;
+					font-family: $lato-bold;
+					margin-bottom: 10px;
+					text-transform: uppercase;
+				}
+				p{
+					font-size: 16px;
+					color: #A8AAAD;
+				}
+				.steps{
+					font-size: 0;
+					position: absolute;
+					top: -50px;
+					left: 0;
+					right: 0;
+					width: 100px;
+					border-radius: 100%;
+					background-color: #fff;
+					margin: 0 auto;
+					height: 100px;
+					box-shadow: 0px 4px 8px rgba(80, 80, 80, .4);
+					line-height: 100px;
+					display: block;
+					&:before{
+						font-size: 90px;
+						line-height: 100px;
+					}
+					&.icon-step-1{
+						color: #E9B3B8;
+					}
+					&.icon-step-2{
+						color: #DD777F;
+					}
+					&.icon-step-3{
+						color: $red-1;
+					}
+				}
+
+                &:nth-child(1){
+                    transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 400ms;
+                }
+                &:nth-child(2){
+                    transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 600ms;
+                }
+                &:nth-child(3){
+                    transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 800ms;
+                }
+			}
+		}
+	}
+
+    &.loaded{
+        >article{
+            h2{
+                opacity: 1;
+                transform: translateY(0);
+            }
+            p{
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .message{
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+            }
+        }
+        .list-steps{
+            li{
+                article{
+                    opacity: 1;
+                    transform: translateY(0);
+                    .steps{
+
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+.sec-testimonial{
+	background-image: linear-gradient(45deg, #8baaaa 0%, #ae8b9c 100%);
+	color: #fff;
+	width: 100%;
+	padding: 80px 0;
+	min-height: 650px;
+	height: 80%;
+	height: 70vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	display: none;
+	.gwr{
+		width: 70%;
+		max-width: 100%;
+	}
+	.list-testimonial{
+
+		li{
+			display: flex;
+			flex-direction: column;
+			position: relative;
+			padding-left: 40px;
+			&:before{
+				content: "\e903";
+				@include icon();
+				font-size: 40px;
+				position: absolute;
+				top: -10px;
+				left: 0;
+			}
+			.cnt{
+				order: 1;
+				padding-left: 80px;
+				position: relative;
+				h2{
+					font-family: $lato-bold;
+					font-size: 22px;
+					margin-bottom: 5px;
+				}
+				span{
+					font-family: $lato-light;
+					font-size: 22px;
+				}
+				img{
+					position: absolute;
+					left: 0;
+					top: 50%;
+					transform: translateY(-50%);
+					width: 60px;
+				}
+			}
+			p{
+				font-size: 30px;
+				margin-bottom: 20px;
+			}
+		}
+	}
+	.owl-dots{
+		text-align: center;
+		position: absolute;
+		bottom: -90%;
+		left: 0;
+		right: 0;
+        .owl-dot {
+            display: inline-block;
+            zoom: 1;
+            cursor: pointer;
+            cursor: hand;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            span{
+                width: 12px;
+                height: 12px;
+                margin: 5px 7px;
+                background: transparent;
+                border: 1px solid #cccccc;
+                background-color: #cccccc;
+                display: block;
+                -webkit-backface-visibility: visible;
+                transition: opacity .2s ease;
+                border-radius: 30px;
+            }
+            &.active{
+            	span{
+            		background-color: $red-1;
+            		border: 1px solid  $red-1;
+            	}
+            }
+        }
+    }
+}
+
+.sec-services{
+	>article{
+		padding: 80px 0;
+		text-align: center;
+		h2{
+			font-family: $lato-bold;
+			font-size: 30px;
+			margin-bottom: 10px;
+		}
+		span{
+			font-family: $lato-medium;
+			font-size: 22px;
+			&:after{
+				content: "\e900";
+				@include icon();
+				color: $red-1;
+				display: block;
+				margin: 10px auto;
+				font-size: 210px;
+				height: 20px;
+				line-height: 10px;
+    			margin-left: -8px;
+			}
+		}
+
+	}
+	.list-services{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		li{
+			position: relative;
+			overflow: hidden;
+			width: 50%;
+			height: 450px;
+			height: 50vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 6em 4em 4em 4em;
+			article{
+				color: #fff;
+				display: flex;
+				flex-wrap: wrap;
+				h3{
+					position: relative;
+					font-size: 22px;
+					font-family: $lato-bold;
+					margin-bottom: 1em;
+					width: 100%;
+					z-index: 2;
+				}
+				p{
+					position: relative;
+					font-size: 16px;
+					font-family: $lato-light;
+					z-index: 2;
+					span{
+						font-family: $lato-medium;
+    					font-style: italic;
+						text-transform: uppercase;
+					}
+				}
+				i{
+					order: -1;
+					font-size: 7.6em;
+					position: relative;
+					line-height: 0;
+					z-index: 2;
+				}
+				img{
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					width: 100%;
+					width: 100vh;
+					height: auto;
+					max-height: none;
+					max-width: none;
+					min-height: 100%;
+					min-width: 100%;
+					transform: translate(-50%, -50%) scale(1.0);
+					transition: all 620ms ease;
+					transition: transform 620ms cubic-bezier(0.3, 0, 0.7, 1), opacity 1s ease, -webkit-transform 620ms cubic-bezier(0.3, 0, 0.7, 1);
+					object-fit: cover;
+				}
+			}
+			&:hover{
+				article{
+					img{
+						transform: translate(-50%, -50%) scale(1.1);
+					}
+				}
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 768px){
+    .sec-entities{
+        ul{
+            li{
+                width: 25%;
+            }
+        }
+    }
+    .sec-entities .solven01{
+        width: 150px;
+    }
+}
+@media screen and (max-width: 600px){
+    .sec-entities{
+        border-bottom: 1px solid #ccc;
+        h3{
+            font-size: 20px;
+            margin: 2.5rem auto 1rem auto !important;
+            text-align: center;
+            max-width: 270px;
+            &:after{
+                content: "..............";
+                color: #F7323F;
+                display: block;
+                margin: 0 auto;
+                font-size: 37px;
+                letter-spacing: 2px;
+                height: 35px;
+                line-height: 0;
+                margin-left: 0;
+            }
+        }
+        ul{
+            li{
+                width: 50%;
+            }
+        }
+        .solven01{
+            max-width: 150px;
+        }
+    }
+    .sec-youneedhelp article .h2{
+        font-size: 20px !important;
+        &:after{
+            margin: 0 auto !important;
+        }
+    }
+}
+.sec-question{
+	padding: 60px 0 80px 0;
+	.gwr{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	.title{
+		width: 100%;
+		h2{
+			text-align: center;
+			font-size: 30px;
+			font-family: $lato-black;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 50px;
+			span{
+				font-size: 0px;
+				&:before{
+					font-size: 90px;
+					color: $red-1;
+					margin: 0 5px;
+					height: 10px;
+				}
+			}
+		}
+		&:after{    
+			content: '---------------';
+			display: block;
+			color: $red-1;
+			font-family: $lato-black;
+			font-size: 28px;
+			letter-spacing: 2px;
+			text-align: center;
+			margin: 0px auto;
+			width: 100%;
+		}
+	}
+
+	.list-info{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		max-width: 960px;
+		margin: 2em auto 3em auto;
+		li{
+			width: 44%;
+			margin: 1em 2%;
+			.cnt{
+				position: relative;
+				font-family: $lato-medium;
+				padding: 30px 30px 30px 60px;
+				border-radius: 6px;
+				box-shadow: 5px 5px 16px rgba(80, 80, 80, .2);
+				color: $black-3;
+
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 130px;
+				.step-number{
+					background-color: #fff;
+					border-radius: 100%;
+					box-shadow: 0px 0px 16px rgba(80, 80, 80, .3);
+					position: absolute;
+					top: 50%;
+					left: -40px;
+					transform: translateY(-50%);
+					width: 90px;
+					height: 90px;
+					
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					div{
+						font-size: 45px;
+						font-weight: bold;
+						color: $red-1;
+					}
+					span{
+						border-radius: 100%;
+						border: 5px solid $red-1;
+						width: 70px;
+						height: 70px;
+						display: block;
+						position: absolute;
+						top: 50%;
+						left: 50%;
+						transform: translate(-50%,-50%);
+					}
+				}
+			}
+			&:nth-child(1){
+				margin-right: 8%;
+				margin-left: 0;
+				.cnt{
+					.step-number{
+						img{
+							margin-left: 2px;
+						}
+					}
+				}
+			}
+			&:nth-child(2){
+				margin-right: 0px;
+				.cnt{
+					.step-number{
+						img{
+							margin-right: 5px;
+						}
+					}
+				}
+			}
+			&:nth-child(3){
+				margin-right:8%;
+				margin-left: 0;
+				.cnt{
+					.step-number{
+						img{
+							margin-bottom: 5px;
+						}
+					}
+				}
+			}
+			&:nth-child(4){
+				margin-right: 0px;
+				.cnt{
+					.step-number{
+						img{
+							margin-bottom: 5px;
+							margin-right: 5px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.fintech{
+		text-align: center;
+		padding: 20px 40px;
+		background-color: $black-4;
+		max-width: 900px;
+		width: 100%;
+		border-radius: 10px;
+		font-size: 20px;
+		position: relative;
+		&:before, &:after{
+			@include icon();
+			font-size: 80px;
+			height: 60px;
+			line-height: 0;
+			color: $black-4;
+			position: absolute;
+			bottom: -60px;
+		}
+		&:before{
+			content: "\e901";
+			left: -50px;	
+		}
+		&:after{
+			content: "\e902";
+			right: -50px;
+		}
+
+		.c-red{
+			color: $red-1;
+		}
+	}
+}
+
+.sec-contact{
+	margin: 0 auto 70px auto;
+	&:before{
+		content: '';
+		background-color: #ccc;
+		display: block;
+		margin: 0 auto 70px auto;
+		height: 1px;
+		width: 80%;
+		max-width: 1200px;
+	}
+	.gwr{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		max-width: 1200px;
+	}
+	h2{
+		width: 100%;
+		text-align: center;
+		font-family: $lato-medium;
+		font-size: 30px;
+		margin-bottom: 40px;
+		span{
+			font-family: $lato-bold;
+		}	
+	}
+	form{
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		flex-wrap: wrap;
+		.gform{
+			width: 99%;
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			margin: 0 auto;
+			width: 48%;
+			margin-right: 2%;
+			.gfield{
+				width: 100%;
+				height: 82px;
+				height: 62px;
+				position: relative;
+				&.gfield-select{
+				}
+				.gfield_label{
+					color: $black-3;
+					font-size: 16px;
+					height: 20px;
+					position: relative;
+					top: 20px;
+					left: 0px;
+					cursor: pointer;
+					transition: all .25s ease;
+					z-index: 1;
+					display: none;
+				}
+				.select2-container{
+					width: 100% !important;
+				}
+				.ginput_container{
+					position: relative;
+					width: 100%;
+					margin-top: 0;
+					input{
+						border: 2px solid #D6D8DD;
+						color: #34465d;
+						font-size: 1em;
+						border-radius: 5px;
+						height: 45px;
+						outline: none;
+						padding: .35em .75em .5em .75em;
+						transition: all 0.3s ease;
+						width: 100%;
+					}
+					&:before, &:after{
+						content: "";
+						height: 1.5px;
+						width: 0;
+						bottom: 0;
+						position: absolute;
+						background-color: $green;
+						transition: .2s ease all;
+					}
+					&:before{
+						left: 50%;
+					}
+					&:after{
+						right: 50%;
+					}
+				}
+				select{
+					font-size: 16px;
+					color: $black-3;
+					width: 100%;
+					border-radius: 0px;
+					background-color: transparent;
+					border-bottom: 1px solid $black-3;
+					height: 2px;
+					//display: none;
+					option{
+						border-radius: none;
+						outline: none;
+						background-color: transparent;
+						color: $black-3;
+					}
+
+				}
+				.SumoSelect{
+					width: 100%;
+					font-size: 16px;
+					color: $black-3;
+					width: 100%;
+					border-radius: 0px;
+					background-color: transparent;
+					position: relative;
+					&:after{
+						content: "\e93c";
+						font-size: 10px;
+						color: #26C9D2;
+						position: absolute;
+						top: 50%;
+						right: 15px;
+						transform: translateY(-50%);
+						@include icon();
+						z-index: -1
+					}
+					>.CaptionCont{
+						border: none;
+						min-height: inherit;
+						background-color: transparent;
+						border-radius: 0;
+						margin: 0;
+						height: 100%;
+						display: flex;
+						justify-content: flex-start;
+						align-items: center;
+						box-shadow: none !important;
+						padding-left: 0px;
+
+						border: 2px solid #D6D8DD;
+						color: #34465d;
+						font-size: 1em;
+						border-radius: 5px;
+						height: 45px;
+						outline: none;
+						padding: .35em .75em .5em .75em;
+						transition: all 0.3s ease;
+						width: 100%;
+						>span{
+							&.placeholder{
+								font-style: normal;
+							}
+						}
+					}
+					&.open{
+						&:after{
+							transform: translateY(-50%) rotate(180deg);
+						}
+						>.optWrapper{
+							top: 44px;	
+						}
+					}
+					&:focus, &:hover{
+						>.CaptionCont{
+							box-shadow: none;
+						}
+					}
+					.disabled{
+						display: none !important;
+					}
+				}
+				.SumoSelect>.optWrapper>.options>li.opt:first-child{
+					display: none;
+				}
+				.SumoSelect>.optWrapper>.options>li.opt:first-child.selected {
+	   				display: none;
+				}
+				.SumoSelect>.CaptionCont>span{
+					color: #808080;
+					line-height: 25px;
+				}
+				.SumoSelect>.optWrapper>.options li{
+					color: #808080;
+				}
+				.SumoSelect>.optWrapper>.options li.opt:hover{
+					background: #26CAD3;
+    				color: #fff;
+				}
+				.SumoSelect>.CaptionCont>label>i{
+					background-image: none;
+				}
+
+
+				&.focus{
+					label{
+						&.gfield_label{
+							//top: 0;
+						}
+					}
+					.ginput_container{
+						&:before, &:after{
+							//width: 50%;
+						}
+						input{
+							border-color: #C9E5E9;
+						}
+					}
+				}
+				&.has-error{
+					margin-bottom: 10px;
+					position: relative;	
+					.ginput_container{
+						input{
+							border: 2px solid #DE777F;
+						}
+					}
+					.errorContainer{
+						font-size: .75em;
+					}
+					.CaptionCont{
+						border: 2px solid #DE777F
+					}
+					&:after{
+						content: "\e92e";
+						font-size: 28px;
+						color: #DE777F;
+						@include icon();
+						position: absolute;
+						top: 8px;
+						right: 8px;
+						z-index: 0;
+					}
+				}
+			}
+			&.gformarea{
+				margin-right: 0;
+				.gfield{
+					height: 100%;
+					.ginput_container{
+    					height: 228px;
+					}
+					textarea{
+    					font-family: "Lato-Regular", sans-serif;
+    					font-size: 16px;
+						border: 2px solid #D6D8DD;
+						color: #34465d;
+						font-size: 1em;
+						border-radius: 5px;
+						height: 100%;
+						outline: none;
+						padding: .35em .75em .5em .75em;
+						transition: all 0.3s ease;
+						width: 100%;
+						&:focus{
+							outline: none;
+						}
+					}
+					&:before, &:after{
+						content: "";
+						height: 1.5px;
+						width: 0;
+						bottom: 0;
+						position: absolute;
+						background-color: $green;
+						transition: .2s ease all;
+					}
+					&:before{
+						left: 50%;
+					}
+					&:after{
+						right: 50%;
+					}
+					&.has-error{
+						margin-bottom: 10px;	
+						.ginput_container{
+							input,textarea{
+								border: 2px solid #DE777F;
+							}
+						}
+						.errorContainer{
+							font-size: .75em;
+						}
+					}
+				}
+				.cnt-button{
+					width: 100%;
+					display: flex;
+					justify-content: flex-end;
+					align-items: center;
+					margin: 30px 0;
+					input,button,a{
+						margin-bottom: 10px;
+					}
+				}
+			}
+		}
+	}
+}
+
+.sec-youneedhelp{
+	>.gwr{
+		padding: 80px 0;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+	}
+	article{
+		.h2{
+			font-family: $lato-bold;
+			font-size: 30px;
+			&:after{
+				content: "..............";
+				color: $red-1;
+				display: block;
+				margin:  10px auto 0 auto;
+				font-size: 37px;
+				letter-spacing: 2px;
+				height: 35px;
+				line-height: 0px;
+				margin-left: 0px;
+			}
+		}
+		p{
+			color: $black-2;
+			//font-size: 18px;
+			max-width: 280px;
+			margin-bottom: 20px;
+			span{
+				color: $black_color_main;
+				//font-family: $lato-italic;
+				display: block;
+			}
+		}
+		ul{
+			color: $black-2;
+			//font-size: 14px;
+			margin-bottom: 18px;
+			max-width: 280px;
+			li{
+				margin-bottom: 2px;
+			}
+		}
+		.info-message{
+			color: $lightblue-1;
+			//font-family: $lato-italic;
+			//font-size: 14px;
+			display: block;
+			max-width: 298px;
+			margin-bottom: 20px;
+		}
+        .g-btn{
+            background-color: $green;
+            color: #fff;
+            &:hover{
+                background-color: #15868c;
+                border: 1px solid #15868c;
+            }
+        }
+	}
+	img{
+		width: 55%;
+		min-height: 140px;
+	}
+	.locate{
+		background-color: #FCFCFC;
+		border-top: 1px solid #D6D8DD;
+		width: 100%;
+		.gwr{
+			display: block;
+			padding: 20px 0;
+			text-align: left;
+		}
+	}
+
+    &.loaded{
+        article{
+            opacity: 1;
+            transform: translateX(0px);
+        }
+    }
+}
+
+.main-la{
+    background: rgba(118,101,170,1);
+    background: -moz-linear-gradient(45deg, rgba(118,101,170,1) 0%, rgba(104,93,171,1) 10%, rgba(78,83,172,1) 22%, rgba(62,80,170,1) 35%, rgba(62,81,159,1) 44%, rgba(91,88,139,1) 59%, rgba(104,91,134,1) 71%, rgba(115,97,135,1) 83%, rgba(147,108,134,1) 92%, rgba(161,111,135,1) 100%);
+    background: -webkit-gradient(left bottom, right top, color-stop(0%, rgba(118,101,170,1)), color-stop(10%, rgba(104,93,171,1)), color-stop(22%, rgba(78,83,172,1)), color-stop(35%, rgba(62,80,170,1)), color-stop(44%, rgba(62,81,159,1)), color-stop(59%, rgba(91,88,139,1)), color-stop(71%, rgba(104,91,134,1)), color-stop(83%, rgba(115,97,135,1)), color-stop(92%, rgba(147,108,134,1)), color-stop(100%, rgba(161,111,135,1)));
+    background: -webkit-linear-gradient(45deg, rgba(118,101,170,1) 0%, rgba(104,93,171,1) 10%, rgba(78,83,172,1) 22%, rgba(62,80,170,1) 35%, rgba(62,81,159,1) 44%, rgba(91,88,139,1) 59%, rgba(104,91,134,1) 71%, rgba(115,97,135,1) 83%, rgba(147,108,134,1) 92%, rgba(161,111,135,1) 100%);
+    background: -o-linear-gradient(45deg, rgba(118,101,170,1) 0%, rgba(104,93,171,1) 10%, rgba(78,83,172,1) 22%, rgba(62,80,170,1) 35%, rgba(62,81,159,1) 44%, rgba(91,88,139,1) 59%, rgba(104,91,134,1) 71%, rgba(115,97,135,1) 83%, rgba(147,108,134,1) 92%, rgba(161,111,135,1) 100%);
+    background: -ms-linear-gradient(45deg, rgba(118,101,170,1) 0%, rgba(104,93,171,1) 10%, rgba(78,83,172,1) 22%, rgba(62,80,170,1) 35%, rgba(62,81,159,1) 44%, rgba(91,88,139,1) 59%, rgba(104,91,134,1) 71%, rgba(115,97,135,1) 83%, rgba(147,108,134,1) 92%, rgba(161,111,135,1) 100%);
+    background: linear-gradient(45deg, rgba(118,101,170,1) 0%, rgba(104,93,171,1) 10%, rgba(78,83,172,1) 22%, rgba(62,80,170,1) 35%, rgba(62,81,159,1) 44%, rgba(91,88,139,1) 59%, rgba(104,91,134,1) 71%, rgba(115,97,135,1) 83%, rgba(147,108,134,1) 92%, rgba(161,111,135,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7665aa', endColorstr='#a16f87', GradientType=1 );
+	.w-latinoamerica{
+		width: 90%;
+		height: 100vh;
+		position: relative;
+		max-width: 1200px;
+		img{
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+			width: 70%;
+		}
+		article{
+			position: absolute;
+			top: 50%;
+			left: 2%;
+			transform: translateY(-50%);
+			z-index: 20;
+			letter-spacing: -1px;
+			@media screen and (max-width: 767px){
+				margin: 0 auto;
+				width: 100%;
+			}
+			h1{
+				color: #FFFFFF;
+				text-transform: uppercase;
+				font-family: 'lato-bold', sans-serif;
+				font-size: 35px;
+				font-weight: bold;
+				max-width: 250px;
+				text-shadow: 0px 0px 1px #CCCCCC;
+				line-height: 1;
+				@media screen and (max-width: 600px){
+					margin: 0 auto;
+					text-align: center;
+					font-size: 20px;
+				}
+			}
+		}
+	}
+	@media screen and (max-height: 768px){
+		 .w-latinoamerica{
+			 max-width: 940px;
+			 img{
+				 width: 58%;
+			 }
+		 }
+        #available-languages{
+            margin:0 auto;
+        }
+	}
+}
+
+.main-empresas{
+    .sec-benefits>article h2{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .sec-benefits>article p{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .sec-benefits .list-steps li article{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.credito-consumo{
+    &.v5{
+        #mainWrap{
+            &.mainWrapArg{
+                #form_preEvaluation{
+                    form{
+                        .w, .inline, #docNumber, .input-outline{
+                            width: 100%;
+                        }
+                        .amount{
+                            .input-outline{
+                                width: calc( 100% - 46px);
+                                width: -webkit-calc( 100% - 46px);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+body{
+    &.rm{
+        main{
+            article{
+                .custom-check{
+                    font-size: .9rem;
+                    margin-bottom: 1rem;
+                    .check-label{
+                        color: #FFFFFF;
+                    }
+                    .check-inner{
+                        &.checked{
+                            background: #26CAD3;
+                            border-color: #26CAD3;
+                            color: white;
+                            position: relative;
+                            i{
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                &:before{
+                                    content: 'L';
+                                    transform: scaleX(-1) rotate(-55deg);
+                                    font-size: 13px;
+                                    color: #fff;
+                                    display: block;
+                                    margin-left: 2px;
+                                    font-weight: bold;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.button-inner-text{
+    margin: 0;
+}
+.form-producto .w-doc,
+.form-producto .w-email,
+.form-producto .w-date{
+    max-width: 218px;
+    width: 100%;
+}
+.form-producto .w-doc {
+    display: block !important;
+    margin-right: 0 !important;
+    margin-left:0 !important;
+}
+.main-banner .form-container #frmRemarketing .field-error .inline input{
+    border-color: #c3202b;
+}
+.form-producto .w-doc .help-block {
+    text-align: left;
+}
+.form-producto .w-doc  .flex{
+    flex-direction: unset !important;
+}
+.form-producto .w-doc .field .input-landing{
+    margin-left: 10px;
+}
+.form-producto .w-doc .field .flex #documentNumber{
+    width: 152px;
+    @media only  screen and (min-width:768px){
+        width: 150px;
+    }
+}
+.form-producto .w-date .c-full{
+    width: 100%;
+    margin-left: 0 !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow{
+    @media only  screen and (max-width:960px){
+        top: 8px !important;
+    }
+}
+body .main-banner-product{
+    @media only  screen and (max-width: 767px){
+        min-height: auto !important;
+        height: auto; 
+    }
+}
+body.credito-consumo.rm{
+    header{
+        .gwr{
+            nav{
+                .list{
+                    display: none !important;
+                }
+            }
+        }
+    }
+    main.main-banner{
+        &:before{
+            //height: 100%;
+        }
+        img{
+            //transform: translate(-50%, -50%) scale(1) scaleX(-1);
+        }
+        .flex{
+            display: flex;
+            align-items: baseline;
+            //justify-content: space-between;
+        }
+        .form-container{
+            z-index: 4;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            margin-left: auto;
+
+            #frmRemarketing{
+                display: flex;
+                flex-wrap: wrap;
+                //justify-content: space-between;
+                //max-width: 440px;
+                flex-direction: column;
+                h2{
+                    font-family: "Lato-Black",sans-serif;
+                    text-align: left;
+                    margin-bottom: 1rem;
+                    width: 100%;
+                }
+                input{
+                    border: 2px solid rgba(255, 255, 255, 0);
+                    &:focus{
+                        border: 2px solid #26CAD3;
+                    }
+
+                }
+
+                .w-check{
+                    label{
+                        &.custom-check{
+                            input[aria-describedby=acceptAgreement-error]{
+                                border-color: #c3202b;
+                            }
+                        }
+                    }
+                    &.field-error{
+                        .custom-check{
+                            .check-inner{
+                                border-color: #c3202b;
+                            }
+                        }
+                    }
+                }
+
+                .wrap{
+                    display: flex;
+                }
+                .w-doc{
+                    display: flex;
+                    margin-right: .75rem;
+
+                }
+                .w-btn{
+                    width: 100%;
+                    margin: 10px 0 0 0;
+                    display: flex;
+                    .button{
+                        align-items: center;
+                        display: flex;
+                        justify-content: center;
+                        margin-left: auto;
+                        margin-right: 0;
+                        opacity: 1;
+                        padding: 0 26px;
+                        span{
+                            margin: 0;
+                        }
+                    }
+                    .loading-ajax-visible{
+                        .button-inner-text{
+                            margin: 0;
+                        }
+                    }
+                }
+                .field{
+                    display: flex;
+                    flex-direction: column;
+                    &.field-error{
+                        input{
+                            border-color: #c3202b;
+                        }
+                    }
+                }
+                .errorContainer{
+                    text-align: right;
+                    font-size: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    span{
+                        background-color: #DE777F;
+                        color: #FFFFFF;
+                        font-family: 'Lato Bold', 'Helvetica', sans-serif;
+                        padding: .5em .75em;
+                        border-radius: 5px;
+                        margin-bottom: 2px;
+                        margin-left: auto;
+                        margin-right: 0;
+                        display: flex;
+                        align-items: center;
+                        line-height: 1;
+                        margin-top: .25rem;
+                        font-size: 12px;
+                        position: relative;
+                        &:before{
+                            content: "\e92e";
+                            font-size: 12px;
+                            margin-right: .5rem ;
+                            font-family: 'icomoon';
+                            speak: none;
+                            font-style: normal;
+                            font-weight: normal;
+                            font-variant: normal;
+                            text-transform: none;
+                            line-height: 1;
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        }
+                        a{
+                            display: inline-block;
+                            margin-left: 4px;
+                            font-weight: 600; 
+                        }
+                        &.error-nofound{
+                            background-color: #26CAD3;
+                            font-size: 13.5px;
+                            margin-top: 8px;
+                            padding: 3px 8px;
+                            &:before{
+                                font-size: 20px;
+                            }
+                            a{
+                                text-decoration: underline;
+                            }
+                        }
+                    }
+                }
+                &.whites{
+                    padding: 2rem;
+                    background-color: #FFFFFF;
+                    border-radius: 6px;
+                    box-shadow: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+                    input::placeholder{
+                        color: #D6D8DD;
+                    }
+                    input{
+                        border: 2px solid #D6D8DD;
+                        color: #34465d;
+                        &:focus{
+                            border-color: #26CAD3;
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+}
+
+body.credito-consumo.main-arg.rm{
+    main.main-banner{
+        .form-container{
+            #frmRemarketing{
+                .wrap{
+                    flex-direction: column;
+                    .w, .w-names{
+                        display: flex;
+                    }
+                    .w{
+                        .w-doc,.w-email{
+                            margin-right: 10px;
+                            .field{
+                                input{
+                                    min-width: 200px;
+                                    font-size: 13px;
+                                    @media screen and (max-width: 640px){
+                                        min-width: 100%;
+                                        font-size: 11px;
+                                    }
+                                }
+                            }
+                        }
+                        .w-email{
+                            margin-right: 0;
+                            .field{
+                                input{
+                                    min-width: 220px;
+
+                                    @media screen and (max-width: 640px){
+                                        min-width: 100%;
+                                        font-size: 11px;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                    .w-names{
+                        .field{
+                            margin-right: 0;
+                            &:first-child{
+                                margin-right: 10px;
+                            }
+                        }
+                    }
+                    .w-btn{
+                        display: flex;
+                        button{
+                            margin-top: .5rem;
+                            margin-left: auto; 
+                            margin-right: 0;
+                        }
+                    }
+                }
+                .w-doc{
+                    .field{
+                        input{
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+body{
+    &.rm{
+        main{
+            article{
+                .custom-check{
+                    font-size: 14px;
+                    margin-bottom: 1rem;
+                    margin-right: auto;
+                    margin-left: 0;
+                    .check-label{
+                        cursor: default;
+                        a{
+                            font-weight: bold;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+body.main-pe.credito-consumo.v5.main-open{
+    #mainWrap{
+        #form_preEvaluation{
+            form{
+                .q{
+
+                }
+            }
+        }
+    }
+}
+
+body{
+    &.main-arg{
+        #header{
+            #hamburger{
+                display: none !important;
+            }
+        }
+    }
+}
+
+
+@media screen and (max-width: 1200px){
+	.sec-benefits{
+		.list-steps{
+			li{
+				padding: 0 20px;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 1023px){
+	.sec-benefits{
+		.list-steps{
+			li{
+				padding: 0 10px;
+			}
+		} 
+	}
+
+
+}
+
+@media screen and (max-width: 960px){
+
+    main.main-banner{
+        &:before{
+
+        }
+        img{
+
+        }
+        .flex{
+            flex-direction: column;
+        }
+        .form-container{
+
+            #frmRemarketing{
+
+                h2{
+
+                }
+                input{
+                    border: 2px solid rgba(255, 255, 255, 0);
+                    &:focus{
+                        border: 2px solid #26CAD3;
+                    }
+                }
+                .wrap{
+                    display: flex;
+                }
+                .w-doc{
+                    display: flex;
+                    margin-right: .75rem;
+                }
+                .w-btn{
+                    width: 100%;
+                    margin: 10px 0 0 0;
+                    display: flex;
+                    .button{
+                        margin-right: 0;
+                        margin-left: auto;
+                    }
+                }
+                .field{
+
+                }
+                .errorContainer{
+
+                }
+                &.whites{
+                    input::placeholder{
+
+                    }
+                    input{
+
+                        &:focus{
+
+                        }
+                    }
+                }
+            }
+         
+        }
+    }
+    .sec-press{
+        .slider-press{
+            li{
+                img{
+                    width: 150px;
+                }
+                &:hover{
+                    &:after{
+                        width: 140px;
+                    }
+                }
+            }
+        }
+    }
+    .sec-benefits{
+        >article{
+            .solven01{
+                width: 150px;
+            }
+            .solven02{
+                width: 100px !important;
+            }
+        }
+    }
+	.sec-testimonial{
+		.gwr{
+			width: 90%;
+		}
+	} 
+	.sec-services{
+		.list-services{
+			li{
+				padding: 2em;
+			}
+		} 
+	} 
+	.sec-question{
+		padding: 60px 0;
+		.list-info{
+			li{
+				width: 38%;
+				.cnt{
+					min-height: 180px;
+				}
+			}
+		}
+		.fintech{
+			width: 80%;
+		}
+	}
+    .main-pe.credito-consumo{
+        &.rm{
+            #main.main-banner{
+                article.flex{
+                    flex-direction: column;
+                    h1{
+                        margin-top: 0;
+                        padding-top: 0;
+                        margin-bottom: .5rem;
+                    }
+                    p{
+                        margin-bottom: 2rem;
+                    }
+                    .form-container{
+                        margin-left: 0;
+                        margin-right: auto;
+                        #frmRemarketing{
+                            .w-btn{
+                                .button{
+                                    margin-right: auto;
+                                    margin-left: 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    body.credito-consumo.rm main.main-banner .form-container #frmRemarketing .errorContainer span{
+        margin-right: auto;
+        margin-left: 0;
+    }
+}
+@media only screen and(min-width:749px){
+  
+    #frmRemarketing .wrap {
+        flex-direction: column;
+
+    }
+    #frmRemarketing .w-doc{
+        margin-right: 0 !important; 
+    }
+    #frmRemarketing .wrap .w-date{
+        display: flex;
+        flex-direction: column;
+    }
+    #frmRemarketing .wrap .w-date:nth-child(2){
+        display: flex;
+        align-items: baseline;
+    }
+    #frmRemarketing .wrap .w-date .w-phonenumber, 
+    #frmRemarketing .wrap .w-date .w-email{
+        max-width: 218px;
+        width: 100%; 
+    }
+    #frmRemarketing .wrap .w-date .w-phonenumber input {
+        width:100%;
+    }
+    #frmRemarketing .wrap .w-date .w-btn{
+        flex-direction: unset;
+        justify-content: center;
+        align-items: center;
+        margin-top: 8px;
+        margin-left: 0 !important;
+        max-width: 218px;
+        width: 100%;
+    }
+    #frmRemarketing .wrap .w-date .w-btn button{
+        width: 100%;
+        margin-left: 0;
+    } 
+}
+@media screen and (max-width: 767px){
+	
+	.main-banner{
+        background: linear-gradient(to bottom, rgba(60,73,90,1) 0%, rgba(108,115,157,1) 100%);
+        .message{
+            font-size: 13px;
+
+        }
+		article{
+			text-align: center;
+			margin-top: 0;
+			margin: auto;
+			h1{
+				font-size: 20px;
+				margin: 20px auto 0 auto;
+			}
+			p,>span{
+				font-size: 15px;
+			}
+			p{
+				margin: 0 auto 20px auto;
+			}
+			>span{
+				width: 200px;
+    			display: block;
+    			margin: 0 auto;
+			}
+			.list-products{
+				max-width: 100%;
+				justify-content: center;
+                margin-bottom: 100px;
+			}
+		}
+		/*#bannerPrincipal{
+			display: none;
+		}*/
+		.list-benefits{
+			display: flex;
+            flex-wrap: wrap;
+            margin: auto auto 0 auto;
+            padding: 0 0 1rem 0;
+            li{
+                width: 50%;
+                padding: 0;
+                font-size: 12.5px;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+		}
+        .form-container{
+            .block{
+                justify-content: center !important;
+                .field{
+                    button{
+                        width: 220px;
+                        height: 40px;
+                    }
+                }
+            }
+        }
+	}
+    .main-banner.main-adelanto-sueldo article{
+        margin-bottom: 0 !important;
+    }
+	.bg-blog{
+		.form-container{
+			.field{
+				width: 100%;
+				.input-landing{
+					width: 220px;
+					margin-right: -8px !important;
+				}
+			}
+		}
+	}
+	.bgblogdetail{
+		.avatar{
+			span{
+				text-align: left;
+			}
+		}
+		article{
+			time{
+				text-align: left !important;
+				display: block !important;
+			}
+		}
+	}
+    .sec-press{
+        height: 100px;
+        padding: 30px 0 30px 0;
+    }
+    .sec-press .slider-press li{
+        &:last-child{
+            display: none;
+        }
+    }
+    .sec-press .slider-press li:after{
+        opacity: 0;
+    }
+    .sec-press .slider-press li:hover:after{
+        opacity: 0;
+    }
+    .sec-press{
+        .slider-press{
+            width: calc( 100% - 60px);
+            li{
+                width: 33.333%;
+                img{
+                    width: 100%;
+                    max-width: 100%;
+                }
+            }
+        }
+
+    }
+	.sec-benefits{
+		.list-steps{
+			flex-direction: column;
+			padding: 100px 0 0 0;
+			li{
+				margin-bottom: 80px;
+			}
+		}
+		>article{
+			height: 190px;
+			img{
+				display: none !important;
+			}
+			h2{
+				font-size: 20px;
+				max-width: 300px;
+				margin: 0 auto;
+                span{
+                    font-size: 19px !important;
+                }
+			}
+			p{
+				font-size: 16px;
+				max-width: 300px;
+				margin: 0 auto;
+			}
+		}
+	}
+	.sec-services {
+		.list-services{
+			flex-direction: column;
+			width: 100%;	
+			li{
+				width: 100%;
+				height: 400px;
+				article{
+					justify-content: flex-start;
+					align-items: center;
+
+				}
+			}
+		}
+		>article{
+			padding: 30px 0 25px 0;
+			h2{
+				font-size: 20px;
+			}
+			span{
+				font-size: 16px;
+			}
+		}
+	}
+	.sec-testimonial{
+		min-height: 400px;
+		padding: 20px 0;
+		.list-testimonial{
+			li{
+				p{
+					font-size: 20px;
+				}
+				.cnt{
+					h2, span{
+						font-size: 14px;
+					}
+				}
+			} 
+		}
+	}
+	.sec-question{
+		.list-info{
+			flex-direction: column;
+			padding-left: 0;
+			margin: 2em auto 1em auto;
+			li{
+				width: 100%;
+				margin: 2.8em 0%;
+				font-size: 14px;
+				text-align: center;
+				.cnt{
+					padding: 60px 15px 20px 15px;
+					min-height: 120px;
+					.step-number{
+						transform: none;
+						top: -40px;
+						left: 0;
+						right: 0;
+						margin: 0 auto;
+						width: 80px;
+						height: 80px;
+						img{
+							width: 135px;
+						}
+					}
+				}
+				&:first-child, &:nth-child(2), &:nth-child(3), &:nth-child(4){
+					margin-right: 0;
+					margin-left: 0;	
+				}
+
+			}
+		}
+		.fintech{			
+			padding: 20px 20px;
+			font-size: 16px;
+		}
+	}
+	.sec-contact{
+		margin: 0 auto;
+		&:before{
+			margin: 0 auto 20px auto;
+		}
+		h2{
+			font-size: 20px;
+		}
+		form{
+			.gform{
+				width: 100%;
+				margin-right: 0;
+				&.gformarea{
+					.cnt-button{
+						justify-content: center;
+					}
+				}
+			}
+		} 
+	}
+	.sec-youneedhelp{
+		.gwr{
+			padding: 30px 0;
+		}
+		article{
+			text-align: left;
+            width: 100%;
+            margin-bottom: 30px;
+
+            width: 90%;
+            margin-bottom: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            p{
+                max-width: 100%;
+            }
+            ul{
+                max-width: 100%;
+            }
+            .info-message{
+                max-width: 100%;
+            }
+		}
+		img{
+			width: 100%;
+			margin: 0 auto;
+		}
+	}
+    .w-latinoamerica{
+        article{
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            h1{
+                font-size: 25px;
+            }
+        }
+        img{
+            display: none !important;
+            opacity: 0;
+        }
+    }
+	.main-banner.main-adelanto-sueldo input#email{
+		width: 220px !important;
+	}
+    .credito-consumo .main-banner.main-adelanto-sueldo article {
+      margin-bottom: 0 !important;
+    }
+    .credito-consumo.v5 #action_preEvaluation_open{
+        top: 0;
+    }
+
+    .main-pe.credito-consumo{
+        &.rm{
+            #main.main-banner{
+                background: linear-gradient(to right, rgba(123,68,130,1) 0%, rgba(249,52,78,1) 100%);
+                article.flex{
+                    flex-direction: column;
+                    >div{
+                        margin: 0 auto;
+                    }
+                    h1{
+
+                    }
+                    p{
+
+                    }
+                    .form-container{
+                        margin-left: auto;
+                        #frmRemarketing{
+                            h2{
+                                font-size: 1rem;
+                                text-align: center;
+                            }
+                            .wrap{
+                                flex-direction: column;
+                                .w-doc{
+                                    margin-right: auto;
+                                    margin-left: auto;
+                                }
+                                .w-email{
+
+                                }
+                            }
+                            .w-btn{
+                                .button{
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    body.credito-consumo.main-arg.rm{
+        main.main-banner{
+            flex-direction: column;
+            .form-container{
+                #frmRemarketing{
+                    .wrap{
+
+
+                        .field{
+                            input{
+                                width: 100% !important;
+                            }
+                        }
+                        .w, .w-names{
+
+                        }
+                        .w{
+                            .w-doc{
+                                margin-left: 0 !important;
+                                margin-right: 10px !important;
+                            }
+                        }
+                        .w-names{
+                            .field{
+
+                                &:first-child{
+
+                                }
+                            }
+                        }
+                        .w-btn{
+
+                            button{
+
+                            }
+                        }
+                    }
+                    .w-doc{
+                        .field{
+                            input{
+
+                            }
+                        }
+                    }
+                    .w-btn{
+                        button{
+                            margin: 0 auto !important;
+                            max-width: 180px !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    body.credito-consumo.rm{
+        main.main-banner{
+            flex-direction: column;
+            min-height: 500px !important;
+            article{
+                margin-top: 100px !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                padding: 0 1.25rem !important;
+                h1{
+                    padding: 0 1.25rem !important;
+                }
+            }
+            .list-benefits{
+                width: 100% !important;
+            }
+            .form-container{
+                #frmRemarketing{
+                    .wrap{
+                        &.w-check{
+                            max-width: 300px;
+                            margin-top: .5rem;
+                            margin-left: auto !important;
+                            margin-right: auto !important;
+                            .acceptAgreement{
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                            }
+                        }
+                    }
+                    .w-btn{
+                        margin-bottom: 1rem;
+                        button{
+                            margin: 0 auto !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    body.credito-consumo.rm main.main-banner .form-container #frmRemarketing .errorContainer span{
+        margin-right: auto;
+        margin-left: auto;
+    }
+}
+
+@media screen and (max-width: 600px){
+	.main-banner{
+        .message{
+            bottom: 60px;
+        }
+		.icon-bottom{
+			bottom:20px !important;
+		}
+
+        .dotted-autoevaluacion{
+            margin-bottom: 20px;
+        }
+
+		article{
+			h1{
+				text-shadow: none;
+                margin-top: 2rem;
+                br{
+                    //display: none;
+                }
+			}
+			p{
+				font-size: 14px;
+				margin: 0 auto 20px auto;
+			}
+			.list-products{
+                margin-top: 10px;
+                margin-bottom: 0;
+				li{
+					margin-right: 20px;
+					.product{
+						span{
+							font-size: 12px;
+							width: 100%;
+						}
+						&:before{
+							font-size: 60px;
+							height: 50px;
+						}
+						&.icon-adelanto-sueldo{
+							&:before{
+								font-size: 60px;
+							}
+						}
+
+					}
+					&:last-child{
+						margin-right: 0;
+					}
+				}
+			}
+
+            /*esto queda para el merge*/
+            .dotted-autoevaluacion{
+                a{
+                    color: #eee;
+                    position: relative;
+                    font-size: .82rem;
+                    //text-decoration: underline;
+                    &:after{
+                        display: block;
+                        content: '------------';
+                        font-size: 1rem;
+                        line-height: .5;
+                    }
+                }
+            }
+		}
+	}
+	.sec-benefits{
+		>article{
+			padding: 30px 0 10px 0 ;
+			h2{
+				&:after{
+					margin: 0 auto 10px auto;
+				}
+			}
+		}
+		.list-steps{
+			li{
+				article{
+					min-height: 150px;
+					padding: 45px 15px 20px 15px;
+					.steps{
+						width: 80px;
+						height: 80px;
+						&:before{
+							font-size: 70px;
+							line-height: 80px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.sec-question{
+		.title{
+			h2{
+				flex-direction: column;
+				font-size: 20px;
+				span{
+					height: 20px;
+					
+					&:before{
+						line-height: 20px !important;
+						font-size: 65px;
+					}
+				}
+			}
+			&:after{
+				margin: 20px auto 0 auto;
+			}
+		} 
+		.fintech{
+			background-color: transparent;
+			width: 100%;
+			max-width: 50vw;
+			font-size: 3vw;
+    		line-height: 6vw;
+    		padding: 0;
+			&:before{
+				display: none;
+			}
+			&:after{
+				content: "\e905";
+				left: -20%;
+				right: 0;
+				font-size: 70vw;
+				line-height: 0;
+				position: absolute;
+				top: 70%;
+				z-index: -1;
+			}
+		}
+	}
+
+	.sec-contact h2{
+		margin-bottom: 15px;
+	}
+	.sec-contact form .gform .gfield{
+		height: 60px;
+	}
+	.sec-contact form .gform .gfield .ginput_container input{
+		height: 42px;
+	}
+	.sec-contact form .gform .gfield select{
+		height: 45px;	
+	}
+	.sec-contact form .gform.gformarea .gfield .ginput_container{
+		height: 80px;
+	}
+	.sec-contact form .gform.gformarea .gfield textarea{
+		height: 80px;
+	}
+
+    .sec-press{
+        .slider-press{
+            .owl-nav{
+                display: block;
+                .owl-prev, .owl-next{
+                    font-size: 0;
+                    width: 35px;
+                    height: 35px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    position: absolute;
+                    top: 50%;
+                    color: #B5B9C1;
+                    &:before{
+                        content: "\e93b";
+                        font-size: 20px;
+                        transition: all .3s ease;
+                        @include icon();
+                    }
+                    &:hover, &:active{
+                        &:before{
+                            transform: scale(0.8);
+                        }
+                    }
+                }
+                .owl-prev{
+                    left: 0px;
+                    transform: translateY(-50%) rotate(90deg);
+                }
+                .owl-next{
+                    right: 0px;
+                    transform: translateY(-50%) rotate(-90deg);
+                }
+            }
+        }
+    }
+
+    .sec-benefits .list-steps li article h3{
+        font-size: 14px !important;
+    }
+
+    .adelanto-sueldo{
+        .main-banner{
+            article{
+                padding-top: 5rem !important;
+            }
+        }
+    }
+    .sec-press .slider-press li{
+        width: 50%;
+    }
+    .sec-press .slider-press li{
+        &:nth-child(3){
+            display: none;
+        }
+    }
+    .vflex .wsi{
+        width: 26px;
+        height: 26px;
+        margin-left: 30px;
+        #viewmore {
+            fill: #F7323F;
+            width: 26px !important;
+            height: 26px !important;
+        }
+    }
+
+    .sec-entities{
+        h3{
+            margin: 3rem auto 2rem auto;
+        }
+    }
+
+}
+.cbo-saca-credito .select2{
+  padding: 0;
+  border:none;
+
+}
+@media screen and (max-width: 480px){
+	.main-banner{
+		min-height: 90vh;
+		height: 90vh;
+		.icon-bottom{
+			bottom: 0px !important;
+		}
+	}
+	.sec-question{
+		.fintech{
+		    max-width: 80vw;
+		    font-size: 4vw;
+		    line-height: 8vw;
+			&:after{
+				font-size: 95vw;
+				line-height: 0;
+				top: 68%;
+				right: -20%;
+			}
+		}
+	}
+
+    .adelanto-sueldo{
+        .main-banner{
+            article{
+                padding-top: 5rem !important;
+            }
+        }
+    }
+    .adelanto-sueldo .main-banner article .form-container .block .display-block, .adelanto-sueldo .main-banner article .actions .block .display-block{
+        max-width: 260px;
+    }
+}
+
+/*temporal*/
+
+.main-arg{
+	article .list-products li .product{
+		&:after{
+			color: #DE777F;
+			content: '¡Muy Pronto!';
+			display: block;
+			font-family: 'Lato Bold', sans-serif;
+			font-size: .75em;
+			left: 0;
+			margin: 0 auto;
+			padding: .25em;
+			position: absolute;
+			right: 0;
+			text-align: center;
+			top: -14px;
+			width: 100%;
+
+			opacity: 0;
+			transform: translateX(100px);
+			transition: all 800ms cubic-bezier(0.26, 1.48, 0.47, 0.96) 800ms;
+
+		}
+	}
+	.loaded{
+		article .list-products li .product{
+			&:after{
+				color: #DE777F;
+				content: '¡Muy Pronto!';
+				display: block;
+				font-family: 'Lato Bold', sans-serif;
+				font-size: .75em;
+				left: 0;
+				margin: 0 auto;
+				padding: .25em;
+				position: absolute;
+				right: 0;
+				text-align: center;
+				top: -14px;
+				width: 100%;
+
+                opacity: 1;
+                transform: translateX(0px);
+			}
+		}
+	}
+
+    .main-banner{
+        background: linear-gradient(to bottom, #1d3460 0%, #00c8d3 100%) !important;
+    }
+}
+
+.credito-consumo{
+    &.v1{
+        .g-btn.bg-red{
+            background-color: $lightblue-1 !important;
+        }
+    }
+    &.v2{
+        .g-btn.bg-red{
+            background-color: $lightblue-1 !important;
+        }
+    }
+    &.v1, &.v2, &.v3, &.v4, &.v5{
+        .main-banner{
+            background: linear-gradient(to bottom, #1d3460 0%, #00c8d3 100%) !important;
+        }
+    }
+}
+
+
+
+@media screen and (max-height: 768px) and (max-width: 1366px){
+    .credito-consumo{
+        &.v5{
+            h2{
+                margin-bottom: 2rem;
+            }
+            #mainWrap{
+                #form_preEvaluation{
+                    form{
+                        margin-top: 0;
+                        margin-bottom: 7rem;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-height: 900px){
+    .credito-consumo{
+        &.v5{
+            #mainWrap{
+                #form_preEvaluation{
+                    h2{
+                        margin-bottom: 2rem;
+                    }
+                    form{
+                        .q{
+                            margin-bottom: .85rem;
+                        }
+                        .tos{
+                            margin-top: 2rem;
+                        }
+                    }
+                }
+            }
+        }
+    }
+   
+
+}
+
+
+
+
+@media screen and (max-width: 900px){
+    .credito-consumo{
+        .main-banner{
+            article{
+                p{
+                    opacity: 1 !important;
+                }
+            }
+        }
+        &.v5{
+
+            &.main-open{
+                #header{
+                    width: 100%;
+                    nav{
+                        display: block;
+                    }
+                }
+            }
+
+            #action_preEvaluation{
+                top: .5rem;
+                right: .35rem;
+                &:before, &:after{
+                    width: 20px;
+                    height: 2px;
+                }
+            }
+            #mainWrap{
+                #form_preEvaluation{
+                    top: -500px;
+                    right: 0;
+                    left: 0;
+                    opacity: 0;
+                }
+            }
+
+
+            &.main-open{
+                overflow: hidden;
+                #mainWrap{
+                    .main-banner{
+                        &:after{
+                            content: '';
+                            position: fixed;
+                            display: block;
+                            width: 100%;
+                            height: 100%;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            background-color: rgba(52,70,93,0.9);
+                            z-index: 99;
+                            opacity: .5;
+                        }
+                        #down{
+                            margin-right: auto;
+                        }
+                    }
+                }
+                #mainWrap{
+                    min-height: 550px;
+                    .main-banner{
+                        margin-right: 0;
+                        min-height: 550px;
+                    }
+                    #form_preEvaluation{
+                        top: 2rem;
+                        left: 0;
+                        right: 0;
+                        margin: 0 auto;
+                        z-index: 99;
+                        border-radius: 4px;
+                        box-shadow: 0 3px 9px rgba(0,0,0,0.5);
+                        max-width: 320px;
+                        width: 94%;
+                        height: 520px;
+                        opacity: 1;
+                        h2{
+                            margin-bottom: 0;
+                            margin-top: 1rem;
+                            font-size: .75rem;
+                            padding-bottom: .5rem;
+                        }
+                        form{
+                            margin-top: 1rem;
+                            .q{
+                                margin-left: auto;
+                                margin-right: auto;
+                                margin-bottom: .5rem;
+                                &:nth-child(2n){
+                                    margin-right: auto;
+                                }
+                            }
+                            .w-btn{
+                                margin: 0.5rem auto 0 auto;
+                                max-width: 230px;
+                                width: 100%;
+                                .g-btn{
+                                    width: 100%;
+                                       max-width: 100%;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 900px){
+    .credito-consumo{
+        &.v5{
+            .main-banner{
+                article{
+                    h1{
+                        br {
+                            display: block;
+                        }
+                    }
+                }
+            }
+            #action_preEvaluation{
+                top: 0;
+                right: 0;
+            }
+            &.main-open{
+                #mainWrap{
+                    #form_preEvaluation{
+                        top: 10px;
+                        height: 480px;
+                        height: 520px;
+
+                        h2{
+                            margin-top: 1rem;
+                            margin-left: auto;
+                            padding-bottom: .5rem;
+                        }
+                        form{
+                            margin-top: .5rem;
+                            .amount{
+                                max-width: 260px;
+                                width: 100%;
+                            }
+                            .wrap-field{
+                                max-width: 260px;
+                                width: 250px;
+                            }
+                            .q{
+                                max-width: 250px;
+                                width: 100%;
+                                >p{
+
+                                    font-size: .85rem;
+                                    margin-bottom: 2px;
+
+                                    font-size: 11px;
+                                }
+                                .w-reason{
+                                    .select2{
+                                        width: 250px !important;
+                                    }
+                                }
+                            }
+                            #docNumber{
+                                width: 164px;
+                            }
+                            .cellphone-input{
+                                width: 250px;
+                            }
+                            .cellphone{
+                                width: 100% ;
+                            }
+                            .input-outline, .box-icon, .wsi{
+                                height: 30px;
+                            }
+                            .select2-selection{
+                                height: 30px;
+                            }
+                            .select2-selection__rendered{
+                                line-height: 25px;
+                            }
+                            .w-btn{
+                                max-width: 250px;
+                                margin-top: .25rem;
+                                .g-btn{
+                                    height: 32px;
+                                    padding: 0;
+                                }
+                            }
+                            small{
+                                display: none;
+                            }
+                            .tos{
+                                margin-top: 0;
+                                border-top: 0;
+                                font-size: 10px;
+                            }
+                            input{
+                                font-size: 12px;
+                            }
+
+                            .q{
+                                margin-bottom: 3px;
+                                &.field{
+                                    &:nth-child(5){
+                                        /*
+                                        margin-right: .25rem;
+                                        width: 58%;
+                                        */
+                                        width: 100%;
+                                        margin-left: auto;
+                                        margin-right: auto;
+                                    }
+                                    &:nth-child(6){
+                                        width: 30%;
+                                        margin-left: 0;
+                                    }
+                                }
+                            }
+                            .w{
+                                width: 100%;
+                                .inline{
+                                    &:last-child{
+                                        width: 100%;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-height: 600px) and (max-width: 1266px){
+    /*
+    .credito-consumo.v5 #mainWrap h2{
+        margin-top: 4.5rem;
+
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    */
+
+    .credito-consumo.v5{
+        #mainWrap{
+            h2{
+                margin-top: 2.5rem;
+                margin-bottom: 1rem;
+            }
+            #form_preEvaluation{
+                form{
+                    .q{
+                        margin-bottom: 0;
+                        >p{
+                            margin-top: .5rem;
+                        }
+                    }
+                    .w-btn{
+                        margin: 0 0 0 auto;
+                    }
+                }
+            }
+        }
+    }
+
+    .credito-consumo.v5 #mainWrap #form_preEvaluation form .tos {
+        margin-top: 1rem;
+    }
+
+    .credito-consumo.main-arg{
+        &.v5{
+            #mainWrap{
+                h2{
+                    margin-top: 1rem !important;
+                    font-size: 1rem !important;
+                    margin-bottom: 1rem !important;
+                }
+                &.mainWrapArg{
+                    #form_preEvaluation{
+                        form{
+                            .w, .inline, #docNumber, .input-outline{
+
+                            }
+                            .amount{
+                                .input-outline{
+
+                                }
+                            }
+                            .w-btn{
+                                margin: .5rem 0 0 auto;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 900px){
+    .credito-consumo.v5.main-arg.main-open{
+        //overflow: initial !important;
+        #mainWrap{
+            overflow: initial !important;
+            #form_preEvaluation{
+                top: 10px !important;
+                height:520px !important;
+                overflow: hidden;
+                h2{
+                    font-size: 12px !important;
+                    margin-bottom: 0 !important;
+                    margin-top: 0;
+                    width: 100%;
+                    max-width: 90%;
+                }
+                form{
+                    justify-content: space-between;
+                    margin-bottom: 0;
+                    .q,.amount,.wrap-field{
+                        max-width: 100%;
+                        width: 100%;
+                    }
+                    .q{
+                        >p{
+                            font-size: 11px;
+                        }
+                        .select2-selection__rendered{
+                            font-size: 12px;
+                        }
+                        .select2-container .select2-dropdown .select2-results .select2-results__options .select2-results__option{
+                            font-size: 12px;
+                        }
+                        input{
+                            font-size: 12px;
+                        }
+                    }
+                    .w-terms{
+                        order: 9;
+                    }
+                    .tos{
+                        order: 10;
+                    }
+                    .w-reason{
+                        .select2{
+                            width: 100% !important;
+                        }
+                    }
+                    .w-btn{
+                        flex-direction: column;
+                        max-width: 100%;
+                        .acceptAgreement{
+                            width: 100%;
+                            margin-bottom: 5px;
+                        }
+                    }
+                    #docNumber{
+                        width: 100% !important;
+                    }
+
+                    .q{
+                        &:nth-child(1){
+                            width: 48%;
+                            margin-left: 0;
+                            order: 1;
+                        }
+                        &:nth-child(2){
+                            width: 50%;
+                            margin-left: auto;
+                            margin-right: 0;
+                            order: 2;
+                        }
+                        &:nth-child(3){
+                            width: 48%;
+                            margin-left: 0;
+                            order: 3;
+                        }
+                        &:nth-child(4){
+                            width: 50%;
+                            margin-left: auto;
+                            margin-right: 0;
+                            order: 4;
+                        }
+                        &:nth-child(5){
+                            width: 48%;
+                            margin-left: 0;
+                            order: 6;
+                        }
+                        &:nth-child(6){
+                            width: 100%;
+                            margin-left: auto;
+                            margin-right: 0;
+                            order: 5;
+                        }
+                        &:nth-child(7){
+                            width: 50%;
+                            order: 7;
+                            .wsi{
+                                width: 24px;
+                                svg{
+                                    width: 12px;
+                                }
+                            }
+                            input{
+                                flex-grow: 1;
+                                &#birthDay{
+                                    width: 28% !important;
+                                }
+                                &#birthMonth{
+                                    width: 28% !important;
+                                }
+                                &#birthYear{
+                                    width: 44% !important;
+                                }
+                            }
+                        }
+                        &:nth-child(8){
+                            order: 8;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 320px){
+    .credito-consumo.v5.main-open #mainWrap #form_preEvaluation form .tos {
+        margin-top: 0;
+        border-top: 0;
+        font-size: 9.7px;
+    }
+}
+

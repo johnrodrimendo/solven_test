@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight"
+         th:classappend="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-arg' : ''}">
+        <p th:if="${isSelfEvaluation}" th:utext="#{questions.block.greeting.selfEvaluation(${agent.name})}"></p>
+        <p th:if="${isEvaluation}" th:text="'¿Cuál es tu email y tu número de documento?'"></p>
+        <form id="questionForm" th:object="${form}" class="forms q1" autocomplete="off">
+            <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+
+                <div class="centrado">
+                    <div>
+                        <div class="wrap-field">
+                            <div class="wsi">
+                                <svg version="1.1" id="icon-email" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                     width="22px" height="22px" viewBox="0 0 511.626 511.626" style="enable-background:new 0 0 511.626 511.626;"
+                                     xml:space="preserve">
+                            <g>
+                                <g>
+                                    <path d="M49.106,178.729c6.472,4.567,25.981,18.131,58.528,40.685c32.548,22.554,57.482,39.92,74.803,52.099
+                                        c1.903,1.335,5.946,4.237,12.131,8.71c6.186,4.476,11.326,8.093,15.416,10.852c4.093,2.758,9.041,5.852,14.849,9.277
+                                        c5.806,3.422,11.279,5.996,16.418,7.7c5.14,1.718,9.898,2.569,14.275,2.569h0.287h0.288c4.377,0,9.137-0.852,14.277-2.569
+                                        c5.137-1.704,10.615-4.281,16.416-7.7c5.804-3.429,10.752-6.52,14.845-9.277c4.093-2.759,9.229-6.376,15.417-10.852
+                                        c6.184-4.477,10.232-7.375,12.135-8.71c17.508-12.179,62.051-43.11,133.615-92.79c13.894-9.703,25.502-21.411,34.827-35.116
+                                        c9.332-13.699,13.993-28.07,13.993-43.105c0-12.564-4.523-23.319-13.565-32.264c-9.041-8.947-19.749-13.418-32.117-13.418H45.679
+                                        c-14.655,0-25.933,4.948-33.832,14.844C3.949,79.562,0,91.934,0,106.779c0,11.991,5.236,24.985,15.703,38.974
+                                        C26.169,159.743,37.307,170.736,49.106,178.729z"/>
+                                    <path d="M483.072,209.275c-62.424,42.251-109.824,75.087-142.177,98.501c-10.849,7.991-19.65,14.229-26.409,18.699
+                                        c-6.759,4.473-15.748,9.041-26.98,13.702c-11.228,4.668-21.692,6.995-31.401,6.995h-0.291h-0.287
+                                        c-9.707,0-20.177-2.327-31.405-6.995c-11.228-4.661-20.223-9.229-26.98-13.702c-6.755-4.47-15.559-10.708-26.407-18.699
+                                        c-25.697-18.842-72.995-51.68-141.896-98.501C17.987,202.047,8.375,193.762,0,184.437v226.685c0,12.57,4.471,23.319,13.418,32.265
+                                        c8.945,8.949,19.701,13.422,32.264,13.422h420.266c12.56,0,23.315-4.473,32.261-13.422c8.949-8.949,13.418-19.694,13.418-32.265
+                                        V184.437C503.441,193.569,493.927,201.854,483.072,209.275z"/>
+                                </g>
+                            </g>
+                            </svg>
+                            </div>
+                            <input type="text" class="input-outline" th:field="*{email}" autocorrect="off"
+                                   autocapitalize="none"/>
+                            <small class="input-help">Correo electr&oacute;nico</small>
+                        </div>
+                        <!-- Peru -->
+                        <div class="field inline">
+                            <select th:field="*{docType}" data-width="80">
+                                <option th:each="type : ${identityDocumentTypes}" th:value="${type.id}"
+                                        th:text="${type.name}"></option>
+                            </select>
+                        </div>
+                        <div class="field inline">
+                            <input id="docNumber" name="docNumber" type="text" class="input-outline document-input"
+                                   style="width:130px" th:value="*{docNumber}"/>
+                        </div>
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                        <!-- -->
+                        <div class="field display-block display-check">
+                            <input type="checkbox" class="real-check" id="acceptAgreement" name="acceptAgreement"/>
+                            <label for="acceptAgreement" class="acceptAgreement">
+                        <span class="check-default">He leído, comprendo y acepto los
+                            <a th:href="@{/terminos-y-condiciones}" target="_blank">Términos y Condiciones</a> y
+                            <a th:href="@{/politica-de-privacidad}" target="_blank">Política de Privacidad</a>
+                        </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <!-- -->
+                <div class="display-block">
+
+                </div>
+            </th:block>
+
+            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                <div class="wrap-arg">
+                    <div class="field inline field-cuit">
+                        <input id="docNumber" name="docNumber" type="text" class="input-outline document-input"
+                               th:value="*{docNumber}"/>
+                        <small class="input-help type-doc">CUIT / CUIL / CDI</small>
+                    </div>
+                    <div class="field field-email inline">
+                        <div class="wrap-field">
+                            <div class="wsi">
+                                <svg version="1.1" id="icon-email" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+                                     width="22px" height="22px" viewBox="0 0 511.626 511.626" style="enable-background:new 0 0 511.626 511.626;"
+                                     xml:space="preserve">
+                            <g>
+                                <g>
+                                    <path d="M49.106,178.729c6.472,4.567,25.981,18.131,58.528,40.685c32.548,22.554,57.482,39.92,74.803,52.099
+                                        c1.903,1.335,5.946,4.237,12.131,8.71c6.186,4.476,11.326,8.093,15.416,10.852c4.093,2.758,9.041,5.852,14.849,9.277
+                                        c5.806,3.422,11.279,5.996,16.418,7.7c5.14,1.718,9.898,2.569,14.275,2.569h0.287h0.288c4.377,0,9.137-0.852,14.277-2.569
+                                        c5.137-1.704,10.615-4.281,16.416-7.7c5.804-3.429,10.752-6.52,14.845-9.277c4.093-2.759,9.229-6.376,15.417-10.852
+                                        c6.184-4.477,10.232-7.375,12.135-8.71c17.508-12.179,62.051-43.11,133.615-92.79c13.894-9.703,25.502-21.411,34.827-35.116
+                                        c9.332-13.699,13.993-28.07,13.993-43.105c0-12.564-4.523-23.319-13.565-32.264c-9.041-8.947-19.749-13.418-32.117-13.418H45.679
+                                        c-14.655,0-25.933,4.948-33.832,14.844C3.949,79.562,0,91.934,0,106.779c0,11.991,5.236,24.985,15.703,38.974
+                                        C26.169,159.743,37.307,170.736,49.106,178.729z"/>
+                                    <path d="M483.072,209.275c-62.424,42.251-109.824,75.087-142.177,98.501c-10.849,7.991-19.65,14.229-26.409,18.699
+                                        c-6.759,4.473-15.748,9.041-26.98,13.702c-11.228,4.668-21.692,6.995-31.401,6.995h-0.291h-0.287
+                                        c-9.707,0-20.177-2.327-31.405-6.995c-11.228-4.661-20.223-9.229-26.98-13.702c-6.755-4.47-15.559-10.708-26.407-18.699
+                                        c-25.697-18.842-72.995-51.68-141.896-98.501C17.987,202.047,8.375,193.762,0,184.437v226.685c0,12.57,4.471,23.319,13.418,32.265
+                                        c8.945,8.949,19.701,13.422,32.264,13.422h420.266c12.56,0,23.315-4.473,32.261-13.422c8.949-8.949,13.418-19.694,13.418-32.265
+                                        V184.437C503.441,193.569,493.927,201.854,483.072,209.275z"/>
+                                </g>
+                            </g>
+                            </svg>
+                            </div>
+                            <input type="text" class="input-outline" th:field="*{email}" autocorrect="off"
+                                   autocapitalize="none"/>
+                            <small class="input-help">Correo electr&oacute;nico</small>
+                        </div>
+                    </div>
+                    <div class="field inline">
+                        <input type="text" class="input-outline" th:field="*{name}"/>
+                        <small class="input-help">Nombre</small>
+                    </div>
+                    <div class="field inline">
+                        <input type="text" class="input-outline" th:field="*{surName}"/>
+                        <small class="input-help">Apellido</small>
+                    </div>
+                    <div class="display-block display-check arg-block">
+                        <input type="checkbox" class="real-check" id="acceptAgreement" name="acceptAgreement"/>
+                        <label for="acceptAgreement" class="acceptAgreement">
+                        <span class="check-default">He leído, comprendo y acepto los
+                            <a th:href="@{/terminos-y-condiciones}" target="_blank">Términos y Condiciones</a> y
+                            <a th:href="@{/politica-de-privacidad}" target="_blank">Política de Privacidad</a>
+                        </span>
+                        </label>
+                    </div>
+                    <div class="field inline r-field">
+                        <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+            </th:block>
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var q1 = $('.q1');
+        q1.closest('body').addClass('body-q1');
+
+
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var docType = $('#docType'),
+            docNumber = $('#docNumber'),
+            email = $('#email');
+        var firstOnChange = true;
+        docType.on('change', function () {
+            if (!firstOnChange) {
+                docNumber.val('');
+            } else {
+                firstOnChange = false;
+            }
+            if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.IdentityDocumentType).CE}]]*/) {
+                $('#docNumber').removeClass('document-input').addClass('document-input-ce');
+                $('#questionForm').data('validatorJson').rules.docNumber.minlength = 8;
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 9;
+                $('')
+            } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.IdentityDocumentType).DNI}]]*/) {
+                $('#docNumber').removeClass('document-input-ce').addClass('document-input');
+                $('#questionForm').data('validatorJson').rules.docNumber.minlength = 8;
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 8;
+            } else {
+                $('#docNumber').removeClass('document-input-ce').addClass('document-input');
+                $('#questionForm').data('validatorJson').rules.docNumber.minlength = 11;
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 11;
+            }
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+        docType.change();
+        email.on('paste', function (event) {
+            $(this).val($.trim($(this).val()));
+        });
+
+        function readCookie(name) {
+            var n = name + "=";
+            var cookie = document.cookie.split(';');
+            for (var i = 0; i < cookie.length; i++) {
+                var c = cookie[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1, c.length);
+                }
+                if (c.indexOf(n) == 0) {
+                    return c.substring(n.length, c.length);
+                }
+            }
+            return null;
+        }
+
+        $('#sendButton').click(function () {
+            var $this = $('.acceptAgreement');
+            if ($this.hasClass('checked')) {
+                $this.find('.check-inner').removeClass('has-error');
+            }
+            else {
+                console.log('desmarcado');
+                $this.find('.check-inner').addClass('has-error');
+            }
+            $('#email').val($.trim($('#email').val()));
+            if ($('#questionForm').valid()) {
+                $('body').removeClass('body-q1');
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {
+                        agent: questionFw.agent,
+                        categoryUrl: questionFw.categoryUrl,
+                        source: readCookie("utm_source"),
+                        medium: readCookie("utm_medium"),
+                        campaign: readCookie("utm_campaign"),
+                        term: readCookie("utm_term"),
+                        content: readCookie("utm_content"),
+                        gclid: readCookie('gclid'),
+                        gaClientID: localStorage.getItem('ga:clientId')
+                    })
+                }, "");
+            }
+        });
+
+        $('#open-modal-question1').on('click', function (event) {
+            event.preventDefault();
+            self.openMsg1Modal();
+            $("#modal_msg_question1").modal('show');
+        });
+        this.openMsg1Modal = function () {
+            $("#modal_msg_question1").modal('show');
+        };
+        /*]]>*/
+
+    </script>
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            email = $('#email');
+            setTimeout(function () {
+                email.focus();
+            }, 300);
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            email = $('#docNumber');
+            setTimeout(function () {
+                email.focus();
+            }, 300);
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+    <div id="modal_msg_question1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="help">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <span class="circle"></span>
+                        <span class="text">Personas Expuestas Polícitamente (PEP)</span>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <p th:text="#{questions.pep.explanation}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</html>

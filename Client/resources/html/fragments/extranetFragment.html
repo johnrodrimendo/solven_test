@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate">
+
+<!-- Documentation -->
+<th:block th:fragment="documentationContainer">
+    <div class="row" id="documentationPanel">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="portlet box green">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-upload"></i><div th:text="'Documentaci&oacute;n '+${loanApplication.code}" th:remove="tag"/>
+                    </div>
+                </div>
+                <div class="portlet-body">
+
+                    <strong>Ay&uacute;danos a acelerar el proceso para desembolsar tu cr&eacute;dito
+                        envi&aacute;ndonos tu documentación.</strong>
+                    <br/><br/>
+                    <div class="row">
+                        <div th:each="userFileType : ${@catalogService.getUserFileTypes()}"
+                             th:remove="tag">
+                            <div th:with="userFiles = ${@userService.getUserFileByType(loanApplication.loanApplicationUserFiles?.userFileList, userFileType.id)}"
+                                 th:remove="tag">
+                                <div class="image-box"
+                                     th:if="${loanApplication.principalOcupation?.requiredDocuments != null
+                                     and #lists.contains(loanApplication.principalOcupation?.requiredDocuments, userFileType.id)
+                                     and userFileType.id != userFileType.DNI_MERGED
+                                     and userFileType.id != userFileType.SELFIE}">
+                                    <div class="form-group">
+                                        <div class="upload-box">
+                                            <div class="title-bar">
+                                                <label th:text="${userFileType.type}"></label>
+                                            </div>
+                                            <div class="tile-thumbs-images">
+                                                <ul class="tiles-container">
+                                                    <li th:each="file : ${userFiles}"
+                                                        class="fileImage"
+                                                        data-gallery="multiimages"
+                                                        data-parent=".tile-thumbs-images"
+                                                        th:attr="data-toggle=${@fileService.isImage(file.fileName)?'lightbox':''}"
+                                                        th:href="@{/client/userFile/__${@fileService.generateUserFileEncrypt(file.userId, file.fileName, file.id)}__/image.jpg(thumbnail=false)}"
+                                                        th:style="'background: url(' + @{/client/userFile/__${@fileService.generateUserFileEncrypt(file.userId, file.fileName, file.id)}__/image.jpg(thumbnail=true)} +');background-size: 100%;'"></li>
+                                                    <li th:onclick="'openUploadUserFileModal('+${userFileType.id}+', '+${loanApplication.id}+')'">
+                                                        <a href="javascript:;"><i
+                                                                class="icon control-add"></i></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var uploadedSuccess = false;
+        function openUploadUserFileModal(userFileType, loanApplicationId) {
+            uploadedSuccess = false;
+            var url = /*[[ @{/client/file/userFile} ]]*/;
+            $("#uploadUserFile").dropzone({
+                url: url,
+                params: {userFileType: userFileType, loanApplicationId: loanApplicationId},
+                paramName: 'file',
+                maxFilesize: 2, // MB
+                maxFiles: 5,
+                dictDefaultMessage: 'Arrastra una imagen aqu&iacute; para subirla, o haz click para seleccionar una.',
+                acceptedFiles: 'image/*',
+                headers: addCsrfToJsonHeaders({
+                    'x-request-sender-type': 'ajax'
+                }),
+                init: function () {
+                    this.on("success", function () {
+                        uploadedSuccess = true;
+                        closeUploadUserFileModal();
+                    });
+                }
+            });
+
+            $('#uploadUserFileModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+
+        function closeUploadUserFileModal() {
+            $('#uploadUserFileModal').modal('hide');
+            Dropzone.forElement("div#uploadUserFile").destroy()
+            if (uploadedSuccess) {
+                debugger;
+                var baseUrl = /*[[ @{/client/dashboard/documentation/panel} ]]*/;
+                $('#documentationPanel').load(baseUrl + ' #documentationPanel > *', function () {
+                    initializeUserFileSection();
+                });
+            }
+        }
+
+        function initializeUserFileSection() {
+            debugger;
+            $('#documentationPanel').find('.fileImage').click(function () {
+                $(this).ekkoLightbox();
+            });
+
+            var sizeDocuments = $('.image-box').length;
+            switch (sizeDocuments) {
+                case 1:
+                    $('.image-box').addClass('col-lg-12');
+                    break;
+                case 2:
+                    $('.image-box').addClass('col-lg-6 col-md-6 col-sm-12');
+                    break;
+                case 3:
+                    $('.image-box').addClass('col-lg-4 col-md-4 col-sm-12');
+                    break;
+                default:
+                    $('.image-box').addClass('col-lg-4 col-md-4 col-sm-12');
+                    break;
+            }
+        }
+
+        initializeUserFileSection();
+
+        /*]]>*/
+    </script>
+</th:block>
+<!-- / Documentation -->
+</html>

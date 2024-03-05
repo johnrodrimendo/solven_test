@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q47">
+            <p th:utext="#{questions.block.rentierIncomes}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="centrado">
+                    <div>
+                        <div class="field field-amount inline">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                </div>
+                                <input type="text" class="input-outline amount-input" th:field="*{rent}"/>
+                                <small class="input-help">Neto</small>
+                            </div>
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+                <div class="display-block">
+                    <div class="field inline">
+                        <label class="h-input-check" th:each="belonging : ${@catalogService.getBelongings(#locale)}">
+                            <input type="checkbox" class="checkbox" th:value="${belonging.id}" name="belonging[]"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <div class="radio inline"></div>
+                                    <h5 class="inline" th:text="${belonging.name}"></h5>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var $rent = $('.amount-input');
+        setTimeout(function () {
+            $rent.focus();
+        }, 300);
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

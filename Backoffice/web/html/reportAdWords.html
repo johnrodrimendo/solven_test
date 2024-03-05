@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Desembolsos AdWords</title>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function exportToExcel(){
+            var filters = $('.form-control.input-sm.form-control-sm');;
+            var jsonParams = {};
+            for (var i = 0; i < filters.length; i++) {
+                if (jsonParams[filters[i].name] == undefined) {
+                    jsonParams[filters[i].name] = [];
+                }
+                jsonParams[filters[i].name][jsonParams[filters[i].name].length] = filters[i].value;
+            }
+
+            var baseUrl = /*[[@{/report/adwords/export}]]*/null;
+            var url = baseUrl+"?"+$.param(jsonParams);
+            window.open(url, '_blank');
+        }
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Desembolsos AdWords</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Desembolsos AdWords</span>
+                                </div>
+
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}" href="javascript:exportToExcel()" >
+                                        <i class="fa fa-table"></i> Generar CSV</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div id="filter">
+                                <form role="form" method="post" th:action="@{/report/adwords/export}">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <!-- Período 1 -->
+                                            <div class="form-row ">
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label"><b>Fecha de Desembolso</b><br />Desde</label>
+                                                    <input id="creationFromFilter" name="creationFrom" type="text" class="form-control input-sm form-control-sm" th:value="${period1From != null ? @utilService.dateCustomFormat(period1From, 'dd-MM-yyyy', #locale) : ''}" />
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label"><b></b><br/>Hasta</label>
+                                                    <input id="creationToFilter" name="creationTo" type="text" class="form-control input-sm form-control-sm" th:value="${period1To != null ? @utilService.dateCustomFormat(period1To, 'dd-MM-yyyy', #locale) : ''}" />
+                                                </div>
+                                                <script th:inline="javascript">
+                                                    /*<![CDATA[*/
+                                                    var creationFromFilter = $('#creationFromFilter');
+                                                    var creationToFilter = $('#creationToFilter');
+                                                    datepicker(creationFromFilter);
+                                                    datepicker(creationToFilter);
+                                                    function datepicker( obj ){
+                                                        obj.datepicker({
+                                                            autoclose: true,
+                                                            format: "dd/mm/yyyy",
+                                                            focusOnShow: true,
+                                                            endDate: "today"
+                                                        });
+                                                    }
+                                                    creationFromFilter.on('change', function () {
+                                                        creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                                    });
+                                                    /*]]>*/
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

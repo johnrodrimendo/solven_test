@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<!-- TAB INTERACTIONS KNOW -->
+<div th:fragment="tab-interactions-know" th:remove="tag">
+    <div id="tabLoading" style="display: none">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando informaci&oacute;n de Interacciones</li>
+        </ul>
+    </div>
+    <div th:if="${firstCall == null or !firstCall}" id="tabData" data-accordion="interactions">
+        <div class="portlet box green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <div th:remove="tag" th:text="Interacciones"/>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="reload" data-original-title="" title="Actualizar"> </a>
+                    <a href="javascript:;" class="expand" data-original-title="" title=""> </a>
+                </div>
+            </div>
+            <div class="portlet-body" style="display: none;">
+                <ul class="fa-ul" style="min-width: 100%;padding-right: 50px;">
+
+                    <th:block th:if="${onlyView != null  AND onlyView}">
+                        <div th:replace="fragments/personFragmentsInteraction :: tab-interactinos-acordeon(interactionsParam=${interaction?.interactions}, code=${interaction?.creditCode != null ? interaction?.creditCode : interaction?.loanApplicationCode})"/>
+                    </th:block>
+
+                    <th:block th:unless="${onlyView != null  AND onlyView}  ">
+                        <li>
+                            <i class="fa-li fa fa-spinner fa-spin"></i>Cargando informaci&oacute;n de Interacciones
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--Modal for upload-->
+    <div id="registerInteractionModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    FORMUlARIO AJAX DE REGISTRO DE INTERACCION CON PERSONA
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="closeRegisterInteractionModal()">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var registerSuccess = false;
+
+        function openRegisterInteractionModal(userId) {
+            $('#registerInteractionModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+
+        function closeRegisterInteractionModal() {
+            $('#registerInteractionModal').modal('hide');
+            if (registerSuccess) {
+                setTimeout(function () {
+                    refreshTabAjax('interactions');
+                }, 300)
+            }
+        }
+
+        /*]]>*/
+    </script>
+</div>
+
+<div class="panel-group" id="accordion" th:fragment="tab-interactinos-acordeon">
+
+    <div th:each="interaction,iterStat : ${interactionsParam}"
+         class="panel panel-default">
+        <div th:if="${interaction instanceof T(com.affirm.common.model.transactional.PersonInteraction)}">
+            <div class="panel-heading">
+                <div class="row">
+                    <a data-toggle="collapse" data-parent="#accordion"
+                       th:href="'#collapse' + ${code} + ${iterStat.index}"
+                       class="col-md-6">
+                        <dl class="dl-horizontal">
+                            <dt>Tipo</dt>
+                            <dd th:text="${interaction?.interactionType?.type}"
+                                style="font-weight: bold"></dd>
+                            <dt>Contenido</dt>
+                            <dd th:text="${interaction?.interactionContent?.content}"></dd>
+                            <dt>Fecha</dt>
+                            <dd th:text="${@utilService.datetimeShortFormat(interaction?.registerDate)}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(interaction?.registerDate)}"></dd>
+                            <dt>Solicitud / Cr&eacute;dito</dt>
+                            <dd>
+                                <th:block th:if="${interaction?.loanApplicationCode != null}"
+                                          th:text="${interaction?.loanApplicationCode}"></th:block>
+                                <th:block th:if="${interaction?.creditCode != null}"
+                                          th:text="${interaction?.creditCode}"></th:block>
+                            </dd>
+                            <dt>Destino</dt>
+                            <dd th:text="${interaction?.destination}"></dd>
+                            <th:block
+                                    th:switch="${interaction?.interactionType.id}">
+                                <th:block th:case="${interaction?.interactionType.MAIL}">
+                                    <dt>Con copia</dt>
+                                    <dd th:text="${interaction?.getCcMailsReadable()}"></dd>
+                                    <dt>Asunto</dt>
+                                    <dd th:text="${interaction?.subject}"></dd>
+                                </th:block>
+                                <th:block th:case="${interaction?.interactionType.CALL}">
+                                    <dt>Analista</dt>
+                                    <dd th:text="${interaction?.getSenderName()}"></dd>
+                                </th:block>
+                            </th:block>
+                            <th:block th:if="${interaction?.holder != null}">
+                                <dt>Contest&oacute; titular</dt>
+                                <dd th:text="${interaction?.holder ? 'Si' : 'No'}"></dd>
+                            </th:block>
+                            <th:block th:if="${interaction?.relationship != null}">
+                                <dt>Pariente que contest&oacute;</dt>
+                                <dd th:text="${interaction?.relationship?.relationship}"></dd>
+                            </th:block>
+                            <!--<dt>Enviado</dt>
+                            <dd th:text="${interaction?.sent} ? 'S?' : 'No'"></dd>-->
+                        </dl>
+                    </a>
+                    <table th:if="${interaction?.stats != null}" class="col-md-4">
+                        <tr th:each="stat : ${interaction?.stats}">
+                            <td class="nowrap"
+                                th:text="${@utilService.datetimeShortFormat(stat?.eventDate)} + ' - ' + ${stat?.event}"
+                                th:attr="data-order=${@utilService.datetimeYearFirstFormat(stat?.eventDate)}"></td>
+                        </tr>
+                    </table>
+                    <th:block
+                            th:if="${interaction?.interactionType?.type == T(com.affirm.common.model.catalog.InteractionType).CALL}">
+                        <a href="javascript:;" class="col-md-2"
+                           th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                           th:onclick="'resendInteraction('+${interaction?.id}+')'">Reenviar
+                        </a>
+                    </th:block>
+                </div>
+            </div>
+            <div th:id="'collapse' + ${code} + ${iterStat.index}" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <th:block th:if="${interaction?.interactionType?.id == T(com.affirm.common.model.catalog.InteractionType).CHAT}">
+                        <div class="title_wa">
+                            <div class="title_wa_message title_wa_active">Mensaje</div>
+                            <div class="title_wa_answer">Respuesta</div>
+                        </div>
+                        <div class="interaction-html"></div>
+                        <div class="interaction-html_wa">
+
+                            <div class="loading-responses">
+                                <ul class="fa-ul">
+                                    <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando respuestas
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="result-responses" style="display: none">
+
+                            </div>
+                        </div>
+
+                        <script th:inline="javascript">
+                            /*<![CDATA[*/
+                            var baseElement = $('#collapse' + [[${code}]] + [[${iterStat.index}]]);
+                            baseElement.find(".title_wa_message").click(function(){
+                                var closestPanel = $(this).closest('.panel-body');
+                                closestPanel.find(".interaction-html").show();
+                                closestPanel.find(".interaction-html_wa").hide();
+                                closestPanel.find(".title_wa_message").addClass("title_wa_active");
+                                closestPanel.find(".title_wa_answer").removeClass("title_wa_active");
+                            });
+                            baseElement.find(".title_wa_answer").click(function(){
+                                var closestPanel = $(this).closest('.panel-body');
+                                closestPanel.find(".interaction-html_wa").show();
+                                closestPanel.find(".interaction-html").hide();
+                                closestPanel.find(".title_wa_answer").addClass("title_wa_active");
+                                closestPanel.find(".title_wa_message").removeClass("title_wa_active");
+
+                                var resultRespnoses = closestPanel.find('.result-responses');
+                                var loadingRespnoses = closestPanel.find('.loading-responses');
+                                var loadingResponsesStatus = resultRespnoses.data('loading-responses-status');
+                                if(loadingResponsesStatus == null || loadingResponsesStatus != 'success'){
+                                    // Ajax to load the responses
+                                    var url = /*[[@{/person/interaction/__${interaction?.id}__/responses}]]*/;
+                                    resultRespnoses.defaultLoad(url, null, function(){
+                                        resultRespnoses.show();
+                                        loadingRespnoses.hide();
+                                        resultRespnoses.data('loading-responses-status', 'success');
+                                    }, 'GET', null);
+                                }
+
+                            });
+                            /*]]>*/
+                        </script>
+                    </th:block>
+                    <th:block th:if="${interaction?.interactionType?.id != T(com.affirm.common.model.catalog.InteractionType).CHAT}">
+                        <div class="interaction-html"></div>
+                    </th:block>
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        var htmlforReplace = /*[[${interaction?.body}]]*/;
+                        var htmlInteraction = $('#collapse' + [[${code}]] + [[${iterStat.index}]]).find('.interaction-html');
+                        htmlforReplace = htmlforReplace.replace(/\\r\\n|\\n/g, '<br/>');
+                        htmlInteraction.html(htmlforReplace);
+                        /*]]>*/
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div th:if="${interaction instanceof T(com.affirm.common.model.transactional.CollectionContacts)}">
+            <div class="panel-heading">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   th:href="'#collapse' + ${interaction.creditCode == null ? interaction.loanApplicationCode : interaction.creditCode} + ${iterStat.index}">
+                    <dl class="dl-horizontal dl-loan-application col-md-6">
+                        <dt>Tipo</dt>
+                        <dd th:text="${interaction?.ContactResult.type}" style="font-weight: bold"></dd>
+                        <dt>Fecha</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(interaction?.registerDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(interaction?.registerDate)}"></dd>
+                        <dt>Usuario</dt>
+                        <dd th:text="${interaction?.getFullName()}"></dd>
+                        <dt>Resultado</dt>
+                        <dd th:if="${interaction?.ContactResult.dateRequired}"
+                            th:text="${interaction?.ContactResult.result} + ' - ' + ${@utilService.dateFormat(interaction?.promissoryNote)}"
+                            style="font-weight: bold"></dd>
+                        <dd th:if="${interaction?.ContactResult.dateRequired} == false"
+                            th:text="${interaction?.ContactResult.result}" style="font-weight: bold"></dd>
+                        <dt>Cr&eacute;dito</dt>
+                        <dd th:text="${interaction?.creditCode}"></dd>
+                    </dl>
+                    <dl class="dl-horizontal col-md-6">
+                    </dl>
+                </a>
+            </div>
+            <div th:id="'collapse' + ${interaction.creditCode == null ? interaction.loanApplicationCode : interaction.creditCode} + ${iterStat.index}"
+                 class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div th:text="${interaction?.comment}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function loadInteractionResponses(code, index, personInteractionId){
+
+        }
+        /*]]>*/
+    </script>
+
+</div>
+
+<th:block th:fragment="personinteractionResponses">
+    <table class="table table-bordered" th:if="${interactionResponses != null}">
+        <thead>
+        <tr>
+            <th>Respuesta</th>
+            <th>-</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="response : ${interactionResponses}">
+            <td th:text="${response.response?.message?.messageText}"></td>
+            <td><a target="_blank" th:attr="href=${'https://web.whatsapp.com/send?phone=' + response?.response?.source + '&amp;text=&amp;source=&amp;data='}">Continuar conversaci&oacute;n</a></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+
+</body>
+
+</html>

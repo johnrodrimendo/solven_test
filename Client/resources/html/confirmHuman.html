@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function onSuccessfulCaptcha(response) {
+                defaultAjax({
+                    url: /*[[@{/checkSuccess}]]*/,
+                    type: 'POST',
+                    data: {
+                        "g-recaptcha-response": document.querySelector('.g-recaptcha-response').value
+                    }
+                });
+        }
+        /*]]>*/
+    </script>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="header">
+   <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="confirm-catpcha">
+        <h2>Verificaci&oacute;n de Seguridad</h2>
+        <p>Para verificar que eres un humano, por favor haz check a continuación.</p>
+        <form name="reForm" th:action="@{/checkSuccess}" method="POST">
+            <div class="g-recaptcha" th:attr="data-sitekey=${@configuration.recaptchaPublicKey()}" data-callback="onSuccessfulCaptcha"></div>
+            <br/>
+        </form>
+    </div>
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+</th:block>
+
+</body>
+</html>

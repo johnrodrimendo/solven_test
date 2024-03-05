@@ -1,0 +1,566 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <header class="headerLanding" id="header-dinamic" th:fragment="landingHeader">
+        <style>
+            header{
+                position: absolute;
+                background: transparent;
+                box-shadow: none;
+            }
+            header:hover {
+                background: transparent;
+            }
+
+            .btn {
+                border-radius: 0.25rem;
+                cursor: pointer;
+                display: inline-block;
+                font-size: 1rem;
+                font-weight: 600;
+                line-height: 1.42857143;
+                min-height: 30px;
+                padding: 0.4rem 1rem;
+                text-align: center;
+                transform: none;
+                transition: all 0.3s ease;
+                vertical-align: middle;
+                white-space: nowrap;
+            }
+            .btn-demo{
+                box-shadow: none;
+                color: #F7323F;
+                background: none;
+                border: 2px solid #F7323F;
+                display: none;
+            }
+
+            .btn-demo:hover{
+                background: #F7323F;
+                color: white;
+            }
+
+            .header-scroll {
+                background: transparent;
+                box-shadow: none;
+            }
+
+            header .menu-default-logo .solven-logo {
+                fill: #F7323F!important;
+            }
+
+            .header-scroll-show{
+                background: white;
+                box-shadow: 0 1px 8px rgb(25 25 25 / 45%);
+                height: 65px;
+                position: fixed;
+            }
+
+            .header-scroll-show:hover{
+                background: white;
+            }
+
+            .header-scroll-show > .gwr > .menu-default > .menu-desk > .btn-demo {
+                display: block!important;
+            }
+
+            @media only screen and (max-width: 800px){
+                header {
+                    background: white;
+                    box-shadow: 0 1px 8px rgb(25 25 25 / 45%);
+                    height: 65px;
+                    position: fixed;
+                }
+                header:hover {
+                    background: white;
+                    box-shadow: 0 1px 8px rgb(25 25 25 / 45%);
+                    height: 65px;
+                }
+
+                .header-scroll {
+                    background: white;
+                    box-shadow: 0 1px 8px rgb(25 25 25 / 45%);
+                }
+
+                .btn-demo{
+                    display: block!important;
+                    font-size: 0.8rem!important;
+                    line-height: 1.52857143!important;
+                    min-height: 20px!important;
+                    padding: 0.1rem 0.5rem!important;
+                }
+
+                header .menu-desk {
+                    direction: ltr;
+                    display: flex;
+                    justify-content: flex-end;
+                    width: 95% !important;
+                    top: 24px;
+                    position: absolute;
+                }
+
+            }
+
+            @media only screen and (max-width: 767px){
+
+
+                header .menu-default-logo {
+                    top: 11px;
+                }
+                header .menu-default-logo .solven-logo {
+                    height: auto;
+                    width: 120px;
+                }
+            }
+        </style>
+        <div class="gwr">
+             <div class="menu-default"
+                 th:with="
+                adelantoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).ADELANTO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())},
+                autosCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).VEHICULO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())},
+                consumoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).CONSUMO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())}">
+                <a th:href="@{/}" class="menu-default-logo">
+                     <svg class="solven-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 129.35 41.95">
+                         <g id="Capa_2" data-name="Capa 2">
+                             <g id="nav">
+                                 <path class="cls-1"
+                                     d="M.19 40.59v-5.41a19.52 19.52 0 0 0 7 1.41c2.53 0 3.51-.73 3.51-2 0-1.56-2.24-1.76-5.16-2.73S0 28.85 0 24.66c0-5.22 4-7.46 9.69-7.46a23.22 23.22 0 0 1 6.34.93v5.45a19.76 19.76 0 0 0-6-1C7.8 22.56 7 23.15 7 24.22c0 1.22 1 1.51 4.19 2.39 3.36 1 6.62 2.77 6.62 7.6 0 5.06-3.85 7.74-9.55 7.74a19.62 19.62 0 0 1-8.07-1.36zM19.19 29.58c0-6.43 3.9-12.38 12-12.38s11.89 5.41 11.89 12.38C43.07 36 39.17 42 31.13 42s-11.94-5.46-11.94-12.42zm16.18 0c0-4.29-1.17-6.92-4.24-6.92s-4.19 2.63-4.19 6.92 1.17 6.87 4.24 6.87 4.19-2.54 4.19-6.87zM55.71 2h7.21L48.5 42h-7.21zM58.8 17.2h8.1l3.52 13.23c.4 1.51.81 3.88.91 4.23h.1c.1-.4.55-2.82.9-4.23L75.8 17.2h7.9L75.55 42h-8.7zM82.46 29.58c0-6.63 3.9-12.38 11.64-12.38 8 0 10.63 5.41 10.63 11.35a20.6 20.6 0 0 1-.15 2.44H90.11c.1 3.36 1.36 5.46 5.65 5.46A18.17 18.17 0 0 0 103 35v5.6a21.81 21.81 0 0 1-7.78 1.4c-9.11 0-12.76-5.16-12.76-12.42zm15-2.78v-.29c0-2-1-4-3.32-4s-3.6 1.71-3.85 4.24zM107.27 17.2h7.38v2.33a10.64 10.64 0 0 1 6.68-2.33c6 0 8 3.66 8 8.57V42h-7.52V26.9c0-2.62-.9-3.81-3.37-3.81a6.34 6.34 0 0 0-3.61 1.39V42h-7.58zM52.9 37.62a4.44 4.44 0 0 1 8.87 0 4.44 4.44 0 0 1-8.87 0z" />
+                                 <path fill="none" d="M0 0h129.35v41.95H0z" />
+                             </g>
+                         </g>
+                     </svg>
+                </a>
+                <div class="menu-desk">
+                    <a onclick="Calendly.showPopupWidget('https://calendly.com/mfernandez-39/30min');return false;" href="javascript:void(0)"
+                       class="btn bg-sec btn-demo">Solicita una demo</a>
+<!--                    <ul class="menu-desk-list">-->
+<!--                        <li class="menu-desk-software">-->
+<!--                            <a class="software" th:href="@{/software}">SOFTWARE</a>-->
+<!--                        </li>-->
+
+<!--                        <li class="menu-desk-credito">Cr&eacute;ditos-->
+<!--                            <ul class="sub-menu-desk-credito-ar">-->
+<!--                                <li class="desk-credito-personal">-->
+<!--                                    <p>Cr&eacute;dito Personal</p>-->
+<!--                                    <ul class="sub-desk-credito-personal">-->
+<!--                                        <li>-->
+<!--                                            <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}"-->
+<!--                                                 th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}">Cr&eacute;dito Efectivo</a>-->
+<!--                                        </li>-->
+<!--                                        <li>-->
+<!--                                            <a th:href="@{/autoevaluacion}">Autoevaluaci&oacute;n</a>-->
+<!--                                        </li>-->
+<!--                                        <li>-->
+<!--                                            <a class="modal-efectivo-auto">Efectivo con tu auto</a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                                &lt;!&ndash;<li class="desk-credito-empresa">-->
+<!--                                    <p>Cr&eacute;dito Empresas</p>-->
+<!--                                    <ul class="sub-desk-credito-empresas">-->
+<!--                                        <li>-->
+<!--                                            <a th:href="@{/empresas}">Soy Empresa</a>-->
+<!--                                        </li>-->
+<!--                                        <li>-->
+<!--                                            <a th:href="@{/colaboradores}">Soy Colaborador</a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>&ndash;&gt;-->
+
+<!--                            </ul>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+                </div>
+<!--                <div class="menu-mobil">-->
+<!--                    <div class="hamburger">-->
+<!--                        <div class="hamburger-layer hamburger-layer-top"></div>-->
+<!--                        <div class="hamburger-layer hamburger-layer-mid"></div>-->
+<!--                        <div class="hamburger-layer hamburger-layer-bottom"></div>-->
+<!--                    </div>-->
+<!--                    <div class="menu-list">-->
+<!--                        <div class="menu-inner-list">-->
+<!--                            <span class="sub-menu-list menu-list-credito sub-menu-active">Cr&eacute;ditos</span>-->
+<!--                            <span class="software sub-menu-list menu-list-software">SOFTWARE</span>-->
+<!--                        </div>-->
+<!--                        <div class="sub-menu-content">-->
+<!--                            <div class="sub-menu-inner-credito ">-->
+<!--                                <div class="credito-personal">-->
+<!--                                    <p>Cr&eacute;dito Personal</p>-->
+<!--                                    <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}"-->
+<!--                                        th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}">Cr&eacute;dito-->
+<!--                                        Efectivo</a>-->
+<!--                                    <a th:href="@{/autoevaluacion}">Autoevaluaci&oacute;n</a>-->
+<!--                                    <a class="modal-efectivo-auto">Efectivo con tu auto</a>-->
+<!--                                </div>-->
+<!--                                &lt;!&ndash;<div class="credito-empresa">-->
+<!--                                    <p>Cr&eacute;dito Empresas</p>-->
+<!--                                    <a th:href="@{/empresas}">Soy Empresa</a>-->
+<!--                                    <a th:href="@{/colaboradores}">Soy Colaborador</a>-->
+<!--                                </div> &ndash;&gt;-->
+<!--                            </div>-->
+<!--                            <div class="sub-menu-inner-software">-->
+<!--                                <p>Nuestro programa</p>-->
+<!--                                <a th:href="@{/software}">Lending as a Service</a>-->
+<!--                            </div>-->
+<!--                            <div class="redes-sociales">-->
+<!--                                <a class="rds-facebook" href="https://www.facebook.com/SolvenLatam/" target="_blank">-->
+<!--                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">-->
+<!--                                        <g data-name="Capa 2">-->
+<!--                                            <g data-name="menu mobile-credito">-->
+<!--                                                <path fill="none" d="M0 0h25v25H0z" />-->
+<!--                                                <path-->
+<!--                                                    d="M17 3.47h-2.33a4.11 4.11 0 0 0-4.33 4.44V10H8a.37.37 0 0 0-.37.37v3a.37.37 0 0 0 .37.37h2.35v7.49a.37.37 0 0 0 .37.37h3.07a.36.36 0 0 0 .37-.37v-7.56h2.74a.37.37 0 0 0 .37-.37v-3a.36.36 0 0 0-.11-.26.35.35 0 0 0-.26-.04h-2.75V8.23c0-.84.2-1.26 1.29-1.26H17a.37.37 0 0 0 .37-.37V3.84a.37.37 0 0 0-.37-.37z"-->
+<!--                                                    fill="#3c485c" />-->
+<!--                                            </g>-->
+<!--                                        </g>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+<!--                                <a class="rds-istagram" href="https://www.instagram.com/SolvenLatam/" target="_blank">-->
+<!--                                    <svg viewBox="0 0 25 25">-->
+<!--                                        <defs>-->
+<!--                                            <style>-->
+<!--                                                .cls-instagram {-->
+<!--                                                    fill: #3c485c-->
+<!--                                                }-->
+<!--                                            </style>-->
+<!--                                        </defs>-->
+<!--                                        <g>-->
+<!--                                            <g id="menu_mobile-credito" data-name="menu mobile-credito">-->
+<!--                                                <path fill="none" d="M0 0h25v25H0z" />-->
+<!--                                                <path class="cls-instagram"-->
+<!--                                                    d="M22.51 12.48c0 1.48-.05 3-.11 4.44a5.94 5.94 0 0 1-.94 3.08 5.23 5.23 0 0 1-3.61 2.27 17.72 17.72 0 0 1-3 .19H9.27a10.27 10.27 0 0 1-2.59-.26 5.18 5.18 0 0 1-4-4.37A14.8 14.8 0 0 1 2.5 15V9.58A13.66 13.66 0 0 1 2.71 7a5.24 5.24 0 0 1 4.46-4.3 18.88 18.88 0 0 1 2.91-.18h5.54a10.85 10.85 0 0 1 2.67.26 5.1 5.1 0 0 1 4 4.36 20.84 20.84 0 0 1 .18 2.86v2.5zm-10.09 8.26h2.42a24.68 24.68 0 0 0 2.72-.18 3.36 3.36 0 0 0 2.92-2.72 12.44 12.44 0 0 0 .2-2.51v-4.71a19.38 19.38 0 0 0-.16-3.14 3.33 3.33 0 0 0-2.6-2.9 8.06 8.06 0 0 0-1.84-.22H9.6a11.94 11.94 0 0 0-2.38.19 3.37 3.37 0 0 0-2.61 2.22 5.15 5.15 0 0 0-.27 1.69v7.12a12 12 0 0 0 .18 2.16 3.27 3.27 0 0 0 2.19 2.61 5.9 5.9 0 0 0 1.86.31z" />-->
+<!--                                                <path class="cls-instagram"-->
+<!--                                                    d="M17.62 12.5a5.14 5.14 0 1 1-5.26-5.14 5.15 5.15 0 0 1 5.26 5.14zm-5.16 3.34a3.34 3.34 0 1 0-3.31-3.46 3.33 3.33 0 0 0 3.31 3.46zM17.8 8.36a1.2 1.2 0 1 1 1.2-1.2 1.18 1.18 0 0 1-1.2 1.2z" />-->
+<!--                                            </g>-->
+<!--                                        </g>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+<!--                                <a class="rds-twitter" href="https://twitter.com/SolvenLatam/" target="_blank">-->
+<!--                                    <svg viewBox="0 0 25 25">-->
+<!--                                        <g data-name="Capa 2">-->
+<!--                                            <g data-name="menu mobile-credito">-->
+<!--                                                <path fill="none" d="M0 0h25v25H0z" />-->
+<!--                                                <path-->
+<!--                                                    d="M4.53 10.45a4.45 4.45 0 0 1-2-3.59 4.29 4.29 0 0 1 .58-2.32 12.8 12.8 0 0 0 9.18 4.64v-.3A4.42 4.42 0 0 1 16 3.76a4.27 4.27 0 0 1 3.72 1.17.43.43 0 0 0 .44.13 9.34 9.34 0 0 0 2.34-.89l.2-.11a4.61 4.61 0 0 1-1.86 2.4 9.62 9.62 0 0 0 2.42-.59 5.61 5.61 0 0 1-.47.62c-.5.49-1 1-1.52 1.45a.39.39 0 0 0-.16.32 13 13 0 0 1-3.54 9.23 11.66 11.66 0 0 1-6.5 3.56 12.78 12.78 0 0 1-8-1 12.64 12.64 0 0 1-1.3-.72 9.13 9.13 0 0 0 6.49-1.89 4.55 4.55 0 0 1-4.17-3 5.06 5.06 0 0 0 2-.11A4.53 4.53 0 0 1 2.5 9.91a4.68 4.68 0 0 0 2.03.54z"-->
+<!--                                                    fill="#3c485c" />-->
+<!--                                            </g>-->
+<!--                                        </g>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+<!--                                <a class="rds-linkedin" href="https://www.linkedin.com/company/solven/" target="_blank">-->
+<!--                                    <svg viewBox="0 0 25 25">-->
+<!--                                        <g data-name="Capa 2">-->
+<!--                                            <g data-name="menu mobile-credito">-->
+<!--                                                <path fill="none" d="M0 0h25v25H0z" />-->
+<!--                                                <path-->
+<!--                                                    d="M21.5 14.45v6.65h-3.86v-6.21c0-1.56-.55-2.62-2-2.62a2.1 2.1 0 0 0-2 1.41 2.67 2.67 0 0 0-.13.94v6.48H9.72V9.49h3.86v1.65a3.83 3.83 0 0 1 3.48-1.92c2.54 0 4.44 1.66 4.44 5.23zM5.68 3.9a2 2 0 1 0 0 4 2 2 0 1 0 0-4zM3.73 21.1h3.86V9.49H3.73z"-->
+<!--                                                    fill="#3c485c" />-->
+<!--                                            </g>-->
+<!--                                        </g>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+        </div>
+       
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function scrollHeader() {
+            if (document.body.scrollTop > 400 || document.documentElement.scrollTop > 400) {
+               element = document.getElementsByClassName("headerLanding")[0];
+                // console.log(element)
+                element.classList.add("header-scroll-show");
+
+            } else {
+                element = document.getElementsByClassName("headerLanding")[0];
+                element.classList.remove("header-scroll-show");
+            }
+        }
+        window.onscroll = function() {scrollHeader()};
+
+        var modalEfectivoAuto = document.querySelectorAll('.modal-efectivo-auto');
+        function  modalAuto(){
+            console.log("entro papus")
+            swal({
+                title:"¡Disculpa!",
+                imageUrl:'/img/icon-user-tuerca.svg',
+                text: "Estamos trabajando para entregarte <br> un mejor producto.",
+                html:true,
+                customClass: 'swal-width',
+                showConfirmButton: false, 
+                allowOutsideClick: true,
+                timer: 3000 
+            }); 
+        }
+        for(i=0; i < modalEfectivoAuto.length;i++) { modalEfectivoAuto[i].addEventListener('click', modalAuto); }
+        var menu = document.querySelector('.hamburger');
+
+        // method
+        function toggleMenu (event) {
+            this.classList.toggle('is-active');
+            document.querySelector( ".menu-list" ).classList.toggle("is-active");
+            document.querySelector( ".solven-logo" ).classList.toggle("is-active");
+            event.preventDefault();
+        }
+
+        // event
+        menu.addEventListener('click', toggleMenu, false); 
+
+    
+        function mediaQuery(x) {
+            if (x.matches) { // If media query matches
+                var subMenu = document.querySelectorAll(".sub-menu-list");
+                function toogleSubMenu(event){
+                    var credito = document.querySelector(".menu-list-credito");
+                    var software = document.querySelector(".menu-list-software");
+                    var innerCredito = document.querySelector(".sub-menu-inner-credito");
+                    var innerPartner = document.querySelector(".sub-menu-inner-software");
+
+                    if(this.classList.contains('sub-menu-active')){
+                        event.preventDefault();
+                    }
+                    else if(!software.classList.contains('sub-menu-active')){
+                        innerCredito.style.display="none";
+                        credito.classList.remove('sub-menu-active');
+                        this.classList.add('sub-menu-active');
+                        credito.style.order="2";
+                        this.style.order="1";     
+                        innerPartner.style.display="flex";
+                    }
+                    else if((!credito.classList.contains('sub-menu-active'))){
+                        innerPartner.style.display="none";
+                        software.classList.remove('sub-menu-active');
+                        this.classList.add('sub-menu-active');
+                        software.style.order="2";
+                        this.style.order="1";
+                        innerCredito.style.display="flex";
+                       
+                    }
+
+                }
+
+                for(i=0; i < subMenu.length;i++) { subMenu[i].addEventListener('click', toogleSubMenu); }
+            } 
+            else {
+                
+
+                
+            }
+        }
+
+        var x = window.matchMedia("(max-width: 768px)")
+        mediaQuery(x) // Call listener function at run time
+        x.addListener(mediaQuery)
+        
+        /*]]>*/    
+        
+        
+        
+    </script>   
+   </header>
+
+   <header th:fragment="landingHeaderArgentina">
+        <div class="gwr">
+            <div class="menu-default"
+                th:with="
+                adelantoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).ADELANTO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())},
+                autosCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).VEHICULO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())},
+                consumoCategoryCountry=${@productService.getProductCategoryCountry(T(com.affirm.common.model.catalog.ProductCategory).CONSUMO, @countryContextService.getCountryParamsByRequest(#httpServletRequest).getId())}">
+                <a th:href="@{/}" class="menu-default-logo">
+                    <svg class="solven-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 129.35 41.95">
+                        <g id="Capa_2" data-name="Capa 2">
+                            <g id="nav">
+                                <path class="cls-1"
+                                    d="M.19 40.59v-5.41a19.52 19.52 0 0 0 7 1.41c2.53 0 3.51-.73 3.51-2 0-1.56-2.24-1.76-5.16-2.73S0 28.85 0 24.66c0-5.22 4-7.46 9.69-7.46a23.22 23.22 0 0 1 6.34.93v5.45a19.76 19.76 0 0 0-6-1C7.8 22.56 7 23.15 7 24.22c0 1.22 1 1.51 4.19 2.39 3.36 1 6.62 2.77 6.62 7.6 0 5.06-3.85 7.74-9.55 7.74a19.62 19.62 0 0 1-8.07-1.36zM19.19 29.58c0-6.43 3.9-12.38 12-12.38s11.89 5.41 11.89 12.38C43.07 36 39.17 42 31.13 42s-11.94-5.46-11.94-12.42zm16.18 0c0-4.29-1.17-6.92-4.24-6.92s-4.19 2.63-4.19 6.92 1.17 6.87 4.24 6.87 4.19-2.54 4.19-6.87zM55.71 2h7.21L48.5 42h-7.21zM58.8 17.2h8.1l3.52 13.23c.4 1.51.81 3.88.91 4.23h.1c.1-.4.55-2.82.9-4.23L75.8 17.2h7.9L75.55 42h-8.7zM82.46 29.58c0-6.63 3.9-12.38 11.64-12.38 8 0 10.63 5.41 10.63 11.35a20.6 20.6 0 0 1-.15 2.44H90.11c.1 3.36 1.36 5.46 5.65 5.46A18.17 18.17 0 0 0 103 35v5.6a21.81 21.81 0 0 1-7.78 1.4c-9.11 0-12.76-5.16-12.76-12.42zm15-2.78v-.29c0-2-1-4-3.32-4s-3.6 1.71-3.85 4.24zM107.27 17.2h7.38v2.33a10.64 10.64 0 0 1 6.68-2.33c6 0 8 3.66 8 8.57V42h-7.52V26.9c0-2.62-.9-3.81-3.37-3.81a6.34 6.34 0 0 0-3.61 1.39V42h-7.58zM52.9 37.62a4.44 4.44 0 0 1 8.87 0 4.44 4.44 0 0 1-8.87 0z" />
+                                <path fill="none" d="M0 0h129.35v41.95H0z" />
+                            </g>
+                        </g>
+                    </svg>
+                </a>
+                <div class="menu-desk">
+                    <ul class="menu-desk-list">
+                        <li class="menu-desk-software">
+                            <a class="software" th:href="@{/software}">SOFTWARE</a>
+                        </li>
+
+                        <li class="menu-desk-credito">Cr&eacute;ditos
+                            <ul class="sub-menu-desk-credito-ar"> 
+                                <li class="desk-credito-personal">
+                                    <p>Cr&eacute;dito Personal</p>
+                                    <ul class="sub-desk-credito-personal">
+                                        <li>
+                                            <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}"
+                                                th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}">Cr&eacute;dito
+                                                Efectivo</a>
+                                        </li>
+                                        <li>
+                                            <a th:href="@{/autoevaluacion}">Autoevaluaci&oacute;n</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="menu-mobil">
+                    <div class="hamburger">
+                        <div class="hamburger-layer hamburger-layer-top"></div>
+                        <div class="hamburger-layer hamburger-layer-mid"></div>
+                        <div class="hamburger-layer hamburger-layer-bottom"></div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-inner-list"> 
+                            <span class="sub-menu-list menu-list-credito sub-menu-active">Cr&eacute;ditos</span>
+                            <span class="software sub-menu-list menu-list-software software">SOFTWARE</span>
+                        </div>
+                        <div class="sub-menu-content">
+                            <div class="sub-menu-inner-credito ">
+                                <div class="credito-personal">
+                                    <p>Cr&eacute;dito Personal</p>
+                                    <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}"
+                                        th:classappend="${consumoCategoryCountry?.active ? '' : 'sooner'}">Cr&eacute;dito
+                                        Efectivo</a>
+                                    <a th:href="@{/autoevaluacion}">Autoevaluaci&oacute;n</a>
+                                </div>
+                            </div>
+                            <div class="sub-menu-inner-software">
+                                <p>Nuestro programa</p>
+                                <a th:href="@{/software}">Lending as a Service</a>
+                            </div>
+                            <div class="redes-sociales">
+                                <a class="rds-facebook" href="https://www.facebook.com/SolvenLatam/" target="_blank">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+                                        <g data-name="Capa 2">
+                                            <g data-name="menu mobile-credito">
+                                                <path fill="none" d="M0 0h25v25H0z" />
+                                                <path
+                                                    d="M17 3.47h-2.33a4.11 4.11 0 0 0-4.33 4.44V10H8a.37.37 0 0 0-.37.37v3a.37.37 0 0 0 .37.37h2.35v7.49a.37.37 0 0 0 .37.37h3.07a.36.36 0 0 0 .37-.37v-7.56h2.74a.37.37 0 0 0 .37-.37v-3a.36.36 0 0 0-.11-.26.35.35 0 0 0-.26-.04h-2.75V8.23c0-.84.2-1.26 1.29-1.26H17a.37.37 0 0 0 .37-.37V3.84a.37.37 0 0 0-.37-.37z"
+                                                    fill="#3c485c" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </a>
+                                <a class="rds-istagram" href="https://www.instagram.com/SolvenLatam/" target="_blank">
+                                    <svg viewBox="0 0 25 25">
+                                        <defs>
+                                            <style>
+                                                .cls-instagram {
+                                                    fill: #3c485c
+                                                }
+                                            </style>
+                                        </defs>
+                                        <g>
+                                            <g id="menu_mobile-credito" data-name="menu mobile-credito">
+                                                <path fill="none" d="M0 0h25v25H0z" />
+                                                <path class="cls-instagram"
+                                                    d="M22.51 12.48c0 1.48-.05 3-.11 4.44a5.94 5.94 0 0 1-.94 3.08 5.23 5.23 0 0 1-3.61 2.27 17.72 17.72 0 0 1-3 .19H9.27a10.27 10.27 0 0 1-2.59-.26 5.18 5.18 0 0 1-4-4.37A14.8 14.8 0 0 1 2.5 15V9.58A13.66 13.66 0 0 1 2.71 7a5.24 5.24 0 0 1 4.46-4.3 18.88 18.88 0 0 1 2.91-.18h5.54a10.85 10.85 0 0 1 2.67.26 5.1 5.1 0 0 1 4 4.36 20.84 20.84 0 0 1 .18 2.86v2.5zm-10.09 8.26h2.42a24.68 24.68 0 0 0 2.72-.18 3.36 3.36 0 0 0 2.92-2.72 12.44 12.44 0 0 0 .2-2.51v-4.71a19.38 19.38 0 0 0-.16-3.14 3.33 3.33 0 0 0-2.6-2.9 8.06 8.06 0 0 0-1.84-.22H9.6a11.94 11.94 0 0 0-2.38.19 3.37 3.37 0 0 0-2.61 2.22 5.15 5.15 0 0 0-.27 1.69v7.12a12 12 0 0 0 .18 2.16 3.27 3.27 0 0 0 2.19 2.61 5.9 5.9 0 0 0 1.86.31z" />
+                                                <path class="cls-instagram"
+                                                    d="M17.62 12.5a5.14 5.14 0 1 1-5.26-5.14 5.15 5.15 0 0 1 5.26 5.14zm-5.16 3.34a3.34 3.34 0 1 0-3.31-3.46 3.33 3.33 0 0 0 3.31 3.46zM17.8 8.36a1.2 1.2 0 1 1 1.2-1.2 1.18 1.18 0 0 1-1.2 1.2z" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </a>
+                                <a class="rds-twitter" href="https://twitter.com/SolvenLatam/" target="_blank">
+                                    <svg viewBox="0 0 25 25">
+                                        <g data-name="Capa 2">
+                                            <g data-name="menu mobile-credito">
+                                                <path fill="none" d="M0 0h25v25H0z" />
+                                                <path
+                                                    d="M4.53 10.45a4.45 4.45 0 0 1-2-3.59 4.29 4.29 0 0 1 .58-2.32 12.8 12.8 0 0 0 9.18 4.64v-.3A4.42 4.42 0 0 1 16 3.76a4.27 4.27 0 0 1 3.72 1.17.43.43 0 0 0 .44.13 9.34 9.34 0 0 0 2.34-.89l.2-.11a4.61 4.61 0 0 1-1.86 2.4 9.62 9.62 0 0 0 2.42-.59 5.61 5.61 0 0 1-.47.62c-.5.49-1 1-1.52 1.45a.39.39 0 0 0-.16.32 13 13 0 0 1-3.54 9.23 11.66 11.66 0 0 1-6.5 3.56 12.78 12.78 0 0 1-8-1 12.64 12.64 0 0 1-1.3-.72 9.13 9.13 0 0 0 6.49-1.89 4.55 4.55 0 0 1-4.17-3 5.06 5.06 0 0 0 2-.11A4.53 4.53 0 0 1 2.5 9.91a4.68 4.68 0 0 0 2.03.54z"
+                                                    fill="#3c485c" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </a>
+                                <a class="rds-linkedin" href="https://www.linkedin.com/company/solven/" target="_blank">
+                                    <svg viewBox="0 0 25 25">
+                                        <g data-name="Capa 2">
+                                            <g data-name="menu mobile-credito">
+                                                <path fill="none" d="M0 0h25v25H0z" />
+                                                <path
+                                                    d="M21.5 14.45v6.65h-3.86v-6.21c0-1.56-.55-2.62-2-2.62a2.1 2.1 0 0 0-2 1.41 2.67 2.67 0 0 0-.13.94v6.48H9.72V9.49h3.86v1.65a3.83 3.83 0 0 1 3.48-1.92c2.54 0 4.44 1.66 4.44 5.23zM5.68 3.9a2 2 0 1 0 0 4 2 2 0 1 0 0-4zM3.73 21.1h3.86V9.49H3.73z"
+                                                    fill="#3c485c" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+             
+            var menu = document.querySelector('.hamburger');
+
+             // method
+            function toggleMenu(event) {
+                this.classList.toggle('is-active');
+                document.querySelector(".menu-list").classList.toggle("is-active");
+                document.querySelector(".solven-logo").classList.toggle("is-active");
+                event.preventDefault();
+             
+            }
+             // event
+            menu.addEventListener('click', toggleMenu, false);
+
+
+
+            function mediaQuery(x) {
+                if (x.matches) { // If media query matches
+                    var subMenu = document.querySelectorAll(".sub-menu-list");
+
+                    function toogleSubMenu(event) {
+                        var credito = document.querySelector(".menu-list-credito");
+                        var software = document.querySelector(".menu-list-software");
+                        var innerCredito = document.querySelector(".sub-menu-inner-credito");
+                        var innerPartner = document.querySelector(".sub-menu-inner-software");
+
+                        if (this.classList.contains('sub-menu-active')) {
+                            event.preventDefault();
+                        } else if (!software.classList.contains('sub-menu-active')) {
+                            innerCredito.style.display = "none";
+                            credito.classList.remove('sub-menu-active');
+                            this.classList.add('sub-menu-active');
+                            credito.style.order = "2";
+                            this.style.order = "1";
+                            innerPartner.style.display = "flex";
+
+
+                            console.log("hola")
+                        } else if ((!credito.classList.contains('sub-menu-active'))) {
+                            innerPartner.style.display = "none";
+                            software.classList.remove('sub-menu-active');
+                            this.classList.add('sub-menu-active');
+                            software.style.order = "2";
+                            this.style.order = "1";
+                            innerCredito.style.display = "flex";
+
+                        }
+
+                    }
+
+                    for (i = 0; i < subMenu.length; i++) {
+                        subMenu[i].addEventListener('click', toogleSubMenu);
+                    }
+                } else {
+                    
+                }
+            }
+
+            var x = window.matchMedia("(max-width: 768px)")
+            mediaQuery(x) // Call listener function at run time
+            x.addListener(mediaQuery)
+
+            /*]]>*/
+         </script>
+   </header>
+
+</th:block>

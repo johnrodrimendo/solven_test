@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.tellMeAboutAdditionalIncome}"></p>
+            <div class="form-group col-md-12">
+                <select class="form-control" th:field="*{activity}">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option th:text="#{form.field.activityType.dependent}" th:value="${T(com.affirm.common.model.catalog.ActivityType).DEPENDENT}"></option>
+                    <option th:text="#{form.field.activityType.independent}" th:value="${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT}"></option>
+                    <option th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                            th:text="#{form.field.activityType.monotributista}" th:value="${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA}"></option>
+                    <option th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                            th:text="#{form.field.activityType.pensioner}" th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('select[name=activity]').on('change', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

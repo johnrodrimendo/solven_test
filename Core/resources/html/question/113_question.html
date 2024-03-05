@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:utext="#{questions.block.pepQuestion}"></p>
+            <div class="form-group col-md-12">
+                <select class="form-control" th:field="*{isPep}" >
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option value="false" >No</option>
+                    <option value="true" >Si</option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group col-md-12 pep-detail" style="display: none;">
+                <small>Nos informaste que eres una Persona Políticamente Expuesta, por favor indicanos tu cargo, función o jerarquía, o relación con la persona políticamente expuesta.</small>
+                <input th:field="*{pepDetail}" type="text" class="form-control"  maxlength="140"/>
+                <div class="errorContainer"></div>
+            </div>
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+            questionFlow.find('select[name=isPep]').on('change', function () {
+                if($(this).val() == 'true')
+                    questionFlow.find('.pep-detail').show();
+                else
+                    questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

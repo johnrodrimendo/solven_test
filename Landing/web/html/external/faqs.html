@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>Preguntas frecuentes.</title>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+</head>
+<body>
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: landingHome"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<th:block layout:fragment="content">
+    <section class="landing-wfs faqs">
+        <div class="hero-content">
+            <div class="container">
+                <div class="wrap">
+                    <div class="hero-text">
+                        <h2 class="landing-title">Centro de ayuda</h2>
+                    </div>
+                    <div class="divisor-bar"></div>
+                    <div class="hero-pharagraph">
+                        <p>¿Tienes alguna duda? Estas son las preguntas que habitualmente nos hacen.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faqs-lists">
+        <div class="container">
+            <div class="wrap-lists">
+                <div class="two-cols left-col">
+                    <ul class="tabs-lists">
+                        <li>
+                            <a href="#about" class="item-tab tab-active">Nosotros</a>
+                        </li>
+                        <li>
+                            <a href="#security" class="item-tab">Seguridad</a>
+                        </li>
+                        <li>
+                            <a href="#apply" class="item-tab">Solicitar un cr&eacute;dito</a>
+                        </li>
+                        <li>
+                            <a href="#products" class="item-tab">Nuestros productos</a>
+                        </li>
+                        <li>
+                            <a href="#evaluation" class="item-tab">El proceso de evaluaci&oacute;n</a>
+                        </li>
+                        <li>
+                            <a href="#payment" class="item-tab">Pagar mis cr&eacute;ditos</a>
+                        </li>
+                        <li>
+                            <a href="#supervising" class="item-tab">Sistema financiero peruano</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="two-cols right-col">
+                    <div class="content-tab" id="about" >
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion"  th:each="m : ${faq.meta}" th:if="${m == 'about'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="content-tab" id="security">
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'security'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="content-tab" id="apply">
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'apply'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="content-tab" id="products">
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'products'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="content-tab" id="evaluation">
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'evaluation'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="content-tab" id="payment">
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'payment'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="content-tab" id="supervising">
+                        <th:block th:each="faq : ${faqs}">
+                        <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'supervising'}">
+                            <dt><a th:text="${faq.title.rendered}"></a></dt>
+                            <dd th:utext="${faq.content.rendered}"></dd>
+                        </dl>
+                        </th:block>
+                    </div>
+
+                    <div class="text-right">
+                        <h3 class="text-normal-size text-black">¿No encontraste lo que buscabas? <span class="text-red">¡Llámanos!</span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function(){
+            $('.content-tab').first().addClass('tab-open');
+            $('.item-tab').on('click', function (e) {
+                e.preventDefault();
+                var target = $(this).attr('href');
+                $('.item-tab').removeClass('tab-active');
+                $(this).addClass('tab-active');
+                $('.content-tab').removeClass('tab-open');
+                $(target).addClass('tab-open');
+            });
+        });
+        (function($) {
+
+            var allPanels = $('.accordion > dd').hide();
+
+            $('.accordion > dt > a').click(function() {
+                allPanels.slideUp();
+                $(this).parent().next().slideDown();
+                return false;
+            });
+
+        })(jQuery);
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings(itemSelected='faqs')"></th:block>
+</th:block>
+
+</body>
+</html>

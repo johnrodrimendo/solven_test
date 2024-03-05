@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Cargar Pagos</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!--Drop Zone-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ @{/preimputator} ]]*/;
+        var urlRedirect = /*[[ @{/creditPayment/pending} ]]*/;
+        var dropzone;
+        $(document).ready(function () {
+
+            dropzone = $("#bankFile").dropzone({
+                url: url,
+                paramName: 'file',
+                maxFilesize: 10, // MB
+                maxFiles: 1,
+                dictDefaultMessage: 'Arrastra un archivo aquí para subirlo, o haz click para seleccionar uno.',
+                acceptedFiles: 'text/plain',
+                headers: addCsrfToJsonHeaders({
+                    'x-request-sender-type': 'ajax'
+                }),
+                init: function () {
+                    this.on("success", function (file, response) {
+                        debugger;
+                        uploadedSuccess = true;
+                        paintResults(response);
+                    });
+                    this.on("sending", function (file, xhr, data) {
+                        data.append("bankId", $('#bank').val());
+                    })
+                }
+            });
+
+
+            $('#bank').change(function () {
+                $('#bankFileDiv').show(300);
+            })
+
+            $('#confirmPaymentsButton').click(confirmPayments);
+        });
+
+        function paintResults(payments) {
+            $('#resultContainer').show();
+            $('#paymentsTable > tbody').empty();
+            for (i = 0; i < payments.length; i++) {
+                var row = $('<tr></tr>');
+                row.append($('<td>' + payments[i].codIdDepositante + '</td>'));
+                row.append($('<td>' + payments[i].nomDepositante + '</td>'));
+                row.append($('<td>' + payments[i].montoCupon + '</td>'));
+                row.append($('<td>' + payments[i].montoMora + '</td>'));
+                row.append($('<td>' + payments[i].montoMinimo + '</td>'));
+                row.append($('<td>' + payments[i].nroDocPago + '</td>'));
+                row.append($('<td>' + payments[i].nroDocIdentidad + '</td>'));
+                $('#paymentsTable').append(row);
+            }
+        }
+
+        function confirmPayments() {
+            defaultAjax({
+                url: /*[[@{/imputator}]]*/null,
+                type: 'POST',
+                success: function () {
+                        window.location = urlRedirect;
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Imputaciones</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Cargar Pagos</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Cargar Pagos</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="control-label" for="bank">Banco</label>
+                                            <select id="bank" class="form-control">
+                                                <option value="" hidden="hidden">Selecciona el banco</option>
+                                                <option th:each="bank : ${@catalogService.getBanks(true, true, 54)}"
+                                                        th:value="${bank.id}"
+                                                        th:text="${bank.name}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="bankFileDiv" class="col-md-4" style="display: none">
+                                        <div id="bankFile" class="dropzone"></div>
+                                    </div>
+                                    <div id="resultContainer" class="col-md-12" style="display: none">
+                                        <div class="portlet transparent">
+                                            <div class="portlet-title">
+                                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Pagos a imputar</span>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive">
+                                                    <table id="paymentsTable"
+                                                           class="table table-bordered table-striped table-hover">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Cod. depositor</th>
+                                                            <th>Nombre depositante</th>
+                                                            <th>Monto</th>
+                                                            <th>Monto mora</th>
+                                                            <th>Monto mínimo</th>
+                                                            <th>Nro. doc. pago</th>
+                                                            <th>Nro. doc. identidad</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <button id="confirmPaymentsButton" type="button" class="btn btn-default pull-right">Confirmar pagos</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END PAGE CONTENT INNER -->
+        </div>
+    </div>
+    <!-- END PAGE CONTENT BODY -->
+    <!-- END CONTENT BODY -->
+
+    <!-- BEGIN MODAL -->
+    <!-- END MODAL -->
+</th:block>
+</body>
+
+</html>

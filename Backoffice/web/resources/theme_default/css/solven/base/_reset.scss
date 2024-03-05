@@ -1,0 +1,519 @@
+/* Fonts */
+@include font-face("Milo-OT Light", "../fonts/Milo-OT/MiloOT-Light/MiloOT-Light", $file-formats: eot otf svg ttf woff);
+@include font-face("Milo-OT Medium", "../fonts/Milo-OT/MiloOT-Medi/MiloOT-Medi", $file-formats: eot otf svg ttf woff);
+@include font-face("Milo-OT Bold", "../fonts/Milo-OT/MiloOT-Bold/MiloOT-Bold", $file-formats: eot otf svg ttf woff);
+@include font-face("Milo-OT Black", "../fonts/Milo-OT/MiloOT-Black/MiloOT-Black", $file-formats: eot otf svg ttf woff);
+@include font-face("Proxima-Nova Light", "../fonts/ProximaNova-Light/ProximaNova-Light", $file-formats: eot otf svg ttf woff);
+@include font-face("Proxima-Nova", "../fonts/ProximaNova-Regular/ProximaNova-Regular", $file-formats: eot otf svg ttf woff);
+@include font-face("Proxima-Nova Semibold", "../fonts/ProximaNova-Semibold/ProximaNova-Semibold", $file-formats: eot otf svg ttf woff);
+@include font-face("Proxima-Nova Bold", "../fonts/ProximaNova-Bold/ProximaNova-Bold", $file-formats: eot otf svg ttf woff);
+@include font-face("Icons", "../fonts/Icons/Icons", $file-formats: eot svg ttf woff);
+
+a {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6, ul, li, p  {
+  margin:0;
+}
+input, select, textarea {
+  @include box-sizing(border-box);
+}
+p {
+  line-height: 1.3em;
+}
+input, select {
+  @include box-sizing(border-box);
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f9f9fb;
+  font-family: 'Proxima-Nova', sans-serif;
+  font-size: 16px;
+}
+
+/* General Classes */
+
+// Avatar with placeholder
+.avatar-placeholder {
+  figure {
+    overflow: hidden;
+    position: relative;
+    img {
+      @include transition(.3s ease);
+      width: 100%;
+    }
+    figcaption {
+      @include background-opacity($black_color_main, .5);
+      bottom:0;
+      color: white;
+      height: 0;
+      left: 0;
+      margin: auto;
+      overflow: hidden;
+      position: absolute;
+      @include transition(all .3s ease-in);
+      right: 0;
+      .info-summary  {
+        margin-top: 40%;
+        text-align: center;
+        h3 {
+          font-family: 'Proxima-Nova Bold', sans-serif;
+        }
+        span {
+          font-family: 'Proxima-Nova', sans-serif;
+        }
+      }
+    }
+  }
+  &:hover {
+    figure {
+      img {
+        @include transform(scale(1.1) rotate(0.8deg));
+      }
+      figcaption {
+        height: 100%;
+      }
+    }
+  }
+}
+.grid-item {
+  figure {
+    overflow: hidden;
+    position: relative;
+    img {
+      width: 100%;
+    }
+    figcaption {
+      @include background-opacity($black_color_main, .3);
+      bottom:0;
+      color: white;
+      height: 100%;
+      left: 0;
+      margin: auto;
+      overflow: hidden;
+      position: absolute;
+      @include transition(all .3s ease-in);
+      right: 0;
+      .info-summary  {
+        display: none; // Remove later
+        margin-top: 40%;
+        text-align: center;
+        h3 {
+          font-family: 'Proxima-Nova Bold', sans-serif;
+        }
+        span {
+          font-family: 'Proxima-Nova', sans-serif;
+        }
+      }
+    }
+  }
+  &:hover {
+    figure {
+      img {
+        @include transform(scale(1.1) rotate(0.8deg));
+      }
+      figcaption {
+        opacity: 0;
+      }
+    }
+  }
+}
+
+// General Buttons
+.button {
+  border: 0;
+  @include border-radius(5px);
+  font-family: 'Proxima-Nova Semibold', sans-serif;
+  display: table;
+  height: 45px;
+  min-width: 160px;
+  padding: 0 1em;
+  span {
+    display: table-cell;
+    vertical-align: top;
+  }
+}
+
+.black-button {
+  background: #3F3B3B;
+  color: white;
+  text-align: center;
+  span {
+    vertical-align: middle;
+  }
+}
+
+td.day {
+  color: $lightblue_color_main;
+  font-family: 'Proxima-Nova Semibold', sans-serif;
+}
+.fl {
+  text-transform: lowercase;
+}
+
+.red-button {
+  background: $red_color_main;
+  color: white;
+}
+//
+
+// Circle for steps on home
+.circle-step-home {
+  background: $lightblue_color_main;
+  @include border-radius(50%);
+  color: white;
+  height: 52px;
+  text-align: center;
+  width: 52px;
+  z-index: 9999;
+  span {
+    display: block;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: .4em;
+  }
+}
+
+// Class for all web icons
+.icon {
+  font-family: 'Icons', sans-serif;
+  font-style: normal;
+}
+
+// Center vertical section
+.info-wrap {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.input-field {
+  display: inline-block;
+  margin: 0 .5em;
+  position: relative;
+  vertical-align: top;
+  input, select {
+    height: 45px;
+    width: 100%;
+  }
+  .input-solven {
+    background: none;
+    border:0;
+    border-bottom: 1px solid #CCC;
+    color: #555;
+    padding: .5em 0;
+    &:focus {
+      outline: none;
+    }
+  }
+  .error-input {
+    border-bottom: 1px solid red;
+  }
+  input::-webkit-input-placeholder {
+    color: #AAA;
+    letter-spacing: 0;
+  }
+
+  input:focus::-webkit-input-placeholder {
+    color: $lightblue_color_main;
+  }
+  .input-solven:focus+.underline {
+    transform: scale(1);
+  }
+  .underline {
+    background-color: $lightblue_color_main;
+    bottom: 0;
+    display: inline-block;
+    height: 2px;
+    left: 0;
+    position: absolute;
+    @include transform(scale(0,1));
+    @include transition(all .3s linear);
+    width: 100%;
+  }
+}
+
+// Circle with border
+.lb-circle-border {
+  border: 2px solid $lightblue_color_main;
+  @include border-radius(50%);
+  height: 100px;
+  margin: 0 auto;
+  position: relative;
+  width: 100px;
+}
+
+.panel-body {
+  padding: 0;
+}
+
+.square-icon {
+  background: #d0d0d0;
+  @include border-radius(5px);
+  display: inline-block;
+  height: 42px;
+  vertical-align: top;
+  width: 42px;
+}
+
+.square-found {
+  background: $graysoft_color;
+  @include border-radius(5px);
+  display: table;
+  height: 65px;
+  text-align: center;
+  width: 100%;
+  h4 {
+    display: table-cell;
+    font-size: 2em;
+    vertical-align: middle;
+  }
+}
+
+.summarypanel-tittle {
+  background: $lightblue_color_main;
+  color: white;
+  padding: 1em;
+  h4 {
+    font-family: 'Proxima-Nova Semibold', sans-serif;
+  }
+}
+
+.title-home {
+  color: $black_color_main;
+  font-family: 'Proxima-Nova Bold', sans-serif;
+  font-size: 1.6em;
+  margin-bottom: 2em;
+  position: relative;
+  text-transform: uppercase;
+  &:after {
+    background: $lightblue_color_main;
+    content: '';
+    bottom: -30px;
+    height: 5px;
+    left: 0;
+    margin: 0 auto;
+    position: absolute;
+    right: 0;
+    width: 100px;
+  }
+}
+
+.t-green-background{
+  @include background-opacity($lightblue_color_main, .3);
+  color: white;
+}
+/* Inputs sizes */
+
+.normal-number{
+  font-family: 'Proxima-Nova', sans-serif;
+}
+.bold-number {
+  font-family: 'Proxima-Nova Bold', sans-serif;
+}
+
+.small-input {
+  max-width: 60px;
+  text-align: center;
+}
+.tidy-input-number {
+  max-width: 50px;
+}
+.small-input-number {
+  max-width: 90px;
+}
+.input-name {
+  max-width: 200px;
+}
+.input-email {
+  width: 250px;
+}
+.input-lastnames {
+  max-width: 150px;
+}
+.input-cities {
+  min-width: 200px;
+  max-width: 250px;
+}
+.medium-number-input {
+  max-width: 120px;
+  input {
+    font-family: 'Proxima-Nova', sans-serif;
+    text-align: center;
+  }
+}
+.bubble-info {
+  display: none;
+}
+
+/* Questions incomes */
+#second-state {
+  display: none;
+}
+
+.answers-incomes {
+  display: none;
+  padding: 2em;
+  .questions {
+    #first-state,
+    #second-state {
+      p {
+        display: inline-block;
+        vertical-align: top;
+      }
+      .anwsers-buttons {
+        display: inline-block;
+        margin: -.75em 0 0 1em;
+        vertical-align: top;
+        button {
+          background: white;
+          border: 1px solid $lightblue_color_main;
+          @include border-radius(3px);
+          padding: .5em 1em;
+        }
+        .focus {
+          background: $lightblue_color_main;
+          color: white;
+        }
+      }
+    }
+    #second-state {
+      margin-top: 2em;
+    }
+  }
+}
+/* inputs Forms */
+#dependentPhoneDiv {
+  margin: 1em auto;
+  padding: 1em 2em;
+}
+.inputs-wrapper {
+  .cl {
+    display: inline-block;
+    margin: 1em 1em 0 1em;
+    vertical-align: top;
+    .divdocType,
+    .names,
+    .firstSurname,
+    .lastSurname,
+    .birthdate,
+    .gender,
+    .nationality,
+    .pe,
+    .maritalStatus,
+    .cellphone,
+    .cityCode,
+    .phone,
+    .streetType,
+    .streetName,
+    .streetNumber,
+    .interior,
+    .details,
+    .location {
+      .control-label {
+        display: block;
+        font-size: .85em;
+        margin: 0;
+      }
+      .form-group {
+        display: inline-block;
+        margin: 0;
+        vertical-align: top;
+        width: auto;
+        select {
+          width: 100%;
+        }
+      }
+    }
+    .cellphone {
+      .input-group-addon {
+        background: none;
+        border: 0;
+        display: inline-block;
+        height: 38px;
+        padding-top: .75em;
+        vertical-align: top;
+        width: 42px;
+      }
+    }
+    .divdocType {
+      .form-group {
+        .form-control {
+          height: 35px;
+        }
+      }
+    }
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  .wp {
+    .divdocType {
+      .form-group {
+        .form-control {
+          height: 38px;
+        }
+      }
+    }
+    &:first-child {
+      margin: 1em 1em 0 0;
+    }
+  }
+}
+.mini-header {
+  @include box-shadow(0, 1px, 4px, rgba(0,0,0,.3));
+  background: white;
+  .panel-heading {
+    background: $lightblue_color_main;
+    @include border-radius(5px);
+    color: white;
+    padding: 1em;
+    .panel-title {
+      font-family: 'Proxima-Nova Semibold', sans-serif;
+    }
+  }
+  .mini-body {
+    padding: 1em 2em;
+    .form-group {
+      input {
+        margin: 0 auto;
+      }
+    }
+  }
+}
+
+#firstDueDateDiv {
+  margin: 1em auto;
+  width: 300px;
+}
+#frmDocumentsContainer {
+  .well {
+    width: 100%;
+  }
+}
+
+#runningDiv {
+  .message-container {
+    .pager {
+      .previous {
+        a {
+          float: none;
+        }
+      }
+    }
+  }
+}
+.meses {
+  position: relative;
+  &:after {
+    content: 'meses';
+    position: absolute;
+    font-size: .85em;
+  }
+}

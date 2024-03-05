@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Pagos de Adelanto</title>
+
+    <!--X-Editable-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css'}"
+          rel="stylesheet"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            $('.payment-amount').blur(function () {
+                if($(this).val() == ""){
+                    $(this).val("0");
+                }
+                updateRow($(this).closest('tr'));
+                updateTotals($(this).closest('.employer-imputator-table'));
+            });
+            $('.payment-amount').each(function () {
+                $(this).forceDoubleOnly(true, 0, parseFloat($(this).closest('tr').data('total-pending-amount')));
+            });
+
+            $('.employer-payment-button').click(function () {
+                registerPayments($(this).closest('.panel').find('.employer-imputator-table'));
+            });
+
+            initialize();
+
+        });
+
+        function updateRow(rowElement) {
+            // update the row data
+            var totalAmount = parseFloat(rowElement.data('total-pending-amount'));
+            var paymentAmount = parseFloat(rowElement.find('.payment-amount').val().replace(",", "."));
+            rowElement.find('.amount-subtraction').html("S/ " + (totalAmount - paymentAmount).toFixed(2).replace(".", ","));
+            rowElement.find('.amount-subtraction').data("value", totalAmount - paymentAmount);
+            rowElement.find('.amount-subtraction').removeClass('font-red font-green-jungle');
+            rowElement.find('.amount-subtraction').addClass(totalAmount - paymentAmount > 0 ? 'font-red' : 'font-green-jungle');
+        }
+
+        function updateTotals(tableElement) {
+            var totalAmountSubtraction = 0.0;
+            tableElement.find('.amount-subtraction').each(function (index) {
+                totalAmountSubtraction = totalAmountSubtraction + $(this).data("value");
+            });
+            $('.total-amount-subtraction').html("S/ " + totalAmountSubtraction.toFixed(2).replace(".", ","))
+
+            var totalPaymentAmount = 0.0;
+            tableElement.find('.payment-amount').each(function (index) {
+                totalPaymentAmount = totalPaymentAmount + parseFloat($(this).val().replace(",", "."));
+            });
+            $('.total-payment-amount').html("S/ " + totalPaymentAmount.toFixed(2).replace(".", ","))
+        }
+
+        function initialize() {
+            // Se the value of the rows
+            $('.employer-imputator-table').each(function () {
+                $(this).find('.employer-imputator-table-row').each(function () {
+                    updateRow($(this));
+                });
+                updateTotals($(this));
+            });
+        }
+
+        function registerPayments(tableElement) {
+            var employerId = tableElement.data("employer-id");
+            var jsonPost = [];
+            tableElement.find('.employer-imputator-table-row').each(function () {
+                jsonPost[jsonPost.length] = {
+                    creditId: $(this).data("credit-id"),
+                    paymentAmount: parseFloat($(this).find('.payment-amount').val().replace(",", "."))
+                }
+            });
+
+            var totalAmountToPay = 0;
+            for(i=0; i<jsonPost.length;i++){
+                totalAmountToPay+=jsonPost[i].paymentAmount;
+            }
+            if(totalAmountToPay > tableElement.data("total-pending-amount")){
+                showErrorModal("El monto a pagar es mayor que la deuda total");
+                return;
+            }
+
+            defaultAjax({
+                url: /*[[@{/creditPayment/multipayment}]]*/,
+                type: 'POST',
+                data: {
+                    employerId: employerId,
+                    multiPaymentJson: JSON.stringify(jsonPost)
+                },
+                success: function (data) {
+                    location.reload();
+                }
+            })
+        }
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Imputaciones</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Pagos de Adelanto</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletPendingCreditPayment"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Pagos de Adelanto</span>
+                                </div>
+                                <div class="actions">
+                                    <a id="registerSelectedPaymentsConfirmationButton" href="javascript:;"
+                                       style="display: none"
+                                       th:class="${@frontEndService.getDefaultActionButtonClass()}"
+                                       th:onclick="'registerCreditPaymentConfirmation()'">Confirmar
+                                        Selec.</a>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+
+                                <!--  Accordion -->
+                                <div class="panel-group accordion" id="accordion3"
+                                     th:if="${salaryAdvancePayments != null}">
+                                    <div class="panel panel-default" th:each="payment : ${salaryAdvancePayments}">
+                                        <div class="panel-heading bg-green bg-font-green">
+                                            <h4 class="panel-title">
+                                                <a class="accordion-toggle accordion-toggle-styled"
+                                                   data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_1"
+                                                   style="color: white;"
+                                                   th:text="${payment.employer.name}"></a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapse_3_1" class="panel-collapse in">
+                                            <div class="panel-body">
+
+                                                <dl class="dl-horizontal dl-multipayment-amounts">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <dt>Monto deuda actual</dt>
+                                                            <dd th:text="${@utilService.doubleMoneyFormat(payment.stats.currentMonthAmount)}"></dd>
+                                                            <dt>Monto mora pasada</dt>
+                                                            <dd th:text="${@utilService.doubleMoneyFormat(payment.stats.getTotalArrearsAmount())}"></dd>
+                                                            <dt>Deuda total</dt>
+                                                            <dd th:text="${@utilService.doubleMoneyFormat(payment.stats.totalPendinAmount)}"></dd>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <dt>Monto depositado</dt>
+                                                            <dd th:text="${@utilService.doubleMoneyFormat(payment.getTotalPaymentAmount())}"></dd>
+                                                            <dt>Monto pagos restantes</dt>
+                                                            <dd th:text="${@utilService.doubleMoneyFormat(payment.getTotalSurplusAmount())}"></dd>
+                                                            <dt>Monto total</dt>
+                                                            <dd th:text="${@utilService.doubleMoneyFormat(payment.getTotalSurplusAmount()+payment.getTotalPaymentAmount())}"></dd>
+                                                        </div>
+                                                    </div>
+
+                                                </dl>
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-hover employer-imputator-table"
+                                                           th:attr="data-employer-id=${payment.employer.id},data-total-pending-amount=${payment.stats.totalPendinAmount}">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Cr&eacute;dito</th>
+                                                            <th>Tipo doc.</th>
+                                                            <th>N&uacute;mero doc.</th>
+                                                            <th>Persona</th>
+                                                            <th>Monto</th>
+                                                            <th>Pendiente pago</th>
+                                                            <th>Monto a pagar</th>
+                                                            <th>Resta</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr class="employer-imputator-table-row"
+                                                            th:each="credit, iterCreditMPayment : ${payment.credits}"
+                                                            th:attr="data-total-pending-amount=${credit.pendingInstallmentAmount},data-credit-id=${credit.id}">
+                                                            <td th:text="${iterCreditMPayment.count}"></td>
+                                                            <td>
+                                                                <a th:href="@{/person(personId=${credit?.personId}, tab='credits')}"
+                                                                   th:text="${credit?.code}"/></td>
+                                                            <td th:text="${credit.personDocumentType.name}"></td>
+                                                            <td th:text="${credit.personDocumentNumber}"></td>
+                                                            <td th:text="${credit.getFullName()}"></td>
+                                                            <td class="numeric"
+                                                                th:text="${@utilService.doubleMoneyFormat(credit.amount)}"></td>
+                                                            <td class="numeric pending-amount"
+                                                                th:text="${@utilService.doubleMoneyFormat(credit.pendingInstallmentAmount)}"></td>
+                                                            <td class="numeric">
+                                                                <div id="form">
+                                                                    <div class="form-group"
+                                                                         style="margin:0 auto;width: 120px;">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon"
+                                                                                  id="sizing-addon1">S/</span>
+                                                                            <input type="text"
+                                                                                   class="form-control payment-amount"
+                                                                                   aria-describedby="sizing-addon1"
+                                                                                   th:value="${@utilService.doubleFormat(credit.amountToPay)}"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="numeric amount-subtraction"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="4"></td>
+                                                            <td><b>Totales</b></td>
+                                                            <td class="numeric total-pending-amount"
+                                                                th:text="${@utilService.doubleMoneyFormat(payment.stats.totalPendinAmount)}"></td>
+                                                            <td class="numeric total-payment-amount"></td>
+                                                            <td class="numeric total-amount-subtraction"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div>
+                                                    <button type="button"
+                                                            class="btn btn-info employer-payment-button pull-right">
+                                                        Guardar
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Accordion -->
+
+
+                            </div>
+                        </div>
+                        <!-- END SAMPLE TABLE PORTLET-->
+                    </div>
+                </div>
+            </div>
+            <!-- END PAGE CONTENT INNER -->
+        </div>
+    </div>
+    <!-- END PAGE CONTENT BODY -->
+    <!-- END CONTENT BODY -->
+</th:block>
+</body>
+
+</html>

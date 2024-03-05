@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:if="${isSelfEvaluation}" th:utext="#{questions.block.greeting.selfEvaluation(${agent.name})}"></p>
+            <p th:if="${isEvaluation}" th:text="'¿Cuál es tu email y tu número de documento?'"></p>
+
+            <div class="form-group col-md-12">
+                <small>Correo electr&oacute;nico</small>
+                <input th:field="*{email}" class="form-control"/>
+                <div class="errorContainer"></div>
+            </div>
+
+            <th:block th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                <div class="form-group col-md-6">
+                    <small>Nombre</small>
+                    <input th:field="*{name}" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="form-group col-md-6">
+                    <small>Apellido</small>
+                    <input th:field="*{surName}" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+            </th:block>
+
+            <div class="form-group col-md-4 nopadding">
+                <select th:field="*{docType}" class="form-control">
+                    <option value="" hidden="hidden"></option>
+                    <option th:each="type : ${identityDocumentTypes}" th:value="${type.id}" th:text="${type.name}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+
+            <div class="form-group col-md-8 nopadding">
+                <input th:field="*{docNumber}" class="form-control"/>
+                <div class="errorContainer"></div>
+            </div>
+
+            <div class="form-group" th:if="${isEvaluation and showPep}">
+                <div class="mt-checkbox-list">
+                    <label class="mt-checkbox mt-checkbox-outline">
+                        <input type="checkbox" name="pep"/>
+                        <small>Declaro que soy una persona expuesta pol&iacute;ticamente</small>
+                        <span></span>
+                    </label>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

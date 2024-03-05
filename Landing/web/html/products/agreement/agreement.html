@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+
+    <title>Cr&eacute;dito por convenio</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!-- / Bootstrap DatePicker -->
+
+    <!-- Bootstrap selectpicker -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js"></script>
+    <!-- / Bootstrap selectpicker -->
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.js'}"></script>
+    <!-- / Owl. Carousel -->
+
+    <!-- Burger Menu -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/hamburger/hamburgers.min.css'}"/>
+    <!-- / Burger Menu -->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var loanApplicationToken;
+
+
+        function letMeKnow() {
+            var baseUrl = /*[[@{/early/3/}]]*/;
+            if (!isEmail($('#earlyEmail').val())) {
+                $('#response-block').html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+            } else {
+                $('#response-block').html('');
+                $('#landingSubmit').loading();
+                defaultAjax({
+                    url: baseUrl,
+                    type: 'POST',
+                    data: $('#frmEarlyAccess').serializeObject(),
+                    success: function (data) {
+                        $('#landingSubmit').unloading();
+                        $('.hideAjax').css({'display': 'none'});
+                        $('#response-block').html(successAjaxMessage('Te avisaremos apenas estemos listos.'));
+                    },
+                    error: function () {
+                        $('#landingSubmit').unloading();
+                    }
+                });
+            }
+        }
+
+        $(document).on('ready', function () {
+
+            var validator = /*[[${advanceContactForm.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                $('#frmContactAdvance').validateForm(createFormValidationJson(jsonValidator, $('#frmContactAdvance')));
+            }
+
+            <!-- Cookies Notification -->
+            /*if (getCookie('acceptCookies') != 'true') {
+             $('.cookiesBar').fadeIn();
+             $('#acceptCookies').on('click', function (event) {
+             event.preventDefault();
+             $('.cookiesBar').fadeOut();
+             createCookie('acceptCookies', 'true', 360);
+             });
+             }*/
+            <!-- / Cookies Notification -->
+
+            <!-- BirthDate -->
+            $('#birthDate').datepicker({
+                endDate: "-18y",
+                autoclose: true,
+                startView: 2,
+                format: "dd/mm/yyyy",
+                focusOnShow: true
+            });
+            <!-- / BirthDate -->
+
+            <!-- Contact anchor -->
+            $('#contactAdelanto').on('click', function (event) {
+                event.preventDefault();
+                var href = $(this).attr('href');
+                $('html, body').stop().animate({
+                    scrollTop: $(href).offset().top
+                }, 300);
+            });
+            <!-- / Contact anchor -->
+
+            <!-- Swip document -->
+            $('#docNumber').forceLettersOnly("^[0-9 ()]+$", true, 8, 8);
+            $('#cellphone').forceLettersOnly("^[0-9 ()]+$", true, 9, 9);
+            $('#authToken').forceLettersOnly("^[0-9 ()]+$", true, 4, 4);
+            $('#docType').on('change', function () {
+                $('#response-block').html('');
+                if ($(this).val() == 1) {
+                    $('#docNumber').val('');
+                    $('#ceSection').css({'display': 'none'});
+                    $('#docNumber').forceLettersOnly("^[0-9 ()]+$", true, 8, 8);
+                } else {
+                    $('#docNumber').val('');
+                    $('#ceSection').css({'display': 'inline-block'});
+                    $('#docNumber').forceLettersOnly("^[0-9 ()]+$", true, 9, 9);
+                }
+
+            });
+            <!-- / Swip document -->
+
+            $('.jsDropAction').click(function (event) {
+                event.preventDefault();
+                $(this).find('.dropHeader__btn').toggleClass('upArrow');
+                $(this).next('.dropBody').toggleClass('js-open');
+            });
+
+            $('.itemSelect').click(function () {
+                $('.itemSelect').removeClass('selected');
+                $('.itemSelect').removeClass('js-open');
+                //$('.itemSelect input').attr('checked', false);
+                $(this).addClass('selected');
+                $(this).addClass('js-open').siblings().removeClass('js-open');
+                //$(this).children('input').attr('checked', true);
+                $('.dropBody').removeClass('js-open');
+                $('.dropHeader__btn').removeClass('upArrow');
+                $('.jsValue').text($(this).text());
+            });
+
+
+            var resendButtonToken = $('#resendToken');
+            resendButtonToken.on('click', function (event) {
+                event.preventDefault();
+                var url = /*[[@{/loanapplication}]]*/;
+                defaultAjax({
+                    url: url + "/"+loanApplicationToken+"/resendSmsToken",
+                    type: 'POST',
+                    success: function (data) {
+                        resendButtonToken.fadeOut();
+//                        $('.responseResend').html('Te hemos reenviado el PIN');
+                        setTimeout(function () {
+                            resendButtonToken.fadeIn();
+//                            $('.responseResend').html('');
+                        }, 30000);
+                        console.log(data);
+                    }
+                });
+            });
+
+            <!-- Show Sections and Submit -->
+
+            $('#frmAdelanto').find('input').on('keyup', function(e){
+                if(e.keyCode == 13)
+                {
+                    $(this).closest('.block-e').find('.toTarget:enabled').click();
+                }
+            });
+
+            $('.displayTarget').on('click', function (event) {
+                event.preventDefault();
+                switch ($(this).data('target')) {
+                    case 'agreementDniAdelanto':
+                        $('#response-block').html('');
+                        $('.emailAdelanto').css({'display': 'none'});
+                        $('#docNumber').val('');
+                        $('.' + $(this).data('target')).fadeIn();
+                        break;
+                    case 'emailAdelanto':
+                        $('#response-block').html('');
+                        $('.agreementDniAdelanto').css({'display': 'none'});
+                        $('#email').val('');
+                        $('.' + $(this).data('target')).fadeIn();
+                        break;
+                }
+            });
+
+            $('.toTarget').on('click', function (event) {
+                event.preventDefault();
+
+                var cell;
+
+                switch ($(this).data('target')) {
+                    case 'showDni':
+                        if ($('label.selected input').val()) {
+                            $('#response-block').html('');
+                            $('.home-select').hide();
+                            $('.agreementDniAdelanto').fadeIn();
+                        } else {
+                            if ($('#no-modal-select').find('.jsValue').text() == 'Selecciona el destino') {
+                                $('.jsDropAction').trigger('click');
+                                return false;
+                            }
+                        }
+                        break;
+                    case 'submitEmailAdelanto':
+                        if (!isEmail($('#email').val())) {
+                            $('#response-block').html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+                        } else {
+                            $('#response-block').html('');
+                            $('[data-target=submitEmailAdelanto]').loading();
+                            defaultAjax({
+                                url: /*[[@{/agreementloanapplication}]]*/null,
+                                type: 'POST',
+                                form: $('#frmAdelanto'),
+                                data: {
+                                    loanReasonId: $('label.selected input').val(),
+                                    email: $('#email').val()
+                                },
+                                success: function (data) {
+                                    $('[data-target=submitEmailAdelanto]').unloading();
+                                    $('.hideAjax').css({'display': 'none'});
+                                    $('#response-block').html(successAjaxMessage('Te enviamos un email con el link para acceder a tu crédito. Puede tardar unos segundos.'));
+                                },
+                                error: function () {
+                                    $('[data-target=submitEmailAdelanto]').unloading();
+                                }
+                            });
+                        }
+                        break;
+                    case 'submitDniAdelanto':
+
+                        var v = false,
+                                msgError = 'N&uacute;mero de documento inv&aacute;lido.';
+                        if ($('#docNumber').val().length == 8 && $('#docType').val() == 1) {
+                            v = true;
+                        }
+
+                        if ($('#docNumber').val().length == 9 && $('#docType').val() == 2){
+                            v = true;
+                            if ($('#birthDate').val().length > 0 && $('#birthDate').val() != '' && $('#birthDate').val().length == 10){
+                                v = true;
+                            } else {
+                                v = false;
+                                msgError = 'Fecha de nacimiento inv&aacute;lido.';
+                            }
+                        }
+
+                        if (v) {
+                            $('#response-block').html('');
+                            $('[data-target=submitDniAdelanto]').loading();
+
+                            defaultAjax({
+                                url: /*[[@{/user/validateDocument/__${T(com.affirm.common.model.catalog.Product).AGREEMENT}__}]]*/null,
+                                type: 'POST',
+                                data: {
+                                    docType: $('#docType').val(),
+                                    docNumber: $('#docNumber').val(),
+                                    birthDate: $('#birthDate').val()
+                                },
+                                success: function (data) {
+                                    if (isJsonString(data)) {
+                                        showMessageModal(JSON.parse(data).message);
+                                    }
+
+                                    if(data == "waitCE"){
+                                        setTimeout(function () {
+                                            defaultAjax({
+                                                url: /*[[@{/user/validCE/}]]*/null,
+                                                type: 'POST',
+                                                success: function (data) {
+                                                    docValidationOk();
+                                                },
+                                                error: function () {
+                                                    $('#cellphone-button').unloading();
+                                                }
+                                            });
+                                        }, 30000);
+                                        return;
+                                    }
+
+                                    defaultAjax({
+                                        url: /*[[@{/agreementloanapplication}]]*/null,
+                                        type: 'POST',
+                                        form: $('#frmAdelanto'),
+                                        data: {
+                                            loanReasonId: $('label.selected input').val(),
+                                            docType: $('#docType').val(),
+                                            docNumber: $('#docNumber').val(),
+                                            birthDate: $('#birthDate').val()
+                                        },
+                                        success: function (data) {
+                                            $('[data-target=submitDniAdelanto]').unloading();
+
+                                            var json = JSON.parse(data);
+                                            loanApplicationToken = json.loanApplicationToken;
+                                            $('.agreementDniAdelanto').css({'display': 'none'});
+                                            $('.cellAdelanto').fadeIn();
+                                        },
+                                        error: function (xhr, data) {
+                                            $('[data-target=submitDniAdelanto]').unloading();
+                                        }
+                                    });
+                                },
+                                error: function () {
+                                    $('[data-target=submitDniAdelanto]').unloading();
+                                }
+                            });
+                        } else {
+                            $('#response-block').html(errorAjaxMessage(msgError));
+                        }
+
+                        break;
+                    case 'submitCellAdelanto':
+
+                        cell = isValidCellphone($('#cellphone').val());
+
+                        if ($('#cellphone').val().length == 9 && cell) {
+                            $('#response-block').html('');
+                            $('[data-target=submitCellAdelanto]').loading();
+                            defaultAjax({
+                                url: /*[[@{/credito-por-convenio/cellphone}]]*/null,
+                                type: 'POST',
+                                form: $('#frmAdelanto'),
+                                data: {
+                                    loanApplicationToken: loanApplicationToken,
+                                    cellphone: $('#cellphone').val()
+                                },
+                                success: function (data) {
+                                    $('[data-target=submitCellAdelanto]').unloading();
+
+                                    $('.cellAdelanto').css({'display': 'none'});
+                                    $('.pinAdelanto').fadeIn();
+                                },
+                                error: function () {
+                                    $('[data-target=submitCellAdelanto]').unloading();
+                                }
+                            });
+                        } else {
+                            $('#response-block').html(errorAjaxMessage('Ingresa un n&uacute;mero v&aacute;lido.'));
+                        }
+
+                        break;
+                    case 'submitPinAdelanto':
+                        if ($('#authToken').val().length == 4) {
+                            $('#response-block').html('');
+                            $('[data-target=submitPinAdelanto]').loading();
+                            defaultAjax({
+                                url: /*[[@{/credito-por-convenio/cellphone/validate}]]*/null,
+                                type: 'POST',
+                                form: $('#frmAdelanto'),
+                                data: {
+                                    loanApplicationToken: loanApplicationToken,
+                                    authToken: $('#authToken').val()
+                                },
+                                success: function (data) {
+                                    $('[data-target=submitPinAdelanto]').unloading();
+
+                                    $('.cellAdelanto').css({'display': 'none'});
+                                    $('.pinAdelanto').fadeIn();
+                                },
+                                error: function () {
+                                    $('[data-target=submitPinAdelanto]').unloading();
+                                }
+                            });
+                        } else {
+                            $('#response-block').html(errorAjaxMessage('El PIN no es v&aacute;lido.'));
+                        }
+
+                        break;
+                    case 'contactAdvance':
+                        if ($('#frmContactAdvance').valid()) {
+                            $('[data-target=contactAdvance]').hide();
+                            $('#advanceReCaptcha').fadeIn();
+                            grecaptcha.render('advanceReCaptcha', {
+                                'sitekey': /*[[${@configuration.hiddencaptchaPublicKey()}]]*/null,
+                                'callback': function() {
+                                    $('[data-target=contactAdvance]').loading();
+                                    defaultAjax({
+                                        url: /*[[@{/advanceContact/convenio}]]*/null,
+                                        type: 'POST',
+                                        form: $('#frmContactAdvance'),
+                                        data: $('#frmContactAdvance').serializeObject(),
+                                        success: function (data) {
+                                            if (window.grecaptcha) {
+                                                grecaptcha.reset();
+                                            }
+                                            $('#advanceReCaptcha').hide();
+                                            $('#frmContactAdvance')[0].reset();
+                                            $('#salarySubmit').fadeIn();
+                                            $('[data-target=contactAdvance]').unloading();
+                                            $('#msgResponseContact').html(successAjaxMessage('Te contactaremos a la brevedad.'));
+                                        },
+                                        error: function () {
+                                            $('.msgResponseContact').hide();
+                                            $('[data-target=contactAdvance]').unloading();
+                                        }
+                                    });
+                                }
+
+                            });
+                        }
+                }
+            });
+            <!-- / Focus input -->
+
+            <!-- Selectpicker -->
+            $('.selectpicker').selectpicker({
+                style: 'btn-info',
+                size: 4
+            });
+            <!-- / Selectpicker -->
+
+            <!-- Focus input -->
+            $('.field .field-wrap input').on('focus', function () {
+
+                currentFocus($(this));
+
+                $(this).keyup(function () {
+                    currentFocus($(this));
+                });
+
+                $(this).focusout(function () {
+                    $('.field .field-wrap input').removeClass('is-empty');
+                });
+
+            });
+            <!-- / Focus input -->
+
+            <!-- Brand Carousel -->
+            $("#company-list").owlCarousel({
+                center: true,
+                items: 1, // remove later
+                //itemsDesktop: [1000, 5],
+                //itemsDesktopSmall: [900, 3],
+                //itemsTablet: [600, 2],
+                //itemsMobile: [480, 1],
+                loop: false, // remove later
+                navigation: true,
+                navigationText: ['<i class="icon control-prev-icon"></i>', '<i class="icon control-next-icon"></i>'],
+                pagination: false,
+                paginationNumbers: false
+            });
+            <!-- / Brand Carousel-->
+
+        });
+
+        <!-- Cookies Bar -->
+        /*$(window).on('resize', function () {
+         if ($(window).width() > 480) {
+         $('.cookiesBar').removeClass('slideInDown');
+         $('.cookiesBar').removeClass('slideInUp');
+         $('.cookiesBar').css({'bottom': '70px'}).addClass('slideInDown');
+         } else {
+         $('.cookiesBar').removeClass('slideInDown');
+         $('.cookiesBar').removeClass('slideInUp');
+         $('.cookiesBar').css({'bottom': 0}).addClass('slideInUp');
+         }
+         });*/
+        <!-- / Cookies Bar -->
+
+        <!-- Header Sticky -->
+        $(window).on('scroll', function () {
+            var scrollTop = $(window).scrollTop(),
+                    header = $('.home-header');
+
+            if (scrollTop > 1) {
+
+                /*if ($(window).width() > 480) {
+                 $('.cookiesBar').removeClass('slideInDown');
+                 $('.cookiesBar').removeClass('slideInUp');
+                 $('.cookiesBar').css({'bottom': 0}).addClass('slideInDown');
+                 }*/
+
+                sticky(header);
+            } else {
+
+                /*if ($(window).width() > 480) {
+                 $('.cookiesBar').removeClass('slideInDown');
+                 $('.cookiesBar').removeClass('slideInUp');
+                 $('.cookiesBar').css({'bottom': '70px'}).addClass('slideInUp');
+                 }*/
+
+                unSticky(header);
+            }
+
+        });
+        <!-- / Header Sticky -->
+
+        <!-- Input is focused -->
+        function currentFocus(element) {
+            if (element.val() != '') {
+                $('.field .field-wrap input').removeClass('is-empty');
+            } else {
+                $('.field .field-wrap input').removeClass('is-empty');
+                element.addClass('is-empty');
+            }
+        }
+        <!-- / Header Sticky -->
+
+        /*]]>*/
+    </script>
+
+    <!--TOKY-->
+    <script th:if="${@configuration.TOKY_ACTIVE()}">
+
+        (function(v,p){
+            var s=document.createElement('script');
+            s.src='https://app.toky.co/resources/widgets/toky-widget.js?v='+v;
+            s.onload=function(){Toky.load(p);};
+            document.head.appendChild(s);
+        })('6800f1c', {"$username":"Solven","$bubble":false,"$color": "#00aabb,#f7323f,#ffffff"});
+
+    </script>
+
+</head>
+<body>
+
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: headerLanding(landingType='salaryAdvance')"></th:block>
+</th:block>
+<!-- /Header -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+    <!-- Cookies -->
+    <!--<div class="cookiesBar animated">
+        <div class="container">
+            <p>Las cookies nos ayudan a mejorar tu experiencia en Solven. Se utilizan tambi&eacute;n en estad&iacute;sticas,
+                redes sociales, controles de calidad y junto con nuestros aliados, en marketing. Al continuar navegando
+                en nuestro sitio web, aceptas el uso. <a href="#" id="acceptCookies">Ocultar</a>.</p>
+        </div>
+    </div>-->
+    <!-- / -->
+
+    <!-- Landing -->
+    <div class="landing agreement-bg">
+        <div class="overlay"></div>
+        <div class="hero-title landings">
+
+            <div class="top">
+                <h2 class="red-text">Pr&eacute;stamos especiales para <br/>colaboradores de empresas.</h2>
+                <p>Obt&eacute;n el cr&eacute;dito que mereces, con descuento autom&aacute;tico de tu planilla. <br/>No podr&iacute;a ser m&aacute;s simple y conveniente.</p>
+            </div>
+
+            <div class="middle">
+
+                <div class="form-unlocked" th:if="${product?.active == true and session.countryUnlocked}">
+
+                    <div class="frm" id="frmAdelanto">
+
+                        <div class="form-block home-select">
+                            <span class="i-will-like">Me gustar&iacute;a</span>
+                            <div class="field inline" id="no-modal-select">
+                                <div class="customDrop" id="drp">
+                                    <div class="dropHeader fl t-green-background jsDropAction">
+                                        <div class="dropHeader__title jsValue">Selecciona el destino</div>
+                                        <div class="dropHeader__btn"><i class="icon bullet-down-icon"></i></div>
+                                    </div>
+                                    <div class="dropBody">
+                                        <div th:each="reason : ${@catalogService.getLoanApplicationReasonsVisibles(#locale)}">
+                                            <label class="itemSelect">
+                                                <span th:text="${reason.reason}"></span>
+                                                <input type="radio" name="loanApplicationReasonDropdown" id="choose-deal-home"
+                                                       class="checkYourRate"
+                                                       th:value="${reason.id}"/>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field inline">
+                                <button class="button red-button toTarget" data-target="showDni">
+                                    <span>Solic&iacute;talo aqu&iacute;</span></button>
+                            </div>
+                        </div>
+
+                        <div class="form-block block-e emailAdelanto hideAjax">
+
+                            <div class="field inline input-email-big">
+                                <input type="text" class="input-landing" name="email" id="email"
+                                       placeholder="Correo corporativo" autocomplete="false"/>
+                            </div>
+
+                            <div class="field inline">
+                                <button class="button red-button toTarget" data-target="submitEmailAdelanto">
+                                    Solicitar
+                                </button>
+                            </div>
+
+                            <div class="small-text d-block">
+                                &iquest;No tienes correo corporativo? Ingresa con tu documento
+                                <a href="#" class="displayTarget" data-target="agreementDniAdelanto">aqu&iacute;</a>.
+                            </div>
+
+                        </div>
+
+                        <div class="form-block block-e agreementDniAdelanto">
+
+                            <div class="field inline">
+                                <select class="selectpicker" name="docType" id="docType">
+                                    <option th:value="${T(com.affirm.common.model.catalog.IdentityDocumentType).DNI}">DNI
+                                    </option>
+                                    <option th:value="${T(com.affirm.common.model.catalog.IdentityDocumentType).CE}">CE
+                                    </option>
+                                </select>
+                                <input type="text" class="input-landing align-center input-document-big" name="docNumber" id="docNumber"
+                                       placeholder="Documento" autocomplete="off" pattern="[0-9]*"/>
+                            </div>
+
+                            <div class="field inline" id="ceSection">
+                                <input type="text" class="input-landing input-lastnames align-center" id="birthDate"
+                                       placeholder="dd/mm/yyy"/>
+                                <div class="small-text d-block">Fecha de nacimiento.</div>
+                            </div>
+
+                            <div class="field inline">
+                                <button class="button red-button toTarget" data-target="submitDniAdelanto">
+                                    Solicitar
+                                </button>
+                            </div>
+
+                            <div class="small-text d-block">Si prefieres ingresar con tu correo corporativo haz click <a
+                                    href="#" class="displayTarget" data-target="emailAdelanto">aqu&iacute;</a></div>
+
+                        </div>
+
+                        <div class="form-block block-e cellAdelanto">
+
+                            <div class="field inline">
+                                <input type="text" id="cellphone" name="cellphone" class="input-landing align-center cellphone-input-big"
+                                       placeholder="N&uacute;mero celular" autocomplete="off" pattern="[0-9]*"/>
+
+                            </div>
+
+                            <div class="field inline">
+                                <button class="button red-button toTarget" data-target="submitCellAdelanto">
+                                    Enviar
+                                </button>
+                            </div>
+                            <div class="small-text d-block">Ingresa tu n&uacute;mero de celular. Te enviaremos un SMS con el PIN de
+                                verificaci&oacute;n.</div>
+                        </div>
+
+                        <div class="form-block block-e pinAdelanto">
+
+                            <div class="field inline">
+                                <input type="text" id="authToken" name="authToken" class="input-landing align-center small-input-number"
+                                       placeholder="PIN" autocomplete="off" pattern="[0-9]*"/>
+                            </div>
+
+                            <div class="field inline">
+                                <button class="button red-button toTarget" data-target="submitPinAdelanto">
+                                    Verificar
+                                </button>
+                            </div>
+                            <div class="small-text d-block">Ingresa el PIN de verificaci&oacute;n que te enviamos por SMS. <a href="#" id="resendToken">Reenviar</a></div>
+
+                        </div>
+
+                        <div class="block" id="response-block"></div>
+                    </div>
+
+                </div>
+
+
+                <form role="form" id="frmEarlyAccess" action="#" th:if="${product?.active == false and session.countryUnlocked}" autocomplete="off">
+                    <div class="onlyEmail">
+                        <div class="field hideAjax">
+                            <input type="hidden" value="null"/>
+                            <input type="hidden" value=""/>
+                            <input type="text" class="input-landing" name="email"
+                                   placeholder="Correo Electr&oacute;nico" id="earlyEmail" autocomplete="off"/>
+                        </div>
+                        <div class="mobileBlock hideAjax"></div>
+                        <div class="field hideAjax">
+                            <button class="button red-button" id="landingSubmit" onclick="letMeKnow();return false;">
+                                ¡Avísenme!
+                            </button>
+                        </div>
+                        <div class="block" id="response-block"></div>
+                    </div>
+
+                </form>
+
+                <div class="small-text successMessage" id="countryLocked" th:if="${session.countryUnlocked == false}">En este momento solo es posible solicitar productos desde Per&uacute;</div>
+
+            </div>
+
+        </div>
+        <div class="scroll-down landing-scroll">
+            <i class="icon down-arrow-icon"></i>
+        </div>
+        <div class="bottom-info bottom-info-landing">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Desde <span
+                            th:text="${@utilService.integerMoneyFormat(product?.minAmount)}"></span> a <span
+                            th:text="${@utilService.integerMoneyFormat(product?.maxAmount)}"></span></p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Tasas 20 % - 25 %</p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Hasta <span
+                            th:text="${product?.maxInstallments}"></span> meses
+                    </p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Sin costos ocultos</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Landing -->
+    <div class="press">
+        <div class="container">
+            <th:block layout:fragment="pressCarousel">
+                <th:block th:replace="fragments/pressCarousel :: pressCarousel"></th:block>
+            </th:block>
+        </div>
+    </div>
+    <!-- How it works? -->
+    <div class="hw-salary-advance">
+        <div class="for-employer" id="employers">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="row">
+                        <h2 class="title-home">Colaboradores</h2>
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="box">
+                                <div class="icon-image">
+                                    <img th:src="@{/img/icons/fast.png}" alt="R&aacute;pido"/>
+                                </div>
+                                <h3>R&aacute;pido</h3>
+                                <p>Solicita tu cr&eacute;dito en l&iacute;nea, te lo enviamos el mismo d&iacute;a a tu cuenta. P&iacute;delo en el momento que quieras.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="box">
+                                <div class="icon-image">
+                                    <img th:src="@{/img/icons/easy.png}" alt="F&aacute;cil"/>
+                                </div>
+                                <h3>F&aacute;cil</h3>
+                                <p>Ingresa con tu documento y completa la informaci&oacute;n en s&oacute;lo 90 segundos. Somos flexibles y muy &aacute;giles.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="box">
+                                <div class="icon-image">
+                                    <img th:src="@{/img/icons/just.png}" alt="Justo"/>
+                                </div>
+                                <h3>Justo</h3>
+                                <p>Haz tus matem&aacute;ticas, dif&iacute;cilmente consigas mejores condiciones. Paga lo que realmente es justo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <th:block th:fragment="linkToProducts">
+            <th:block th:replace="fragments/linkToProductsFragment :: linkToProducts"></th:block>
+        </th:block>
+        <div class="for-company" id="companies">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="row">
+                        <h2 class="title-home">Empresas</h2>
+                        <div class="col-lg-7 col-md-7 col-sm-12 column">
+                            <div class="profit-list agreement-top">
+                                <ul>
+                                    <li>
+                                        <h5 class="lightblue-text">Aumenta el paquete de beneficios.</h5>
+                                        <p>Los colaboradores son el recurso m&aacute;s importante que las organizaciones modernas poseen, de eso no hay dudas - hacen toda la diferencia. Aumenta sus beneficios, tenemos los cr&eacute;ditos m&aacute;s convenientes para cuidar de ellos.</p>
+                                    </li>
+                                    <li>
+                                        <h5 class="lightblue-text">Mejora la productividad.</h5>
+                                        <p>&iquest;Sab&iacute;as que la tasa anual promedio de los cr&eacute;ditos de consumo supera el 40%?. Ayuda a que tus colaboradores tomen las decisiones financieras correctas. Pasar&aacute;n menos tiempo preocup&aacute;ndose por sus finanzas, ser&aacute;n m&aacute;s felices y productivos.</p>
+                                    </li>
+                                    <li>
+                                        <h5 class="lightblue-text">Pon foco en tu negocio.</h5>
+                                        <p>Te quitamos todo el trabajo administrativo y simplificamos el proceso de n&oacute;mina. Es muy simple y sin papeleos, inscribes a tus colaboradores al programa y listo. Nosotros nos encargamos del resto. Creemos que no podr&iacute;a ser m&aacute;s simple.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-12 column">
+                            <div class="sign-up-company">
+                                <h3>¿Te interesa sumar a tu empresa?</h3>
+                                <div class="form-container">
+                                    <form id="frmContactAdvance" action="" autocomplete="off">
+                                        <div id="msgResponseContact"></div>
+
+                                        <div class="field">
+                                            <div class="field-wrap">
+                                                <input name="contactFullName" type="text" placeholder="Tu nombre"/>
+                                            </div>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="field-wrap">
+                                                <input name="contactCompany" type="text"
+                                                       placeholder="Nombre de la empresa"/>
+                                            </div>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="field-wrap">
+                                                <input name="contactEmail" type="email"
+                                                       placeholder="Correo Electr&oacute;nico"/>
+                                            </div>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 column">
+                                                <div class="field">
+                                                    <div class="field-wrap">
+                                                        <input name="contactTelephone" type="text" class="medium"
+                                                               placeholder="Tel / Cel"/>
+                                                        <div class="errorContainer">
+                                                            <span class="help-block form-field-error-message"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 column">
+                                                <div class="field">
+                                                    <div class="field-wrap">
+                                                        <input name="annexTelephone" type="text" class="small"
+                                                               placeholder="Anexo"/>
+                                                        <div class="errorContainer">
+                                                            <span class="help-block form-field-error-message"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="field-wrap">
+                                                <select name="contactNumberEmployee" class="selectpicker">
+                                                    <option value="1 - 50">1 - 50 colaboradores</option>
+                                                    <option value="51 - 100">51 - 100 colaboradores</option>
+                                                    <option value="101 - 250">101 - 250 colaboradores</option>
+                                                    <option value="251 - 1000">251 - 1000 colaboradores</option>
+                                                    <option value="+1000">+1000 colaboradores</option>
+                                                </select>
+                                                <div class="errorContainer">
+                                                    <span class="help-block form-field-error-message"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <div id="advanceReCaptcha" class="g-recaptcha"></div>
+                                            <button class="button red-button toTarget" data-target="contactAdvance" id="salarySubmit">Cont&aacute;ctanos</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / how it works? -->
+
+    <!-- Company -->
+    <div class="company-list">
+        <div class="container">
+            <div class="carousel-container">
+                <div id="company-list" class="owl-carousel owl-theme">
+                    <div class="item"><a rel="noopener noreferrer" href="http://www.solven.pe" target="_blank"><img th:src="@{/img/solven_rojo.png}" alt="Logo"
+                                                      style="max-width: 200px"/></a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / Company -->
+
+</th:block>
+<!-- /Content -->
+
+<!-- Footer -->
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+<!-- / Footer -->
+
+</body>
+</html>

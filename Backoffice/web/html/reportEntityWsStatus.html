@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <!--Bootstrap 3-->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/clipboardjs/dist/clipboard.min.js'}"></script>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Errores</span>
+                </li>
+            </ul>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="portletAdmin"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Excepciones</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body" id="listExceptions">
+                                <th:block th:replace="this :: list"></th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            var clipboard = new ClipboardJS('.clipboard-btn');
+
+            clipboard.on('success', function(e) {
+                alert("Contenido copiado");
+                e.clearSelection();
+            });
+
+            clipboard.on('error', function(e) {
+                alert("Algo salio mal :(");
+            });
+        });
+    </script>
+</th:block>
+
+<th:block th:fragment="list">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Web service</th>
+            <th>Failed</th>
+            <th>Success</th>
+            <th>Running</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entityWs, it : ${entityWsStatuses}">
+            <td th:text="${it.count}"></td>
+            <td th:text="${entityWs.entityWebService.wbeserviceName}"></td>
+            <td th:text="${entityWs.failed}"></td>
+            <td th:text="${entityWs.success}"></td>
+            <td th:text="${entityWs.running}"></td>
+            <td th:text="${entityWs.total}"></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+</body>
+</html>

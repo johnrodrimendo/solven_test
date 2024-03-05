@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/privatePagesTemplate">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+
+<th:block layout:fragment="head">
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!--Botstrap material-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/js/material.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-material-design/dist/css/bootstrap-material-design.css'}"/>
+
+    <!--own-->
+    <script th:inline="javascript" charset="ISO-8859-1">
+        /*<![CDATA[*/
+        var errorMessage = /*[[${errorMessage}]]*/null;
+
+        $(document).ready(function () {
+
+            if (errorMessage != null) {
+                $('#errorModal').find('p').html(errorMessage);
+                $('#errorModal').modal('show');
+            }
+
+            var validator = /*[[${loanApplicationSignatureForm.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                var jsonFormValidation = createFormValidationJson(jsonValidator, $('#frmRegister'));
+
+                console.log(jsonFormValidation);
+
+                jsonFormValidation.rules.declarationCheck = {};
+                jsonFormValidation.rules.declarationCheck.required = true;
+                jsonFormValidation.rules.termsCheck = {};
+                jsonFormValidation.rules.termsCheck.required = true;
+
+                $('#frmRegister').validateForm(jsonFormValidation);
+            }
+
+            $('#fullName').on('input', function (e) {
+                if ($(this).data("lastval") != $(this).val()) {
+                    $(this).data("lastval", $(this).val());
+                    $('#confirmUserSignature').html($(this).val());
+                    $('#confirmUserName').html($(this).val());
+                }
+            });
+
+            $('#docNumber').on('input', function (e) {
+                if ($(this).data("lastval") != $(this).val()) {
+                    $(this).data("lastval", $(this).val());
+                    $('#confirmUserDocument').html($("#docType option:selected").text() + " - " + $(this).val());
+                }
+            });
+
+            $('#docType').on('change', function (e) {
+                $('#confirmUserDocument').html($("#docType option:selected").text() + " - " + $('#docNumber').val());
+                if (this.value == '1') {
+                    jsonFormValidation.rules.docNumber.maxlength = 8;
+                    $('#frmRegister').validateForm(jsonFormValidation);
+                } else {
+                    jsonFormValidation.rules.docNumber.maxlength = 9;
+                    $('#frmRegister').validateForm(jsonFormValidation);
+                }
+            });
+
+
+            $('#email').on('input', function (e) {
+                if ($(this).data("lastval") != $(this).val()) {
+                    $(this).data("lastval", $(this).val());
+                    $('#confirmUserEmail').html($(this).val());
+                }
+            });
+
+            //            $('#formSubmit').on('click', function () {
+            //                document.getElementById('frmRegister').submit();
+            //            });
+
+            $('#docType').change();
+
+            $('#showOriginalScheduleLink').click(function (event) {
+                event.preventDefault();
+                openOriginalScheduleModal();
+            });
+
+            /*$('#originalScheduleModal').on('shown.bs.modal', function () {
+             $(this).find('.modal-dialog').css({
+             width: 'auto',
+             height: 'auto',
+             'max-height': '80%'
+             });
+             });*/
+            $.material.init({
+                validate: falsepersonDao.getPerson(locale, jsonDecrypted.getInt("person"), false)
+            });
+
+            $('#formSubmit').click(function (e) {
+                e.preventDefault();
+
+                var declaration = $('#declarationCheck').prop('checked'),
+                    terms = $('#termsCheck').prop('checked');
+
+                if (terms == false || declaration == false) {
+                    $('#error-response').html('Debe aceptar los t&eacute;rminos y condiciones.');
+                } else {
+                    if ($('#frmRegister').valid()) {
+                        $(this).prop('disabled', true);
+                        defaultAjax({
+                            url: /*[[@{/loanapplication/__${loanAplicationToken}__/signature}]]*/null,
+                            type: 'POST',
+                            form: $('#frmRegister'),
+                            data: $('#frmRegister').serializeObject(),
+                            error: function () {
+                                $('#formSubmit').prop('disabled', false);
+                            }
+                        });
+                    }
+                }
+
+            });
+        });
+
+        function openOriginalScheduleModal() {
+            $('#originalScheduleModal').modal('show');
+        }
+
+        function preventBack() {
+            window.history.forward();
+        }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () {
+            null
+        };
+
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="container" id="loanApplicationSignature">
+
+        <form role="form" action="#" th:object="${loanApplicationSignatureForm}" id="frmRegister" autocomplete="off">
+            <div id="offerTittleContainer">
+                <h2>Firma tu solicitud</h2>
+            </div>
+
+            <div class="row">
+                <div class="panel panel-default offer-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Información del Crédito</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-9 col-md-9 col-sm-9">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4">
+                                        <div class="wrap-loan-info">
+                                            <h3 th:text="#{form.field.approvedAmmount}"></h3>
+                                            <div class="square-bg">
+                                                <h4 th:text="${@utilService.integerMoneyFormat(credit.amount)}"></h4>
+                                            </div>
+                                            <div class="bottom-info">
+                                                <span th:text="#{form.field.commission}"></span>
+                                                <h4 th:text="${@utilService.doubleMoneyFormat(credit.loanCommission)}"></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4">
+                                        <div class="wrap-loan-info">
+                                            <h3 th:text="#{form.field.installments}"></h3>
+                                            <div class="square-bg">
+                                                <h4 th:text="${credit.installments} + ' meses'"></h4>
+                                            </div>
+                                            <div class="bottom-info">
+                                                <span th:text="#{form.field.tea}"></span>
+                                                <h4 th:text="${@utilService.doubleMoneyFormat(credit.effectiveAnnualRate)} + '%'"></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4">
+                                        <div class="wrap-loan-info">
+                                            <h3 th:text="#{form.field.installmentAmmountAVG}"></h3>
+                                            <div class="square-bg">
+                                                <h4 th:text="${@utilService.doubleMoneyFormat(credit.installmentAmountAvg)}"></h4>
+                                            </div>
+                                            <div class="bottom-info">
+                                                <span th:text="#{form.field.tcea}"></span>
+                                                <h4 th:text="${@utilService.doubleMoneyFormat(credit.effectiveAnnualCostRate)} + '%'"></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3">
+                                <button class="button red-button" id="showOriginalScheduleLink">
+                                    <span>Ver Cronograma de pagos</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Datos Personales</h4>
+                        </div>
+                        <div class="panel-body" id="cred-body-firm">
+                            <div class="inputs-wrapper">
+                                <div>
+                                    <div class="document" th:classappend="*{validator.docNumber.hasErrors?'has-error':''}">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label" style="margin: 0" for="docType" th:text="#{form.field.document}"></label>
+                                            <select class="form-control tidy-input-number" th:field="*{docType}">
+                                                <!--<option value="" th:text="#{form.field.documentType.placeholder}" disabled="disabled"></option>-->
+                                                <option value="1" th:text="#{form.field.documentType.dni}"></option>
+                                                <option value="2" th:text="#{form.field.documentType.ce}"></option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group label-floating">
+                                            <label for="docNumber" class="control-label" style="margin: 0" th:text="#{form.field.docNumber}"></label>
+                                            <input type="text" th:field="*{docNumber}" class="form-control"/>
+                                            <div class="errorContainer" style="display:inline">
+                                                <span class="help-block form-field-error-message" th:if="*{validator.docNumber.hasErrors}" th:text="*{validator.docNumber.errors}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="names" th:classappend="*{validator.fullName.hasErrors?'has-error':''}">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label" for="fullName" style="margin: 0" th:text="#{form.filed.namesAndSurnames}"></label>
+                                            <input type="text" th:field="*{fullName}" class="form-control"/>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message" th:if="*{validator.fullName.hasErrors}" th:text="*{validator.fullName.errors}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h4 th:text="#{loanApplicationSignature.bankAccount.tittle}" class="title-wrapper"></h4>
+                                <div>
+                                    <div class="names" th:classappend="*{validator.bankId.hasErrors?'has-error':''}">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label" for="bankId" style="margin: 0" th:text="#{form.field.bank}"></label>
+                                            <select class="form-control" th:field="*{bankId}">
+                                                <option value="" hidden="hidden"></option>
+                                                <option th:each="bank : ${@catalogService.getBanks(false)}" th:value="${bank.id}"
+                                                        th:text="${bank.name}"></option>
+                                                <div class="errorContainer">
+                                                    <span class="help-block form-field-error-message" th:if="*{validator.bankId.hasErrors}" th:text="*{validator.bankId.errors}"></span>
+                                                </div>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="names" th:classappend="*{validator.bankAccountType.hasErrors?'has-error':''}">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label" for="bankAccountType" style="margin: 0" th:text="#{form.field.bankAccountType}"></label>
+                                            <select class="form-control" th:field="*{bankAccountType}">
+                                                <option value="" hidden="hidden"></option>
+                                                <option value="S" th:text="#{form.field.bankAccountType.saving}"></option>
+                                                <option value="C" th:text="#{form.field.bankAccountType.current}"></option>
+                                            </select>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message" th:if="*{validator.bankAccountType.hasErrors}" th:text="*{validator.bankAccountType.errors}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="names" th:classappend="*{validator.bankAccountNumber.hasErrors?'has-error':''}">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label" for="bankAccountNumber" style="margin: 0" th:text="#{form.field.bankAccountNumber}"></label>
+                                            <input type="text" th:field="*{bankAccountNumber}" class="form-control"/>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message" th:if="*{validator.bankAccountNumber.hasErrors}" th:text="*{validator.bankAccountNumber.errors}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="names" th:classappend="*{validator.bankAccountDepartment.hasErrors?'has-error has-feedback':''}">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label" for="bankAccountDepartment" style="margin: 0" th:text="#{loanApplicationSignature.bankAccountDepartment}"></label>
+                                            <select th:field="*{bankAccountDepartment}" class="form-control">
+                                                <option value="" hidden="hidden"></option>
+                                                <option th:each="department : ${@catalogService.getDepartments()}" th:value="${department.id}" th:text="${department.name}"></option>
+                                            </select>
+                                            <div class="errorContainer">
+                                                <span class="help-block form-field-error-message" th:if="*{validator.bankAccountDepartment.hasErrors}" th:text="*{validator.bankAccountDepartment.errors}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8" id="well-firma-client">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h2>Contrato del Crédito</h2>
+                            <p>Dichos consentimientos tienen la validez y eficacia que le confiere el artículo 141 <br/> del Código Civil peruano.</p>
+                            <div class="box-terms">
+                                <p>
+                                    Hay muchas variaciones de los pasajes de Lorem Ipsum disponibles, pero la mayoría
+                                    sufrió alteraciones en alguna manera, ya sea porque se le agregó humor, o palabras
+                                    aleatorias que no parecen ni un poco creíbles. Si vas a utilizar un pasaje de Lorem
+                                    Ipsum, necesitás estar seguro de que no hay nada avergonzante escondido en el medio
+                                    del texto. Todos los generadores de Lorem Ipsum que se encuentran en Internet
+                                    tienden a repetir trozos predefinidos cuando sea necesario, haciendo a este el único
+                                    generador verdadero (válido) en la Internet.
+                                </p>
+                            </div>
+                            <div class="signature">
+                                <div class="userSignature"><span id="confirmUserSignature"></span></div>
+                                <p class="signatureLine" id="confirmUserDocument"></p>
+                            </div>
+                            <div class="user-info">
+                                <ul>
+                                    <li>
+                                        <label><input name="declarationCheck" id="declarationCheck" type="checkbox"/> He leído y manifiesto mi consentimiento expreso con todas las condiciones del presente contrato de crédito.</label>
+                                        <br/>
+                                        <label><input name="termsCheck" id="termsCheck" type="checkbox"/> He leído y manifiesto mi consentimiento expreso con los
+                                            <a th:href="@{/terminos-y-condiciones}" target="_blank" rel="nofollow noopener noreferrer">Términos y Condiciones Generales</a> <br/>y con la <a th:href="@{/politica-de-privacidad}" target="_blank" rel="nofollow noopener noreferrer">Política de Privacidad.</a></label>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div id="error-response" class="generalError"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="formSubmit" type="submit" class="button red-button"
+                            th:text="#{loanOffer.applyForLoan}"></button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <div id="errorModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="originalScheduleModal" class="modal fade"
+         tabindex='-1'>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-lightblue-header" style="padding: 1.5em">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4>Cronograma de pagos preliminar</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <table th:if="${credit?.managementSchedule != null}" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Cuota</th>
+                                <th>Vencimiento</th>
+                                <!--<th>Remanente</th>-->
+                                <th>Capital</th>
+                                <th>Interés<br/>(Inc. <th:block th:text="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>)</th>
+                                <th>Gasto<br/>de Recaudo<br/>(Inc. <th:block th:text="${credit?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>)</th>
+                                <th>Desgravamen</th>
+                                <th>Cuota<br/>total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="offerSchedule : ${credit?.managementSchedule}">
+                                <td th:text="${offerSchedule?.getInstallmentId()}"></td>
+                                <td th:text="${@utilService.dateFormat(offerSchedule?.getDueDate())}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(offerSchedule?.getDueDate())}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentCapital())}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalInterest())}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getTotalCollectionCommission())}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInsurance())}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentAmount())}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="actions" style="padding: 1.5em">
+                    <button type="button" class="button black-button" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

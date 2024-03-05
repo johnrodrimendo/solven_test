@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <p th:utext="#{questions.block.customer2Ruc}"></p>
+                <div class="centrado">
+                    <div>
+                        <div class="field inline">
+                            <input type="text" class="input-outline document-input-ruc" th:field="*{ruc}" pattern="[0-9]*"/>
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="display-block">
+                    <label class="h-input-radio">
+                        <input type="radio" name="clients" value="3"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Tengo entre 3 y 5 clientes.</h5>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="h-input-radio">
+                        <input type="radio" name="clients" value="5"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline"> Tengo m&aacute;s de 5 clientes.</h5>
+                            </div>
+                        </div>
+                    </label>
+                    <!--<label for="between3and5Customers" class="custom-check">-->
+                    <!--<span class="check-inner">-->
+                    <!--<i class="icon icon-check"></i>-->
+                    <!--</span>-->
+                    <!--<span class="check-label"> Tengo entre 3 y 5 clientes.</span>-->
+                    <!--<input type="checkbox" class="real-check" id="between3and5Customers"/>-->
+                    <!--</label>-->
+                    <!--<label for="moreThan65" class="custom-check">-->
+                    <!--<span class="check-inner">-->
+                    <!--<i class="icon icon-check"></i>-->
+                    <!--</span>-->
+                    <!--<span class="check-label"> Tengo m&aacute;s de 5 clientes.</span>-->
+                    <!--<input type="checkbox" class="real-check" id="moreThan65"/>-->
+                    <!--</label>-->
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        var $radio = null;
+
+        $('input[type="radio"]').on('click', function (e) {//on click/change
+
+            var remove = false;
+            if ($radio == $(this).val()) {
+                remove = true;
+            }
+
+            $radio = $(this).val();
+
+            if (remove == false) {
+                $(this).prop('checked', true).attr('checked', 'checked');
+            }
+            else {
+                $(this).prop('checked', false).removeAttr('checked');
+                $(".h-input-radio").removeClass("radio-selected");
+            }
+        });
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

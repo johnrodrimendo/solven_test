@@ -1,0 +1,593 @@
+@import "generals/reset.scss";
+@import "variables/variables.scss";
+@import "mixins/mixins.scss";
+@import "libraries/select2.scss";
+@import "libraries/slick.scss";
+@import "libraries/slick-theme.scss";
+@import "generals/general.scss";
+@import "generals/button.scss";
+@import "generals/footer.scss";
+@import "components/custom-select2.scss";
+@import "../../assets/sass/libraries/sweetalert.scss";
+@import "../../assets/sass/libraries/slick.scss";
+@import "../../assets/sass/libraries/slick-theme.scss";
+@import "components/sections.scss";
+
+
+
+header { 
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transition: all .25s ease;
+    width: 100%;
+    z-index: 9999;
+}
+header .menu-default { 
+    align-items: center;
+    display: flex;
+    position: relative;
+}
+header .menu-default-logo .solven-logo {
+    fill: white; 
+    transition: all .25s ease;
+    width: 80px;
+    height: 25px;
+}
+header .menu-default-logo {
+    position: absolute;
+    top: 23px;
+}
+header .menu-default .menu-desk{
+    position: absolute;
+    right: -3px;
+    top: 29px; 
+} 
+header .menu-default .menu-desk .menu-desk-list {
+    align-items: center;
+    color:white;
+    display: flex;
+}
+header .menu-default .menu-desk .menu-desk-list .menu-desk-credito:first-child::after{
+    border-right: 1px solid white;
+    content: '';
+    margin: 0 8px;
+}
+header .menu-default .menu-desk .menu-desk-list .menu-desk-credito a {
+    font-size: 0.75rem; 
+    font-weight: bold;
+    text-transform: uppercase; 
+}
+ 
+.header-scroll,
+.header-form{
+    background: white;
+    box-shadow: 0 1px 8px rgba(25, 25, 25, 0.45);
+}
+.header-scroll{
+    height: 65px; 
+}
+   
+.header-scroll .menu-default-logo .solven-logo,
+.header-form .menu-default-logo .solven-logo {
+    fill: #f7323f;
+}
+.header-scroll .menu-default .menu-desk .menu-desk-list,
+.header-form .menu-default .menu-desk .menu-desk-list {
+    color:#3c485c;
+} 
+.header-scroll .menu-default .menu-desk .menu-desk-list .menu-desk-credito:first-child::after,
+.header-form .menu-default .menu-desk .menu-desk-list .menu-desk-credito:first-child::after {
+    border-right-color: #3c485c;
+}   
+ 
+ 
+body .select2 {
+    display: block;
+}
+
+body>.select2-container.select2-container--open .select2-dropdown .select2-search,
+body>.select2-container.select2-container--open .select2-dropdown.select2-dropdown--above .select2-search,
+body>.select2-container.select2-container--open .select2-dropdown.select2-dropdown--below .select2-search {
+    display: none;
+}
+
+.landing-empresa .contain-banner {
+    width: 100%; 
+}
+.landing-empresa .contain-banner_active {
+    position: relative;
+}
+
+.landing-empresa .inner-contain-banner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+}
+.landing-empresa .inner-contain-banner picture{
+    display: flex;
+    height: auto;
+    width: 100%;
+}
+.landing-empresa .inner-contain-banner img { 
+    height: 500px;
+    object-fit: cover;
+    object-position: 65%;
+    overflow: hidden;
+}
+
+.landing-empresa .inner-contain-banner .title {
+    align-items: center;
+    bottom: 0;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    text-align: center;
+    top: 63px;
+    width: 100%;
+}
+
+.landing-empresa .inner-contain-banner .title h1 {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.25;
+    text-transform: uppercase;
+    
+}
+
+.landing-empresa .inner-contain-banner .title p {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+
+.landing-empresa .inner-contain-banner .bg-red {
+    border-radius: 4px;
+    color: white;
+    font-size: 1.2rem;
+    height: 45px;
+    line-height: 1.65;
+    width: 250px; 
+}
+
+.landing-empresa .inner-contain-banner .meta {
+    align-items: center;
+    background: #3c485c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 130px;
+    justify-content: center;
+    margin: 0 auto;
+    text-align: center;
+    width: 100%;
+}
+
+.landing-empresa .inner-contain-banner .meta span {
+    font-size: 17px;
+    line-height: 1;
+}
+
+ 
+.landing-empresa  .contain-form {
+    display: none;
+    margin-top: calc(65px + 1rem);
+    padding: 1rem 0;
+    transition: transform 0.35s cubic-bezier(0.05, 1.04, 0.72, 0.98) 0s,
+}
+
+.landing-empresa  .contain-form-transform {
+    transform: translate3d(0px, 100%, 0px);
+}
+
+.landing-empresa  .contain-form-active {
+    display: flex;
+    transform: translate3d(0px, 0px, 0px);
+    margin-left: auto;
+    margin-right: auto;
+}
+.landing-empresa .contain-form-active { 
+    height: 100%;
+}
+.landing-empresa  .contain-form h2 {
+    border-bottom: 1px solid #03BFC3;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0 auto; 
+    text-transform: uppercase; 
+    width: 100%;
+}
+
+.landing-empresa  .contain-form .group-inner {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-empresa  .contain-form .group-inner:nth-child(1) {
+    padding-top: 32px;
+}
+.landing-empresa .contain-form .group-inner:nth-child(1) .group:nth-child(2) .sub-group{
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.landing-empresa .contain-form .group-inner:nth-child(1) .group:nth-child(2) .sub-group span {
+    align-items: center;
+    background-color: #D6D8DD;
+    border-radius: .25rem 0 0 .25rem;
+    display: flex;
+    fill: #7a7f8c;
+    font-size: 1rem;
+    font-weight: 700;
+    height: 38px;
+    justify-content: center;
+    width: 2.5rem; 
+}
+.landing-empresa .contain-form .group-inner:nth-child(1) .group:nth-child(2) .sub-group span svg{
+    width: 1.15rem; 
+}
+
+.landing-empresa .contain-form .group-inner:nth-child(1) .group:nth-child(2) .sub-group input{
+    border-radius: 0 .25rem .25rem 0; 
+}
+.landing-empresa .contain-form .group-inner:nth-child(3) .sub-group{
+    display: flex;    
+    align-items: center; 
+    justify-content: center;
+}
+.landing-empresa .contain-form .group-inner:nth-child(3) .sub-group .field .select2,
+.landing-empresa .contain-form .group-inner:nth-child(3) .sub-group .field input{
+    margin-top: .3rem;
+} 
+.landing-empresa .contain-form .group-inner:nth-child(5){
+    margin: 0 auto;
+    max-width: 250px;
+    padding-top: 1rem;
+    width: 100%;
+} 
+.landing-empresa .contain-form .group-inner:nth-child(5) .btn{
+    width: 100%;
+}
+.landing-empresa .contain-form .group-inner .group {
+    padding-bottom: .75rem;
+    width: 100%; 
+}
+.landing-empresa .contain-form .group-inner .group label {
+    display: none;
+}
+.landing-empresa  .contain-form .group-inner .group .field {
+    margin-top: .3rem;
+}
+
+.landing-empresa  .contain-form .group-inner .group .field input {
+    width: 100%;
+}
+.sec-products ul li article #icon-phone path{
+    fill: #34465d; 
+}
+.landing-empresa .contain-form .group-inner:nth-child(3) .sub-group .field:nth-child(1) {
+    margin-right: 1rem;
+}
+
+.landing-empresa .contain-form .group-inner:nth-child(3) .sub-group .field {
+    width: 100%;
+} 
+
+@media only screen and (min-width: 1400px){
+    .landing-empresa .contain-form .group-inner:nth-child(1) {
+        padding-top: 3.5rem;
+    }
+}
+
+
+@media only screen and (min-width: 1024px) {
+    .inner-menu_active {
+        display: flex;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        z-index: 1;
+    }
+    .inner-menu_active .headerLanding {
+        width: calc(100% - 540px);
+    }
+
+    .inner-menu_active .empty {
+        display: flex;
+        max-width: 540px;
+        min-width: 540px;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .landing-empresa {
+        display: flex;
+    }
+
+    .landing-empresa .contain-form {
+        max-width: 540px;
+        min-width: 540px;
+        width: 100%;
+    }
+
+    .landing-empresa .contain-form-transform {
+        transform: translate3d(100%, 0 0px);
+    }
+
+    .landing-empresa .contain-form .gwr h2 {
+        font-size: 1.1rem;
+    }
+
+}
+
+@media only screen and (max-width: 1399px) and (min-width: 1300px) {
+    .landing-empresa .contain-form .group-inner:nth-child(1) {
+        padding-top: 3.5rem;
+    }
+}
+ 
+@media only screen and (max-width: 1299px) and (min-width: 1223px) {
+    .landing-empresa .contain-form .group-inner:nth-child(1) {
+        padding-top: 2.5rem;
+    } 
+    
+}
+@media only screen and (width: 800px) and (height:1280px) {
+    .landing-empresa .inner-contain-banner .title {
+        top: 9%;
+    }
+    .landing-empresa .inner-contain-banner .title .gwr {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .landing-empresa .inner-contain-banner .bg-red {
+        height: 50px;
+        line-height: 1.7;
+        width: 255px;
+    }
+
+    .landing-empresa .contain-form-active {
+        align-self: stretch;
+        height: 104vh;
+    }
+
+    .landing-empresa .contain-form-active .gwr {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .landing-empresa .contain-form-active h2 {
+        padding-top: 2.5rem;
+    }
+
+    .landing-empresa .contain-form-active form {
+        margin: auto 0;
+
+    }
+
+}
+@media only screen and (min-width: 800px){
+    .landing-empresa .inner-contain-banner .title {
+        bottom: 2%;
+    }
+    .landing-empresa .inner-contain-banner .title .gwr {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .landing-empresa .inner-contain-banner .title h1 br {
+        display: block !important;
+    }
+
+    .landing-empresa .inner-contain-banner .bg-red {
+        height: 50px;
+        line-height: 1.7; 
+        width: 255px;
+    }
+}
+@media only screen and (min-width: 768px) and (max-width:799px) {
+
+    .landing-empresa .inner-contain-banner .title{
+        top: 8% !important;
+    }
+    .landing-empresa .inner-contain-banner .title .gwr {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+    .landing-empresa .inner-contain-banner .title h1 br {
+        display: block !important; 
+    }
+    .landing-empresa .inner-contain-banner .bg-red {
+        height: 50px;
+        line-height: 1.7;
+        width: 255px;
+    }
+    .landing-empresa .contain-form h2 {
+      font-size: 1.3rem !important;
+    } 
+    
+}
+@media only screen and (min-width: 768px) {
+    header .menu-default-logo {
+        top: 11px;
+    } 
+    header .menu-default-logo .solven-logo { 
+        fill: #f7323f;
+        height: auto;
+        width: 120px;
+    }
+    header .menu-default .menu-desk .menu-desk-list .menu-desk-credito a{
+        font-size: 1rem;
+    }
+    header .menu-default .menu-desk .menu-desk-list .menu-desk-credito:first-child{
+        padding-right: 2rem;
+    }
+    header .menu-default .menu-desk .menu-desk-list .menu-desk-credito:first-child::after{
+        content: unset;
+    } 
+    .landing-empresa .contain-form .group-inner {
+        align-items: center;
+        justify-content: center;
+    }
+    .landing-empresa .inner-contain-banner picture{
+        height: 100% !important;
+    }
+    .landing-empresa .inner-contain-banner img {
+        height: 100%;
+        width: 100%;
+    }
+
+    .landing-empresa .inner-contain-banner .title {
+        align-items: baseline;
+        text-align: left; 
+    }
+
+    .landing-empresa .inner-contain-banner .meta {
+        align-items: baseline;
+        background: none;
+        bottom: 29px; 
+        left: 0; 
+        position: absolute;
+        text-align: left; 
+    }
+    .landing-empresa .inner-contain-banner .title h1 {
+        font-size: 2.7rem;
+        font-weight: 750;
+    }
+    .landing-empresa .inner-contain-banner .title p {
+        display: block;
+        font-size: 1.5rem;
+        margin: 1rem 0;
+    }
+
+    .landing-empresa .inner-contain-banner .bg-red{
+        margin-top: 10px;
+    }
+    .landing-empresa .inner-contain-banner .meta span{
+        font-size: 1.2rem;
+        line-height: 1.2rem;
+    }
+    .landing-empresa .contain-form h2 {
+        font-size: 16px;
+    } 
+    .landing-empresa .contain-form .group-inner .group label{
+        display: block;
+    } 
+    
+    .landing-empresa .contain-form .group-inner .group .field input::placeholder{
+        color:unset;
+        font-size: unset;
+        opacity: 0;
+    }
+    .landing-empresa .contain-form .group-inner:nth-child(5) .btn-color {
+        width: 100%;
+    } 
+    .landing-empresa .contain-form .group-inner:nth-child(5) .btn {
+        height: 45px;
+        line-height: 1.5px;
+    } 
+    :-moz-placeholder,
+    ::-moz-placeholder ,
+    ::-webkit-input-placeholder{
+        color: transparent;
+    }
+    .landing-empresa,
+    .landing-empresa .inner-contain-banner {
+        height: 104vh;  
+    }  
+    .landing-empresa .contain-banner_active .inner-contain-banner {
+        height: 104vh !important; 
+    }
+   
+}
+@media only screen and (max-width:1024px) {
+    .landing-empresa .select2,
+    .landing-empresa .contain-form .group-inner .group .field input {
+        height: 38px; 
+    }
+    .landing-empresa .select2-container .select2-selection--single .select2-selection__rendered {
+        line-height: 2.5; 
+    }
+    .landing-empresa .select2-container--default .select2-selection--single .select2-selection__arrow{
+        top: 0; 
+    }
+    
+}
+@media only screen and (max-width:800px){
+    .landing-empresa .inner-contain-banner .title .gwr {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+}
+@media only screen and (width:1024px) and (height:768px){
+    .landing-empresa .inner-contain-banner .meta{
+        bottom: 23px;
+    }
+}
+@media only screen and (max-width:768px){
+    .landing-empresa .inner-contain-banner .title h1 {
+        margin: auto;
+        width: 100%;
+    }
+    .landing-empresa .inner-contain-banner .title h1 br {
+        display: none;
+    }
+    
+} 
+@media only screen and (max-width:767px){
+    .landing-empresa .inner-contain-banner {
+        height: 100%;
+    } 
+}
+@media only screen and (max-width:400px){
+    .landing-empresa .inner-contain-banner .meta span br{
+        display: none;
+    }
+}
+@media only screen and (max-height: 500px) {
+    /*.landing-empresa .inner-contain-banner{
+        height: 168vh;
+    }*/
+    .landing-empresa .inner-contain-banner .title {
+        align-items: center;
+        bottom: 0;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: absolute;
+        text-align: center;
+        top: 80px;
+        width: 100%;
+    }
+
+    .landing-empresa .inner-contain-banner .meta {
+        align-items: center;
+        background: #3c485c;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        height: 130px;
+        justify-content: center;
+        margin: 0 auto;
+        text-align: center;
+        width: 100%;
+    }
+}

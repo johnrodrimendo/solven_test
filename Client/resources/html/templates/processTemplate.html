@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <title>Solven | El crédito que mereces</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta name="Author" content="SOLVEN FUNDING SAC"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="description" content="En Solven creamos una experiencia financiera completamente distinta, obtén las mejores tasas de interés para tu crédito, sin tener que ir al banco."/>
+    <meta name="keywords" content="solven, crédito, créditos, crédito en linea, prestamo, prestamos, tarjeta de crédito, tarjetas de crédito, adelanto de sueldo, seguros, financiera, banco, el crédito que mereces"/>
+    <meta name="keywords" content="keyword, keyword, 23065a2966d539311018"/>
+    <meta name="Resource-type" content="Document"/>
+    <meta name="google-site-verification" content="txqJLVmZKqIDznpHRlmJhz8vYZhjahoajQXKwxC18gA" />
+    <meta name="norton-safeweb-site-verification" content="3aewqfzfxfk051dgd6fz79kuw0-0jztb1risjnh425ysb7kioj5ozis2yh9bykk1kepq5s0dbj8223o1r7t0ox-ebzgs5fc9hp4dpzsbn5cpiu7r0le-efyrrsqmdyrf" />
+    <meta name="wot-verification" content="23065a2966d539311018"/>
+    <meta name="detectify-verification" content="a6429d4cc053eaf318223516bffb2767"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="theme-color" content="#F7323F"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="#F7323F"/>
+    <meta name="msapplication-navbutton-color" content="#F7323F"/>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon/favicon.png}"/>
+    <link rel="preload" th:href="@{../fonts/Lato-Regular/Lato-Regular.woff}" as="font" crossorigin="crossorigin" />
+    <style th:inline="text">@font-face {font-family: "Solven Icons";font-style: normal;font-weight: normal;src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")}</style>
+    <style type="text/css">
+
+    </style>
+    <link rel="preload" th:href="@{/css/main.css}" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" th:href="@{/css/main.css}" /></noscript>
+    <script>
+        /*<![CDATA[*/
+        !function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var system = {
+            contextPath : /*[[ ${#httpServletRequest.getContextPath()} ]]*/,
+            unloadAlert: false
+        };
+        window.addEventListener("beforeunload", function (e) {
+            if (system.unloadAlert) {
+                var confirmationMessage = '¿Est&aacute;s seguro que deseas salir de la página?';
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <th:block th:replace="components/tracking :: all" />
+</head>
+<body>
+<th:block th:replace="components/tracking :: gtm-noscript" />
+<th:block layout:fragment="header">
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <th:block th:replace="fragments/landingHeaderFragment :: landingHeaderArgentina"></th:block>
+    </th:block>
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <th:block th:replace="fragments/landingHeaderFragment :: landingHeader"></th:block>
+    </th:block>
+</th:block>
+<th:block layout:fragment="content"/>
+<th:block layout:fragment="footer">
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <th:block th:replace="fragments/landingFooterFragment :: landingFooterArgentina"></th:block>
+    </th:block>
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <th:block th:replace="fragments/landingFooterFragment :: landingFooter"></th:block>
+    </th:block>
+</th:block>
+<th:block layout:fragment="modal">
+    <th:block th:replace="fragments/globalModalFragment :: globalModalContact"></th:block>
+</th:block>
+<script async="async" src="https://www.google.com/recaptcha/api.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var ajaxValidator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+    var ajaxContact = /*[[@{/contact}]]*/;
+    /*]]>*/
+</script>
+<script defer="true" async="true" type="text/javascript" th:src="@{/js/main.min.js}"></script>
+<th:block th:replace="fragments/countryInformation :: metadata"/><!-- fragments - countryInformation -->
+</body>
+</html>

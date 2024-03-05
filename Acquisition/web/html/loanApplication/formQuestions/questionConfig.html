@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="config">
+    <div id="questionConfiguration"
+         th:attr="data-section=${section},data-show-application-update-modal=${showLoanApplicationUpdateModal},data-show-offer-update-modal=${showLoanOfferUpdateModal},data-show-agent=${showAgent},data-percentage=${progressPercentage},data-force-vehicle-modal-show=${forceVehicleModalShow},data-show-go-back=${showGoBack},data-show-name-email=${showNameEmail},data-user-email=${userEmail},data-user-name=${userFullName},data-show-pre-approved=${showPreApproved},data-show-pre-approved-message=${showPreApprovedMessage},data-question-catgory=${questionCategory},data-show-zendesk-widget=${showZendeskWidget},data-document-title=${isCustomDocumentTitle},data-is-banbif=${isBanBif},data-show-custom-offer=${showCustomOffer},data-show-label-information=${showLabelInformation}"></div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var pixelConversion = [[${pixelConversion}]];
+            pixelConversion = JSON.parse(pixelConversion);
+            if(pixelConversion != null){
+                for(var i=0; i<pixelConversion.length; i++){
+                    var pixel = pixelConversion[i];
+                    if(pixel.type != null){
+                        dataLayer.push({'event':pixel.type,'conversionValue':pixel.value});
+                    }
+                    if(pixel.categoryType != null){
+                        dataLayer.push({'event':pixel.categoryType,'conversionValue':pixel.categoryValue});
+                    }
+                }
+            }
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

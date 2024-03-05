@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:utext="#{questions.block.selfie}"></p>
+        <br/>
+        <div id="selfie"></div>
+        <div class="actions">
+            <button id="sendButton" class="button bg-red block-hidden" type="button" th:text="#{button.next}"></button>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var files = [{
+            id: /*[[${T(com.affirm.common.model.catalog.UserFileType).SELFIE}]]*/,
+            name: "selfie",
+            maxFiles: 1,
+            required: true
+        }];
+        var tp = new Tp({container: '#selfie', userFileConfig: files});
+        tp.init();
+
+        $('#sendButton').click(function () {
+            $('#sendButton').loading('', 2);
+            tp.uploadPictures();
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST"
+            }, "");
+        });
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

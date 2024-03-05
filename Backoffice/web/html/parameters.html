@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Cola de Procesos</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            $('#bank').change(function () {
+                var bankId = $("#bank").val();
+                defaultAjax({
+                    url: /*[[@{/parameters/bankParameters}]]*/null,
+                    type: 'POST',
+                    data: {
+                        bankId: bankId
+                    },
+                    success: function (data) {
+                        refreshRates(data);
+                    },
+                    error: function (data) {
+                    }
+                });
+            });
+        });
+        function refreshRates(data) {
+            $('.tablefilter-table').replaceWith(data);
+        }
+        function saveParametersByBank() {
+            var dataRow = $('.dataRow');
+            var jsonArray = [];
+            var costArray = [];
+            var bankId = $('#bank').val();
+            var dataRowObj = new Object();
+            var costObj = new Object();
+            $('.dataRow').each(function(i, e){
+                $(e).find('select').each(function(index, elem){
+                    switch(index) {
+                        case 0 : dataRowObj.categoryId = $(elem).val(); break;
+                        case 1 : if(dataRowObj.categoryId == /*[[${T(com.affirm.common.model.catalog.Category).TARJETA_CREDITO}]]*/) {dataRowObj.brandId = $(elem).val(); break;} //else {dataRowObj.brandId = 0}
+                    }
+                });
+                dataRowObj.bankId = $('#bank').val();
+                $(e).find('.rowDataInput').each(function(index, elem) {
+                    switch(index){
+                        case 0: dataRowObj.productName = $(elem).val(); break;
+                        case 1: dataRowObj.productURL = $(elem).val(); break;
+                        case 2: dataRowObj.resume = $(elem).val(); break;
+                        case 3: dataRowObj.maxTEA = $(elem).val(); break;
+                        case 4: dataRowObj.minTEA = $(elem).val(); break;
+                        case 5: dataRowObj.minimunIncomes = $(elem).val(); break;
+                        default:
+                            costObj.cost = $(elem).val();
+                            costObj.id = $(elem).data('cost-id');
+                            costArray.push(costObj);
+                            costObj = new Object();
+                    }
+                });
+                dataRowObj.costs = costArray;
+                jsonArray.push(dataRowObj);
+                costArray = [];
+                dataRowObj = new Object();
+            });
+            var jsonRow = JSON.stringify(jsonArray);
+            defaultAjax({
+                url: /*[[@{/parameters/save}]]*/null,
+                data:{
+                    bankId : bankId,
+                    jsonRow : jsonRow
+                },
+                type: 'POST',
+                success: function () {
+                    swal(
+                        'Enhorabuena',
+                        '¡Se registraron los parámetros correctamente!',
+                        'success'
+                    )
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al registrar la información');
+                }
+            });
+        }
+        function applyParameters() {
+            defaultAjax({
+                url: /*[[@{/parameters/apply}]]*/null,
+                type: 'POST',
+                success: function () {
+                    swal(
+                        'Enhorabuena',
+                        '¡Se registraron los parámetros correctamente!',
+                        'success'
+                    )
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al registrar la información');
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Actualización de Parámetros</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletBufferTransactions"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Actualización de Parámetros</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="control-label" for="bank">Banco</label>
+                                            <select id="bank" class="form-control">
+                                                <option value="" hidden="hidden">Selecciona el banco</option>
+                                                <option th:each="bank : ${@catalogService.getBanks(false)}" th:value="${bank.id}" th:text="${bank.name}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="parametersTable" class="tablefilter-table" th:switch="${#lists.isEmpty(comparisonRates)}">
+                                        <div th:case="true">
+                                            <p>No hay resultados</p>
+                                        </div>
+                                        <div th:case="false" class="table-responsive">
+                                            <table id="mainTable" class="table table-bordered table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>Categoría</th>
+                                                    <th>Producto</th>
+                                                    <th>URL</th>
+                                                    <th>Descripción</th>
+                                                    <th>TEA</th>
+                                                    <th>Ingreso Mínimo</th>
+                                                    <th>Costos</th>
+                                                    <th></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="dataRow" th:id="row + ${comparisonRate?.rateId}" th:each="comparisonRate, iterComparisonRates : ${comparisonRates}">
+                                                        <td>
+                                                            <div>
+                                                                <select th:id="category + ${comparisonRate?.rateId}">
+                                                                    <option value="" hidden="hidden">Selecciona la Categoría</option>
+                                                                    <option th:each="category : ${@catalogService.getComparisonCategory()}" th:value="${category.id}" th:selected="${category.id == comparisonRate?.categoryId}" th:text="${category.name}"></option>
+                                                                </select>
+                                                                <script th:inline="javascript">
+                                                                    /*<![CDATA[*/
+                                                                    var i = 0;
+                                                                    $('#category' + /*[[${comparisonRate?.rateId}]]*/).on('change', function() {
+                                                                        var td = $("#costs" + /*[[${comparisonRate?.rateId}]]*/);
+                                                                        baseUrl = /*[[@{/parameters/change}]]*/;
+                                                                        var bankId = $('#bank').val();
+                                                                        var categoryId = this[this.selectedIndex].value;
+                                                                        td.defaultLoad(baseUrl + '?bankId=' + bankId + '&categoryId=' + categoryId, null, function () {});
+                                                                        if(categoryId == /*[[${T(com.affirm.common.model.catalog.Category).TARJETA_CREDITO}]]*/){
+                                                                            $(this).closest('tr').find('select').last().show();
+                                                                        }else{
+                                                                            $(this).closest('tr').find('select').last().hide();
+                                                                        }
+                                                                    });
+                                                                    /*]]>*/
+                                                                </script>
+                                                                <br/>
+                                                                <div th:id="brand + ${comparisonRate?.rateId}" th:if="${comparisonRate?.categoryId} == ${T(com.affirm.common.model.catalog.Category).TARJETA_CREDITO}">
+                                                                    <select th:id="brand_id + ${comparisonRate?.rateId}">
+                                                                        <option value="" hidden="hidden">Selecciona la Marca</option>
+                                                                        <option th:each="brands : ${@catalogService.getBrands()}" th:value="${brands.id}" th:selected="${brands.id == comparisonRate?.brandId}" th:text="${brands.name}"></option>
+                                                                    </select>
+                                                                </div>
+                                                                <div th:id="brand + ${comparisonRate?.rateId}" th:unless="${comparisonRate?.categoryId} == ${T(com.affirm.common.model.catalog.Category).TARJETA_CREDITO}">
+                                                                    <select th:id="brand_id + ${comparisonRate?.rateId}" hidden="true">
+                                                                        <option value="" hidden="hidden">Selecciona la Marca</option>
+                                                                        <option th:each="brands : ${@catalogService.getBrands()}" th:value="${brands.id}" th:text="${brands.name}"></option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td><input class="rowDataInput text" type="text" th:value="${comparisonRate?.productName}" /></td>
+                                                        <td><input class="rowDataInput text" type="text" th:value="${comparisonRate?.productURL}" /></td>
+                                                        <td><input class="rowDataInput text" type="text" th:value="${comparisonRate?.resume}" /></td>
+                                                        <script th:inline="javascript">
+                                                            /*<![CDATA[*/
+                                                            $('.rowDataInput.text').forceLettersOnly('^[a-zA-Z0-9. ()]+$', true, 1, 50);
+                                                            /*]]>*/
+                                                        </script>
+                                                        <td>
+                                                            <div>
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>Máxima : </td>
+                                                                        <td th:if="${!flagNew}">
+                                                                            <input class="rowDataInput double" type="text" th:value="${comparisonRate?.maxTEA}" />
+                                                                        </td>
+                                                                        <td th:unless="${!flagNew}">
+                                                                            <input class="rowDataInput double" type="text" />
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Mínima : </td>
+                                                                        <td th:if="${!flagNew}">
+                                                                            <input class="rowDataInput double" type="text" th:value="${comparisonRate?.minTEA}" />
+                                                                        </td>
+                                                                        <td th:unless="${!flagNew}">
+                                                                            <input class="rowDataInput double" type="text" />
+                                                                        </td>
+                                                                        <script th:inline="javascript">
+                                                                            /*<![CDATA[*/
+                                                                            $('.rowDataInput.double').forceDoubleOnly(true, 5, 200);
+                                                                            /*]]>*/
+                                                                        </script>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="rowDataInput double" type="text" th:value="${comparisonRate?.minimunIncomes}" />
+                                                        </td>
+                                                        <td>
+                                                            <th:block th:replace="this :: costsTable"></th:block>
+                                                        </td>
+                                                        <td>
+                                                            <div class="rowtrash" th:id="trash + ${comparisonRate?.rateId}"><i class="fa fa-trash font-red"></i></div>
+                                                            <script th:inline="javascript">
+                                                                /*<![CDATA[*/
+                                                                $('#trash' + /*[[${comparisonRate?.rateId}]]*/)
+                                                                    .css('cursor', 'pointer')
+                                                                    .click(function(){
+                                                                        var obj = $('#mainTable >tbody >tr');
+                                                                        var size = obj.length;
+                                                                        if(size == 1){
+                                                                            obj.find("input").each(function() {
+                                                                                $(this).val('');
+                                                                            })
+                                                                        }else{
+                                                                            this.closest('tr').remove();
+                                                                        }
+                                                                    });
+                                                                /*]]>*/
+                                                            </script>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div>
+                                                <input type="button" id="newRow" class="btn btn-default " th:value="Nuevo"/>
+                                                <input type="button" id="saveParameters" class="btn btn-default " th:value="Guardar"/>
+                                                <input type="button" id="applyParameters" class="btn btn-default " th:value="Aplicar"/>
+                                                <script th:inline="javascript">
+                                                    /*<![CDATA[*/
+                                                    $('#saveParameters').click(function(){
+                                                        saveParametersByBank();
+                                                    });
+                                                    $('#applyParameters').click(function(){
+                                                        applyParameters();
+                                                    });
+                                                    $('#newRow').click(function(){
+                                                        i++;
+                                                        var newRowId = 'row' + i;
+                                                        var trashId = 'trash' + i;
+                                                        var categoryId = 'category' + i;
+                                                        var brandId = 'brand_id' + i;
+                                                        var newRowObject = $("#mainTable > tbody > tr:first").clone();
+                                                        newRowObject.attr('id', newRowId).find("input").each(function() {
+                                                            $(this).val('');
+                                                        }).end().appendTo("#mainTable > tbody");
+                                                        newRowObject.find('i').parent().attr('id', trashId).css('cursor', 'pointer').click(function(){
+                                                            this.closest('tr').remove();
+                                                        });
+                                                        newRowObject.find('select').attr('id', categoryId);
+                                                        $('#'+categoryId).on('change', function() {
+                                                            var td = newRowObject.find('table').last().parent();
+                                                            baseUrl = /*[[@{/parameters/change}]]*/;
+                                                            var bankId = $('#bank').val();
+                                                            var categoryId = this[this.selectedIndex].value;
+                                                            td.defaultLoad(baseUrl + '?bankId=' + bankId + '&categoryId=' + categoryId, null, function () {});
+                                                            if(categoryId == /*[[${T(com.affirm.common.model.catalog.Category).TARJETA_CREDITO}]]*/){
+                                                                $(this).closest('tr').find('select').last().show();
+                                                            }else{
+                                                                $(this).closest('tr').find('select').last().hide();
+                                                            }
+                                                        });
+                                                        $('.rowDataInput.text').forceLettersOnly('^[a-zA-Z0-9 ()]+$', true, 1, 50);
+                                                        $('.rowDataInput.double').forceDoubleOnly(true, 5, 200);
+                                                        $('.rowDataInput.cost.double').forceDoubleOnly(true, 0, 1000);
+                                                    });
+                                                    /*]]>*/
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="costsTable">
+    <table th:id="costs + ${comparisonRate?.rateId}" align="center" width="100%">
+        <div th:each="comparisonCost, iterComparisonCost : ${@catalogService.getComparisonCategoryById(comparisonRate?.categoryId).creditCosts}">
+            <tr>
+                <td>
+                    <div th:text="${@catalogService.getComparisonCostById(comparisonCost).costName}" ></div>
+                </td>
+                <td th:if="${comparisonRate?.rateId} != 0">
+                    <td><input type="text" th:attr="data-cost-id=${comparisonCost}" class="rowDataInput cost double" th:value="${@catalogService.getCostValuesByCategoryCost(comparisonRate?.rateId, comparisonRate?.bankId, comparisonRate?.categoryId, comparisonCost)?.cost}" /></td>
+                </td>
+                <td th:unless="${comparisonRate?.rateId} != 0">
+                    <td><input type="text" th:attr="data-cost-id=${comparisonCost}" class="rowDataInput cost double"/></td>
+                </td>
+                <td>
+                    <div th:if="${@catalogService.getComparisonCostById(comparisonCost).costType} == ${T(com.affirm.common.model.catalog.Cost).PORCENTAJE}">%</div>
+                </td>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    $('.rowDataInput.cost.double').forceDoubleOnly(true, 0, 1000);
+                    /*]]>*/
+                </script>
+            </tr>
+        </div>
+    </table>
+</th:block>
+</body>
+</html>

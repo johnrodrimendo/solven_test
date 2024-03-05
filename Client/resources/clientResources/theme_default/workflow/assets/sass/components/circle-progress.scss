@@ -1,0 +1,268 @@
+$font_family_1: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$background_color_1: #d6dadc;
+$background_color_3: #fbfbfb;
+$font_family_2: "'Lato Regular', sans-serif";
+
+:root {
+  --loading-page-color: #26CAD3;
+}
+
+.process-loading-container .loading-content {
+  .sk-circle {
+    height: 80px;
+    border-radius: 50%;
+    font-size: 10px;
+    margin-top: 0;
+    margin: 18% auto;
+    position: relative;
+    text-indent: -9999em;
+    width: 80px;
+  }
+
+  .sk-circle .sk-child {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+
+  .sk-circle .sk-child:before {
+    -webkit-animation: sk-circleBounceDelay 1.3s infinite ease-in-out both;
+    animation: sk-circleBounceDelay 1.3s infinite ease-in-out both;
+    background-color: var(--branding-loading-color);
+    border-radius: 100%;
+    content: '';
+    display: block;
+    height: 15%;
+    margin: 0 auto;
+    width: 15%;
+  }
+
+  .sk-circle .sk-circle2 {
+    -ms-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  .sk-circle .sk-circle3 {
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
+
+  .sk-circle .sk-circle4 {
+    -ms-transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+    transform: rotate(135deg);
+  }
+
+  .sk-circle .sk-circle5 {
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+
+  .sk-circle .sk-circle6 {
+    -webkit-transform: rotate(225deg);
+    -ms-transform: rotate(225deg);
+    transform: rotate(225deg);
+  }
+
+  .sk-circle .sk-circle7 {
+    -webkit-transform: rotate(270deg);
+    -ms-transform: rotate(270deg);
+    transform: rotate(270deg);
+  }
+
+  .sk-circle .sk-circle8 {
+    -webkit-transform: rotate(315deg);
+    -ms-transform: rotate(315deg);
+    transform: rotate(315deg);
+  }
+
+  .sk-circle .sk-circle2:before {
+    -webkit-animation-delay: -1.15s;
+    animation-delay: -1.15s;
+  }
+
+  .sk-circle .sk-circle3:before {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+  }
+
+  .sk-circle .sk-circle4:before {
+    -webkit-animation-delay: -0.75s;
+    animation-delay: -0.75s;
+  }
+
+  .sk-circle .sk-circle5:before {
+    -webkit-animation-delay: -0.60s;
+    animation-delay: -0.60s;
+  }
+
+  .sk-circle .sk-circle6:before {
+    -webkit-animation-delay: -0.45s;
+    animation-delay: -0.45s;
+  }
+
+  .sk-circle .sk-circle7:before {
+    -webkit-animation-delay: -0.30s;
+    animation-delay: -0.30s;
+  }
+
+  .sk-circle .sk-circle8:before {
+    -webkit-animation-delay: -0.15s;
+    animation-delay: -0.15s;
+  }
+
+  @-webkit-keyframes sk-circleBounceDelay {
+    0%, 80%, 100% {
+      -webkit-transform: scale(0);
+      transform: scale(0);
+    }
+    40% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+    }
+  }
+
+  @keyframes sk-circleBounceDelay {
+    0%, 80%, 100% {
+      -webkit-transform: scale(0);
+      transform: scale(0);
+    }
+    40% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+    }
+  }
+}
+
+// TODO MOVER LO QUE NO CORRESPONDE A CIRCLE-PROGRESS A SU SCSS
+
+.circle-progress-bg {
+  background-color: rgba(255, 255, 255, .8);
+  bottom: 0;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.circle-progress-question {
+  background: none;
+  height: 100%;
+  position: relative;
+  z-index: 100;
+}
+
+.circle-question {
+  background: none !important;
+}
+
+.circle-progress,
+.circle-progress-question {
+  align-items: center;
+  background-color: white;
+  display: flex;
+  height: calc(100vh - 50px);
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0 ;
+  top: 50px;
+  width: 100%;
+  z-index: 100;
+}
+
+.loading-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: unset !important;
+}
+
+.loading-text {
+  margin-top: 2rem;
+}
+
+.loading-text span {
+  animation-name: blink;
+  animation-duration: 1.4s;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  font-size: 1.5rem;
+}
+
+.loading-text span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-text span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+#loading-screen{
+  height: 100vh;
+  position: fixed;
+  width: 100%;
+  z-index: 10000;
+  div.process-loading-container{
+    position: initial !important;
+    height: 100% !important;
+    .sk-circle .sk-child:before {
+      background-color: var(--loading-page-color) !important;
+    }
+  }
+}
+
+#loading-screen-transparent{
+  height: 100vh;
+  position: fixed;
+  width: 100%;
+  z-index: 1000000000;
+  display: none;
+  div.process-loading-container{
+    position: initial !important;
+    height: 100% !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    .sk-circle .sk-child:before {
+      background-color: var(--loading-page-color) !important;
+    }
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .circle-progress #loading-ajax,
+  .circle-progress-question #loading-ajax {
+    margin-top: initial;
+  }
+}
+
+@media screen and (min-width: 749px) {
+  .circle-progress,
+  .circle-progress-question {
+    height: calc(100vh - 60px - 70px);
+    top: 60px;
+  }
+}

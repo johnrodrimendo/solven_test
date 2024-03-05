@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>Solven - Elige un auto</title>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var filter = {
+            brands: [[${brands}]],
+            priceFrom: [[${priceFrom}]],
+            priceTo: [[${priceTo}]],
+            order: [[${order}]],
+            gasType: [[${gasType}]],
+            transmition: [[${transmition}]],
+            showPriceFilter: false
+        };
+        if (filter.brands != null) {
+            var parsed = JSON.parse(filter.brands);
+            filter.brands = parsed;
+        }
+        if (filter.gasType != null) {
+            var parsed = JSON.parse(filter.gasType);
+            filter.gasType = parsed;
+        }else{
+            filter.gasType = [];
+        }
+        if (filter.transmition != null) {
+            var parsed = JSON.parse(filter.transmition);
+            filter.transmition = parsed;
+        }else{
+            filter.transmition = [];
+        }
+
+        var registerEmail;
+
+        $(function () {
+
+            paintFilter();
+            $('input[name=priceFrom],input[name=priceTo]').forceIntegerOnly(true, 0, 999999);
+
+            $('#resetFilters').click(function(){
+                filter.brands = JSON.parse([[${brands}]]);
+                filter.priceFrom = null;
+                filter.priceTo = null;
+                filter.showPriceFilter = false;
+                filter.transmition = [];
+                filter.order = null;
+                filter.gasType = [];
+
+                $('input[name=priceFrom]').val("");
+                $('input[name=priceTo]').val("");
+                $('input[name=gasType]').val("");
+                $('input[name=priceFrom]').val("");
+
+                // Set null transmisition
+                $('input[name="transmition').prop('checked', false);
+                // Render input checkbox
+                $('input[name="transmition').checked()
+
+                runFilter();
+            });
+
+            $("select").each(function () {
+                $(this).select2({
+                    minimumResultsForSearch: -1,
+                    placeholder: $(this).data('placeholder'),
+                    width: $(this).data('width') + 'px'
+                });
+            });
+
+            //trigger click select2
+            $('.controls-filters .icon-sort').on('click', function (e) {
+                e.preventDefault();
+                console.log('click');
+                $(".select-category").select2("open");
+            });
+
+            $("select").change(function (e) {
+                filter.order = e.target.value;
+                runFilter();
+            });
+
+            $('label.custom-check').on('change', '.real-check', function () {
+                $(this).checked();
+            });
+
+            $('input[name=gasType]').on('change', function () {
+                var id = parseInt($(this).val());
+
+                if ($.inArray(id, filter.gasType) != -1) {
+                    filter.gasType.splice(filter.gasType.indexOf(id), 1);
+                } else {
+                    filter.gasType.push(id);
+                }
+                runFilter();
+            });
+
+            $('input[name=transmition]').on('change', function () {
+                var id = $(this).val();
+
+                if ($.inArray(id, filter.transmition) != -1) {
+                    filter.transmition.splice(filter.transmition.indexOf(id), 1);
+                } else {
+                    filter.transmition.push(id);
+                }
+                runFilter();
+            });
+
+            var i = 0;
+            $('#filter').on('click', function (e) {
+                e.preventDefault();
+                if (i == 0) {
+                    $(this).addClass('icon-active');
+                    $('.main-filters').animate({width: '230px', padding: '1em'});
+                    i = 1;
+                } else {
+                    $(this).removeClass('icon-active');
+                    $('.main-filters').animate({width: 0, padding: 0});
+                    i = 0;
+                }
+            });
+
+            $('input[name=priceFrom]').blur(function () {
+                filter.priceFrom = $(this).val();
+                filter.showPriceFilter = true;
+                runFilter();
+            });
+
+            $('input[name=priceTo]').blur(function () {
+                filter.priceTo = $(this).val();
+                filter.showPriceFilter = true;
+                runFilter();
+            });
+
+            $('input[name=priceTo]').keyup(function (e) {
+                var code = e.which;
+                if(code == 13) {
+                    filter.priceTo = $(this).val();
+                    filter.showPriceFilter = true;
+                    runFilter();
+                }
+            });
+
+            $('input[name=priceFrom]').keyup(function (e) {
+                var code = e.which;
+                if(code == 13) {
+                    filter.priceFrom = $(this).val();
+                    filter.showPriceFilter = true;
+                    runFilter();
+                }
+            });
+
+            $('.brandSelected').on('click' , function(e) {
+                e.preventDefault();
+                var id = parseInt($(this).data('id'));
+
+                if ($.inArray(id, filter.brands) != -1) {
+                    $(this).removeClass('brand-active');
+                    filter.brands.splice(filter.brands.indexOf(id), 1);
+                } else {
+                    $(this).addClass('brand-active');
+                    filter.brands.push(id);
+                }
+                runFilter();
+            });
+
+            var $brandList = $('#topFilter').find('.brand-list');
+            var $brandItem = $brandList.find('li');
+            var $viewmore = $('#viewmore');
+            if( $brandItem.size() > 12 ){
+                $viewmore.addClass('active');
+            }
+
+            $viewmore.on('click', function(){
+                $(this).parent().find('.brand-list').toggleClass('active');
+                if( $(this).hasClass('view') ){
+                    $(this).find('span').text('Ver menos');
+                    $(this).removeClass('view');
+                } else{
+                    $(this).find('span').text('Ver más');
+                    $(this).addClass('view');
+                }
+            });
+            $('.openfilter').on('click', function( event){
+                event.preventDefault();
+                $(this).closest('#choose_brand').find('.wrap-choose-brand').find('#lateralFilter').toggleClass('active');
+            });
+
+            $('body').on('click', '.open-carmodal', function (event) {
+                event.preventDefault();
+                var buttonClicked = $(this);
+                var id = buttonClicked.attr('data-groupId');
+                $('#groupId').val(id);
+                if(registerEmail == undefined){
+                    $(".modal_msg_question_email").modal({
+                        show: true,
+                        keyboard: false,
+                        backdrop: 'static'
+                    });
+                }else{
+                    var url = /*[[@{/vehicle/registerDiscovery}]]*/null;
+                    var email = registerEmail;
+                    var groupId = id;
+                    defaultAjax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            email: email,
+                            groupId: groupId
+                        },
+                        success: function (data) {
+                            $("a[data-groupId='" + groupId + "']").parent().toggleClass('active');
+                        }
+                    })
+                }
+            });
+
+            $('.modal_msg_question_email').find('button.icon-close').on('click',function(){
+                //$('#filterResult').find('.wrap-price').removeClass('active');
+            });
+
+        });
+
+        function paintFilter() {
+            $('.brandSelected').each(function () {
+                if ($.inArray(parseInt($(this).data('id')), filter.brands) != -1) {
+                    $(this).addClass('brand-active');
+                }
+            });
+            $('input[name=gasType]').each(function () {
+                if ($.inArray(parseInt($(this).val()), filter.gasType) != -1) {
+                    $(this).prop('checked', true);
+                    $(this).checked();
+                }
+            });
+            $('input[name=transmition]').each(function () {
+                if ($.inArray($(this).val(), filter.transmition) != -1) {
+                    $(this).prop('checked', true);
+                    $(this).checked();
+                }
+            });
+        }
+
+        function getIntValue(value) {
+            if(value === undefined || value === null || value === "") {
+                return 0;
+            }
+            value = value + "";
+            var intValue = 0;
+
+            for(var i = 0 ; i < value.length ; ++i) {
+                if(value[i] >= '0' && value[i] <= '9') {
+                    intValue *= 10;
+                    intValue += parseInt(value[i]);
+                }
+            }
+            return intValue;
+        }
+
+        function getCurrentRelativeUrl(){
+
+            var valueFrom = filter.priceFrom;
+            var valueTo = filter.priceTo;
+
+            if(filter.showPriceFilter === true) {
+                if (getIntValue(filter.priceFrom) < 1000) {
+                    filter.priceFrom = 1000;
+                    $("input[name=priceFrom]").val(filter.priceFrom);
+                }
+
+                if (getIntValue(filter.priceTo) < getIntValue(filter.priceFrom)) {
+                    filter.priceTo = getIntValue(filter.priceFrom) + 1000;
+                    $("input[name=priceTo]").val(filter.priceTo);
+                }
+            }
+
+            var queryParam = "";
+            if (filter.brands != null)
+                queryParam = queryParam + "brands=" + JSON.stringify(filter.brands) + "&";
+            if (filter.priceFrom != null && filter.priceTo != null)
+                queryParam = queryParam + "priceFrom=" + filter.priceFrom + "&priceTo=" + filter.priceTo + "&";
+            if (filter.order != null)
+                queryParam = queryParam + "order=" + filter.order + "&";
+            if (filter.gasType != null)
+                queryParam = queryParam + "gasType=" + JSON.stringify(filter.gasType) + "&";
+            if (filter.transmition != null)
+                queryParam = queryParam + "transmition=" + JSON.stringify(filter.transmition);
+            return system.contextPath + [[@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/busqueda}]] + "?" + queryParam;
+        }
+
+        function runFilter() {
+            // change the url with the new params
+            window.history.pushState(null, null, getCurrentRelativeUrl());
+
+            // This call the post and repaint the results!!
+            $('#filterResult').defaultLoad(/*[[@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/resultados}]]*/null, null, null, 'GET', {
+                brands: JSON.stringify(filter.brands),
+                priceFrom: filter.priceFrom,
+                priceTo: filter.priceTo,
+                order: filter.order,
+                gasType: filter.gasType,
+                transmition: filter.transmition
+            })
+        }
+
+        function goToCarDetails(id) {
+            window.location.replace([[@{/__${T(com.affirm.common.model.catalog.ProductCategory).VEHICULO_CATEGORY_URL}__/detalles/}]] + id);
+        }
+
+
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: processHeader"></th:block>
+</th:block>
+<th:block layout:fragment="content">
+    <!-- modal -->
+    <div class="modal_msg_question_email modal fade"  tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="help" th:with="emailForm=${T(com.affirm.client.model.form.ValidateEmailForm).newInstance()}">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <span class="circle"></span>
+                        <span class="text">Ingresa tu correo para ver el precio online</span>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <!-- -->
+                <form class="modal-middle"  id="emailForm">
+                    <div class="wrap-field">
+                        <input type="hidden" class="input-outline" autocorrect="off" autocapitalize="none" id="groupId" name="groupId" value="" aria-required="true"/>
+                        <div class="box-icon"><i class="icon icon-gmail"></i></div>
+                        <input type="text" class="input-outline" autocorrect="off" autocapitalize="none" id="email" name="email" value="" aria-required="true"/>
+                        <small class="input-help">Correo electrónico</small>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" class="button bg-red send_email">Continuar</button>
+                    </div>
+                </form>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+
+                    var validator = /*[[${emailForm.validator.toJson(#locale)}]]*/null;
+                    $('#emailForm').validateForm(createFormValidationJson(JSON.parse(validator), $('#emailForm')));
+
+
+                    $('#email').keypress(function(event) {
+                        if (event.which == 13) {
+                            sendMail();
+                            event.preventDefault();
+                            return false;
+                        }
+                    });
+
+                    $('.send_email').on('click', function (event) {
+                        sendMail();
+                    });
+
+                    function sendMail() {
+                        var email = $('#email').val();
+                        if(!email){
+                            swal({
+                                title: "",
+                                text: "Debes ingresar tu correo electrónico",
+                                type: "warning"
+                            });
+                        }else{
+                            var url = /*[[@{/vehicle/registerDiscovery}]]*/null;
+                            var groupId = $('#groupId').val();
+                            defaultAjax({
+                                url: url,
+                                type: 'POST',
+                                data: {
+                                    email: email,
+                                    groupId: groupId
+                                },
+                                success: function (data) {
+                                    $("a[data-groupId='" + groupId + "']").parent().toggleClass('active');
+                                    $(".modal_msg_question_email").modal('toggle');
+                                    registerEmail = email;
+                                }
+                            })
+                        }
+                    }
+
+                    /*]]>*/
+                </script>
+            </div>
+        </div>
+    </div>
+    <!-- end modal -->
+    <div id="choose_brand">
+        <div id="middleFilter">
+            <div class="container">
+                <div class="sortby">
+                    <span>Ordenar por: </span>
+                    <div class="field inline">
+                        <select id="select_sortby" data-width="140" class="select-category">
+                            <option value="lower_price" th:selected="${order == 'lower_price'}">Menor Precio</option>
+                            <option value="higher_price" th:selected="${order == 'higher_price'}">Mayor Precio</option>
+                        </select>
+                    </div>
+                </div>
+                <a href="#" class="openfilter icon icon-sort"><span>Filtro</span></a>
+                <div class="controls-filters right">
+                    <a class="text-lightblue" th:href="@{/credito-vehicular}">Regresar</a>
+                </div>
+            </div>
+        </div>
+        <div class="wrap-choose-brand">
+            <div class="container">
+                <div id="lateralFilter">
+                    <div class="wrap-filter">
+                        <h4 class="icon icon-filter"><span>Filtros</span></h4>
+                        <div class="bloc bloc-brandcars">
+                            <span class="filter-title">Marcas</span>
+                            <ul class="brand-list">
+                                <li th:each="brand : ${@catalogService.getActiveVehicleBrands()}">
+                                    <a href= "#" class="brandSelected" th:attr="data-id=${brand.id}">
+                                        <img th:src="${brand.image}"/>
+                                        <h3 th:text="${brand.brand}"></h3>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bloc bloc-amount">
+                            <span class="filter-title">Precio</span>
+                            <ul>
+                                <li>
+                                    <div class="field inline">
+                                        <input type="text" class="input-outline-small amount-input-small"
+                                               placeholder="Min." name="priceFrom" th:value="${priceFrom}"/>
+                                        <span class="type-money">$</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="field inline">
+                                        <input type="text" class="input-outline-small amount-input-small"
+                                               placeholder="Max." name="priceTo" th:value="${priceTo}"/>
+                                        <span class="type-money">$</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bloc">
+                            <span class="filter-title">Transmisión</span>
+                            <ul>
+                                <li>
+                                    <label for="transmition2" class="custom-check">
+                                        <span class="check-inner">
+                                            <i class="icon icon-check"></i>
+                                        </span>
+                                        <span class="check-label">Mec&aacute;nica</span>
+                                        <input type="checkbox" name="transmition" class="real-check" id="transmition2" value="M"/>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label for="transmition4" class="custom-check">
+                                        <span class="check-inner">
+                                            <i class="icon icon-check"></i>
+                                        </span>
+                                        <span class="check-label">Autom&aacute;tica</span>
+                                        <input type="checkbox" name="transmition" class="real-check" id="transmition4" value="A"/>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="#" class="icon icon-trash " id="resetFilters">
+                        <span>Limpiar Filtros</span>
+                    </a>
+                </div>
+
+
+                <div id="filterResult">
+                    <th:block th:replace="this :: result"></th:block>
+                </div>
+
+            </div>
+
+            <!--<nav aria-label="navigation" id="pagination" class="container">-->
+            <!--<ul class="pagination">-->
+            <!--<li class="page-item"><a class="page-link" href="#">&laquo;</a></li>-->
+            <!--<li class="page-item"><a class="page-link" href="#">1</a></li>-->
+            <!--<li class="page-item active"><a class="page-link" href="#">2</a></li>-->
+            <!--<li class="page-item"><a class="page-link" href="#">3</a></li>-->
+            <!--<li class="page-item"><a class="page-link" href="#">4</a></li>-->
+            <!--<li class="page-item"><a class="page-link" href="#">&raquo;</a></li>-->
+            <!--</ul>-->
+            <!--</nav>-->
+
+        </div>
+
+        <div class="legal container">
+            <table style="font-family: sans-serif; font-size: 8px; text-align: justify; margin: 10px 0;"><tbody><tr><td>No válido para flotas ni endosos. No acumulable con otras promociones. Fotos y colores referenciales. Válido en los locales de Mitsui Automotriz en Miraflores y Surco. Los datos técnicos y de equipamiento de los vehículos están sujetos a la versión del modelo elegido.  Los precios de venta al público indicados en esta web son referenciales, por lo que los precios finales que ofrezca un punto de venta de Mitsui pueden ser distintos. La compra de cualquier producto o servicio está sujeto a los términos y condiciones fijados en cada operación. Los precios incluyen IGV y están indicados en Dólares Americanos, teniendo en cuenta el tipo de cambio del día aplicándose al momento de la transacción.</td></tr></tbody></table>
+        </div>
+
+    </div>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+</th:block>
+
+<th:block th:fragment="result">
+    <!-- poner este boque cuando no haya criterio de busqueda o no se encuentra alguno seleccionado -->
+    <div id="filterDefault" th:if="${#lists.isEmpty(results)}">
+        <div class="message">
+            <span class="icon-car">
+                <span>No encontramos autos con estos criterios.</span>
+                <span class="line"></span>
+            </span>
+        </div>
+    </div>
+    <!-- -->
+    <ul>
+
+    <li class="car-item" th:each="vehicle:${results}">
+        <a th:href="'javascript:goToCarDetails('+${vehicle.groupId}+')'">
+            <figure>
+                <img th:attr="src=${vehicle.image}, alt=${vehicle.brand.brand}+' '+${vehicle.model}"  class="lazy" />
+            </figure>
+        </a>
+        <div class="wrap-title">
+            <div class="title-wrap">
+                <div class="vTitle">
+                    <h2 class="text-black" th:text="${vehicle.brand.brand}+' '+${vehicle.model}"></h2>
+                </div>
+                <div class="cnt">
+                    <div class="brand-logo">
+                        <img th:src="${vehicle.brand.image}" alt=""/>
+                    </div>
+                    <span th:text="${vehicle?.version}"></span>
+                </div>
+            </div>
+            <div class="wrap-price">
+                <div class="wrap">
+                    <span class="price-default" th:text="${@utilService.integerMoneyFormat(vehicle?.listPrice, vehicle?.currency)}"></span>
+                    <small th:text="${@utilService.percentajeSave(vehicle?.listPrice, vehicle?.price)}"></small>
+                </div>
+                <a th:attr="data-groupId=${vehicle?.groupId}" href="#" class="icon icon-business open-carmodal"><span>Ver precio online</span></a>
+                <div class="cnt">
+                    <strong class="price-online" th:text="${@utilService.integerMoneyFormat(vehicle?.price, vehicle?.currency)}"></strong>
+                </div>
+            </div>
+        </div>
+        <div class="list-description">
+            <ul>
+                <li>
+                    <p><span class="title">Año de Fabricación</span><span class="description" th:text="${vehicle?.yearOfProduction}"></span></p>
+                </li>
+                <li class="wrap-list-color">
+                    <p class="p">
+                        <span class="title">Colores</span>
+                    <ul class="description colors" >
+                        <li th:each="vehicleDetails:${vehicle?.vehicleDetails}">
+                            <label th:for="${vehicleDetails?.color}" th:class="${vehicleDetails?.boxClass}" th:style="${vehicleDetails?.boxStyle}">
+                                <input type="radio" th:id="${vehicleDetails?.color}" class="colorPicker" name="colorpicker"/>
+                            </label>
+                        </li>
+                    </ul>
+                    </p>
+                </li>
+                <li>
+                    <p><span class="title">Transmisión</span><span class="description" th:text="${vehicle.transmission == vehicle.MECANICO ? 'Mec&aacute;nica' : 'Autom&aacute;tica'}"></span></p>
+                </li>
+                <li>
+                    <p><span class="title">Garantía</span><span class="description" th:text="${vehicle?.warranty}"></span></p>
+                </li>
+            </ul>
+        </div>
+        <div class="actions">
+            <a th:href="'javascript:goToCarDetails('+${vehicle.groupId}+')'" class="bg-green btn-vermas icon icon-control-next">
+                <span>Ver detalle</span>
+            </a>
+            <!--a th:href="${@vehicleService.createVehicleEvaluationUrl(vehicle.groupId, #httpServletRequest)}"  class="btn bg-red btn-solicitar">Solicitar crédito</a-->
+        </div>
+    </li>
+
+    </ul>
+</th:block>
+
+</body>
+</html>

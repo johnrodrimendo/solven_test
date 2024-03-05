@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--Google maps-->
+
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q166">
+        <div class="form q166">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <div class="row row-q166">
+                    <div class="d-flex-al-c mb-2">
+                        <div class="col-sm-12 col-md-6">
+                            <p class="m-0 text-left ">¿Cuál es tu ocupación?</p>
+                        </div>
+                        <div class="col-sm-12 col-md-6 text-left">
+                            <div class="field inline">
+                                <select data-width="275" th:field="*{professionOcupation}" data-placeholder="Elige una ocupación"
+                                        >
+                                    <th:block th:each="professionOccupation : ${professionOcupations}">
+                                        <option value="" disabled="disabled" selected="selected"></option>
+                                        <option th:value="${professionOccupation.id}"
+                                                th:text="${professionOccupation.occupation}"></option>
+                                    </th:block>
+                                </select>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <th:block th:if="${showCustomProfessions}">
+                        <div class="d-flex-al-c mb-2">
+                            <div class="col-sm-12 col-md-6">
+                                <p class="m-0 text-left ">¿Cuál es tu profesión?</p>
+                            </div>
+                            <div class="col-sm-12 col-md-6 text-left">
+                                <div class="field inline">
+                                    <select id="customProfessionId" data-width="275" name="customProfessionId" data-placeholder="Elige una profesión">
+                                        <option value="" hidden="hidden">Elige una profesión</option>
+                                        <option th:each="customEntityProfession : ${customEntityProfessions}"
+                                                th:value="${customEntityProfession.id}" th:text="${customEntityProfession.description}"></option>
+                                    </select>
+                                    <div class="errorContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                    <!--                    <div class="d-flex-al-c mb-2">-->
+                    <!--                        <div class="col-sm-12 col-md-6">-->
+                    <!--                            <p class="m-0 text-left ">¿Cuál es tu cargo?</p>-->
+                    <!--                        </div>-->
+                    <!--                        <div class="col-sm-12 col-md-6 text-left">-->
+                    <!--                            <div class="field inline">-->
+                    <!--                                <select data-width="275" th:field="*{ocupation}"-->
+                    <!--                                        th:attr="data-placeholder=#{question.map.charge}">-->
+                    <!--                                    <th:block th:each="ocupation : ${occupations}">-->
+                    <!--                                        <option value="" disabled="disabled" selected="selected"></option>-->
+                    <!--                                        <option th:value="${ocupation.id}" th:text="${ocupation.ocupation}"></option>-->
+                    <!--                                    </th:block>-->
+                    <!--                                </select>-->
+                    <!--                            </div>-->
+                    <!--                            <div class="errorContainer"></div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <div class="d-flex-al-c mb-2">
+                        <div class="col-sm-12 col-md-6">
+                            <p class="m-0 text-left ">¿En qué sector económico trabajas?</p>
+                        </div>
+                        <div class="col-sm-12 col-md-6 text-left">
+                            <div class="field inline">
+                                <select id="profession" data-width="275" name="profession"
+                                        th:attr="data-placeholder=#{question.map.sector}">
+                                    <option value="" hidden="hidden">Sectores</option>
+                                    <option th:each="profession : ${@catalogService.getProfessionsActive(#locale)}"
+                                            th:value="${profession.id}" th:text="${profession.profession}"></option>
+                                </select>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <th:block th:if="${showActivities}">
+                        <div class="d-flex-al-c mb-2">
+                            <div class="col-sm-12 col-md-6">
+                                <p class="m-0 text-left ">¿Qué actividad desempeñas?</p>
+                            </div>
+                            <div class="col-sm-12 col-md-6 text-left">
+                                <div class="field inline">
+                                    <select id="activityId" data-width="275" name="activityId" th:attr="data-placeholder=#{question.map.activity}">
+                                        <option value="" hidden="hidden">Actividades</option>
+                                        <option th:each="activity : ${activities}"
+                                                th:value="${activity.id}" th:text="${activity.description}"></option>
+                                    </select>
+                                    <div class="errorContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                    <div class="d-flex-al-c mb-2">
+                        <div class="col-sm-12 col-md-6">
+                            <p class="m-0 text-left ">¿Desempeñas o has desempeñado, en los últimos 5 años, un cargo
+                                público importante?</p>
+                        </div>
+                        <div class="field col-sm-12 col-md-6"
+                             style="flex-direction: column;display:flex;justify-content: start">
+                            <div style="width: 100%;display: flex">
+                                <div class="custom-rb">
+                                    <input type="radio" id="isPepTrue" name="isPep" th:value="true"/>
+                                    <label for="isPepTrue">Si</label>
+                                </div>
+                                <div class="custom-rb" style="margin-left: 2.5rem">
+                                    <input type="radio" id="isPepFalse" name="isPep" th:value="false"/>
+                                    <label for="isPepFalse">No</label>
+                                </div>
+                            </div>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex-al-c mb-2">
+                        <div class="col-sm-12 col-md-6">
+                            <p class="m-0 text-left ">¿Tienes residencia fiscal o tributaria en otro país que no sea
+                                Perú?</p>
+                        </div>
+                        <div class="field col-sm-12 col-md-6"
+                             style="flex-direction: column;display:flex;justify-content: start">
+                            <div style="width: 100%;display: flex">
+                                <div class="custom-rb">
+                                    <input type="radio" id="isFatcaTrue" name="isFatca" th:value="true"/>
+                                    <label for="isFatcaTrue">Si</label>
+                                </div>
+                                <div class="custom-rb" style="margin-left: 2.5rem">
+                                    <input type="radio" id="isFatcaFalse" name="isFatca" th:value="false"/>
+                                    <label for="isFatcaFalse">No</label>
+                                </div>
+                            </div>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row" style="margin-top: 1rem">
+                    <div class="field inline field-button">
+                        <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"
+                                style="min-width: 220px !important;"></button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div id="pep-facta" class="modal fade on">
+        <div class="modal-dialog modal-lg">
+            <div id="modal-facta" class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">FATCA - Foreign Account Tax Compliance Act</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close" style="background: rgb(0, 56, 118);"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="gray-block">
+                        <div class="on-modal">
+                            <p class="on-modal">
+                                <span class="col-md-7 col-sm-12 col-xs-12" style="padding-bottom: 29px;width: 100%;"><span style="display: inline-block;margin-bottom: 5px">¿Cuándo se debe considerar residencia Fiscal o tributaria en otro país?</span><br/>
+                                   Cuando declaro mis ingresos o pago impuestos a otro país, en caso de tener doble nacionalidad, si mi domicilio no fuera Perú entre otros.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1rem;margin-bottom: 1rem;text-align: center">
+                    <div class="field inline field-button">
+                        <button id="confirm-modal-fatca"  type="button" class="button bg-red" data-dismiss="modal"
+                                 style="min-width: 220px !important;">
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-pep" class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">PEP - Personas Expuestas Políticamente</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close" style="background: rgb(0, 56, 118);"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="gray-block">
+                        <div class="on-modal">
+                            <p class="on-modal">
+                                <span class="col-md-7 col-sm-12 col-xs-12" style="padding-bottom: 29px;width: 100%;"><span style="display: inline-block;margin-bottom: 5px">¿Que se considera un cargo público importante?</span><br/>
+                                Por ejemplo, el Presidente de la República, el Vicepresidente, los ministros, Jueces, Funcionarios de partidos políticos, policías o militantes entre otros. También se consideran si tuvieras algún vínculo directo con algún organismo del estado.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1rem;margin-bottom: 1rem;text-align: center">
+                    <div class="field inline field-button">
+                        <button id="confirm-modal-pep"  type="button" class="button bg-red" data-dismiss="modal"
+                                 style="min-width: 220px !important;">
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $("#isPepFalse").prop("checked",true);
+        $("#isFatcaFalse").prop("checked",true);
+        var confirmoPep = false;
+        var confirmoFatca = false;
+
+        $("#isPepTrue").click("click",function(){
+            if(!confirmoPep){
+                $("#isPepFalse").prop("checked",true);
+            }
+        });
+
+        $("#isFatcaTrue").click("click",function(){
+            if(!confirmoFatca) {
+                $("#isFatcaFalse").prop("checked", true);
+            }
+        });
+
+        $("#isPepFalse").click("click",function(){
+            confirmoPep = false;
+        });
+
+        $("#isFatcaFalse").click("click",function(){
+            confirmoFatca = false;
+        });
+
+        $("#confirm-modal-fatca").click("click",function(){
+            $("#isFatcaTrue").prop("checked",true);
+            confirmoFatca = true
+        });
+
+        $("#confirm-modal-pep").click("click",function(){
+            $("#isPepTrue").prop("checked",true);
+            confirmoPep = true
+        });
+
+        $("#isPepTrue").one("click",function(){
+            $('#modal-facta').hide();
+            $('#modal-pep').show();
+            $('#pep-facta').modal({backdrop: 'static', keyboard: false, show: true});
+        });
+
+        $("#isFatcaTrue").one("click",function(){
+            $('#modal-pep').hide();
+            $('#modal-facta').show();
+            $('#pep-facta').modal({backdrop: 'static', keyboard: false, show: true});
+        });
+
+        questionFw.initializeFormInputs();
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(),
+                        {})
+                }, "");
+            }
+        });
+
+
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

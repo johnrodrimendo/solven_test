@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/companyTemplate">
+<head>
+    <title>Historicos</title>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+
+            var firstMonth = /*[[${@utilService.dateCustomFormat(firstCreditMonth, 'MM/yyyy', #locale)}]]*/;
+            var actualDate = moment().format('MM/YYYY');
+            if (firstMonth != null) {
+                while (firstMonth != actualDate) {
+                    $('#months').append("<option value='" + firstMonth + "'>" + firstMonth + "</option>");
+                    firstMonth = moment(firstMonth, 'MM/YYYY').add(1, 'months').format('MM/YYYY');
+                    debugger;
+                }
+            }
+
+            $('#months').change(function () {
+                var val = $(this).val();
+                system.unloadAlert = false;
+                window.location.replace(system.contextPath + "/historicos?month=" + val);
+            });
+
+            var monthSelected = /*[[${month}]]*/;
+            if (monthSelected != null) {
+                $('#months').val(monthSelected);
+            }
+
+
+        });
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+
+
+<th:block layout:fragment="header">
+    <!-- BEGIN HEADER & CONTENT DIVIDER -->
+    <th:block th:replace="fragments/headers :: companyDashboardHeader "></th:block>
+    <div class="clearfix"></div>
+    <!-- END HEADER & CONTENT DIVIDER -->
+</th:block>
+
+
+<th:block layout:fragment="content">
+
+    <!-- Sidebar -->
+    <th:block
+            th:replace="fragments/extranetSidebarFragments :: extranetCompanySidebar(currentPage='history')"></th:block>
+    <!-- / Sidebar -->
+
+    <!-- BEGIN CONTENT -->
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+
+            <!-- BEGIN PAGE BREADCRUMB -->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <span class="active">Historicos</span>
+                </li>
+            </ul>
+            <!-- END PAGE BREADCRUMB -->
+
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption font-dark">
+                        <i class="icon-settings font-dark"></i>
+                        <span class="caption-subject bold uppercase"> Historial</span>
+                    </div>
+                    <div class="actions">
+                        <span style="display: inline-block;margin-top:.25em;vertical-align: top;">Filtrar </span>
+                        <select id="months" class="form-control"
+                                style="display: inline-block;vertical-align: top; width: 150px">
+                            <option value="">Todos</option>
+                        </select>
+
+                        <div class="btn-group" style="margin-left: 1em;">
+                            <a class="btn green btn-circle" href="javascript:;" data-toggle="dropdown"
+                               aria-expanded="true">
+                                <i class="fa fa-cog"></i> Acciones
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a th:href="@{/salarayAdvances/excel}">
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar">
+                    </div>
+                    <div id="sample_1_2_wrapper" class="dataTables_wrapper" th:if="${credits != null}">
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover table-checkable order-column dataTable"
+                                   id="sample_1_2" role="grid" aria-describedby="sample_1_2_info">
+                                <thead>
+                                <tr role="row">
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 100px;">
+                                        Per&iacute;odo
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 90px;" width="100">
+                                        Tipo documento
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 100px;">
+                                        N&uacute;mero documento
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1"
+                                        colspan="1" aria-sort="ascending"
+                                        aria-label=" Username : activate to sort column descending"
+                                        style="text-align:center;width: 240px;"> Nombre Completo
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Email : activate to sort column ascending"
+                                        style="text-align:center;width: 110px;">
+                                        Cantidad cr&eacute;ditos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Status : activate to sort column ascending"
+                                        style="text-align:center;width: 196px;">
+                                        Monto cr&eacute;ditos
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="sample_1_2" rowspan="1" colspan="1"
+                                        aria-label=" Joined : activate to sort column ascending"
+                                        style="background:#32c5d2;color: white;text-align:center;width: 187px;">
+                                        Monto pagado
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr role="row" th:each="credit : ${credits}">
+                                    <td style="padding:1em;text-align:center;">
+                                        <span th:text="${@utilService.dateCustomFormat(credit.registerDate, 'MM/yyyy', #locale)}"></span>
+                                    </td>
+                                    <td style="padding:1em;text-align:left;">
+                                        <span th:text="${credit.docType.name}"></span>
+                                    </td>
+                                    <td style="text-align: center">
+                                        <span th:text="${credit.docNumber}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${credit.getFullName()}"></span>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span th:text="${credit.credits}"></span>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span th:text="${@utilService.doubleMoneyFormat(credit.totalCreditAmount)}"></span>
+                                    </td>
+                                    <td style="background:#c3eef1;text-align:center;">
+                                        <span th:text="${@utilService.doubleMoneyFormat(credit.totalCreditAmountToPay)}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td style="text-align: right"><b>Total</b></td>
+                                    <td style="text-align: center">
+                                        <b th:text="${totals.credits}"></b>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <b th:text="${@utilService.doubleMoneyFormat(totals.totalCreditAmount)}"></b>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <b th:text="${@utilService.doubleMoneyFormat(totals.totalCreditAmountToPay)}"></b>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END CONTENT BODY -->
+    </div>
+    <!-- END CONTENT -->
+
+</th:block>
+
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

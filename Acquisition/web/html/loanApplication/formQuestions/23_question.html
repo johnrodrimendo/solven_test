@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q23">
+            <p th:text="#{questions.block.propertyType}"></p>
+            <div class="field inline" th:each="type : ${houseTypes}">
+                <label class="h-input-radio">
+                    <input type="radio" name="housingType" th:value="${type.id}"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline" th:text="${type.type}"></h5>
+                        </div>
+                    </div>
+                </label>
+                <small th:text="${type?.description}"></small>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=housingType]:radio').change(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {housingType: $(this).val()}
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

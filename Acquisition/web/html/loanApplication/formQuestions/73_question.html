@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:text="#{questions.compare.importance}"></p>
+        <div class="note">
+            <span th:text="#{questions.compare.mainForMe}"></span>
+        </div>
+        <div class="field inline"
+             th:each="reason : ${@catalogService.getComparisonReasonsByGroupId(T(com.affirm.common.model.catalog.ComparisonReason).REASON_GROUP_BETTER_CARD, #locale)}">
+            <label class="input-radio">
+                <input type="radio" class="howEarnMoney" name="reason" th:value="${reason.id}"/>
+                <div class="option-wrapper">
+                    <div class="iconic-option-inner">
+                        <i class="icon" th:classappend="'icon-main-' + ${reason.id}"></i>
+                        <h5 th:text="${reason.subreason}"></h5>
+                        <div class="radio"></div>
+                    </div>
+                </div>
+            </label>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=reason]').on('change', function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    reason: $(this).val()
+                }
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

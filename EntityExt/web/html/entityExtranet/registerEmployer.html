@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/extranetTemplate(sidebarClosed=true)">
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}" rel="stylesheet"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+            var formEmployer = $('#createEmployerForm');
+            var jsonValidator = createFormValidationJson(JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/), formEmployer);
+            formEmployer.validateForm(jsonValidator);
+            $('#createEmployerBtn').click(function (event) {
+                if (formEmployer.valid()) {
+                    $('#createEmployerBtn').loading();
+                    defaultAjax({
+                        url: /*[[@{/employers}]]*/null,
+                        type: 'POST',
+                        form: formEmployer,
+                        data: formEmployer.serializeObject(),
+                        success: function (data) {
+                            $('#createEmployerBtn').unloading();
+                            clearElementsInContainer(formEmployer);
+                            swal({title: "", text: "Empresa registrada", type: "success"});
+                        },
+                        error: function () {
+                            $('#createEmployerBtn').unloading();
+                        }
+                    });
+                }
+            });
+
+            $('.activeBtn').click(function () {
+                var active = $(this).data('active');
+                var btnSelected = $(this);
+
+                defaultAjax({
+                    url: /*[[@{/employers/activate}]]*/null,
+                    type: 'POST',
+                    data: {
+                        active: !active,
+                        employerId: $(this).data('id')
+                    },
+                    success: function (data) {
+                        if (active) {
+                            swal({title: "", text: "Desactivación satisfactoria", type: "success"});
+                            btnSelected.text("Inactivo");
+                        } else {
+                            swal({title: "", text: "Activación satisfactoria", type: "success"});
+                            btnSelected.text("Activo");
+                        }
+                        btnSelected.toggleClass('btn-primary');
+                        btnSelected.toggleClass('btn-danger');
+                        btnSelected.data('active', !active);
+                    },
+                    error: function () {
+                        swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                    }
+                });
+            });
+
+            $('.modifyTeaBtn').click(function () {
+                var name = $(this).data('name');
+                var ruc = $(this).data('ruc');
+                var employerId = $(this).data('id');
+                swal({
+                    title: "Cambio de TEA",
+                    text: "Ingrese la nueva TEA para la empresa " + name + " con RUC " + ruc,
+                    type: "input",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    animation: "slide-from-top",
+                    inputPlaceholder: "22.5"
+                },
+                function(inputValue){
+                    if (inputValue === false) return false;
+
+                    var teaFloat = parseFloat(inputValue);
+                    if (inputValue === "" || teaFloat <= 0.00001) {
+                        swal.showInputError("Ingresa un valor correcto");
+                        return false
+                    }
+
+                    defaultAjax({
+                        url: /*[[@{/employers/updateTea}]]*/null,
+                        type: 'POST',
+                        data: {
+                            employerId: employerId,
+                            tea: teaFloat
+                        },
+                        success: function(){
+                            swal({title: "", text: "TEA modificada correctamente", type: "success"});
+                            $('#tea_'+employerId).text(teaFloat.toFixed(2) + " %");
+                        },
+                        error: function(){
+                            swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                        }
+                    });
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <div class="clearfix"></div>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='business')"/>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject font-green bold uppercase">Creaci&oacute;n de Empresas</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-lg-9">
+                                    <form id="createEmployerForm" role="form" class="form" th:object="${form}">
+                                        <div class="row">
+                                            <div class="form-group col-sm-4">
+                                                <label>Nombre de la empresa (*)</label>
+                                                <input th:field="*{name}" class="form-control" placeholder=""/>
+                                            </div>
+                                            <div class="form-group col-sm-4">
+                                                <label>RUC (*)</label>
+                                                <input th:field="*{ruc}" type="text" class="form-control" placeholder=""/>
+                                            </div>
+                                            <div class="form-group col-sm-4">
+                                                <label>Rubro (*)</label>
+                                                <select th:field="*{profession}" class="form-control">
+                                                    <option value="" hidden="hidden" selected="selected"></option>
+                                                    <option th:each="profession : ${@catalogService.getProfessionsActive(#locale)}"
+                                                            th:value="${profession.id}" th:text="${profession.profession}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-8">
+                                                <label>Direcci&oacute;n (*)</label>
+                                                <input th:field="*{address}" type="text" class="form-control" placeholder=""/>
+                                            </div>
+                                            <div class="form-group col-sm-4">
+                                                <label>Tel&eacute;fono (*)</label>
+                                                <input th:field="*{phone}" type="text" class="form-control" placeholder=""/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-12">
+                                                <label>Usuario 1 (*)</label>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user1Name}" type="text" class="form-control" placeholder="Nombre..."/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user1FirstSurname}" type="text" class="form-control" placeholder="Ap. paterno"/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user1LastSurname}" type="text" class="form-control" placeholder="Ap. materno"/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user1Email}" type="text" class="form-control" placeholder="Email..."/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-12">
+                                                <label>Usuario 2</label>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user2Name}" type="text" class="form-control" placeholder="Nombre..."/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user2FirstSurname}" type="text" class="form-control" placeholder="Ap. paterno"/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user2LastSurname}" type="text" class="form-control" placeholder="Ap. materno"/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user2Email}" type="text" class="form-control" placeholder="Email..."/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-12">
+                                                <label>Usuario 3</label>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user3Name}" type="text" class="form-control" placeholder="Nombre..."/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user3FirstSurname}" type="text" class="form-control" placeholder="Ap. paterno"/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user3LastSurname}" type="text" class="form-control" placeholder="Ap. materno"/>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input th:field="*{user3Email}" type="text" class="form-control" placeholder="Email..."/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-xs-6 col-sm-4">
+                                                <label class="col-sm-9">Fecha de corte (*)</label>
+                                                <input th:field="*{cutoffDay}" class="form-control col-sm-3" placeholder="" maxlength="2"/>
+                                            </div>
+                                            <div class="form-group col-xs-6 col-sm-4">
+                                                <label class="col-sm-9">Fecha de Pago (*)</label>
+                                                <input th:field="*{paymentDay}" class="form-control col-sm-3" placeholder="" maxlength="2"/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-md-3">
+                                                <label>Tasa de inter&eacute;s (%) (*)</label>
+                                                <input th:field="*{tea}" class="form-control" placeholder="22.5"/>
+                                            </div>
+                                        </div>
+                                        <div class="errorContainer"></div>
+                                        <div class="form-actions">
+                                            <button id="createEmployerBtn" type="button" class="btn red">Crear</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="overflow:auto">
+                <table id="tableResults" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nombre de la empresa</th>
+                            <th>RUC</th>
+                            <th>Tel&eacute;fono</th>
+                            <th>Fecha de corte</th>
+                            <th>Fecha de pago</th>
+                            <th>TEA</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="employer : ${employers}">
+                            <td th:text="${employer?.name}"></td>
+                            <td th:text="${employer?.ruc}"></td>
+                            <td th:text="${employer?.phoneNumber}"></td>
+                            <td th:text="${employer?.cutoffDay}"></td>
+                            <td th:text="${employer?.agreementPaymentDay}"></td>
+                            <td th:attr="id=${'tea_'+employer.id}" th:text="${@utilService.percentFormat(employer?.entityTea)}"></td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-sm activeBtn" th:attr="data-id=${employer.id}, data-active=${employer?.entityActive}" th:text="${employer?.entityActive ? 'Activo' : 'Inactivo'}" th:classappend="${employer?.entityActive ? 'btn-primary' : 'btn-danger'}"></button>
+                                <button class="btn btn-sm btn-default modifyTeaBtn" th:attr="data-id=${employer.id}, data-ruc=${employer.ruc}, data-name=${employer.name}, data-id=${employer.id}">Modificar TEA</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

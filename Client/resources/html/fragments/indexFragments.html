@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<th:block th:fragment="applyForCreditForm">
+    <form role="form" id="frmRegister" class="aff-form" action="#"
+          th:object="${userRegisterForm}"
+          method="post" autocomplete="off">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group sol-cont-tith3">
+                    <h3 class="sol-tit-h3">Solicita un crédito</h3>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="aff-rwd-label form-group"
+                     th:classappend="*{validator.loanApplicationAmmount.hasErrors?'has-error':''}">
+                    <label class="control-label"
+                           for="loanApplicationAmmount"
+                           th:text="#{registerForm.loanApplicationAmmount}">
+                    </label>
+
+                    <div id="loanApplicationAmmountValue" class="input-group">
+                        <h4></h4>
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </div>
+
+                    <div id="loanApplicationAmmountEditable" style="display: none">
+                        <input type="text" maxlength="5"/>
+                    </div>
+
+                    <input type="text" th:field="*{loanApplicationAmmount}"
+                           class="form-control"/>
+                    <div class="errorContainer">
+                        <span class="help-block form-field-error-message"
+                              th:if="*{validator.loanApplicationAmmount.hasErrors}"
+                              th:text="*{validator.loanApplicationAmmount.errors}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="form-group"
+                     th:classappend="*{validator.loanApplicationInstallemnts.hasErrors?'has-error':''}">
+                    <label class="control-label" for="loanApplicationInstallemnts"
+                           th:text="#{registerForm.loanApplicationInstallments}"></label>
+                    <div class="input-group">
+                        <div class="loanApplicationInstallemntsValue">
+                            <h4 id="loanApplicationInstallemntsValue"></h4>
+                        </div>
+                    </div>
+                    <input th:field="*{loanApplicationInstallemnts}" type="text"
+                           class="form-control"/>
+                    <div class="errorContainer">
+                        <span class="help-block form-field-error-message"
+                              th:if="*{validator.loanApplicationInstallemnts.hasErrors}"
+                              th:text="*{validator.loanApplicationInstallemnts.errors}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div id="loanShortTermDaysDiv" class="form-group" style="display: none">
+                    <label for="loanApplicationShorTermDays"
+                           th:text="#{registerForm.loanApplicationInstallments.shortTerm.label}">Selecciona
+                        los días</label>
+                    <h4 id="loanApplicationShorTermDaysValue" style="text-align: center"></h4>
+                    <input th:field="*{loanApplicationShorTermDays}" type="text"
+                           class="form-control"/>
+                </div>
+            </div>
+
+            <input type="hidden" th:field="*{loanApplicationReason}"/>
+            <input type="hidden" th:field="*{loanApplicationCluster}"/>
+
+            <div class="col-md-12" id="aff-col-dociden">
+                <div class="row">
+                    <div class="col-md-12 aff-label-dociden">
+                        <label class="control-label" for="documentType" th:text="#{form.field.document}"
+                               th:placeholder="#{form.field.docNumber}">Documento de identidad</label>
+                    </div>
+                    <div class="col-md-3"
+                         th:classappend="*{validator.docType.hasErrors?'has-error':''}">
+                        <div class="form-group label-floating">
+                            <label class="control-label" for="documentType"></label>
+                            <select th:field="*{docType}" class="form-control">
+                                <!--<option value="" hidden="hidden"></option>-->
+                                <!--<option value="" th:text="#{form.field.documentType.placeholder}"></option>-->
+                                <option value="1" th:text="#{form.field.documentType.dni}">DNI
+                                </option>
+                                <option value="2" th:text="#{form.field.documentType.ce}">CE
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-9"
+                         th:classappend="*{validator.docNumber.hasErrors?'has-error':''}">
+
+                        <div class="form-group label-floating">
+                            <label class="control-label" for="documentType"></label>
+                            <input type="text" th:field="*{docNumber}" class="form-control"
+                                   placeholder="Número de documento"/>
+                            <div class="errorContainer">
+         <span class="help-block form-field-error-message"
+               th:if="*{validator.docNumber.hasErrors}"
+               th:text="*{validator.docNumber.errors}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" id="cellphoneDiv" style="display: none;">
+                <div class="form-group">
+                    <label class="control-label">Ingresa tu número y te enviaremos un código de
+                        identificación</label>
+                    <div class="form-group label-floating aff-labflo-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">+51</span>
+                            <!--<label class="control-label" th:placeholder="#{form.field.docNumber}">Número celular</label>-->
+                            <input th:field="*{phoneNumber}"
+                                   class="form-control" placeholder="Número de celular"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group aff-formgroup-buttons-sol">
+                    <div class="col-md-6 col-xs-12">
+                        <button type="button" class="aff-form-button-gray"
+                                th:text="#{form.button.cancel}" onclick="hiform-disclaimereCellphoneDiv()">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <button id="phoneSubmit" type="button"
+                                class="aff-form-button" th:text="#{registerForm.apply}">Solicitar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group aff-cont-disc">
+                    <div class="col-md-12">
+                        <p class="form-disclaimer" th:utext="#{registerForm.authorization.message}">
+                            La
+                            siguiente evaluación
+                            no
+                            afectará tu score crediticio en las centrales de riesgo. Para validar tu
+                            identidad, necesitaremos que te registres con Facebook o con tu número
+                            de
+                            teléfono celular (que será validado).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" th:text="#{registerForm.aceptConditions}"
+                               name="termsAndConditions"
+                               id="termsAndConditions"/>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row aff-row-buttons-home">
+            <div id="validationOptionButtons">
+                <div class="col-md-6">
+                    <button type="button"
+                            class="aff-form-button-tel fontawe-phone"
+                            onclick="validateFormForModal('phone')">&#xf10b; <span class="text-cel">Celular</span>
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button type="button"
+                            class="aff-form-button-face fontawe-face"
+                            onclick="validateFormForModal('facebook')">&#xf09a; <span class="text-face">Facebook</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</th:block>
+
+<th:block th:fragment="estimateRateForm">
+    <form role="form" class="aff-form" id="frmRate" autocomplete="off">
+        <div class="row-fluid">
+            <div class="col-md-12 aff-minheight0">
+                <div class="form-group">
+                    <h3>Estimado de acuerdo a personas como tú</h3>
+                </div>
+            </div>
+            <div class="col-md-6 aff-minheight">
+                <div class="form-group label-floating">
+                    <!--<span th:text="#{registerForm.loanApplicationReason}">?Cuál es el destino del crédito?</span>-->
+                    <div class="input-group">
+                        <label class="control-label">¿Cuál es el destino del crédito?</label>
+                        <select id="loanReason" class="form-control">
+                            <option value="" hidden="hidden"></option>
+                            <option value=""
+                                    th:text="#{registerForm.loanApplicationReason.placeholder}"
+                                    hidden="hidden">Selecciona
+                            </option>
+                            <option th:each="reason : ${@catalogService.getLoanApplicationReasons(#locale)}"
+                                    th:value="${reason.id}" th:text="${reason.reason}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div id="estimaPostLoanApplicationReason">
+                    <div class="form-group aff-rwd-label label-floating">
+                        <span th:text="#{registerForm.loanApplicationAmmount}">¿Cuánto dinero necesitas?</span>
+
+                        <div id="loanAmmountValue" class="input-group">
+                            <h4></h4>
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </div>
+
+                        <div id="loanAmmountValueEditable" style="display: none">
+                            <input type="text" maxlength="5"/>
+                        </div>
+
+                        <div>
+                            <input id="loanAmmount" name="loanAmmount" type="text" value="500"/>
+                        </div>
+                    </div>
+                    <div class="form-group" id="loanClusterContainer">
+                        <span th:text="#{registerForm.loanApplicationCluster}">¿Como pagas tus créditos?</span>
+                        <div class="input-group">
+                            <div class="loanClusterValue">
+                                <h4 id="loanClusterValue"></h4>
+                            </div>
+                        </div>
+                        <input type="text" id="loanCluster"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 aff-minheight2">
+                <div id="adelantoResutl" style="display: none;">
+                    <div class="row">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Adelanto</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-5">
+                                    <label>TEA</label>
+                                    <br/>
+                                    <span id="adelantoResutlTcea">300</span>
+                                </div>
+                                <div class="col-md-7">
+                                    <label>PAGO TOTAL</label>
+                                    <br/>
+                                    <span id="adelantoResutlPayment">S/. 40000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tradicionalResutl" style="display: none;">
+                    <div class="row">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">18 meses<sup>(*)</sup></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-4">
+                                    <label>TEA</label>
+                                    <br/>
+                                    <span id="tradicionalResutl18Tcea">300</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <label>PAGO MENSUAL</label>
+                                    <br/>
+                                    <span id="tradicionalResutl18Payment">S/. 40000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">36 meses<sup>(*)</sup></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-4">
+                                    <label>TEA</label>
+                                    <br/>
+                                    <span id="tradicionalResutl36Tcea">300</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <label>PAGO MENSUAL</label>
+                                    <br/>
+                                    <span id="tradicionalResutl36Payment">S/. 40000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-12 text-center">
+                <!--<button id="goToFormButton" type="button" class="btn btn-info btn-lg"-->
+                <!--style="width: 100%">Solicitar-->
+                <!--</button>-->
+                <button onclick="goToSolicitaCredito()" type="button" class="aff-form-button"
+                        style="margin-top: 20px">Solicitar
+                </button>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-12">
+                <p class="form-disclaimer" th:text="#{registerForm.sup3}"><sup>(*)</sup> La TCEA
+                    real y el pago mensual podrían variar respecto a los estimados. Los cálculos se
+                    basan en las TCEAs para los períodos mostrados, de acuerdo al perfil crediticio seleccionado.</p>
+            </div>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>

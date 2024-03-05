@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+
+        <p th:utext="#{questions.block.ordenService}"></p>
+
+        <form id="questionForm" class="forms q145">
+            <div class="note" style="text-align: justify; margin-bottom: 30px;">
+                <div class="container">
+                    <button type="button" class="button btn-no bg-red">NO</button>
+                    <button type="button" class="button btn-si bg-red">SI</button>
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <div class="field inline">
+                            <input name="orderNumber" class="input-outline" />
+                            <small class="input-help">C&oacute;digo SIAF</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline">
+                            <input name="amount" class="input-outline" />
+                            <small class="input-help">Monto</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="field inline">
+                            <select name="incomeRange" data-placeholder="Elige un rango">
+                                <option value="" hidden="hidden">Elige un rango</option>
+                                <option>500 a 3000</option>
+                                <option>3000 a 5000</option>
+                                <option>5000 a mas</option>
+                            </select>
+                            <small class="input-help">Rango de ingreso mensual personal</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline">
+                            <div class="sub-field">
+                                <span class="icon-porcentaje">%</span>
+                                <input name="participationPercentage" class="input-outline sub-field-input" />
+                            </div>
+                            <small class="input-help">% de participaci&oacute;n en empresa</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div> 
+                    <div class="form-group">
+                        <div class="field inline">
+                            <select name="incomeRangeCompany" data-placeholder="Elige un rango">
+                                <option value="" hidden="hidden">Elige un rango</option>
+                                <option>Menos 50,000 Soles</option>
+                                <option>Entre 50,000 y 100,000 Soles</option>
+                                <option>Mas de 100,000 Soles</option>
+                            </select>
+                            <small class="input-help">Rango de ingreso mensual empresa</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                        <div class="field inline">
+                            <input name="activationDate" type="text" id="getDatetimepicker"
+                                class="input-outline datetimepicker-input" />
+                            <small class="input-help">Fecha Estimada de cobro</small>
+                            <div class="errorContainer"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        (function() {
+
+            questionFw.initializeFormInputs();
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+            var enableDates = [[${enableDates}]];
+            moment.locale("es");
+            var jsonDatePicker = {
+                format: 'DD/MM/YYYY',
+                inline: true,
+                sideBySide: true,
+                locale: 'es'
+            };
+            if (enableDates != null) {
+                for (i = 0; i < enableDates.length; i++) {
+                    enableDates[i] = moment(enableDates[i], "DD/MM/YYYY");
+                }
+                jsonDatePicker.enabledDates = enableDates;
+            }
+            $("#getDatetimepicker").on('click',function(){
+                $('#getDatetimepicker').datetimepicker(jsonDatePicker);
+            })
+            
+            $('#getDatetimepicker').on('dp.change', function (event) {
+                console.log("calendario aberierto")
+                //$('#getDatetimepicker').data("DateTimePicker").hide();
+                var formatted_date = event.date.format("DD/MM/YYYY");
+                console.log(event.date)
+                $('#getDatetimepicker').val(formatted_date);
+                if (event.date) {
+                    console.log("date event")
+                    console.log('Date chosen: ' + event.date.format());
+                }
+            });
+            $(document).on("click", "td.day", function () {
+                console.log("calendario aberierto 2")
+                if (!$(this).hasClass('disabled')) {
+                    console.log('esta deshabilitado');
+                }
+            });
+
+            $('#sendButton').on('click', function(){
+                if ($('#questionForm').valid()) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $('#questionForm'),
+                        data: $.extend($('#questionForm').serializeObject(), {serviceOrder: true})
+                    }, "");
+                }
+            });
+            $(".btn-si").on('click',function(){
+                $(".form-container").show();
+            })
+             $(".btn-no").on('click',function(){
+                swal({
+                    title: '',
+                    text: "¿Estás seguro que no tienes orden de servicio?",
+                    html:true,
+                    customClass: 'swal-orden',
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-danger",
+                    cancelButtonText: "No",
+                    confirmButtonText: "Si"
+                }, function (data) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $('#questionForm'),
+                        data: {serviceOrder: false}
+                    }, "");
+                });
+            })
+        })();
+
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

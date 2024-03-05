@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/Chartjs-2.7.2/dist/Chart.min.js'}"></script>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Errores</span>
+                </li>
+            </ul>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Procesos por hora</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="chart-container" style="position: relative; width:60vw; margin: auto;">
+                                    <canvas id="processByHourChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        var processesByHour = JSON.parse(/*[[${processesByHours}]]*/);
+        var labelsChart = [];
+        var dataChart = [];
+        const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+        processesByHour.forEach(function(p) {
+            var date = new Date(p.tag);
+            labelsChart.push(days[date.getDay()] + " " + date.getHours()+":00");
+            dataChart.push(p.total);
+        });
+
+        var ctx = document.getElementById("processByHourChart").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labelsChart,
+                datasets: [{
+                    label: '# of Process',
+                    data: dataChart,
+                    backgroundColor: "rgb(255, 49, 32)",
+                    borderColor: "rgb(255, 49, 32)",
+                    fill: false
+                }],
+                options: {
+                    responsive: false
+                }
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

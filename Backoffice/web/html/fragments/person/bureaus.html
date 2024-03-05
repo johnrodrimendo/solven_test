@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<div>
+    <th:block th:fragment="bureaus" th:remove="tag">
+        <div id="tabLoading" style="display: none">
+            <ul class="fa-ul">
+                <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de bureau
+                </li>
+            </ul>
+        </div>
+        <div th:if="${firstCall == null or !firstCall}">
+            <div id="bureaus" th:unless="${#lists.isEmpty(bureauIds)}">
+                <th:block th:if="${#lists.contains(bureauIds, T(com.affirm.common.model.catalog.Bureau).EQUIFAX)}">
+                    <th:block th:replace="this :: tab-equifax"></th:block>
+                </th:block>
+                <th:block th:if="${#lists.contains(bureauIds, T(com.affirm.common.model.catalog.Bureau).NOSIS)}">
+                    <th:block th:replace="this :: tab-nosis"></th:block>
+                </th:block>
+                <th:block th:if="${#lists.contains(bureauIds, T(com.affirm.common.model.catalog.Bureau).EXPERIAN)}">
+                    <th:block th:replace="this :: tab-experian"></th:block>
+                </th:block>
+            </div>
+            <div th:if="${#lists.isEmpty(bureauIds)}">
+                -- Mensaje cuando no se ha evaluado en ningun bureau --
+            </div>
+        </div>
+    </th:block>
+
+    <!-- TAB EQUIFAX -->
+    <th:block th:fragment="tab-equifax">
+        <div th:switch="${equifax == null}" id="tabData">
+            <div th:case="true">
+                <label th:if="${allowEFX == null or !allowEFX}">No tenemos información de equifax y el estado actual
+                    no permite consultar ahora.</label>
+                <label th:if="${allowEFX != null and allowEFX}">No se pudo traer información EQUIFAX</label>
+                <a th:if="${allowEFX != null and allowEFX}" href="javascript:;"
+                   class="btn btn-circle btn-default btn-xs" style="margin-left:5em" onclick="retryEFX()">
+                    Reintentar </a>
+            </div>
+            <div th:case="false" th:remove="tag">
+                <!-- PREDICTOR DE RIESGO -->
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Predictor de riesgo</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <dl class="dl-horizontal dl-loan-application">
+                                                <dt>Puntaje</dt>
+                                                <dd th:text="${riskPredictor?.getPuntaje()?.getValue()}"></dd>
+                                                <dt>Nivel de Riesgo</dt>
+                                                <dd th:text="${riskPredictor?.getNivelRiesgo()?.getValue()}"></dd>
+                                                <dt>Conclusion</dt>
+                                                <dd th:text="${riskPredictor?.getConclusion()?.getValue()}"></dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- DIRECTORIO PERSONA -->
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Directorio de Persona</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <dl class="dl-horizontal dl-loan-application">
+                                                <dt>Nombres</dt>
+                                                <dd th:text="${directorioPersona?.getNombres()}"></dd>
+                                                <dt>Tipo de Documento</dt>
+                                                <dd th:text="${directorioPersona?.getTipoDocumento()}"></dd>
+                                                <dt>Número de Documento</dt>
+                                                <dd th:text="${directorioPersona?.getNumeroDocumento()}"></dd>
+                                                <dt>Fecha de Nacimiento</dt>
+                                                <dd th:text="${directorioPersona?.getFechaNacimiento()}"></dd>
+                                                <dt>Estado Civil</dt>
+                                                <dd th:text="${directorioPersona?.getEstadoCivil()}"></dd>
+                                                <dt>Nacionalidad</dt>
+                                                <dd th:text="${directorioPersona?.getNacionalidad()}"></dd>
+                                                <dt>Grado Instrucción</dt>
+                                                <dd th:text="${directorioPersona?.getGradoInstruccion()}"></dd>
+                                                <dt>Teléfono</dt>
+                                                <dd th:text="${directorioPersona?.getTelefono()}"></dd>
+                                                <dt>Ocupación</dt>
+                                                <dd th:text="${directorioPersona?.getOcupacion()}"></dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- PREDICTOR DE INGRESOS-->
+                <div class="col-md-4">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Predictor de ingresos</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <dl class="dl-horizontal dl-loan-application">
+                                                <dt>Categoria</dt>
+                                                <dd th:text="${incomePredictor?.getCategoria()}"></dd>
+                                                <dt>Rango Incial</dt>
+                                                <dd th:text="${incomePredictor?.getRangoInicial()}"></dd>
+                                                <dt>Rango Final</dt>
+                                                <dd th:text="${incomePredictor?.getRangoFinal()}"></dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- DIRECTORIO SUNAT -->
+                <div class="col-md-6">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Directorio SUNAT</span>
+                            </div>
+                            <!--<div class="tools">
+                                <a href="javascript:;" class="expand" data-original-title=""
+                                   title="Mostrar"> </a>
+                            </div>-->
+                        </div>
+                        <div class="portlet-body">
+                            <th:block th:each="directorioSunat : ${directorioSUNAT?.directorio}">
+                                <dl class="dl-horizontal dl-loan-application">
+                                    <dt>RUC</dt>
+                                    <dd th:text="${directorioSunat?.RUC}"></dd>
+                                    <dt>Razon Social</dt>
+                                    <dd th:text="${directorioSunat?.RazonSocial}"></dd>
+                                    <dt>Nombre Comercial</dt>
+                                    <dd th:text="${directorioSunat?.nombreComercial}"></dd>
+                                    <dt>Tipo</dt>
+                                    <dd th:text="${directorioSunat?.tipoContribuyente}"></dd>
+                                    <dt>Estado</dt>
+                                    <dd th:text="${directorioSunat?.estadoContribuyente}"></dd>
+                                    <dt>Condición</dt>
+                                    <dd th:text="${directorioSunat?.condicionContribuyente}"></dd>
+                                    <dt>Dependencia</dt>
+                                    <dd th:text="${directorioSunat?.dependencia}"></dd>
+                                    <dt>CIIU</dt>
+                                    <dd th:text="${directorioSunat?.CIIU}"></dd>
+                                    <dt>Código CIIU</dt>
+                                    <dd th:text="${directorioSunat?.codigoCIIU.value}"></dd>
+                                    <dt>Descipción CIIU</dt>
+                                    <dd th:text="${directorioSunat?.descripcionCIIU}"></dd>
+                                    <dt>Inicio Actividades</dt>
+                                    <dd th:text="${directorioSunat?.inicioActividades}"></dd>
+                                    <dt>Act. Comercio Exterior</dt>
+                                    <dd th:text="${directorioSunat?.actividadComercioExterior}"></dd>
+                                    <dt>Padrón</dt>
+                                    <dd th:text="${directorioSunat?.padron}"></dd>
+                                    <dt>Direciones</dt>
+                                    <dd th:text="${directorioSunat?.direcciones?.direccion?.get(0)}"></dd>
+                                </dl>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <!-- REPRESENTANTES LEGALES -->
+                <div class="col-md-6">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Representantes Legales</span>
+                            </div>
+
+                        </div>
+                        <div class="portlet-body">
+                            <div th:if="${representantesLegales?.RepresentantesDe?.representante} != null">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Es representante de:</span>
+                                <th:block
+                                        th:each="representante : ${representantesLegales.representantesDe.representante}">
+                                    <h5><label th:text="${representante?.nombres}"/></h5>
+                                    <dl class="dl-horizontal dl-loan-application">
+                                        <!--<dt>Nombres</dt><dd th:text="${representante?.nombres}"></dd>-->
+                                        <dt>Documento</dt>
+                                        <dd th:text="${representante?.numeroDocumento}"></dd>
+                                        <dt>Cargo</dt>
+                                        <dd th:text="${representante?.cargo}"></dd>
+                                        <dt>Fecha</dt>
+                                        <dd th:text="${representante?.fecha}"></dd>
+                                    </dl>
+                                </th:block>
+                            </div>
+                            <div th:if="${representantesLegales?.RepresentandosPor?.representante} != null">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Es representado por:</span>
+                                <th:block
+                                        th:each="representante : ${representantesLegales?.representandosPor?.representante}">
+                                    <h5><label th:text="${representante?.nombres}"/></h5>
+                                    <dl class="dl-horizontal dl-loan-application">
+                                        <!--<dt>Nombres</dt><dd th:text="${representante?.nombres}"></dd>-->
+                                        <dt>Documento</dt>
+                                        <dd th:text="${representante?.numeroDocumento}"></dd>
+                                        <dt>Cargo</dt>
+                                        <dd th:text="${representante?.cargo}"></dd>
+                                        <dt>Fecha</dt>
+                                        <dd th:text="${representante?.fecha}"></dd>
+                                    </dl>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ENDEUDAMIENTO - SBS Y MICROFINANZAZ -->
+                <div class="col-md-12">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Endeudamiento</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-md-12"><h4 class="margin bold">Resumen de Comportamiento de Pago</h4>
+                                </div>
+                                <div class="col-md-6">
+                                    Compuesto por:
+                                    <ul>
+                                        <li>Sistema Financiero Regulado (SBS): Bancos, Cajas, Financieras, Edpymes.</li>
+                                        <li>Sistema Financiero No Regulado (Microfinanzas): Cooperativas y ONGs.)</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><span class="badge badge-success">*</span> No tiene impagos</h6>
+                                    <h6><span class="badge badge-warning">*</span> Tiene Deudas Atrasadas</h6>
+                                    <h6><span class="badge badge-danger">*</span> Tiene deudas impagas o reportadas a
+                                        Infocorp</h6>
+                                    <h6><span class="badge badge-default">*</span> Información No Disponible o No
+                                        Reportada
+                                    </h6>
+                                </div>
+                                <div class="table-responsive col-md-12">
+                                    <table th:if="${sistemaFinanciero?.getResumenComportamientoPago()?.getSemaforo() != null}"
+                                           class="table table-light">
+                                        <tr>
+                                            <td align="center"
+                                                th:each="semaforo : ${sistemaFinanciero?.getResumenComportamientoPago()?.getSemaforo()}">
+                                            <span th:if="${semaforo?.noTieneImpagos}"
+                                                  class="btn btn-circle btn-icon-only green"></span>
+                                                <span th:if="${semaforo?.tieneDeudasAtrasadas}"
+                                                      class="btn btn-circle btn-icon-only yellow-crusta"></span>
+                                                <span th:if="${semaforo?.tieneDeudasImpagasInfocorp}"
+                                                      class="btn btn-circle btn-icon-only red"></span>
+                                                <span th:if="${semaforo?.informacionNoDisponible}"
+                                                      class="btn btn-circle btn-icon-only grey-cascade"></span>
+                                                <span class="help-block" th:text="${semaforo?.periodo}"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div><h4 class="margin bold">Vista del último Periodo</h4></div>
+                                    <table class="table table-light">
+                                        <tr>
+                                            <td><span class="label label-success">NOR</span> Normal</td>
+                                            <td><span class="label label-primary">CPP</span> Con Problemas Potenciales
+                                            </td>
+                                            <td><span class="label label-info">DEF</span> Deficiente</td>
+                                            <td><span class="label label-warning">DUD</span> Dudoso</td>
+                                            <td><span class="label label-danger">PER</span> Pérdida</td>
+                                            <td><span class="label label-default">SCAL</span> Sin Calificación</td>
+                                        </tr>
+                                    </table>
+                                    <!--<h5 class="bold" th:text="${sistemaFinanciero?.getDeudasUltimoPeriodo()?.getPeriodo()}"></h5>-->
+                                    <h4>
+                                        <span>Periodo </span>
+                                        <span class="bold"
+                                              th:text="${sistemaFinanciero?.getDeudasUltimoPeriodo()?.getPeriodo()}"/>
+                                    </h4>
+                                </div>
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Entidad</th>
+                                            <th>Sistema Financiero</th>
+                                            <th>Tipo de Producto</th>
+                                            <th>Calificación</th>
+                                            <th>Monto (S/.)</th>
+                                            <th>Dias de atraso</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="deuda : ${sistemaFinanciero?.getDeudasUltimoPeriodo()?.getDeuda()}">
+                                            <td th:text="${deuda?.getEntidad()}"/>
+                                            <td align="center" th:text="${deuda?.getSistemaFinanciero()}"/>
+                                            <td>
+                                            <span th:each="producto : ${deuda?.getProductos()?.getProducto()}">
+                                                <span class="help-block" th:text="${producto?.getTipo()}"></span>
+                                            </span>
+                                            </td>
+                                            <td align="center" th:if="${deuda?.getCalificacion()} == 'NOR'"><span
+                                                    class="label label-success">NOR</span></td>
+                                            <td align="center" th:if="${deuda?.getCalificacion()} == 'CPP'"><span
+                                                    class="label label-primary">CPP</span></td>
+                                            <td align="center" th:if="${deuda?.getCalificacion()} == 'DEF'"><span
+                                                    class="label label-info">DEF</span></td>
+                                            <td align="center" th:if="${deuda?.getCalificacion()} == 'DUD'"><span
+                                                    class="label label-warning">DUD</span></td>
+                                            <td align="center" th:if="${deuda?.getCalificacion()} == 'PER'"><span
+                                                    class="label label-danger">PER</span></td>
+                                            <td align="center" th:if="${deuda?.getCalificacion()} == 'SCAL'"><span
+                                                    class="label label-default">SCAL</span></td>
+                                            <td align="right"
+                                                th:text="${@utilService.doubleMoneyFormat(deuda?.getMontoTotal(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                            <td>
+                                            <span align="center"
+                                                  th:each="producto : ${deuda?.getProductos()?.getProducto()}">
+                                                <span class="help-block" th:text="${producto?.getDiasAtraso()}"></span>
+                                            </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div><h4 class="margin bold">Vista Histórica</h4></div>
+                                    <table class="table table-light">
+                                        <tr>
+                                            <td><span class="label label-success">NOR</span> Normal</td>
+                                            <td><span class="label label-primary">CPP</span> Con Problemas Potenciales
+                                            </td>
+                                            <td><span class="label label-info">DEF</span> Deficiente</td>
+                                            <td><span class="label label-warning">DUD</span> Dudoso</td>
+                                            <td><span class="label label-danger">PER</span> Pérdida</td>
+                                            <td><span class="label label-default">SCAL</span> Sin Calificación</td>
+                                        </tr>
+                                    </table>
+                                    <h4>
+                                        <span>Periodo </span>
+                                        <!--<span class="bold" th:text="${sistemaFinanciero?.getDeudasHistoricas()?.getDeuda()?.get(0)?.getPeriodo()}"/>-->
+                                        <span class="bold"
+                                              th:if="${!#lists.isEmpty(sistemaFinanciero?.getDeudasHistoricas()?.getDeuda())}"
+                                              th:text="${sistemaFinanciero?.getDeudasHistoricas()?.getDeuda()?.get(0)?.getPeriodo()}"/>
+
+                                    </h4>
+                                </div>
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th rowspan="2">Periodo</th>
+                                            <th rowspan="2">% Peor Calificación</th>
+                                            <th rowspan="2"># Entidades</th>
+                                            <th colspan="5">Situación de Deuda S/. (**)</th>
+                                            <th rowspan="2">Días de atraso</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Al día</th>
+                                            <th>Atrasada</th>
+                                            <th>Judicial</th>
+                                            <th>TOTAL</th>
+                                            <th>Castigada</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="deuda : ${sistemaFinanciero?.getDeudasHistoricas()?.getDeuda()}">
+                                            <th:block th:if="${deuda.Calificacion} != null">
+                                                <td th:text="${deuda?.getPeriodo()}"/>
+                                                <td align="left" th:if="${deuda?.getCalificacion()} == 'NOR'"><span
+                                                        class="label label-success">NOR</span> <span
+                                                        th:text="${deuda?.getPorcentaje()} + '%'"></span></td>
+                                                <td align="left" th:if="${deuda?.getCalificacion()} == 'CPP'"><span
+                                                        class="label label-primary">CPP</span> <span
+                                                        th:text="${deuda?.getPorcentaje()} + '%'"></span></td>
+                                                <td align="left" th:if="${deuda?.getCalificacion()} == 'DEF'"><span
+                                                        class="label label-info">DEF</span> <span
+                                                        th:text="${deuda?.getPorcentaje()} + '%'"></span></td>
+                                                <td align="left" th:if="${deuda?.getCalificacion()} == 'DUD'"><span
+                                                        class="label label-warning">DUD</span> <span
+                                                        th:text="${deuda?.getPorcentaje()} + '%'"></span></td>
+                                                <td align="left" th:if="${deuda?.getCalificacion()} == 'PER'"><span
+                                                        class="label label-danger">PER</span> <span
+                                                        th:text="${deuda?.getPorcentaje()} + '%'"></span></td>
+                                                <td align="left" th:if="${deuda?.getCalificacion()} == 'SCAL'"><span
+                                                        class="label label-default">SCAL</span> <span
+                                                        th:text="${deuda?.getPorcentaje()} + '%'"></span></td>
+                                                <td align="right" th:text="${deuda?.getNroEntidades()}"/>
+                                                <td align="right"
+                                                    th:text="${@utilService.doubleMoneyFormat(deuda?.getDeudaVigente(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <td align="right"
+                                                    th:text="${@utilService.doubleMoneyFormat(deuda?.getDeudaAtrasada(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <td align="right"
+                                                    th:text="${@utilService.doubleMoneyFormat(deuda?.getDeudaJudicial(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <td align="right"
+                                                    th:text="${@utilService.doubleMoneyFormat(deuda?.getDeudaTotal(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <td align="right"
+                                                    th:text="${@utilService.doubleMoneyFormat(deuda?.getDeudaCastigada(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <td th:text="${deuda?.getDiasAtraso()}"/>
+                                            </th:block>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    (*) Se toma en cuenta la peor calificación del periodo, segun la SBS.<br/>
+                                    (*) Situación de la deuda segun criterioa establecidos por la SBS
+                                    <ul>
+                                        <li>Al Día: Deuda Vigente.</li>
+                                        <li>Atrasada: deuda vencida+ deuda refinanciada + deuda reestructurada</li>
+                                        <li>Judicial : deuda en cobranza judicial</li>
+                                        <li>Castigada : deuda castigada</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div><h4 class="margin bold">Registro Crediticio Consolidado (RCC) del Sistema
+                                        Financiero Regulado</h4></div>
+                                    <table class="table table-light">
+                                        <tr>
+                                            <td><span class="label label-success">NOR</span> Normal</td>
+                                            <td><span class="label label-primary">CPP</span> Con Problemas Potenciales
+                                            </td>
+                                            <td><span class="label label-info">DEF</span> Deficiente</td>
+                                            <td><span class="label label-warning">DUD</span> Dudoso</td>
+                                            <td><span class="label label-danger">PER</span> Pérdida</td>
+                                            <td><span class="label label-default">SCAL</span> Sin Calificación</td>
+                                        </tr>
+                                    </table>
+                                    <h4>
+                                        <span>Periodo </span>
+                                        <!--<span class="bold" th:text="${sistemaFinanciero?.getDeudasHistoricas()?.getDeuda()?.get(0)?.getPeriodo()}"/>-->
+                                        <span class="bold"
+                                              th:if="${!#lists.isEmpty(sistemaFinanciero?.getDeudasHistoricas()?.getDeuda())}"
+                                              th:text="${sistemaFinanciero?.getDeudasHistoricas()?.getDeuda()?.get(0)?.getPeriodo()}"/>
+
+                                        <br/><span>Resumen de las deudas reportadas</span>
+
+                                    </h4>
+                                </div>
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th rowspan="2">Periodo</th>
+                                            <th rowspan="2"># Entidades</th>
+                                            <th colspan="5">Calificación</th>
+                                        </tr>
+                                        <tr>
+                                            <th>NOR</th>
+                                            <th>CPP</th>
+                                            <th>DEF</th>
+                                            <th>DUD</th>
+                                            <th>PER</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <block th:each="deuda : ${sistemaFinanciero?.getRCC()?.getPeriodos()?.getValue()?.getPeriodo()}">
+                                            <tr th:if="${deuda?.getNroEntidades()} != null">
+                                                <td align="center" th:text="${deuda?.getValor()}"/>
+                                                <td align="center" th:text="${deuda?.getNroEntidades()}"/>
+                                                <td align="right"
+                                                    th:text="${deuda?.getCalificaciones()?.getNOR() + ' %'}"/>
+                                                <td align="right"
+                                                    th:text="${deuda?.getCalificaciones()?.getCPP() + ' %'}"/>
+                                                <td align="right"
+                                                    th:text="${deuda?.getCalificaciones()?.getDEF() + ' %'}"/>
+                                                <td align="right"
+                                                    th:text="${deuda?.getCalificaciones()?.getDUD() + ' %'}"/>
+                                                <td align="right"
+                                                    th:text="${deuda?.getCalificaciones()?.getPER() + ' %'}"/>
+                                            </tr>
+                                        </block>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--OTRAS DEUDAS IMPAGAS-->
+                <div class="col-md-12">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Otras deudas impagas</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-md-12"><h4 class="margin bold">Resumen de Comportamiento de Pago</h4>
+                                </div>
+                                <div class="col-md-6">
+                                    Compuesto por:
+                                    <ul>
+                                        <li>Deudas Reportadas a Infocorp.</li>
+                                        <li>Documentos Protestados (Letras y Pagarés)</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><span class="badge badge-success">*</span> No tiene impagos</h6>
+                                    <h6><span class="badge badge-danger">*</span> Tiene deudas impagas o reportadas a
+                                        Infocorp</h6>
+                                </div>
+                                <div class="table-responsive col-md-12">
+                                    <table th:if="${deudasImpagas?.getResumenDeudasImpagas()?.getSemaforoPeriodo() != null}"
+                                           class="table table-light">
+                                        <tr>
+                                            <td align="center"
+                                                th:each="semaforoPeriodo : ${deudasImpagas?.getResumenDeudasImpagas()?.getSemaforoPeriodo()}">
+                                            <span th:unless="${semaforoPeriodo.tieneDeuda}"
+                                                  class="btn btn-circle btn-icon-only green"></span>
+                                                <span th:if="${semaforoPeriodo.tieneDeuda}"
+                                                      class="btn btn-circle btn-icon-only red"></span>
+                                                <span class="help-block" th:text="${semaforoPeriodo.periodo}"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12"><h4 class="margin bold">Detalle de Deudas Impagas</h4></div>
+                                <div class="table-responsive col-md-12">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Tipo de información</th>
+                                            <th>Cantidad</th>
+                                            <th>Monto</th>
+                                            <th>Detalle</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:if="${deudasImpagas?.getSicom()?.getCabecera() != null}">
+                                            <td valign="middle" class="bold">Detalle de deudas impagas reportadas a
+                                                INFOCORP
+                                            </td>
+                                            <td align="center">
+                                                <h6 th:text="${deudasImpagas?.getSicom().getCabecera().getCantidadSoles()}"/>
+                                                <h6 th:text="${deudasImpagas?.getSicom().getCabecera().getCantidadDolares()}"/>
+                                            </td>
+                                            <td align="center">
+                                                <h6 th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getSicom()?.getCabecera()?.getMontoSoles(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <h6 th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getSicom()?.getCabecera()?.getMontoDolares(), T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"/>
+                                            </td>
+                                            <td valign="middle"
+                                                th:text="'Fecha más reciente de inicio de cobranza el ' + ${deudasImpagas?.getSicom().getCabecera().getFechaVencimientoReciente()}"/>
+                                        </tr>
+                                        <tr th:if="${deudasImpagas?.getSicom()?.getDetalle() != null}">
+                                            <td colspan="6">
+                                                <div>
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Vencimiento</th>
+                                                            <th>Monto</th>
+                                                            <th>Acreedor</th>
+                                                            <th>Documento<br/>Bancario</th>
+                                                            <th>Condición</th>
+                                                            <th>Deudor</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="deuda : ${deudasImpagas?.getSicom()?.getDetalle()?.getDeuda()}">
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaVencimiento()}"></td>
+                                                            <td align="center" th:text="${deuda?.getMonto()}"></td>
+                                                            <td th:text="${deuda?.getAcreedor()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda.getDocumentoBancario()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getCondicionDeuda()}"></td>
+                                                            <td align="center" th:text="${deuda?.getTipoDeudor()}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr th:if="${deudasImpagas?.getNegativoSunat()?.getCabecera() != null}">
+                                            <td valign="middle" class="bold">Informe Negativo SUNAT</td>
+                                            <td align="center"
+                                                th:text="${deudasImpagas?.getNegativoSunat()?.getCabecera()?.getCantidadTotal()}"></td>
+                                            <td align="center"
+                                                th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getNegativoSunat()?.getCabecera()?.getMontoTotal(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"></td>
+                                            <td valign="middle"
+                                                th:text="'Fecha más reciente de inicio de cobranza el ' + ${deudasImpagas?.getNegativoSunat()?.getCabecera()?.getFechaCobranzaReciente()}"/>
+                                        </tr>
+                                        <tr th:if="${deudasImpagas?.getNegativoSunat()?.getDetalle() != null}">
+                                            <td colspan="6">
+                                                <div>
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Periodo</th>
+                                                            <th>Monto</th>
+                                                            <th>Tipo</th>
+                                                            <th>Dependencia</th>
+                                                            <th>Fec. Cobranza</th>
+                                                            <th>Fec. Proceso</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="deuda : ${deudasImpagas?.getNegativoSunat()?.getDetalle()?.getDeuda()}">
+                                                            <td align="center" th:text="${deuda?.getPeriodo()}"></td>
+                                                            <td align="center" th:text="${deuda?.getMonto()}"></td>
+                                                            <td align="center" th:text="${deuda?.getTipo()}"></td>
+                                                            <td align="center" th:text="${deuda.getDependencia()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaCobranza()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaProceso()}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr th:if="${deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getCabecera() != null}">
+                                            <td valign="middle" class="bold">Documentos Protestados Aclarados</td>
+                                            <td align="center">
+                                                <h6 th:text="${deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getCabecera()?.getCantidadSoles()}"/>
+                                                <h6 th:text="${deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getCabecera()?.getCantidadDolares()}"/>
+                                            </td>
+                                            <td align="center">
+                                                <h6 th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getCabecera()?.getMontoSoles(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <h6 th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getCabecera()?.getMontoDolares(), T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"/>
+                                            </td>
+                                            <td valign="middle"
+                                                th:text="'Fecha más reciente de inicio de cobranza el ' + ${deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getCabecera()?.getFechaVencimientoReciente()}"/>
+
+                                        </tr>
+                                        <tr th:if="${deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getDetalle() != null}">
+                                            <td colspan="6">
+                                                <div>
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Boletín</th>
+                                                            <th>Tipo de<br/>documento</th>
+                                                            <th>Divisa</th>
+                                                            <th>Monto</th>
+                                                            <th>Emisor</th>
+                                                            <th>Aceptante</th>
+                                                            <th>Fec. Vencimiento</th>
+                                                            <th>Fec. Aclaración</th>
+                                                            <th>Notaria</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="deuda : ${deudasImpagas?.getProtestos()?.getProtestosAclarados()?.getDetalle()?.getDeuda()}">
+                                                            <td align="center"
+                                                                th:text="${deuda?.getNumeroBoletin()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getTipoDocumento()}"></td>
+                                                            <td align="center" th:text="${deuda?.getDivisa()}"></td>
+                                                            <td align="center" th:text="${deuda.getMonto()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getAceptanteDocumento()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaVencimiento()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaAclaracion()}"></td>
+                                                            <td align="center" th:text="${deuda?.getNotaria()}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr th:if="${deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getCabecera() != null}">
+                                            <td valign="middle" class="bold">Documentos Protestados No Aclarados</td>
+                                            <td align="center">
+                                                <h6 th:text="${deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getCabecera()?.getCantidadSoles()}"/>
+                                                <h6 th:text="${deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getCabecera()?.getCantidadDolares()}"/>
+                                            </td>
+                                            <td align="center">
+                                                <h6 th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getCabecera()?.getMontoSoles(), T(com.affirm.system.configuration.Configuration).SOLES_CURRENCY)}"/>
+                                                <h6 th:text="${@utilService.doubleMoneyFormat(deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getCabecera()?.getMontoDolares(), T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"/>
+                                            </td>
+                                            <td valign="middle"
+                                                th:text="'Fecha más reciente de inicio de cobranza el ' + ${deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getCabecera()?.getFechaVencimientoReciente()}"/>
+                                        </tr>
+                                        <tr th:if="${deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getDetalle() != null}">
+                                            <td colspan="6">
+                                                <div>
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Boletín</th>
+                                                            <th>Tipo de<br/>documento</th>
+                                                            <th>Divisa</th>
+                                                            <th>Monto</th>
+                                                            <th>Emisor</th>
+                                                            <th>Aceptante</th>
+                                                            <th>Fec. Vencimiento</th>
+                                                            <th>Fec. Aclaración</th>
+                                                            <th>Notaria</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="deuda : ${deudasImpagas?.getProtestos()?.getProtestosNoAclarados()?.getDetalle()?.getDeuda()}">
+                                                            <td align="center"
+                                                                th:text="${deuda?.getNumeroBoletin()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getTipoDocumento()}"></td>
+                                                            <td align="center" th:text="${deuda?.getDivisa()}"></td>
+                                                            <td align="center" th:text="${deuda.getMonto()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getAceptanteDocumento()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaVencimiento()}"></td>
+                                                            <td align="center"
+                                                                th:text="${deuda?.getFechaAclaracion()}"></td>
+                                                            <td align="center" th:text="${deuda?.getNotaria()}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                        <div class="portlet-title">
+                            <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Indicadores de Consulta</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="table-responsive">
+                                <table th:if="${entidades != null}"
+                                       class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Mercado</th>
+                                        <th>Nombre</th>
+                                        <block th:each="periodo : ${entidades?.get(0)?.periodos}">
+                                            <div th:each="periodito : ${periodo.periodo}">
+                                                <th th:text="${periodito.periodo}"></th>
+                                            </div>
+                                        </block>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <block th:each="entidad : ${entidades}">
+                                        <tr>
+                                            <td th:text="${entidad?.mercado}"></td>
+                                            <td th:text="${entidad?.nombre}"></td>
+                                            <div th:each="periodo : ${entidad.periodos.periodo}">
+                                                <td th:text="${periodo.value}"></td>
+                                            </div>
+                                        </tr>
+                                    </block>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function retryEFX() {
+                defaultAjax({
+                    url: /*[[@{/person/retryEquifax}]]*/null,
+                    type: 'POST',
+                    data: {
+                        personId: /*[[${personId}]]*/null
+                    },
+                    success: function () {
+                        alert("Se ha enviado una petición a equifax, vuelve en un momento para ver la respuesta");
+                        //setTimeout(function() {
+                        //  window.location.reload()
+                        //}, 5000);
+                    }
+                });
+            }
+
+            /*]]>*/
+        </script>
+    </th:block><!-- TAB EQUIFAX -->
+
+    <!-- TAB NOSIS -->
+    <th:block th:fragment="tab-nosis">
+        <th:block th:if="${nosisXml != null}">
+            <div th:remove="tag" th:utext="${parteHtml}"></div>
+            <pre th:text="${nosisXml}"></pre>
+        </th:block>
+        <th:block th:if="${nosisXml == null}">
+            No se tiene informacion de Nosis
+        </th:block>
+    </th:block><!-- TAB NOSIS -->
+    <!-- TAB EXPERIAN -->
+    <th:block th:fragment="tab-experian">
+        <th:block th:if="${experianResultList != null}">
+            <div class="portlet light">
+                <div class="portlet-title">
+                    <div class="caption font-red-sharp">
+                        <span class="caption-subject font-green-steel bold">Información de Experian</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="">
+                        <table class="table table-bordered table-striped table-hover">
+
+                            <tbody>
+                            <tr>
+                                <td align="left" >Entidad</td>
+                                <block th:each="experianResult : ${experianResultList}">
+                                    <td align="center"  th:text="${#strings.defaultString(@catalogService.getEntity(experianResult?.getEntityId()).getShortName(),'-')}"/>
+                                </block>
+                            </tr>
+                                <tr>
+                                    <td align="left"  >Score</td>
+                                    <block th:each="experianResult : ${experianResultList}">
+                                        <td align="center" th:text="${#strings.defaultString(experianResult?.getScore(),'-')}"/>
+                                    </block>
+                                </tr>
+                                <tr>
+                                    <td align="left">Ingreso</td>
+                                    <block th:each="experianResult : ${experianResultList}">
+                                        <td align="center" th:text="${#strings.defaultString(experianResult?.getIncomes(),'-')}"/>
+                                    </block>
+                                </tr>
+                                <tr>
+                                    <td align="left">Segmento</td>
+                                    <block th:each="experianResult : ${experianResultList}">
+                                        <td align="center" th:text="${#strings.defaultString(@catalogService.getCluster(experianResult?.getClusterId(),locale).getCluster(),'-')}"/>
+                                    </block>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </th:block>
+        <th:block th:if="${experianResultList == null }">
+            No se tiene informacion de Experian
+        </th:block>
+    </th:block><!-- TAB EXPERIAN -->
+
+</div>
+</body>
+</html>

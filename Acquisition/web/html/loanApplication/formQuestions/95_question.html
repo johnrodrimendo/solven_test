@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section fadeInRight">
+        <div class="circle-progress-bg" th:style="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).BANBIF ?
+        'background-color: unset' : 'background-color: rgba(255,255,255,0.8);'}"></div>
+        <div class="wrap-note">
+            <!--<figure>
+                <img src="/img/icons/ofertas.jpg" alt=""
+                     th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"/>
+                <img src="/img/icons/ofertas-peru.jpg" alt=""
+                     th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}"/>
+            </figure>-->
+            <th:block th:if="${loanApplication?.entityUserId != null}">
+                <th:block th:switch="${loanApplication?.entityId}">
+                    <th:block th:case="${T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}">
+                        <p id="waiting_text" th:if="${message != null}" th:utext="${message}"></p>
+                    </th:block>
+                    <th:block th:case="*">
+                        <p id="waiting_text">Estamos procesando la solicitud</p>
+                    </th:block>
+                </th:block>
+            </th:block>
+            <th:block th:if="${loanApplication?.entityUserId == null}">
+                <p id="waiting_text" th:if="${message == null}" th:utext="#{questions.block.lookingYourOffer}"></p>
+                <p id="waiting_text" th:if="${message != null}" th:utext="${message}"></p>
+            </th:block>
+
+            <div class="process-loading-container circle-progress-question">
+                <div class="loading-content">
+                    <div class="sk-circle">
+                        <div class="sk-circle1 sk-child"></div>
+                        <div class="sk-circle2 sk-child"></div>
+                        <div class="sk-circle3 sk-child"></div>
+                        <div class="sk-circle4 sk-child"></div>
+                        <div class="sk-circle5 sk-child"></div>
+                        <div class="sk-circle6 sk-child"></div>
+                        <div class="sk-circle7 sk-child"></div>
+                        <div class="sk-circle8 sk-child"></div>
+                    </div>
+                    <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var completed = /*[[${completed}]]*/;
+
+        function sendPost(waiting) {
+            questionFw.ajaxToCurrentQuestionController({
+                showLoadingBar: false,
+                type: "POST",
+                data: {completed: waiting},
+                success: function (data) {
+                    if (data == null || data == '') {
+                        setTimeout(function () {
+                            sendPost();
+                        }, 1000);
+                    } else {
+                        $('#waiting_text').html(data);
+                        setTimeout(function () {
+                            sendPost(true);
+                        }, 1500);
+                    }
+                }
+            }, "");
+        }
+
+        sendPost(completed);
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

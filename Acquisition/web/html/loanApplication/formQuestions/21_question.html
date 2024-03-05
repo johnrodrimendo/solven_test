@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" th:object="${form}" class="q21" autocomplete="off">
+            <div id="marital-status-block">
+                <p th:text="#{questions.block.maritalStatus(${personName != null and !personName.isEmpty() ? personName : 'Hola'})}"></p>
+                <p style="font-size: 15px;" th:if="${(loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA)}" >(Recuerda: Tus datos deben coincidir con los que aparecen en tu DNI)</p>
+                <div class="centrado">
+                    <div>
+                        <div class="wrap-radios">
+                            <th:block th:each="maritalStatus : ${@catalogService.getMaritalStatus(#locale)}">
+                                <th:block th:if="${(loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA) and maritalStatus?.id !=  T(com.affirm.common.model.catalog.MaritalStatus).COHABITANT}">
+                                    <div class="field inline">
+                                        <label class="input-radio">
+                                            <input type="radio" class="howEarnMoney" name="maritalStatus"
+                                                   th:value="${maritalStatus?.id}"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <h5 th:text="${maritalStatus?.status}"></h5>
+                                                    <div class="radio"></div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </th:block>
+                                <th:block th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                    <div class="field inline">
+                                        <label class="input-radio">
+                                            <input type="radio" class="howEarnMoney" name="maritalStatus"
+                                                   th:value="${maritalStatus?.id}"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <h5 th:text="${maritalStatus?.status}"></h5>
+                                                    <div class="radio"></div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </th:block>
+                            </th:block>
+
+                        </div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <form id="resetProcess" method="POST"></form>
+        <div class="block-hidden" id="arentYou"
+             th:if="${!@countryContextService.isCountryContextInArgentina(#httpServletRequest) and !@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+            <p th:if="${#strings.isEmpty(personName)}">
+                <small th:text="#{question.21.small}"></small>
+                <small>
+                    <a href="#" th:text="${documentNumber}" id="reset"></a>?
+                </small>
+            </p>
+            <p th:unless="${#strings.isEmpty(personName)}">
+                <small th:text="#{question.21.small}"></small>
+                <small>
+                    <a href="#" th:text="${personName}" id="reset"></a>?
+                </small>
+            </p>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $("#reset").on('click', function (e) {
+            console.log("contextPath:", /*[[ ${#httpServletRequest.getContextPath()} ]]*/);
+            console.log('cambiado');
+            var url = system.contextPath + "/" + questionFw.categoryUrl + '/evaluacion/reset/' + questionFw.token;
+            console.log(url);
+            $("#resetProcess").attr('action', url);
+            console.log($("#resetProcess").attr('action'));
+
+            defaultAjax({
+                url: url,
+                type: 'POST',
+                success: function (data) {
+                    console.log(data);
+                    //resetTimer();
+                }
+            });
+
+            //$("#resetProcess").submit();
+        });
+        $('.input-radio').on('click', function (event) {
+            //('#sendButton').trigger('click');
+            sendForm();
+            if ($(this).hasClass('radio-selected')) {
+                console.log('escogido, cargando y pasando');
+            }
+        });
+
+
+        $('#sendButton').on('click', function (e) {
+            e.preventDefault();
+            sendForm($(this));
+        });
+
+        function sendForm(button) {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    //button: button,
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        }
+
+        console.log('test');
+        setTimeout(function () {
+            $('#preevaluaton-success').addClass('block-hidden');
+            //$('#marital-status-block').removeClass('block-hidden').addClass('fadeIn');
+            $('#arentYou').removeClass('block-hidden').addClass('fadeIn');
+        }, 1000);
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

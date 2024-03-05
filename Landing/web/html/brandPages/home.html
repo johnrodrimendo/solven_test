@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>El cr&eacute;dito que mereces</title>
+
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!-- Owner -->
+    <script th:src="@{/js/registerForm.js}"></script>
+
+    <!-- Burger Menu -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/hamburger/hamburgers.min.css'}"/>
+    <!-- / Burger Menu -->
+
+    <!-- StandoutMe -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/standoutme/css/standoutme.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/standoutme/js/standoutme.min.js'}"></script>
+    <!-- / StandoutMe -->
+
+    <!-- Jquery Countdown -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/countDown/jquery.downCount.min.js'}"></script>
+    <!-- / Jquery Countdown -->
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owl.carousel/owl-carousel/owl.carousel.min.js'}"></script>
+    <!-- / Owl. Carousel -->
+
+    <!-- SwipeBox -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <!-- / SwipeBox -->
+
+    <!-- noUiSlider -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/noUiSlider/nouislider.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/wnumb-1.0.2/wNumb.min.js'}"></script>
+    <!-- / noUiSlider -->
+
+    <!-- Locale -->
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+    <!-- / Locale -->
+
+    <script th:inline="javascript">
+
+        $(document).on('ready', function(){
+
+            <!-- Header Sticky -->
+            $(window).on('scroll', function () {
+                var scrollTop = $(window).scrollTop(),
+                        header = $('.home-header');
+
+                if (scrollTop > 1) {
+
+                    /* if ($(window).width() > 480) {
+                     $('.cookiesBar').removeClass('slideInDown');
+                     $('.cookiesBar').removeClass('slideInUp');
+                     $('.cookiesBar').css({'bottom': 0}).addClass('slideInDown');
+                     }*/
+
+                    sticky(header);
+                } else {
+
+                    /*if ($(window).width() > 480) {
+                     $('.cookiesBar').removeClass('slideInDown');
+                     $('.cookiesBar').removeClass('slideInUp');
+                     $('.cookiesBar').css({'bottom': '70px'}).addClass('slideInUp');
+                     }*/
+
+                    unSticky(header);
+                }
+
+            });
+            <!-- / Header Sticky -->
+
+
+        });
+
+    </script>
+
+</head>
+<body>
+
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: headerLanding(landingType='personalLoan')"></th:block>
+</th:block>
+<!-- /Header -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+    <!-- Cookies -->
+    <!--<div class="cookiesBar animated">
+        <div class="container">
+            <p>Las cookies nos ayudan a mejorar tu experiencia en Solven. Se utilizan tambi&eacute;n en estad&iacute;sticas,
+                redes sociales, controles de calidad y junto con nuestros aliados, en marketing. Al continuar navegando
+                en nuestro sitio web, aceptas el uso. <a href="#" id="acceptCookies">Ocultar</a>.</p>
+        </div>
+    </div>-->
+    <!-- / -->
+
+    <!-- Landing -->
+    <div class="landing personal-loan-bg">
+        <div class="overlay"></div>
+        <div class="hero-title">
+            <h2 class="red-text">El cr&eacute;dito que necesitas,<br/> tan s&oacute;lo en 90 segundos.</h2>
+            <p>&iquest;Cansado de tantos tr&aacute;mites y burocracia? Obt&eacute;n el cr&eacute;dito que mereces, <br/>100% en l&iacute;nea y sin letras chicas.</p>
+            <div class="hero-form">
+                <form th:if="${session.countryUnlocked}">
+                    <span class="i-will-like">Me gustar&iacute;a</span>
+
+                    <div class="field" id="no-modal-select">
+                        <div class="customDrop" id="drp">
+                            <div class="dropHeader fl t-green-background jsDropAction">
+                                <div class="dropHeader__title jsValue">Selecciona el destino</div>
+                                <div class="dropHeader__btn"><i class="icon bullet-down-icon"></i></div>
+                            </div>
+                            <div class="dropBody">
+                                <div th:each="reason : ${@catalogService.getLoanApplicationReasonsVisibles(#locale)}">
+                                    <label class="itemSelect">
+                                        <span th:text="${reason.reason}"></span>
+                                        <input type="radio" name="loanApplicationReasonDropdown" id="choose-deal-home"
+                                               class="checkYourRate"
+                                               th:value="${reason.id}"/>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <button onclick="goToEstimaTasa();return false;" class="button red-button" id="rateButton">
+                            <span>Solic&iacute;talo aqu&iacute;</span></button>
+                        <p class="small-text"><i class="icon creditcard-icon"></i>No afecta tu score crediticio.</p>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="hero-rate">
+                <div class="small-text successMessage" id="countryLocked" th:if="${session.countryUnlocked == false}">Lo sentimos mucho, pero en este momento s&oacute;lo es posible solicitar productos desde Per&uacute;.</div>
+            </div>
+        </div>
+        <div class="bottom-info bottom-info-landing">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Desde <span th:text="${@utilService.integerMoneyFormat(product.minAmount)}"></span> a <span th:text="${@utilService.integerMoneyFormat(product.maxAmount)}"></span></p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Tasas <span th:text="${@utilService.percentFormat(product.minTea)}"></span> - <span th:text="${@utilService.percentFormat(product.maxTea)}"></span></p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p><span th:text="${product.minInstallments}"></span> a <span th:text="${product.maxInstallments}"></span> cuotas</p></div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6"><p>Sin costos ocultos</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Landing -->
+
+    <!-- Press -->
+    <div class="press">
+        <div class="container">
+            <th:block layout:fragment="pressCarousel">
+                <th:block th:replace="fragments/pressCarousel :: pressCarousel"></th:block>
+            </th:block>
+        </div>
+    </div>
+    <!-- / Press -->
+
+    <!-- How it works -->
+    <div id="how-it-works-consolidation" class="how-it-works-consolidation">
+        <div class="container">
+            <div class="hero-content">
+                <div class="row">
+                    <h2 class="title-home">&iquest;C&oacute;mo funciona?</h2>
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <div class="box">
+                            <div class="icon-image">
+                                <img th:src="@{/img/icons/simula.png}" alt="Agrega"/>
+                            </div>
+                            <h3>SIMULA</h3>
+                            <p>Nunca fue tan f&aacute;cil solicitar un cr&eacute;dito de libre disponibilidad. Simula las tasas de inter&eacute;s e ingresa con tu documento. Te evaluamos sin afectar tu score crediticio.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <div class="box">
+                            <div class="icon-image">
+                                <img th:src="@{/img/icons/solicita.png}" alt="Calcula"/>
+                            </div>
+                            <h3>SOLICITA</h3>
+                            <p>Completa tu informaci&oacute;n, te tomar&aacute; tan s&oacute;lo 90 segundos. De acuerdo a tu experiencia crediticia, tus ingresos y deudas, buscaremos la mejor propuesta de cr&eacute;dito para ti.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <div class="box">
+                            <div class="icon-image">
+                                <img th:src="@{/img/icons/elige.png}" alt="Consolida"/>
+                            </div>
+                            <h3>ELIGE</h3>
+                            <p>Selecciona la oferta que se acomoda a tus necesidades. Te enviamos el dinero el mismo d&iacute;a a tu cuenta bancaria. Nuestra meta es que hagas realidad las tuyas, y no es s&oacute;lo un slogan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / How it works -->
+
+    <th:block th:fragment="linkToProducts">
+        <th:block th:replace="fragments/linkToProductsFragment :: linkToProducts"></th:block>
+    </th:block>
+
+    <!-- Play video -->
+    <div class="play-video">
+        <div class="container">
+            <a class="circle swipebox-video" rel="vimeo" th:if="false"><i
+                    class="icon bullet-right-icon"></i></a>
+            <p th:if="false">Ver video</p>
+        </div>
+    </div>
+    <!-- / Play video -->
+
+    <!-- Modal Estimate your rate in Home -->
+    <div class="modal fade" id="checkYourRate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-lightblue-header">
+                    <button type="button" class="closeRoundButton" data-dismiss="modal" aria-label="Close"><i
+                            class="icon close-icon"></i></button>
+                    <div class="pick-deals" id="pick-deals" th:if="${landingType != null ? false: true}">
+                        <div class="field" id="modal-select">
+                            <span class="i-will-like">Me gustar&iacute;a</span>
+                            <div class="customDrop inside">
+                                <div class="dropHeader fl jsDropAction">
+                                    <div class="dropHeader__title jsValue">Selecciona el destino</div>
+                                    <div class="dropHeader__btn"><i class="icon bullet-down-icon"></i></div>
+                                </div>
+                                <div class="dropBody">
+                                    <div th:each="reason : ${@catalogService.getLoanApplicationReasonsVisibles(#locale)}">
+                                        <label class="itemSelect">
+                                            <span th:text="${reason.reason}"></span>
+                                            <input type="radio" name="loanApplicationReasonDropdown" id="choose-deal"
+                                                   class="checkYourRate"
+                                                   th:value="${reason.id}"/>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" id="backModal-button"><i class="icon back-icon"></i></a>
+                    <h2 class="static-title" th:if="${reason != null}" id="static-title"
+                        th:text="${#strings.capitalize(reason.mailingReplacement1)}"></h2>
+                    <h2 id="header-text"></h2>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <form th:if="${session.countryUnlocked}" role="form" id="frmRate" class="aff-form" action="#"
+
+                          th:object="${userRegisterForm}"
+                          method="post">
+                        <div id="slides-section">
+                            <!-- Months -->
+                            <div class="loan-details loanApplicationMonths without-mt">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                        <div class="slider-section">
+                                            <label for="loanApplicationHowMany-input">&iquest;Cu&aacute;nto dinero
+                                                necesitas?</label>
+                                            <div id="loanApplicationHowMany"></div>
+                                            <div class="values">
+                                                <div class="min-value normal-number" id="tradMountMin"></div>
+                                                <div class="max-value normal-number" id="tradMountMax"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                        <div class="square-found editable">
+                                            <h4 id="loanApplicationHowMany-label"></h4>
+                                            <a href="#" class="icon edit-icon edit-amount" rel="nofollow"
+                                               title="Editar"></a>
+                                            <input type="text" id="loanApplicationHowMany-input"
+                                                   class="editAmount-home" pattern="[0-9]*"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="loan-details loanApplicationMonths">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                        <div class="slider-section">
+                                            <label for="loanApplicationPeriodMonths-input">&iquest;En que
+                                                per&iacute;odo?</label>
+                                            <div id="loanApplicationPeriodMonths"></div>
+                                            <div class="values">
+                                                <div class="min-value normal-number"><span th:text="${product.minInstallments}"></span> meses</div>
+                                                <div class="max-value normal-number"><span th:text="${product.maxInstallments}"></span> meses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                        <div class="square-found date">
+                                            <h4 id="loanApplicationPeriodMonths-label" class="bold-number"></h4>
+                                            <span id="loanApplicationPeriodEndDate-finish"></span>
+                                        </div>
+                                        <input type="text" id="loanApplicationPeriodMonths-input"
+                                               name="loanApplicationInstallemnts" class="slider"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="loan-details">
+                                <div class="max-slider">
+                                    <label for="loanApplicationCluster-input">&iquest;Qu&eacute; tan buen pagador
+                                        eres?</label>
+                                    <div class="custom-tooltip">
+                                        <ul>
+                                            <li class="one-tp">
+                                                <span id="active-1">A</span>
+                                            </li>
+                                            <li class="two-tp">
+                                                <span id="active-2">B</span>
+                                            </li>
+                                            <li class="three-tp">
+                                                <span id="active-3">C</span>
+                                            </li>
+                                            <li class="four-tp">
+                                                <span id="active-4">D</span>
+                                            </li>
+                                            <li class="five-tp">
+                                                <span id="active-5">E</span>
+                                            </li>
+                                            <li class="six-tp">
+                                                <span id="active-6">F</span>
+                                            </li>
+                                            <li class="seven-tp">
+                                                <span id="active-7">SE</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div id="loanApplicationCluster"></div>
+                                    <input type="text" name="loanApplicationCluster" id="loanApplicationCluster-input"
+                                           class="slider"/>
+                                </div>
+                                <div class="max-slider-value">
+                                    <div class="square-found">
+                                        <div class="lightblue">
+                                            <h4 id="loanApplicationCluster-label"></h4>
+                                        </div>
+                                        <p id="descCluster"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="loan-details">
+                                <div class="row">
+                                    <div class="col-lg-7 col-sm-7 col-sm-7 col-xs-7 mount-details">
+                                        <div class="info-loan">
+                                            <p><span id="totalAmountText" class="inline-small">Pago mensual</span> <span
+                                                    class="big bold-number"
+                                                    id="estimatedResutlPayment">S/. 177.43</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-sm-5 col-sm-5 col-xs-5 mount-details">
+                                        <div class="info-loan">
+                                            <p>
+                                                <small id="teaLabel" class="inline-small">TEA</small>
+                                                <span class="big bold-number"
+                                                      id="estimatedResutlTcea">18.00 %</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="loan-details actions">
+                                <button class="button red-button" id="apply-for"><span>Solicitar</span></button>
+                            </div>
+                        </div>
+                        <div id="document-section" th:if="${product.active == true and session.countryUnlocked == true}">
+                            <div class="header-loanInfo">
+                                <div class="square-info">
+                                    <h4 id="loan-amount" class="bold-number"></h4>
+                                </div>
+                                <div class="square-info">
+                                    <h4 id="loan-cuotes" class="bold-number"></h4>
+                                    <span id="finish-date"></span>
+                                </div>
+                            </div>
+                            <div class="field-content">
+                                <div class="document-content">
+                                    <div class="wrap-input" id="document-block">
+
+                                        <div class="section" id="dniSection">
+                                            <p>Documento de Identidad</p>
+                                            <div class="content">
+                                                <div class="input-field small-input">
+                                                    <select name="docType" id="docType" class="input-solven">
+                                                        <option th:each="doc : ${@catalogService.getIdentityDocumentTypeByCountry(@countryContextService.getCountryParamsByRequest(#httpServletRequest).id, false)}"
+                                                                th:text="${doc.name}" th:value="${doc.id}"></option>
+                                                    </select>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <div class="input-field medium-number-input">
+                                                    <input type="text" placeholder="Nro. Documento"
+                                                           class="input-solven"
+                                                           autofocus="true" th:field="*{docNumber}" pattern="[0-9]*"/>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <div class="generalError" id="docError"></div>
+                                            </div>
+                                        </div>
+                                        <div class="section" id="ceSection">
+                                            <br/>
+                                            <div class="content">
+                                                <p>Fecha Nacimiento</p>
+                                                <div class="input-field medium-number-input">
+                                                    <input type="text" class="form-control"
+                                                           th:field="*{birthDate}"/>
+                                                </div>
+                                                <div class="generalError" id="dobError"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="wrap-input" id="cellphone-block">
+                                        <div class="section">
+                                            <p>Ingresa tu n&uacute;mero, te enviaremos un c&oacute;digo de verificaci&oacute;n</p>
+                                            <div class="content">
+                                                <div class="input-field small-input">
+                                                    <div class="square-input disabled">+51</div>
+                                                </div>
+                                                <div class="input-field medium-number-input">
+                                                    <input type="text" placeholder="Nro. Celular" class="input-solven"
+                                                           name="phoneNumber" id="phoneNumber" pattern="[0-9]*"/>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <div class="generalError"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="wrap-input" id="sms-token-block">
+                                        <div class="section">
+                                            <p>Ingresa el PIN que te acabamos de enviar.</p>
+                                            <div class="content">
+                                                <div class="input-field tidy-input-number">
+                                                    <input type="text" placeholder="PIN" class="input-solven"
+                                                           name="smsTokenNumber" id="smsTokenNumber"
+                                                           style="text-align: center;"/>
+                                                    <small><a href="#" id="resendToken">Reenviar</a></small>
+                                                    <span class="underline"></span>
+                                                </div>
+                                                <p class="responseResend"></p>
+                                                <div class="generalError"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wrap-input terms" id="terms">
+                                        <div class="section">
+                                            <div class="content">
+                                                <div class="input-field">
+                                                    <label for="termsAndConditions">
+                                                        <input type="checkbox" name="termsAndConditions"
+                                                               id="termsAndConditions"
+                                                               required="true"/>
+                                                        Acepto los <a th:href="@{/terminos-y-condiciones}" target="_blank" rel="noopener noreferrer">T&eacute;rminos y
+                                                        condiciones</a> y la <a th:href="@{/politica-de-privacidad}" target="_blank" rel="noopener noreferrer">Pol&iacute;tica de Privacidad</a>.
+                                                    </label>
+                                                    <div class="generalError" id="error-response"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wrap-input" id="m-buttons">
+                                        <button data-type="phone" class="button black-button" id="cellphone-button">
+                                            <i class="icon cellphone-icon"></i>Celular
+                                        </button>
+                                        <button data-type="cancel" class="button black-button" id="cancel-button">
+                                            Cancelar
+                                        </button>
+                                        <!--/* button data-type="facebook" class="button facebook-button"
+                                                id="facebook-button"><i class="icon facebook-icon"></i>Facebook
+                                        </button */-->
+                                        <button data-type="apply" class="button red-button" id="apply-button">
+                                            <span>Enviar</span>
+                                        </button>
+                                        <button data-type="validated" class="button red-button" id="validate-button">
+                                            <span>Validar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form th:if="${session.countryUnlocked}" role="form" id="frmEarlyAccess" class="aff-form" action="#"
+                          th:object="${earlyAccessForm}"
+                          method="post">
+                        <div id="sooner-section" th:if="${product.active == false and session.countryUnlocked == true}">
+                            <div class="soon" id="soonerFirst">
+                                <p class="justifyText">Nos encontramos realizando pruebas con un n&uacute;mero limitado
+                                    de usuarios. Reg&iacute;strate para tener novedades nuestras muy pronto y poder
+                                    acceder primero a Solven.</p>
+                                <div class="form-container" id="comingSoonForm">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl">
+                                            <div class="fields">
+                                                <label for="docTypeSooner"></label>
+                                                <div class="inline-inputs">
+                                                    <select name="" class="form-control tidy-input-number"
+                                                            th:field="*{docTypeSooner}">
+                                                        <option th:each="doc : ${@catalogService.getIdentityDocumentTypeByCountry(@countryContextService.getCountryParamsByRequest(#httpServletRequest).id, false)}"
+                                                                th:text="${doc.name}" th:value="${doc.id}"></option>
+                                                    </select>
+                                                    <div class="form-group label-floating">
+                                                        <label for="docNumberSooner"
+                                                               class="control-label">N&uacute;mero</label>
+                                                        <input type="text" th:field="*{docNumberSooner}"
+                                                               class="form-control input-dni" pattern="[0-9]*"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.4em">
+                                            <div class="fields">
+                                                <div class="form-group label-floating">
+                                                    <label for="emailSooner" class="control-label">Correo electr&oacute;nico</label>
+                                                    <input type="email" class="form-control input-email"
+                                                           th:field="*{emailSooner}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button data-type="accessFirst" class="button red-button" id="nextButtonSooner"
+                                                style="display:block;margin-bottom: 1.5em;margin-top:.5em;">
+                                            <div id="loading-ajax-sooner" class="loading-ajax-invisible">
+                                                <div class="sk-circle">
+                                                    <div class="sk-circle1 sk-child"></div>
+                                                    <div class="sk-circle2 sk-child"></div>
+                                                    <div class="sk-circle3 sk-child"></div>
+                                                    <div class="sk-circle4 sk-child"></div>
+                                                    <div class="sk-circle5 sk-child"></div>
+                                                    <div class="sk-circle6 sk-child"></div>
+                                                    <div class="sk-circle7 sk-child"></div>
+                                                    <div class="sk-circle8 sk-child"></div>
+                                                </div>
+                                                <span
+                                                    class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                                            </div>
+                                            <span id="text-button-sooner">Accede primero</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gratefulnessSooner" id="gratefulnessSooner">
+
+                                <p class="justifyText">Desarrollamos el canal m&aacute;s moderno para que puedas obtener
+                                    tus cr&eacute;ditos 100% en l&iacute;nea, con la tasa m&aacute;s conveniente y en tu
+                                    cuenta bancaria en el mismo d&iacute;a. Soportado en la mejor tecnolog&iacute;a,
+                                    operado por expertos.</p>
+                                <p class="textAlone"><strong>&iquest;Impresionante, no? Bienvenido a Solven.</strong>
+                                </p>
+                                <img th:attr="data-src=@{/img/logo-red.png}" th:src="@{/img/logo-red.png}"
+                                     alt="Solven"/>
+                                <br/>
+                                <div class="countdownSooner">
+                                    <ul class="countdown">
+                                        <li>
+                                            <span class="days">00</span>
+                                            <div class="smallText days_ref">d&iacute;as</div>
+                                        </li>
+                                        <li class="seperator">.</li>
+                                        <li>
+                                            <span class="hours">00</span>
+                                            <div class="smallText hours_ref">horas</div>
+                                        </li>
+                                        <li class="seperator">:</li>
+                                        <li>
+                                            <span class="minutes">00</span>
+                                            <div class="smallText minutes_ref">minutos</div>
+                                        </li>
+                                        <li class="seperator">:</li>
+                                        <li>
+                                            <span class="seconds">00</span>
+                                            <div class="smallText seconds_ref">segundos</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="socials-share" style="margin-bottom: 1.5em;">
+                                    <ul>
+                                        <li>
+                                            <div class="fb-share-button"
+                                                 data-href="https://www.facebook.com/profile.php?id=1050798058333658&amp;fref=ts"
+                                                 data-layout="button" data-size="small" data-mobile-iframe="true">
+                                                <a class="fb-xfbml-parse-ignore" target="_blank"
+                                                   href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D100009674015894%26fref%3Dts&amp;src=sdkpreparse">Compartir</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <a class="twitter-share-button"
+                                               href="https://twitter.com/intent/tweet?text=El%20%23cr%C3%A9dito%20que%20mereces%2C%20100%25%20en%20l%C3%ADnea%2C%20sin%20letras%20chicas%20y%20con%20un%20servicio%20personalizado%20de%20primera%20%23fintech">Tweet</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="countryLocked" th:if="${session.countryUnlocked == false}">
+                        <h3>Lo sentimos, en este momento solo es posible solicitar productos desde Per&uacute;.</h3>
+                        <p>&iquest; Est&aacute;s en Per&uacute;? Es posible que tu conexi&oacute;n est&eacute; usando
+                            una VPN. Int&eacute;ntalo desde una conexi&oacute;n diferente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+<!-- /Content -->
+
+<!-- Footer -->
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+<!-- / Footer -->
+
+</body>
+</html>

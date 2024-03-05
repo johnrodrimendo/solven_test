@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<th:block th:fragment="all">
+    <th:block th:replace="components/tracking :: utm-capture"></th:block>
+    <th:block th:replace="components/tracking :: social"></th:block>
+    <th:block th:replace="components/tracking :: gtm-noscript" />
+</th:block>
+<th:block th:fragment="social">
+    <script defer="true" async="true"  th:inline="javascript">
+        /*<![CDATA[*/
+        var GA_LOCAL_STORAGE_KEY = 'ga:clientId';
+        var dataLayer = [{
+            'clientId': localStorage.getItem(GA_LOCAL_STORAGE_KEY),
+        }];/*]]>*/
+    </script>
+    <script defer="true" async="true"  th:inline="javascript">
+        /*<![CDATA[*/
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer', /*[[ ${@configuration.getGoogleTagManagerKey(@countryContextService.getCountryParamsByRequest(#httpServletRequest)?.getId())} ]]*/null);
+        /*]]>*/
+    </script>
+</th:block>
+<th:block th:fragment="gtm-noscript">
+    <noscript>
+        <iframe th:src="'https://www.googletagmanager.com/ns.html?id='+${@configuration.getGoogleTagManagerKey(@countryContextService.getCountryParamsByRequest(#httpServletRequest)?.getId())}" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+</th:block>
+<th:block th:fragment="utm-capture">
+    <script async="true"  th:inline="javascript">
+        /*<![CDATA[*/
+        var trackingParameters = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'r_parameter', 'aff_sub', 'click_id', 'toro_sid', 'toro_affiliate_id', 'marketing_campaign'];
+        var days_after_expiration = 30;
+        function setCookie(name, value, days){
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            var expires = "; expires=" + date.toGMTString();
+            document.cookie = name + "=" + encodeURI(value) + expires + ";path=/";
+        }
+        function cleanCookies() {
+            for(var i = 0 ; i < trackingParameters.length ; ++i) {
+                setCookie(trackingParameters[i], null, 0);
+            }
+        }
+        function isSet (param) {
+            var content = getParam(param);
+            return !(content === undefined || content == null || content === "")
+        }
+        function isAnySet() {
+            var response = false;
+
+            for(var i = 0 ; i < trackingParameters.length ; ++i) {
+                response = response || isSet(trackingParameters[i]);
+            }
+            return response;
+        }
+        function getParam(p){
+            var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
+            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+        }
+        function storeCookies() {
+            if(!isAnySet())
+                return;
+            cleanCookies();
+
+            for(var i =  0 ; i < trackingParameters.length ; ++i) {
+                if(isSet(trackingParameters[i])) {
+                    setCookie(trackingParameters[i], getParam(trackingParameters[i]), days_after_expiration);
+                }
+            }
+        }
+        storeCookies();
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

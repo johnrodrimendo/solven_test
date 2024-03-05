@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:text="#{static.title.faqs}"></title>
+    <meta name="description" th:attr="content=#{static.description.privacy}" />
+    <link rel="alternate" href="https://www.solven.pe/centro-de-ayuda" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/centro-de-ayuda" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/centro-de-ayuda" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/centro-de-ayuda" hreflang="x-default" />
+</head>
+<body th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe main-arg' : 'main-pe'}">
+<th:block layout:fragment="content">
+<section id="banner" class="main-banner bgbanner-inner bgbanner-faqs">
+    <article>
+        <h1>Centro de ayuda</h1>
+        <p th:text="#{static.pages.centroayuda.subtitle}"></p>
+    </article>
+    <img id="bannerPrincipal" th:attr="data-src=@{img/bgfaqs.jpg}" alt="" class="lazy"/>
+    <img id="bannerResponsive" th:attr="data-src=@{img/bgperu_responsive.jpg}" alt=""/>
+</section>
+    <section class="w-faqs gwr">
+    <ul class="tabs-lists">
+        <li>
+            <a href="#about" class="item-tab tab-active">Nosotros</a>
+        </li>
+        <li>
+            <a href="#security" class="item-tab">Seguridad</a>
+        </li>
+        <li>
+            <a href="#apply" class="item-tab">Solicitar un cr&eacute;dito</a>
+        </li>
+        <li>
+            <a href="#products" class="item-tab">Nuestros productos</a>
+        </li>
+        <li>
+            <a href="#evaluation" class="item-tab">El proceso de evaluaci&oacute;n</a>
+        </li>
+        <li>
+            <a href="#payment" class="item-tab">Pagar mis cr&eacute;ditos</a>
+        </li>
+        <li>
+            <a href="#supervising" class="item-tab" th:text="#{static.faqs.supervising}" ></a>
+        </li>
+    </ul>
+    <div class="w-content-faqs">
+        <article class="content-tab" id="about" >
+            <h2>Nosotros</h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion"  th:each="m : ${faq.meta}" th:if="${m == 'about'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <article class="content-tab" id="security">
+            <h2>Seguridad</h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'security'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <article class="content-tab" id="apply">
+            <h2>Solicitar un cr&eacute;dito</h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'apply'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <article class="content-tab" id="products">
+            <h2 th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}"> Nuestros productos</h2>
+            <h2 th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">Nuestro producto</h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'products'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <article class="content-tab" id="evaluation">
+            <h2>El proceso de evaluaci&oacute;n</h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'evaluation'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <article class="content-tab" id="payment">
+            <h2>Pagar mis cr&eacute;ditos</h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'payment'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <article class="content-tab" id="supervising">
+            <h2 th:text="#{static.faqs.supervising}"></h2>
+            <th:block th:each="faq : ${faqs}">
+                <dl class="accordion" th:each="m : ${faq.meta}" th:if="${m == 'supervising'}">
+                    <dt><a th:text="${faq.title.rendered}"></a></dt>
+                    <dd th:utext="${faq.content.rendered}"></dd>
+                </dl>
+            </th:block>
+        </article>
+
+        <div class="text-right">
+            <h3 class="text-normal-size text-black" th:utext="#{static.page.centroayuda.callus}"></h3>
+        </div>
+    </div>
+</section>
+</th:block>
+<script th:inline="javascript" async="async">
+    /*<![CDATA[*/
+    (function() {
+        $('#subscribe').on('click', function(e){
+            e.preventDefault();
+            var responseBlock = $('#response-block'),
+                    btn = $(this);
+            if(!isEmail($('#email').val())){
+                responseBlock.html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+            } else {
+                responseBlock.html('');
+                btn.loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/subscribe}]]*/null,
+                    type: 'POST',
+                    data: {
+                        email: $('#email').val(),
+                    },
+                    success: function (data) {
+                        btn.unloading();
+                        $('#email-block').addClass('block-hidden');
+                        responseBlock.html(successAjaxMessage('Gracias por suscribirte, te enviaremos novedades.'));
+
+                    },
+                    error: function (xhr, data) {
+                        btn.unloading();
+                        responseBlock.html(errorAjaxMessage(data.message));
+                        return false;
+                    }
+                });
+            }
+        });
+
+
+
+        var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+        if (validator != null) {
+            var jsonValidator = JSON.parse(validator);
+            $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $('#contactForm')));
+        }
+        $('#sendMessage').on('click', function(event){
+            event.preventDefault();
+            validate();
+        });
+        function validate() {
+            if ($('#contactForm').valid()) {
+                grecaptcha.reset();
+                grecaptcha.execute();
+            }
+        }
+        function submit(){
+            $('#sendMessage').loading('', 2);
+            defaultAjax({
+                url: /*[[@{/contact}]]*/,
+                type: 'POST',
+                formValidation: $('#contactForm').data('validator'),
+                data: $('#contactForm').serializeObject(),
+                success: function (data) {
+                    $('#sendMessage').unloading();
+                    $('#contactForm').data('validator').resetForm();
+                    $('#contactForm')[0].reset();
+                    $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                },
+                error: function () {
+                    $('#sendMessage').unloading();
+                }
+            });
+        }
+    }());
+    /*]]>*/
+</script>
+</body>
+</html>

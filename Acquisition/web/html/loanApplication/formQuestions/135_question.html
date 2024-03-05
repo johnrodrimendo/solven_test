@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var showTerm1 = /*[[${showTerm1}]]*/;
+        var showTerm2 = /*[[${showTerm2}]]*/;
+        var showTerm3 = /*[[${showTerm3}]]*/;
+
+        /*]]>*/
+    </script>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q135">
+            <div th:style="'display:'+ ${!showContractResume ? 'none' : 'block'}">
+                <th:block th:if="${customMessage != null}">
+                    <p id="customMessageContract" th:utext="${customMessage}" style="margin-bottom: 15px;"></p>
+                </th:block>
+                <th:block th:unless="${shouldVerifyEmail}">
+                    <div class="box-content">
+                        <div class="box-header">
+                            <p>Resumen</p>
+                        </div>
+                        <div class="box-body">
+                            <th:block th:if="${offer?.entityProductParam?.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_CUENTA_AHORRO}">
+
+                                <div class="box-body_text">
+                                    <span class="saving-detail"><strong>TREA:</strong></span>
+                                    <span>
+                                    <th:block th:utext="${@utilService.doubleMoneyFormatWithoutSpaces(offer?.getBankAccountOfferData()?.annualInterest,null)}"></th:block>%
+                                </span>
+                                </div>
+
+                                <!--                            <div class="box-body_text">
+                                                                <span class="saving-detail"><strong>N° Oper. Permitidas:</strong></span>
+                                                                <span>
+                                                                    <th:block th:if="${offer?.getBankAccountOfferData()?.allowedOperations == -1}">Ilimitado</th:block>
+                                                                    <th:block th:unless="${offer?.getBankAccountOfferData()?.allowedOperations == -1}">
+                                                                        <th:block  th:text="${offer?.getBankAccountOfferData()?.allowedOperations}"></th:block> mensuales
+                                                                    </th:block>
+
+                                                                </span>
+                                                            </div>-->
+
+                                <div class="box-body_text">
+                                    <span class="saving-detail"><strong>N° oper. ventanilla:</strong></span>
+                                    <span>
+                                    <th:block th:if="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency == -1}">Ilimitado</th:block>
+                                    <th:block th:unless="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency == -1}" th:text="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency}"></th:block>
+                                    <th:block th:unless="${offer?.getBankAccountOfferData()?.monthlyWithdrawalAgency == -1}">al mes</th:block>
+                                </span>
+                                </div>
+
+                                <div class="box-body_text">
+                                    <span class="saving-detail"><strong>Tipo de moneda:</strong></span>
+                                    <span>
+                                    <th:block th:text="${offer?.getBankAccountOfferData()?.currency}"></th:block>
+                                </span>
+                                </div>
+                            </th:block>
+                            <th:block th:unless="${offer?.entityProductParam?.id == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_CUENTA_AHORRO}">
+                                <div class="box-body_text" th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                                    <span><strong>Financiador:</strong></span>
+                                    <span th:text="${offer?.entity?.shortName}"></span>
+                                </div>
+                                <div class="box-body_text">
+                                    <span><strong>Importe:</strong></span>
+                                    <span th:text="${@utilService.doubleMoneyFormat(offer?.ammount, offer?.currency?.symbol)}"></span>
+                                </div>
+
+                                <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                    <div class="box-body_text">
+                                        <span><strong>Cuota promedio mensual:</strong></span>
+                                        <span
+                                                th:text="${@utilService.doubleMoneyFormat(maxInstallmentAmount, offer?.currency?.symbol)}">
+                                </span>
+                                    </div>
+                                </th:block>
+                                <th:block th:unless="${offer.entityId == T(com.affirm.common.model.catalog.Entity).ACCESO}">
+                                    <div class="box-body_text">
+                                        <span><strong>Cuota:</strong></span>
+                                        <span
+                                                th:text="${@utilService.doubleMoneyFormat(maxInstallmentAmount, offer?.currency?.symbol)}">
+                                </span>
+                                    </div>
+                                </th:block>
+                                <div class="box-body_text">
+                                    <span><strong>Plazo:</strong></span>
+                                    <span th:text="${offer?.installments + ' meses'}"></span>
+                                </div>
+                                <div class="box-body_text"
+                                     th:if="${offer.getTotalScheduleField('insurance')} > 0">
+                                    <span><strong>Desgravamen:</strong></span>
+                                    <span th:text="${@utilService.doubleMoneyFormat(offer.getTotalScheduleField('insurance'))}">
+                            </span>
+                                </div>
+                                <div class="box-body_text box-body_tea_tcea">
+                            <span>
+                                <strong>TEA:</strong>
+                                <span th:text="${@utilService.percentFormat(offer?.effectiveAnualRate)}"></span>
+                            </span>
+                                    <span>
+                                <strong>TCEA:</strong>
+                                <span th:text="${@utilService.percentFormat(offer?.effectiveAnnualCostRate)}"></span>
+                            </span>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="content-button">
+                        <button class="button see-contract q135-button">Ver Contrato</button>
+                        <button class="button bg-red signatureOpenModal" id="signatureOpenModal"
+                                th:utext="#{contract.sign}"><i
+                                class="icon icon-feather"></i></button>
+                    </div>
+                </th:block>
+            </div>
+
+            <div class="pdfViewer">
+                <div class="zoom-options">
+                    <!--                    <button id="fullscreen" type="button" class="button bg-red"></button>-->
+                    <button id="zoominbutton" type="button" class="button bg-red zoominbutton">+</button>
+                    <button id="zoomoutbutton" type="button" class="button bg-red zoomoutbutton">-</button>
+                </div>
+                <div class="pdf-bar">
+                    <div class="container">
+                        <button class="button bg-red signatureOpenModal" id="signatureOpenModal"
+                            th:utext="#{contract.sign}"><i class="icon icon-feather"></i></button>
+                    </div>
+                </div>
+                <div class="pdf-container">
+                    <div id="page">
+                        <div id="pdfContainer">
+
+                        </div>
+                        <!--                        <div id="loading-ajax" class="loading-ajax-invisible loading-content">-->
+                        <!--                            <div class="sk-circle">-->
+                        <!--                                <div class="sk-circle1 sk-child"></div>-->
+                        <!--                                <div class="sk-circle2 sk-child"></div>-->
+                        <!--                                <div class="sk-circle3 sk-child"></div>-->
+                        <!--                                <div class="sk-circle4 sk-child"></div>-->
+                        <!--                                <div class="sk-circle5 sk-child"></div>-->
+                        <!--                                <div class="sk-circle6 sk-child"></div>-->
+                        <!--                                <div class="sk-circle7 sk-child"></div>-->
+                        <!--                                <div class="sk-circle8 sk-child"></div>-->
+                        <!--                            </div>-->
+                        <!--                            <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>-->
+                        <!--                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="signatureModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Hoja de Firma</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <form class="form" role="form" id="formSignatureModal" th:object="${signatureForm}"
+                              autocomplete="off">
+                            <div id="signature-block" class="signature-block">
+                                <div class="field">
+                                    <i class="icon icon-feather"></i>
+                                </div>
+                                <div class="field">
+                                    <input type="text" th:field="*{loanApplicationSign}" class="signature-input"/>
+                                    <small class="input-help text-center" style="font-size: 16px">
+                                        <span>Para firmar, escribe: </span>
+                                        <strong
+                                                th:text="${person.getName().substring(0,1).concat('. ').concat(person.getFirstSurname()) }"
+                                                style="background-color: yellow;"></strong>
+                                    </small>
+                                    <div class="errorContainer"></div>
+                                </div>
+                                <div class="terms-block text-left"
+                                     th:if="${!bankRequired and !paymentApplicationTypeRequired}">
+                                    <div th:if="${showTerm1}" class="field">
+                                        <label for="terms1" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                            <span class="check-label" th:utext="#{contract.conditions}"> </span>
+                                            <input type="checkbox" class="real-check" id="terms1" name="terms1"/>
+                                        </label>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                    <div class="field" th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA and showTerm3}">
+                                        <label for="terms3" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                            <span class="check-label">Se autoriza la apertura de una cuenta de ahorros. Se adjunta la Cartilla de Información y Contrato de Apertura de Cuenta aprobada por Res. SBS N° 01045-2021. Para mayor información visite <a
+                                                    href="https://www.alfinbanco.pe" target="_blank">www.alfinbanco.pe</a>.</span>
+                                            <input type="checkbox" class="real-check" id="terms3" name="terms3"/>
+                                        </label>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                    <div class="field" th:if="${showTerm2}">
+                                        <label for="terms2" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+
+                                            <th:block th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                               <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento
+                                                                expreso con los <a href="https://alfinbanco.pe/terminosycondiciones"
+                                                                                   rel="noopener noreferrer" target="_blank">T&eacute;rminos y
+                                                                    Condiciones</a> y con la <a href="https://alfinbanco.pe/politicasdeprivacidad"
+                                                                                                rel="noopener noreferrer"
+                                                                                                target="_blank">Pol&iacute;tica de
+                                                                    Privacidad</a>. <th:block th:utext="#{contract.valid}"> </th:block>
+                                               </span>
+                                            </th:block>
+                                            <th:block th:unless="${offer.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                                               <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento
+                                                                expreso con los <a th:href="@{/terminos-y-condiciones}"
+                                                                                   rel="noopener noreferrer" target="_blank">T&eacute;rminos y
+                                                                    Condiciones</a> y con la <a th:href="@{/politica-de-privacidad}"
+                                                                                                rel="noopener noreferrer"
+                                                                                                target="_blank">Pol&iacute;tica de
+                                                                    Privacidad</a>. <th:block th:utext="#{contract.valid}"> </th:block>
+                                               </span>
+                                            </th:block>
+                                            <input type="checkbox" class="real-check" id="terms2" name="terms2"/>
+                                        </label>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                    <div class="field" th:if="${offer.entityId == T(com.affirm.common.model.catalog.Entity).PRISMA and showTerm3}">
+                                        <label for="terms3" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                            <span class="check-label">Acepto que el cronograma oficial impreso me sea entregado al momento del desembolso en la Agencia de la COOPAC MF PRISMA. </span>
+                                            <input type="checkbox" class="real-check" id="terms3" name="terms3"/>
+                                        </label>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </div>
+
+                                <div class="actions">
+                                    <button class="button bg-red" id="signButton" type="button">Firmar</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <form th:if="${bankRequired}" id="loanApplicationBankForm" class="form block-hidden" role="form"
+                              action="#" th:object="${bankForm}" autocomplete="off">
+                            <h3>&iquest;A qu&eacute; cuenta te enviamos tu dinero?</h3>
+                            <span class="subtitle">(Recuerda que debes ser titular de la misma, caso contrario no
+                                podremos realizar la transferencia)</span>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 column">
+                                    <div class="field">
+                                        <small th:text="#{form.field.bank}" class="input-help"></small>
+                                        <select th:value="*{bankId}" name="bankId" id="bankId"
+                                                data-placeholder="Selecciona el banco">
+                                            <option value="" hidden="hidden"></option>
+                                            <th:block th:each="bank : ${@catalogService.getBanks(false)}">
+                                                <option value="" disabled="disabled" selected="selected"></option>
+                                                <option th:value="${bank.id}" th:text="${bank.name}"></option>
+                                            </th:block>
+
+                                        </select>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+
+                                    <div class="field">
+                                        <small th:text="#{form.field.bankAccountType}" class="input-help"></small>
+                                        <select th:value="*{bankAccountType}" name="bankAccountType"
+                                                id="bankAccountType" data-placeholder="Seleccione el tipo de cuenta">
+                                            <option value="" hidden="hidden" selected="selected" disabled="disabled">
+                                            </option>
+                                            <option value="S" th:text="#{form.field.bankAccountType.saving}"></option>
+                                            <option value="C" th:text="#{form.field.bankAccountType.current}"></option>
+                                        </select>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 column">
+                                    <div class="field">
+                                        <small th:text="#{form.field.bankAccountNumber}" class="input-help"></small>
+                                        <input type="text" th:value="*{bankAccountNumber}" name="bankAccountNumber"
+                                               id="bankAccountNumber" class="input-outline"/>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+
+                                    <div class="field">
+                                        <small th:text="#{loanApplicationSignature.bankAccountDepartment}"
+                                               class="input-help"></small>
+                                        <select th:value="*{bankAccountDepartment}" id="bankAccountDepartment"
+                                                name="bankAccountDepartment" data-placeholder="Seleccione el lugar">
+                                            <th:block th:each="department : ${@catalogService.getDepartments()}">
+                                                <option value="" hidden="hidden" disabled="disabled"
+                                                        selected="selected"></option>
+                                                <option th:value="${department.id}" th:text="${department.name}">
+                                                </option>
+                                            </th:block>
+                                        </select>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="terms-block text-left">
+                                <label th:if="${showTerm1}" for="terms1" class="custom-check">
+                                    <span class="check-inner">
+                                        <i class="icon icon-check"></i>
+                                    </span>
+                                    <span class="check-label" th:utext="#{contract.conditions}"> </span>
+                                    <input type="checkbox" class="real-check" id="terms1"/>
+                                </label>
+                                <label th:if="${showTerm2}" for="terms2" class="custom-check">
+                                    <span class="check-inner">
+                                        <i class="icon icon-check"></i>
+                                    </span>
+                                    <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento expreso
+                                        con los <a th:href="@{/terminos-y-condiciones}" rel="noopener noreferrer"
+                                                   target="_blank">T&eacute;rminos y Condiciones</a> y con la <a
+                                                th:href="@{/politica-de-privacidad}" rel="noopener noreferrer"
+                                                target="_blank">Pol&iacute;tica de Privacidad</a>. Dichos consentimientos
+                                        tienen la validez y eficacia que le confiere el art&iacute;culo 141 del
+                                        C&oacute;digo Civil peruano.</span>
+                                    <input type="checkbox" class="real-check" id="terms2"/>
+                                </label>
+                                <small id="error-response" class="error-text"></small>
+                            </div>
+                            <div class="actions text-center">
+                                <button id="sendButton" class="button bg-red" type="button">Aceptar</button>
+                            </div>
+                        </form>
+
+
+                        <form th:if="${paymentApplicationTypeRequired}" id="paymentApplicationTypeForm"
+                              class="form block-hidden" role="form" action="#" autocomplete="off">
+                            <h3>Elige un tipo de aplicaci&oacute;n de pago</h3>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 column" id="modalFormInputRadio">
+                                    <div class="field">
+                                        <label class="h-input-radio">
+                                            <input type="radio" name="type" value="A"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Reducción de número de cuotas</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="h-input-radio">
+                                            <input type="radio" name="type" value="D"/>
+                                            <div class="option-wrapper">
+                                                <div class="iconic-option-inner">
+                                                    <div class="radio inline"></div>
+                                                    <h5 class="inline">Reducción de monto</h5>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="terms-block text-left" th:if="${!bankRequired}">
+                                <label th:if="${showTerm1}" for="terms1" class="custom-check">
+                                    <span class="check-inner">
+                                        <i class="icon icon-check"></i>
+                                    </span>
+                                    <span class="check-label" th:utext="#{contract.conditions}"></span>
+                                    <input type="checkbox" class="real-check" id="terms1"/>
+                                </label>
+                                <label th:if="${showTerm2}" for="terms2" class="custom-check">
+                                    <span class="check-inner">
+                                        <i class="icon icon-check"></i>
+                                    </span>
+                                    <span class="check-label"> He le&iacute;do y manifiesto mi consentimiento expreso
+                                        con los <a th:href="@{/terminos-y-condiciones}" rel="noopener noreferrer"
+                                                   target="_blank">T&eacute;rminos y Condiciones</a> y con la <a
+                                                th:href="@{/politica-de-privacidad}" rel="noopener noreferrer"
+                                                target="_blank">Pol&iacute;tica de Privacidad</a>. Dichos consentimientos
+                                        tienen la validez y eficacia que le confiere el art&iacute;culo 141 del
+                                        C&oacute;digo Civil peruano.</span>
+                                    <input type="checkbox" class="real-check" id="terms2"/>
+                                </label>
+                                <small id="error-response-type-application" class="error-text"></small>
+                            </div>
+                            <div class="terms-block text-left" th:if="${bankRequired}">
+                                <small id="error-response-type-application" class="error-text"></small>
+                            </div>
+                            <div class="actions text-center">
+                                <button id="sendButtonPaymentType" class="button bg-red" type="button">Aceptar</button>
+                            </div>
+
+
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+
+                                $('.h-input-radio').radio();
+                                /*]]>*/
+                            </script>
+                        </form>
+
+
+                        <form th:if="${smsPinRequired}" id="smsPinForm" class="form modal-pin block-hidden" role="form"
+                              onsubmit="return false;" action="javascript:void(0);" autocomplete="off">
+                            <p>Acepta los términos y condiciones ingresando el PIN enviado por SMS al <span
+                                    th:text="${phoneNumberMasked}"/>.</p>
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <div class="field inline">
+                                        <input size="6" type="text" name="pin" id="pin" class="input-outline"
+                                               placeholder="PIN" autocomplete="off"/>
+                                    </div>
+                                    <div class="field inline">
+                                        <button id="sendPinButton" class="button bg-red" type="button">Continuar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="errorContainer"></div>
+                                <div class="group-help">
+                                    <small th:class="input-help" style="display: flex; justify-content: center">
+                                        <a href="#" class="text-lightblue" style="display: none;text-align: center"
+                                           id="resendToken"><i class="icon icon-reload"></i>Reenviar</a>
+                                        <a href="#" class="text-lightblue" style="display: none;text-align: center"
+                                           id="callMe">
+                                            <i class="icon icon-reload"></i>
+                                            <span th:text="#{questions.block.q54.callme}"></span>
+                                            <span class="timeout"></span>
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+                                var smsPinFormValidator = /*[[${smsPinForm.validator.toJson(#locale)}]]*/ null;
+                                $('#smsPinForm').validateForm(createFormValidationJson(JSON.parse(smsPinFormValidator),
+                                    $('#smsPinForm')));
+                                var smsPinFormPinElement = document.getElementById('pin');
+                                if(smsPinFormPinElement){
+                                    smsPinFormPinElement.onpaste = function(e) {
+                                        e.preventDefault();
+                                    }
+                                }
+                                /*]]>*/
+                            </script>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal" th:utext="#{contract.about}"></h4>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <ul style="text-align: left">
+                        <li style="margin: 1em 0;">
+                            <p><b>1.-</b>
+                                <th:block th:utext="#{contract.read}"></th:block>
+                            </p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>2.-</b> Podr&aacute;s dar tu consentimiento de manera electr&oacute;nica, indicando tu
+                                nombre completo al final del mismo (dicho consentimiento tienen la validez y eficacia
+                                que le confiere el art&iacute;culo 141 del C&oacute;digo Civil peruano - es equivalente
+                                a tu firma en un documento f&iacute;sico).</p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>3.-</b> Ingresa los datos de la cuenta bancaria donde te depositaremos el dinero (al
+                                momento de realizar la transferencia validaremos que se encuentre a tu nombre, caso
+                                contrario detendremos el proceso). *</p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>4.-</b> Recibir&aacute;s un correo electr&oacute;nico con la copia
+                                <th:block th:utext="#{contract.read2}"></th:block>
+                                y el cronograma preliminar. El cronograma final te lo enviaremos una vez que hayamos
+                                validado la acreditaci&oacute;n del dinero en tu cuenta bancaria.
+                            </p>
+                        </li>
+                        <li style="margin: 1em 0;">
+                            <p><b>5.-</b> El dinero se acreditar&aacute; en tu cuenta de acuerdo al tiempo que pueda
+                                tomar una transferencia interbancaria (habitualmente hasta 24hs h&aacute;biles como
+                                m&aacute;ximo).
+                            </p>
+                        </li>
+                    </ul>
+                    <small>* No aplica para consolidaci&oacute;n de deudas.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="additionalInformationModal" tabindex="-1" role="dialog" aria-labelledby="additionalInformationModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <h4 class="title-modal">Información</h4>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <th:block th:if="${bancoAztecaDueDateModified == true or bancoAztecaDueDateModifiedAfterContract == true}">
+                            <p style="margin-bottom: 15px; text-align: center">Se actualizaron las fechas de vencimiento del cronograma para cumplir con el período mínimo de gracia, revisa y acepta el contrato actualizado.</p>
+                        </th:block>
+                        <div class="actions text-center" style="text-align: center;">
+                            <button class="button bg-red" data-dismiss="modal" type="button">Continuar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var showContractResume = /*[[${showContractResume}]]*/;
+        var bankRequired = /*[[${bankRequired}]]*/;
+        var paymentApplicationTypeRequired = /*[[${paymentApplicationTypeRequired}]]*/;
+        var smsPinRequired = /*[[${smsPinRequired}]]*/;
+        var contractRead2 = /*[[#{contract.read2}]]*/;
+
+            $(function () {
+                $('#bankId, #bankAccountType, #bankAccountDepartment').select2({
+                    minimumResultsForSearch: -1,
+                    width: 100 + '%'
+                });
+                $('label.custom-check').on('change', '.real-check', function () {
+                    $(this).checked();
+                });
+                // Set the validations
+                var validator = /*[[${bankForm.validator.toJson(#locale)}]]*/ null;
+                $('#loanApplicationBankForm').validateForm(createFormValidationJson(JSON.parse(validator), $(
+                    '#loanApplicationBankForm')));
+                var validatorSign = /*[[${signatureForm.validator.toJson(#locale)}]]*/ null;
+                $('#formSignatureModal').validateForm(createFormValidationJson(JSON.parse(validatorSign), $(
+                    '#formSignatureModal')));
+                var helpSign = $('#helpSign'),
+                    helpModal = $('#helpModal'),
+                    signText = $('.signatureOpenModal'),
+                    signModal = $('#signatureModal'),
+                    liveBox = $('#loanApplicationSign'),
+                    signButton = $('#signButton'),
+                    signtureBlock = $('#formSignatureModal'),
+                    bankAccountBlock = $('#loanApplicationBankForm'),
+                    smsPinBlock = $('#smsPinForm'),
+                    paymentApplicationTypeBlock = $('#paymentApplicationTypeForm');
+
+                helpSign.on('click', function (event) {
+                    event.preventDefault();
+                    helpModal.modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                        show: true
+                    });
+                });
+
+                signText.on('click', function (e) {
+                    signModal.modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                        show: true
+                    });
+
+                    signModal.on('shown.bs.modal', function () {
+                        liveBox.focus();
+                    });
+                });
+
+                liveBox.keypress(function (event) {
+                    if (event.which == 13) {
+                        signButton.click();
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+
+                //AJax
+                signButton.on('click', function (e) {
+                    e.preventDefault();
+                    if (paymentApplicationTypeRequired) {
+                        if ($('#formSignatureModal').valid()) {
+                            signButton.loading('', 2);
+                            questionFw.ajaxToCurrentQuestionController({
+                                type: "POST",
+                                data: $('#formSignatureModal').serializeObject(),
+                                success: function (data) {
+                                    signButton.unloading();
+                                    signtureBlock.addClass('block-hidden');
+                                    paymentApplicationTypeBlock.removeClass('block-hidden');
+                                },
+                                error: function (xhr, errorJson) {
+                                    signButton.unloading();
+                                    if (errorJson != null && errorJson.constructor == {}
+                                        .constructor && errorJson.type == "message") {
+                                        $('#formSignatureModal').data('validator').showErrors({
+                                            loanApplicationSign: errorJson.message
+                                        })
+                                        return false;
+                                    }
+                                }
+                            }, "signature");
+                        }
+                    } else if (bankRequired) {
+                        if ($('#formSignatureModal').valid()) {
+                            signButton.loading('', 2);
+                            questionFw.ajaxToCurrentQuestionController({
+                                type: "POST",
+                                data: $('#formSignatureModal').serializeObject(),
+                                success: function (data) {
+                                    signButton.unloading();
+                                    signtureBlock.addClass('block-hidden');
+                                    paymentApplicationTypeBlock.removeClass('block-hidden');
+                                },
+                                error: function (xhr, errorJson) {
+                                    signButton.unloading();
+                                    if (errorJson != null && errorJson.constructor == {}
+                                        .constructor && errorJson.type == "message") {
+                                        $('#formSignatureModal').data('validator').showErrors({
+                                            loanApplicationSign: errorJson.message
+                                        })
+                                        return false;
+                                    }
+                                }
+                            }, "signature");
+                        }
+                    } else if (smsPinRequired) {
+                        if ($('#formSignatureModal').valid()) {
+                            signButton.loading('', 2);
+                            questionFw.ajaxToCurrentQuestionController({
+                                type: "POST",
+                                data: $('#formSignatureModal').serializeObject(),
+                                success: function (data) {
+                                    signButton.unloading();
+                                    signtureBlock.addClass('block-hidden');
+                                    smsPinBlock.removeClass('block-hidden');
+                                    showPinRetryCountdown();
+                                },
+                                error: function (xhr, errorJson) {
+                                    signButton.unloading();
+                                    if (errorJson != null && errorJson.constructor == {}
+                                        .constructor && errorJson.type == "message") {
+                                        $('#formSignatureModal').data('validator').showErrors({
+                                            loanApplicationSign: errorJson.message
+                                        })
+                                        return false;
+                                    }
+                                }
+                            }, "signature");
+                        }
+                    } else {
+                        var terms1 = $('#terms1').prop('checked'),
+                            terms2 = $('#terms2').prop('checked');
+                        if (terms1 == false) {
+                            $('#error-response').html('Debe aceptar los t&eacute;rminos ' + contractRead2 +
+                                '.');
+                        } else if (terms2 == false) {
+                            $('#error-response').html(
+                                'Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.'
+                            );
+                        } else {
+                            if ($('#formSignatureModal').valid()) {
+                                signButton.loading('', 2);
+                                questionFw.ajaxToCurrentQuestionController({
+                                    type: "POST",
+                                    data: $('#formSignatureModal').serializeObject(),
+                                    success: function (data) {
+                                        signButton.unloading();
+                                        signtureBlock.addClass('block-hidden');
+                                        paymentApplicationTypeBlock.removeClass('block-hidden');
+                                        signModal.modal('hide');
+                                    },
+                                    error: function (xhr, errorJson) {
+                                        signButton.unloading();
+                                        if (errorJson != null && errorJson.constructor == {}
+                                            .constructor && errorJson.type == "message") {
+                                            $('#formSignatureModal').data('validator')
+                                                .showErrors({
+                                                    loanApplicationSign: errorJson.message
+                                                })
+                                            return false;
+                                        }
+                                    },
+                                    successBeforeChangeQuestion: function (data) {
+                                        signModal.modal('hide');
+                                    }
+                                }, "signature");
+                            }
+                        }
+                    }
+
+                });
+                var sendButton = $('#sendButton');
+                sendButton.on('click', function (e) {
+                    e.preventDefault();
+                    var terms1 = $('#terms1').prop('checked'),
+                        terms2 = $('#terms2').prop('checked');
+                    if (terms1 == false) {
+                        $('#error-response').html('Debe aceptar los t&eacute;rminos ' + contractRead2 +
+                        '.');
+                    } else if (terms2 == false) {
+                        $('#error-response').html(
+                            'Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.'
+                        );
+                    } else {
+                        if ($('#loanApplicationBankForm').valid()) {
+                            $('#error-response').html('');
+                            sendButton.loading('', 2);
+                            questionFw.ajaxToCurrentQuestionController({
+                                type: "POST",
+                                form: $('#formSignatureModal'),
+                                data: $.extend({}, $('#formSignatureModal').serializeObject(), $(
+                                    '#loanApplicationBankForm').serializeObject()),
+                                success: function (data) {
+                                    sendButton.unloading();
+                                    signModal.modal('hide');
+                                },
+                                error: function (xhr, errorJson) {
+                                    sendButton.unloading();
+                                },
+                                successBeforeChangeQuestion: function (data) {
+                                    signModal.modal('hide');
+                                }
+                            }, "bankSignature");
+                        }
+                    }
+                });
+
+                var sendButtonPaymentType = $('#sendButtonPaymentType');
+                sendButtonPaymentType.on('click', function (e) {
+                    e.preventDefault();
+                    if (!bankRequired) {
+                        var terms1 = $('#terms1').prop('checked'),
+                            terms2 = $('#terms2').prop('checked');
+                        if (terms1 == false) {
+                            var text = 'Debe aceptar los t&eacute;rminos ' + contractRead2 + '.';
+                            $('#error-response-type-application').html(text);
+                            return;
+                        } else if (terms2 == false) {
+                            $('#error-response-type-application').html(
+                                'Para continuar, acepta los Términos y Condiciones y la Pol&iacute;tica de Privacidad.'
+                            );
+                            return;
+                        }
+                    }
+
+                    if ($('input[name=type]:checked').val() != null) {
+                        $('#error-response-type-application').html('');
+                        sendButtonPaymentType.loading('', 2);
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "POST",
+                            data: $.extend({
+                                paymenType: $('input[name=type]:checked').val()
+                            }, $('#formSignatureModal').serializeObject()),
+                            success: function (data) {
+                                sendButtonPaymentType.unloading();
+                                paymentApplicationTypeBlock.addClass('block-hidden');
+                                if (bankRequired) {
+                                    bankAccountBlock.removeClass('block-hidden');
+                                } else {
+                                    signModal.modal('hide');
+                                }
+                            },
+                            error: function (xhr, errorJson) {
+                                sendButtonPaymentType.unloading();
+                            },
+                            successBeforeChangeQuestion: function (data) {
+                                if (!bankRequired) {
+                                    signModal.modal('hide');
+                                }
+                            }
+                        }, "paymentTypeSignature");
+                    } else {
+                        $('#error-response-type-application').html(
+                            'Debes seleccionar un tipo de aplicaci&oacute;n de pago');
+                    }
+                });
+
+                // Sms Pin form
+                var sendPinButton = $('#sendPinButton');
+                sendPinButton.on('click', function (e) {
+                    e.preventDefault();
+                    $('#smsPinForm #pin').val($('#smsPinForm #pin').val()).keyup();
+                    if ($('#smsPinForm').valid()) {
+                        console.log($.extend($('#smsPinForm').serializeObject(), $(
+                            '#formSignatureModal').serializeObject()));
+                        sendPinButton.loading('', 2);
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "POST",
+                            data: $.extend($('#smsPinForm').serializeObject(), $(
+                                '#formSignatureModal').serializeObject()),
+                            success: function (data) {
+                                sendPinButton.unloading();
+                            },
+                            error: function (xhr, errorJson) {
+                                sendPinButton.unloading();
+                            },
+                            successBeforeChangeQuestion: function (data) {
+                                signModal.modal('hide');
+                            }
+                        }, "validateSmsPin");
+                    }
+                });
+                var resendPinBtn = $('#smsPinForm #resendToken');
+                var callMeBtn = $('#smsPinForm #callMe');
+                // var resendCountdown = /*[[ ${T(com.affirm.common.model.transactional.PhoneNumber).RETRY_COUNTDOWN_SECONDS} ]]*/0;
+                var resendCountdown = 10;
+                // var callCountdown = /*[[ ${T(com.affirm.common.model.transactional.PhoneNumber).AVAILABLE_CALL_COUNTDOWN_SECONDS} ]]*/0;
+                var callCountdown = 10;
+                var voiceCallInterval;
+
+                function showPinRetryCountdown() {
+                    setTimeout(function () {
+                        resendPinBtn.click(resendPinEvnt);
+                        resendPinBtn.css('cursor', 'pointer');
+                        resendPinBtn.find('.icon-check').addClass("icon-reload");
+                        resendPinBtn.find('.icon-check').removeClass("icon-check");
+                        resendPinBtn.show();
+                    }, resendCountdown * 1000);
+                }
+
+                function showPinCallCountdown() {
+                    var countdown = callCountdown * 1000;
+
+                    callMeBtn.css('cursor', 'not-allowed');
+                    callMeBtn.show();
+
+                    setTimeout(function () {
+                        callMeBtn.click(callMeEvnt);
+                        callMeBtn.css('cursor', 'pointer');
+                        callMeBtn.find('.icon-check').addClass("icon-reload");
+                        callMeBtn.find('.icon-check').removeClass("icon-check");
+                        callMeBtn.show();
+                        callMeBtn.find('.timeout').html('');
+                        clearTimeout(voiceCallInterval);
+                    }, countdown);
+
+                    var secondsLeft = countdown;
+                    voiceCallInterval = setInterval(function () {
+                        secondsLeft -= 1000;
+                        callMeBtn.find('.timeout').text(' (' + new Date(secondsLeft).getSeconds() + ') s.');
+                    }, 1000);
+                }
+
+                function resendPinEvnt() {
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        success: function (data) {
+                            resendPinBtn.unbind('click', resendPinEvnt);
+                            resendPinBtn.css('cursor', 'not-allowed');
+                            resendPinBtn.find('.icon-reload').addClass("icon-check");
+                            resendPinBtn.find('.icon-reload').removeClass("icon-reload");
+                            // resendPinBtn.hide();
+
+                            // showPinCallCountdown();
+                        },
+                        error: function (xhr, errorJson) {
+                            //    TODO
+                        },
+                        successBeforeChangeQuestion: function (data) {
+                            //    NOTHING
+                        }
+                    }, "resend");
+
+                    showPinCallCountdown();
+                }
+
+                function callMeEvnt() {
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        success: function (data) {
+                            callMeBtn.unbind('click', callMeEvnt);
+                            callMeBtn.css('cursor', 'not-allowed');
+                            callMeBtn.find('.icon-reload').addClass("icon-check");
+                            callMeBtn.find('.icon-reload').removeClass("icon-reload");
+                            // callMeBtn.hide();
+
+                            // showPinRetryCountdown();
+                        },
+                        error: function (xhr, errorJson) {
+                            //    TODO
+                        },
+                        successBeforeChangeQuestion: function (data) {
+                            //    NOTHING
+                        }
+                    }, "call");
+
+                    showPinRetryCountdown();
+                }
+
+                var loanApplicationSign = document.getElementById('loanApplicationSign');
+                loanApplicationSign.onpaste = function(e) {
+                    e.preventDefault();
+                }
+            });
+
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var dueDateModified = /*[[${bancoAztecaDueDateModified}]]*/;
+        var dueDateModifiedAfterContract = /*[[${bancoAztecaDueDateModified}]]*/;
+        if(dueDateModified || dueDateModifiedAfterContract){
+            var additionalInformationModal = $('#additionalInformationModal');
+            if(additionalInformationModal){
+                setTimeout(function (){
+                    additionalInformationModal.modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                        show: true
+                    });
+                }, 1500)
+            }
+        }
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var pdfViewer;
+        var currentScale = 0;
+        var newScale;
+        var pdfJsUrl = /*[[${@urlService.externalUrl(#httpServletRequest) + '/pdfJs2/pdf.js'}]]*/;
+
+        // console.log("pdfJsUrl",pdfJsUrl)
+
+        function loadPdfOnDemand() {
+            $.getScript(pdfJsUrl, function (data, textStatus, jqxhr) {
+                pdfjsLib.GlobalWorkerOptions
+                    .workerSrc = /*[[${@urlService.externalUrl(#httpServletRequest) + '/pdfJs2/pdf.worker.js'}]]*/;
+                $(window).scroll(function () {
+                    setTimeout(function () {
+                        $('.actions-pdf').removeClass('actions-pdf-active');
+                    }, 4000);
+                    $('.actions-pdf').addClass('actions-pdf-active');
+                });
+
+                $('.process-loading-container.circle-progress').css('background-color', 'transparent'); // HACK
+                $('.circle-progress, .loading-content').show();
+
+                pdfjsLib.getDocument(questionFw.generateURlToCurrentQuestionController('contract') + '?token=' + questionFw
+                    .token).promise
+                    .then(function (pdf) {
+                        pdfViewer = pdf;
+                        // Get div#container and cache it for later use
+                        rendering(pdfViewer);
+                        $('.circle-progress, .loading-content').hide();
+                        $('.process-loading-container.circle-progress').css('background-color', ''); // HACK
+                        $(".zoom-options").css("display", "flex");
+                        $(".pdfViewer .pdf-bar").css("display", "flex");
+                        $(".q135 #pdfContainer").css("overflow", "scroll");
+                    });
+            });
+        }
+
+        function rendering(pdf) {
+            var container = document.getElementById("pdfContainer");
+            container.innerHTML = "";
+
+            // Loop from 1 to total_number_of_pages in PDF document
+            for (var i = 1; i <= pdf.numPages; i++) {
+
+                // Get desired page
+                pdf.getPage(i).then(function (page) {
+
+                    var div = document.createElement("div");
+
+                    // Set id attribute with page-#{pdf_page_number} format
+                    div.setAttribute("id", "page-" + (page.pageIndex + 1));
+                    div.setAttribute("class", "page-pdf");
+
+                    // This will keep positions of child elements as per our needs
+                    div.setAttribute("style", "position: relative");
+
+                    // Append div within div#container
+                    container.appendChild(div);
+
+                    // Create a new Canvas element
+                    var canvas = document.createElement("canvas");
+
+                    // Append Canvas within div#page-#{pdf_page_number}
+                    div.appendChild(canvas);
+
+                    var context = canvas.getContext('2d');
+
+                    var viewport = page.getViewport(1);
+
+                    if (currentScale === 0)
+                        currentScale = container.clientWidth / viewport.width;
+
+                    var scale = (newScale) ? newScale : currentScale;
+                    // console.log('scale ' + scale);
+                    viewport = page.getViewport(scale);
+
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    // Render PDF page
+                    var x = page.render(renderContext);
+                    $('.loading-content').hide();
+                    $('.pdf-bar').fadeIn();
+
+                });
+            }
+        }
+
+        // var fullscreen = document.getElementById("fullscreen");
+        // fullscreen.onclick = function() {
+        //     var viewer = document.querySelector('.pdfViewer');
+        //     if (!document.fullscreenElement) {
+        //         viewer.requestFullscreen();
+        //     } else {
+        //         if (document.exitFullscreen) {
+        //             document.exitFullscreen();
+        //         }
+        //     }
+        // };
+
+        var zoominbutton = document.getElementById("zoominbutton");
+        zoominbutton.onclick = function () {
+
+            if (Math.floor(currentScale) >= 2) {
+                //console.log("entro")
+                return;
+            }
+            currentScale = currentScale + 1;
+            rendering(pdfViewer);
+        };
+
+        var zoomoutbutton = document.getElementById("zoomoutbutton");
+        zoomoutbutton.onclick = function () {
+            if (Math.floor(currentScale) <= 0) {
+                return;
+            }
+            //console.log("salio")
+            currentScale = currentScale - 1;
+            rendering(pdfViewer);
+        };
+
+
+        $(".q135 .pdfViewer").addClass("q135-pdfViewer");
+        $(".see-contract").click(function () {
+            var q135skCircle = $(".loading-content .sk-circle").addClass("q135-sk-circle");
+            var q135TextPokebola = $('.loading-text');
+            var newtextPokebola = q135TextPokebola.html(
+                "Estamos cargando la documentaci&oacute;n<span>.</span><span>.</span><span>.</span>");
+            setTimeout(function () {
+                newtextPokebola.html(
+                    "En unos segundos estar&aacute; listo<span>.</span><span>.</span><span>.</span>"
+                );
+            }, 5000);
+            $(".q135 .pdfViewer").removeClass("q135-pdfViewer");
+            $(".q135 .box-content").hide();
+            $(".q135 #customMessageContract").hide();
+            $(".q135 .content-button").hide();
+            questionFw.showHideAgent(false);
+            loadPdfOnDemand();
+        });
+        $(".q135-button").click(function () {
+            $(".loan-process").removeClass("q135-loan-process");
+        });
+
+        if (!showContractResume) {
+            setTimeout(function () {
+                $(".see-contract").click();
+            }, 1000);
+        }
+        /*]]>*/
+    </script>
+</th:block>
+
+</html>

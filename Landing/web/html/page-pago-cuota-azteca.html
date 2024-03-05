@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <title>Alfin | Cancela tu deuda pagando menos</title>
+    <meta name="description" content='Cancela tu deuda pagando menos' />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/credito-de-consumo" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="x-default" />
+
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} != null" id="favicon" rel="icon" type="image/x-icon" th:href="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)}" />
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} == null" id="favicon" rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+
+    <script th:inline="javascript">
+        let primaryLoadingColor = [[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#26CAD3')}]];
+        let rootVarLoading = document.createElement('style');
+        rootVarLoading.type = 'text/css';
+        rootVarLoading.innerHTML = `:root {--loading-page-color: ${primaryLoadingColor}; --loading-color: ${primaryLoadingColor}}`;
+        document.getElementsByTagName('head')[0].appendChild(rootVarLoading);
+    </script>
+
+
+    <th:block layout:fragment="css">
+        <style>
+            body {
+                font-family: 'Lato', sans-serif;
+            }
+
+            @media only screen and (min-width: 960px) {
+                .document-row{
+                    align-items: flex-end !important;
+                }
+            }
+
+            @media screen and (max-height: 690px) and (min-width: 960px) {
+                .is-iframe main{
+                    min-height: 690px !important;
+                }
+                .is-iframe .img-landing-background{
+                    min-height: 690px !important;
+                }
+            }
+
+        </style>
+        <link rel="stylesheet" th:href="@{/css/branding.css}" />
+        <style>
+            :root{
+                --loading-page-color : #FA4616 ;
+                --primary-branding-color: #FA4616  !important;
+            }
+
+            .poweredBySolvenFirmaDesktop > .poweredBySolven  path{
+                fill: #cbcbcb;
+            }
+            .wrap-image{
+                width: 100% !important;
+            }
+            .bg-degrade{
+                display: none;
+            }
+            .wrap-image img.bg{
+                transform: translate(-50%, -50%) scale(1);
+                min-width: 100%;
+            }
+            .wrap{
+                z-index: 4;
+                height: 60vh;
+            }
+            .tos{
+                padding: 0px;
+            }
+
+            .tos > ul {
+                margin-left: 15px;
+            }
+
+            .tos > ul > li{
+                list-style-type: decimal;
+            }
+
+            .img-landing-background{
+                min-height: 100vh;
+                min-width: 100vw;
+                z-index: -1;
+                max-width: 100%;
+                height: 100vh;
+                object-fit: cover;
+                object-position: top;
+            }
+            .logo-landing-azteca-mobile{
+                display: none;
+                left: calc(50% - 1rem - 70px);
+                position: absolute;
+                top: 1.5rem;
+                width: 170px;
+                z-index: 3;
+            }
+
+            .form-container{
+                max-width: 460px;
+                margin-left: auto;
+                margin-right: 5rem;
+                z-index: 3;
+                margin-top: calc(3rem + 40px);
+            }
+
+            .form-headline-subtitle{
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+            .form-headline-subtitle-mobile{
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-headline-subtitle span,
+            .form-headline-subtitle-mobile span
+            {
+                font-weight: bolder;
+            }
+
+            .form-headline-subtitle span{
+                color: var(--primary-branding-color);
+            }
+
+            .form-headline-subtitle-mobile span
+            {
+                text-decoration: underline;
+            }
+
+            .form-headline-subtitle-mobile{
+                display: none;
+            }
+
+            .custom-form{
+                background: #f9f9f9a6;
+                border-radius: 1.5rem;
+                padding-left: 1.65rem;
+                padding-right: 1.65rem;
+            }
+            .tos{
+                margin: 0;
+                width: 100%;
+            }
+            .tos > p{
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            .frm-l5 .ds-fl .field{
+                margin-left: 0px;
+                padding-right: 0px;
+            }
+
+            .custom-form-headline{
+                text-align: left !important;
+                font-size:2.3rem !important;
+                font-weight: bold !important;
+                color: var(--primary-branding-color);
+            }
+            .custom-header{
+                margin-left: 0px;
+                margin-right: 0px;
+                max-width: 100%;
+                width: 100% !important;
+                background: transparent !important;
+                color: #FA4616;
+                border: none;
+                margin-top: 10vh;
+            }
+            span.select2, #documentNumber{
+                background-color: white;
+            }
+
+            section h2::after{
+                display: none;
+            }
+            .tos-mobile-container{
+                background-color: white;
+                display: none;
+            }
+            .tos-mobile-container > .tos {
+                padding: 10px;
+            }
+            .custom-form-headline-mobile{
+                display: none;
+            }
+            .poweredBySolvenFirma{
+                display: none;
+            }
+            .poweredBySolvenFirmaDesktop{
+                display: block;
+                position: absolute;
+                bottom: 15px;
+                max-width: 190px;
+                right: 15px;
+            }
+            .c-full select, .c-full .select2{
+                flex-grow: unset !important;
+                width: calc(30% - .25rem) !important;
+                min-width: 70px;
+                max-width: 70px;
+            }
+            #btnReview{
+                width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .c-i label.icon-checkbox a, .c-full label.icon-checkbox a{
+                color: var(--primary-branding-color);
+            }
+            #loanForm{
+                padding-top: 1.2rem;
+                padding-bottom: 1.2rem;
+            }
+            .frm-l5 .ds-col{
+                max-width: unset;
+                width: 100%;
+            }
+            .headline-title-mobile{
+                display: none;
+            }
+            .opacity-mobile{
+                display: none;
+            }
+
+            @media screen and (min-width: 960px){
+                main{
+                    /*min-height: 678px;*/
+                }
+                .img-landing-background{
+                    height: auto;
+                }
+            }
+            @media screen and (min-width: 960px) and (max-height: 720px) {
+                .form-container {
+                    margin-top: calc(1rem + 40px);
+                }
+            }
+            @media screen and (min-width: 1200px) and (max-height: 650px) {
+                .custom-header{
+                    margin-top: 3vh;
+                }
+                #btnReview{
+                    width: 100%;
+                }
+            }
+            @media screen and (min-width: 1200px) and (max-height: 600px) {
+                .custom-header{
+                    margin-top: 0px;
+                }
+                .custom-header h2{
+                    padding-bottom: 0px;
+                }
+                #loanForm{
+                    padding-top: 1rem;
+                }
+            }
+            @media screen and (min-width: 960px) and (min-height: 640px){
+
+                #loanForm{
+                    /*min-height: 65vh;*/
+                }
+
+                .custom-form-headline{
+                    margin-top: 10px !important;
+                }
+
+                .form-headline-subtitle{
+                    font-size: 1.25rem;
+                    margin-top: 0.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                div.ds-fl.ds-col-bottom{
+                    margin-bottom: 10px;
+                }
+            }
+
+            @media screen and (min-width: 960px) and (max-width: 1023px) {
+                .azteca-entity{
+                    min-height: 100vh;
+                }
+                .custom-header{
+                    margin-top: 5vh;
+                }
+                #loanForm{
+                    margin-top: 3vh;
+                }
+            }
+            @media screen and (max-width: 959px) {
+                body{
+                    height: 100%;
+                }
+                .tos{
+                    margin-top: 10px;
+                }
+                .opacity-mobile{
+                    display: block;
+                    height: 100%;
+                    width: 100%;
+                    position: absolute;
+                    left: 0;
+                    background-color: var(--primary-branding-color);
+                    opacity: 0.85;
+                }
+                .form-headline-subtitle{
+                    display: none;
+                }
+
+                .form-headline-subtitle-mobile{
+                    display: block;
+                    color: var(--primary-branding-color);
+                }
+                .frm-l5 .ds-col{
+                    min-width: unset;
+                }
+                .logo-landing-azteca-mobile{
+                    display: block;
+                }
+                .custom-form-headline-mobile{
+                    margin-top: 0px !important;
+                }
+                main.azteca-entity{
+                    background: url("https://solven-public.s3.amazonaws.com/img/alfin/landing_pagos/alfin_pagos.jpg");
+                    background-size: cover;
+                    background-position: revert;
+                    height: 100vh;
+                    min-height: 670px
+                }
+                .headline-title-mobile{
+                    display: block;
+                    font-size: 1.6rem;
+                    font-weight: bolder;
+                    margin-bottom: 1.2rem;
+                    color: white;
+                }
+                .form-container{
+                    padding-top: 18vh;
+                    max-width: 70%;
+                    margin-left: auto;
+                    margin-right: auto;
+                    max-height: 100%;
+                    display: inline-block;
+                    align-self: flex-start;
+                    margin-top: unset;
+                }
+                .tos-mobile-container{
+                    display: block;
+                }
+                .poweredBySolvenFirma{
+                    display: contents;
+                }
+                .poweredBySolvenFirmaDesktop{
+                    display: none;
+                }
+                .custom-form-headline-mobile{
+                    display: block;
+                    color: #FA4616;
+                    font-size: 25px !important;
+                    font-weight: bold !important;
+                    text-align: left !important;
+                    text-transform: uppercase;
+                }
+                .custom-form-headline{
+                    display: none;
+                }
+                .custom-header{
+                    display: none;
+                }
+                #loanForm{
+                    margin-top: unset;
+                    margin-bottom: unset;
+                    background: #ffffff;
+                    min-height: 320px;
+                }
+            }
+            @media screen and (max-width: 700px) {
+                main.azteca-entity{
+                    background: url("https://solven-public.s3.amazonaws.com/img/alfin/landing_pagos/alfin_pagos.jpg");
+                    background-size: cover;
+                    background-position: center;
+                }
+                .c-full select, .c-full .select2{
+                    flex-grow: unset !important;
+                    width: calc(30% - .25rem) !important;
+                    min-width: 70px !important;
+                }
+            }
+            @media screen and (max-width: 500px) {
+                .form-container{
+                    max-width: 95%;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                .c-full select, .c-full .select2{
+                    flex-grow: unset !important;
+                    width: calc(30% - .25rem) !important;
+                    min-width: 70px !important;
+                }
+            }
+            @media screen and (max-width: 400px) {
+                main.azteca-entity{
+                    min-height: 750px
+                }
+            }
+
+
+
+
+        </style>
+        <script defer="true" type="text/javascript" th:src="@{/js/landing5.js}"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/ ! function (t) {
+                "use strict";
+                t.loadCSS || (t.loadCSS = function () {});
+                var e = loadCSS.relpreload = {};
+                if (e.support = function () {
+                    var e;
+                    try {
+                        e = t.document.createElement("link").relList.supports("preload")
+                    } catch (t) {
+                        e = !1
+                    }
+                    return function () {
+                        return e
+                    }
+                }(), e.bindMediaToggle = function (t) {header-desktop_fdlm2
+                    var e = t.media || "all";
+
+                    function a() {
+                        t.media = e
+                    }
+                    t.addEventListener ? t.addEventListener("load", a) : t.attachEvent && t.attachEvent("onload",
+                        a), setTimeout(function () {
+                        t.rel = "stylesheet", t.media = "only x"
+                    }), setTimeout(a, 3e3)
+                }, e.poly = function () {
+                    if (!e.support())
+                        for (var a = t.document.getElementsByTagName("link"), n = 0; n < a.length; n++) {
+                            var o = a[n];
+                            "preload" !== o.rel || "style" !== o.getAttribute("as") || o.getAttribute(
+                                "data-loadcss") || (o.setAttribute("data-loadcss", !0), e.bindMediaToggle(o))
+                        }
+                }, !e.support()) {
+                    e.poly();
+                    var a = t.setInterval(e.poly, 500);
+                    t.addEventListener ? t.addEventListener("load", function () {
+                        e.poly(), t.clearInterval(a)
+                    }) : t.attachEvent && t.attachEvent("onload", function () {
+                        e.poly(), t.clearInterval(a)
+                    })
+                }
+                "undefined" != typeof exports ? exports.loadCSS = loadCSS : t.loadCSS = loadCSS
+            }("undefined" != typeof global ? global : this);
+            var primaryColor = /*[[${@brandingService.getEntityBrandingPrimaryColor(#httpServletRequest, '#00c8d3')}]]*/ ,
+                mobileHeaderBackgroundColor = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).mobileHeaderBackgroundColor}]]*/ ,
+                mobileHeaderTextColor = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale).mobileHeaderTextColor}]]*/ ,
+                fav_icon = /*[[${@brandingService.getEntityBrandingFavIcon(#httpServletRequest, 'https://s3.amazonaws.com/solven-public/img/icons/favicon/favicon.png')}]]*/ ,
+                isBranded = /*[[${@brandingService.isBranded(#httpServletRequest)}]]*/ ,
+                entityBrandingLoanLanding = /*[[${@brandingService.getEntityBrandingLAConfigSettings(#httpServletRequest, #locale)}]]*/,
+                primaryColorBg = "linear-gradient(to bottom, #33486f4D 0%," + primaryColor + "4D 100%)";
+            if(entityBrandingLoanLanding != null){
+                var customStyle = document.createElement('style');
+                customStyle.type = 'text/css';
+                customStyle.innerHTML = `
+                    :root {
+                        --primary-branding-color: ${primaryColor};
+                    }
+                    `;
+                if(entityBrandingLoanLanding.fontFamily) customStyle.innerHTML += `* {font-family: ${entityBrandingLoanLanding.fontFamily} !important;} \n`;
+                if(entityBrandingLoanLanding.hideTitlePoints) customStyle.innerHTML += `section h2::after {content: none !important} \n`;
+                if(entityBrandingLoanLanding.hidePoweredBy) customStyle.innerHTML += `.poweredBySolven {visibility: hidden;!important} \n`;
+                // if(entityBrandingLoanLanding.customColorForHeadlineText) customStyle.innerHTML += `.custom-form-headline, .header.brand-bg-p h2 {color:${entityBrandingLoanLanding.customColorForHeadlineText} !important; }\n`;
+                if(entityBrandingLoanLanding.hideTagsLines) $("ul.list").hide();
+                if(entityBrandingLoanLanding.customColorForHeadlineUnderline) customStyle.innerHTML += `.header-title-mobile h2 {border-color:${entityBrandingLoanLanding.customColorForHeadlineUnderline} !important; }\n`;
+                document.getElementsByTagName('head')[0].appendChild(customStyle);
+            }
+            document.addEventListener('DOMContentLoaded', function (event) {
+                if(document.querySelector('.bg-degrade')) document.querySelector('.bg-degrade').style.background = primaryColorBg;
+                if(document.querySelector('.header')) document.querySelector('.header').style.borderColor = primaryColor;
+                if(document.querySelector('#btnReview')) document.querySelector('#btnReview').style.background = primaryColor;
+                if(document.querySelector('.tos'))  document.querySelector('.tos').style.borderColor = primaryColor;
+                if(entityBrandingLoanLanding != null){
+                    if(entityBrandingLoanLanding.customColorForFormButton) document.querySelector('#btnReview').style.background = entityBrandingLoanLanding.customColorForFormButton;
+                    if(entityBrandingLoanLanding.customColorForFormButton) document.querySelector('#btnEnter').style.background = entityBrandingLoanLanding.customColorForFormButton;
+                }
+                var chk = document.querySelectorAll(".icon-checkbox a");
+                chk[0].style.color = primaryColor;
+                if(chk.length > 1) chk[1].style.color = primaryColor;
+            });
+            /*]]>*/
+        </script>
+    </th:block>
+</head>
+
+<body style="overflow-y: hidden">
+
+<th:block layout:fragment="content">
+    <div id="loading-screen" style="height: 100%;">
+        <div class="process-loading-container circle-progress-question" style="position: initial !important;">
+            <div class="loading-content">
+                <div class="sk-circle">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <main class="f toload azteca-entity">
+        <div class="opacity-mobile"></div>
+        <a href="https://alfinbanco.pe/pagodecuotas" class="logoLinkUrl">
+            <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                <img class="lazy logo logo-landing-azteca-mobile"
+                     th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/alfin/logo_mobile.png'}" />
+            </th:block>
+        </a>
+
+        <section class="form-container">
+            <h5 class="headline-title-mobile">PAGA TU PRÉSTAMO AQUÍ</h5>
+            <form class="f f-ww-custom form frm-l5 custom-form exclude-iframe" id="loanForm" onsubmit="return false;">
+
+                <h2 class="custom-form-headline">
+                    PAGA TU PRÉSTAMO AQUÍ
+                </h2>
+
+                <!--<h5 class="form-headline-subtitle"><span>Consigue tu carta de no adeudo ahora,</span> pagando tan solo hasta el 15% de lo que tienes pendiente.</h5>-->
+                <h5 class="form-headline-subtitle">Hazlo de manera rápida, sencilla y 100% online.</h5>
+
+                <!-- <h5 class="form-headline-subtitle-mobile">Consigue tu carta de no adeudo ahora, pagando tan solo <span>hasta el 15%</span> de lo que tienes pendiente.</h5>-->
+                <h5 class="form-headline-subtitle-mobile">Hazlo de manera rápida, sencilla y 100% online.</h5>
+
+                <div class="ds-fl ds-col flex-direction-column">
+                    <div class="field c-full f f-ww field-full">
+                        <label>Ingresa tu DNI</label>
+                        <select id="docType" name="docType" class="custom-select ignore_validation" style="display: none"
+                                data-placeholder="DNI">
+                            <option value="" hidden="hidden">DNI</option>
+                            <option value="1" selected="true">DNI</option>
+                            <option value="2">CE</option>
+                        </select>
+                        <input id="documentNumber" name="documentNumber" placeholder="Escribe tu número de documento" type="text" autocorrect="off" autocomplete="off"
+                               autocapitalize="none" />
+                        <div class="errorContainer" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="ds-fl ds-col flex-direction-column">
+                    <div class="field c-full f f-ww field-full" style="margin-bottom: 10px !important;">
+                        <input type="checkbox" id="acceptAgreement" name="acceptAgreement" />
+                        <label for="acceptAgreement" class="icon-checkbox acceptAgreement">
+                            <span class="check-label">He le&iacute;do, comprendo y autorizo el
+<!--                                <a href="javascript:void(0);" id="openModalAzteca" >Tratamiento de datos personales</a>-->
+                                <a href="https://www.alfinbanco.pe/politicasdeprivacidad" target="_blank" >tratamiento de datos personales</a>
+                            </span>
+                        </label>
+                        <div class="errorContainer"></div>
+                    </div>
+
+                    <div class="field c-full f f-ww field-full" style="margin-bottom: 0px !important;">
+                        <input type="checkbox" id="conditionsPolicy" name="conditionsPolicy" />
+                        <label for="conditionsPolicy" class="icon-checkbox acceptAgreement">
+                            <span class="check-label">He le&iacute;do, comprendo y autorizo los <a href="https://alfinbanco.pe/terminosycondiciones" target="_blank">Términos y Condiciones</a></span>
+                        </label>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="ds-fl ds-col-bottom">
+                    <div class="c-i c-right f f-ww btnReviewContainer" style="margin-left: auto;margin-right: auto;margin-top: 1.2rem;margin-bottom: 0.2rem !important;">
+                        <button id="btnReview" class="btn bg-blue-1"> Consulta aquí</button>
+                    </div>
+                </div>
+                <div class="tos">
+                    <p>&#191;Cómo funciona?</p>
+                    <ul>
+                        <li>Revisa tu oferta o cuotas pendientes a cancelar.</li>
+                        <li>Selecciona el canal de pago.</li>
+                        <li>Realiza el pago a través del canal seleccionado.</li>
+                        <li>Consigue tu constancia de no adeudo (solo clientes que cancelen
+                            su crédito).</li>
+                    </ul>
+                </div>
+                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                    <div class="poweredBySolvenFirma">
+                        <svg class="poweredBySolven" viewBox="0 0 128 20">
+                            <path
+                                    d="M2.7 5.3c.6 0 1 .1 1.5.2.4.1.7.3 1 .6.3.2.5.5.6.8.1.3.2.7.2 1 0 .4-.1.8-.2 1.1-.1.4-.3.7-.6.9-.3.2-.6.4-1 .6-.4.1-.9.2-1.4.2H1.6v3H0V5.3h2.7zm0 4.2c.3 0 .5 0 .7-.1.3-.1.5-.2.6-.3.1-.1.2-.3.3-.5.1-.2.1-.4.1-.6 0-.2 0-.4-.1-.6S4.2 7 4 6.9c-.1-.2-.3-.3-.5-.3-.2-.1-.5-.1-.8-.1H1.6v3h1.1zM9.3 7.6c.4 0 .8.1 1.2.2.4.1.7.3.9.6.3.3.5.6.6 1 .1.4.2.8.2 1.3s-.1.9-.2 1.3-.3.7-.6 1c-.3.3-.6.5-.9.6-.4.1-.8.2-1.2.2-.4 0-.9-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.1-.4-.2-.8-.2-1.3s.1-.9.2-1.3.3-.7.6-1c.2-.2.5-.4.9-.6.4-.1.8-.2 1.2-.2zm0 5c.5 0 .9-.2 1.1-.5.2-.3.4-.8.4-1.5 0-.6-.1-1.1-.4-1.5-.2-.3-.6-.5-1.1-.5-.5 0-.9.2-1.1.5-.2.5-.4.9-.4 1.6s.1 1.1.4 1.5c.3.3.6.4 1.1.4zM21.8 7.7l-1.9 6h-1.1c-.1 0-.2-.1-.3-.3L17.4 10c0-.1-.1-.2-.1-.3 0-.1-.1-.2-.1-.3 0 .1 0 .2-.1.4 0 .1-.1.2-.1.4l-1 3.2c0 .2-.1.3-.3.3h-1.1l-1.9-6h1.1c.1 0 .2 0 .3.1.1.1.1.1.1.2l.9 3.2c0 .2.1.3.1.5s.1.3.1.5c0-.2.1-.3.1-.5s.1-.3.2-.5l1-3.2c0-.1.1-.1.1-.2.1-.1.1-.1.2-.1h.6c.1 0 .2 0 .3.1l.2.2 1 3.2c.1.2.1.3.1.5s.1.3.1.5c0-.3.1-.7.2-1l.9-3.2c0-.1.1-.1.1-.2.1-.1.2-.1.2-.1h1.2zM23.6 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1s.4 0 .6-.1c.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1h-3.6zm2.7-.9c0-.2 0-.4-.1-.5 0-.2-.1-.3-.2-.5-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM30 8.7c.2-.4.4-.6.7-.8s.6-.3.9-.3c.3 0 .5.1.7.2l-.1 1.1c0 .1 0 .1-.1.1h-.7c-.2 0-.3 0-.4.1-.1 0-.2.1-.3.2l-.3.3c-.1.1-.1.3-.2.4v3.7h-1.4v-6h.8c.1 0 .3 0 .3.1s.1.1.1.3v.6zM34 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1H34zm2.7-.9c0-.2 0-.4-.1-.5-.1-.2-.1-.3-.2-.4-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM44.2 5v8.6h-.9c-.2 0-.3-.1-.4-.3l-.1-.6c-.2.3-.5.5-.8.7-.3.2-.7.3-1.1.3-.3 0-.6-.1-.9-.2-.3-.1-.5-.3-.7-.6-.2-.3-.3-.6-.5-1-.1-.4-.2-.8-.2-1.3 0-.4.1-.9.2-1.2.1-.4.3-.7.5-1 .2-.3.5-.5.8-.7.3-.2.7-.2 1.1-.2.3 0 .6.1.9.2.2.1.4.2.6.4V5h1.5zm-1.4 4.2c-.2-.2-.3-.3-.5-.4-.2-.1-.4-.1-.6-.1-.2 0-.4 0-.6.1-.2.1-.3.2-.4.4l-.3.6c-.1.3-.1.6-.1.9 0 .3 0 .6.1.9.1.2.1.4.2.6.1.2.2.3.4.3.2.1.3.1.5.1.3 0 .6-.1.8-.2.2-.1.4-.3.6-.5V9.2zM49.9 8.4c.2-.3.5-.5.8-.6.3-.1.6-.2 1-.2.3 0 .7.1.9.2.3.1.5.3.7.6.2.3.3.6.5.9.1.4.2.8.2 1.2 0 .5-.1.9-.2 1.3s-.3.7-.5 1c-.2.3-.5.5-.8.7s-.7.2-1 .2c-.2 0-.4 0-.5-.1-.2 0-.3-.1-.4-.2-.1-.1-.2-.1-.4-.2l-.3-.3-.1.4c0 .1-.1.2-.1.2-.1 0-.1.1-.2.1h-.9V5H50v3.4zm0 3.7c.2.2.3.3.5.4.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.2.5-.4l.3-.6c.1-.2.1-.6.1-.9 0-.7-.1-1.1-.3-1.4-.2-.3-.5-.4-.9-.4-.3 0-.5.1-.7.2-.2.1-.4.3-.6.5v2.6zM60.3 7.7l-3.2 7.6c0 .1-.1.2-.2.2-.1.1-.2.1-.3.1h-1.1l1.1-2.4-2.4-5.5h1.3c.1 0 .2 0 .3.1.1.1.1.1.1.2l1.3 3.1c0 .1.1.2.1.3 0 .1.1.2.1.3 0-.1.1-.2.1-.3 0-.1.1-.2.1-.3L58.8 8c0-.1.1-.1.2-.2s.2-.1.2-.1h1.1z"
+                                    class="st2" />
+                            <g>
+                                <path
+                                        d="M63.6 19.3v-2.7c.9.4 2.3.7 3.5.7 1.3 0 1.8-.4 1.8-1 0-.8-1.1-.9-2.6-1.4-1.5-.5-2.8-1.5-2.8-3.6 0-2.6 2-3.7 4.8-3.7 1.2 0 2.5.2 3.2.5v2.7c-.8-.2-1.8-.5-3-.5-1.1 0-1.6.3-1.6.8 0 .6.5.8 2.1 1.2 1.7.5 3.3 1.4 3.3 3.8 0 2.5-1.9 3.9-4.8 3.9-1.7 0-3-.3-3.9-.7M73.1 13.8c0-3.2 1.9-6.2 6-6.2 4 0 5.9 2.7 5.9 6.2 0 3.2-1.9 6.2-6 6.2-4 0-5.9-2.7-5.9-6.2m8.1 0c0-2.1-.6-3.5-2.1-3.5S77 11.6 77 13.8s.6 3.4 2.1 3.4 2.1-1.2 2.1-3.4M91.4 0H95l-7.3 20h-3.6zM92.9 7.8h3.9l1.7 6.4c.2.7.4 1.9.4 2 0-.2.3-1.4.4-2l1.7-6.4h3.8l-3.9 12h-4.2l-3.8-12zM104.7 13.8c0-3.3 1.9-6.2 5.8-6.2 4 0 5.3 2.7 5.3 5.7 0 .4 0 .8-.1 1.2h-7.2c0 1.7.7 2.7 2.8 2.7 1.5 0 2.8-.3 3.6-.7v2.8c-1.1.4-2.4.7-3.9.7-4.4 0-6.3-2.6-6.3-6.2m7.5-1.4v-.1c0-1-.5-2-1.7-2s-1.8.9-1.9 2.1h3.6zM117.1 7.8h3.6v.9c.7-.5 1.7-1.1 3.3-1.1 2.9 0 3.9 1.8 3.9 4.2v8h-3.7v-7.4c0-1.3-.4-1.9-1.7-1.9-.7 0-1.3.3-1.8.7v8.6H117v-12zM89.9 17.8c0-1.2.9-2.1 2.2-2.1 1.3 0 2.2.9 2.2 2.1s-.8 2.2-2.1 2.2-2.3-1-2.3-2.2"
+                                        class="st2" />
+                            </g>
+                        </svg>
+                    </div>
+                </th:block>
+            </form>
+
+        </section>
+        <div class="wrap-image f f-ww f-ac wrap-image-deuna">
+            <figure>
+                <a href="https://alfinbanco.pe/pagodecuotas" class="logoLinkUrl">
+                    <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                        <img class="lazy logo lazy-logo-desktop"
+                             th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/alfin/logola.png'}" />
+                        <img class="lazy logo lazy-logo-mobile" style="display: none"
+                             th:attr="data-src=${'https://solven-public.s3.amazonaws.com/img/alfin/logo_mobile.png'}" />
+                    </th:block>
+                </a>
+                <img class="img-landing-background"
+                     src="https://solven-public.s3.amazonaws.com/img/alfin/landing_pagos/alfin_pagos.jpg"/>
+
+                <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                    <div class="bg-degrade"></div>
+                </th:block>
+            </figure>
+        </div>
+
+        <div class="poweredBySolvenFirmaDesktop">
+            <svg class="poweredBySolven" viewBox="0 0 128 20">
+                <path
+                        d="M2.7 5.3c.6 0 1 .1 1.5.2.4.1.7.3 1 .6.3.2.5.5.6.8.1.3.2.7.2 1 0 .4-.1.8-.2 1.1-.1.4-.3.7-.6.9-.3.2-.6.4-1 .6-.4.1-.9.2-1.4.2H1.6v3H0V5.3h2.7zm0 4.2c.3 0 .5 0 .7-.1.3-.1.5-.2.6-.3.1-.1.2-.3.3-.5.1-.2.1-.4.1-.6 0-.2 0-.4-.1-.6S4.2 7 4 6.9c-.1-.2-.3-.3-.5-.3-.2-.1-.5-.1-.8-.1H1.6v3h1.1zM9.3 7.6c.4 0 .8.1 1.2.2.4.1.7.3.9.6.3.3.5.6.6 1 .1.4.2.8.2 1.3s-.1.9-.2 1.3-.3.7-.6 1c-.3.3-.6.5-.9.6-.4.1-.8.2-1.2.2-.4 0-.9-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.1-.4-.2-.8-.2-1.3s.1-.9.2-1.3.3-.7.6-1c.2-.2.5-.4.9-.6.4-.1.8-.2 1.2-.2zm0 5c.5 0 .9-.2 1.1-.5.2-.3.4-.8.4-1.5 0-.6-.1-1.1-.4-1.5-.2-.3-.6-.5-1.1-.5-.5 0-.9.2-1.1.5-.2.5-.4.9-.4 1.6s.1 1.1.4 1.5c.3.3.6.4 1.1.4zM21.8 7.7l-1.9 6h-1.1c-.1 0-.2-.1-.3-.3L17.4 10c0-.1-.1-.2-.1-.3 0-.1-.1-.2-.1-.3 0 .1 0 .2-.1.4 0 .1-.1.2-.1.4l-1 3.2c0 .2-.1.3-.3.3h-1.1l-1.9-6h1.1c.1 0 .2 0 .3.1.1.1.1.1.1.2l.9 3.2c0 .2.1.3.1.5s.1.3.1.5c0-.2.1-.3.1-.5s.1-.3.2-.5l1-3.2c0-.1.1-.1.1-.2.1-.1.1-.1.2-.1h.6c.1 0 .2 0 .3.1l.2.2 1 3.2c.1.2.1.3.1.5s.1.3.1.5c0-.3.1-.7.2-1l.9-3.2c0-.1.1-.1.1-.2.1-.1.2-.1.2-.1h1.2zM23.6 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1s.4 0 .6-.1c.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1h-3.6zm2.7-.9c0-.2 0-.4-.1-.5 0-.2-.1-.3-.2-.5-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM30 8.7c.2-.4.4-.6.7-.8s.6-.3.9-.3c.3 0 .5.1.7.2l-.1 1.1c0 .1 0 .1-.1.1h-.7c-.2 0-.3 0-.4.1-.1 0-.2.1-.3.2l-.3.3c-.1.1-.1.3-.2.4v3.7h-1.4v-6h.8c.1 0 .3 0 .3.1s.1.1.1.3v.6zM34 10.9c0 .3.1.6.2.8l.3.6c.1.1.3.3.5.3.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.1.4-.2.1-.1.2-.1.3-.2.1-.1.2-.1.3-.1.1 0 .2 0 .3.1l.4.5-.5.5-.6.3c-.2.1-.4.1-.7.2h-.6c-.4 0-.8-.1-1.2-.2-.4-.1-.7-.3-.9-.6-.3-.3-.5-.6-.6-1-.2-.4-.2-.9-.2-1.4 0-.4.1-.8.2-1.1.1-.4.3-.7.6-.9.2-.3.5-.5.9-.6s.8-.2 1.2-.2c.4 0 .7.1 1 .2.3.1.6.3.8.5.2.2.4.5.5.8.1.3.2.7.2 1.1 0 .2 0 .4-.1.4 0 .1-.1.1-.3.1H34zm2.7-.9c0-.2 0-.4-.1-.5-.1-.2-.1-.3-.2-.4-.1-.1-.2-.2-.4-.3-.2-.1-.3-.1-.6-.1-.4 0-.7.1-1 .4-.2.2-.4.6-.5 1h2.8zM44.2 5v8.6h-.9c-.2 0-.3-.1-.4-.3l-.1-.6c-.2.3-.5.5-.8.7-.3.2-.7.3-1.1.3-.3 0-.6-.1-.9-.2-.3-.1-.5-.3-.7-.6-.2-.3-.3-.6-.5-1-.1-.4-.2-.8-.2-1.3 0-.4.1-.9.2-1.2.1-.4.3-.7.5-1 .2-.3.5-.5.8-.7.3-.2.7-.2 1.1-.2.3 0 .6.1.9.2.2.1.4.2.6.4V5h1.5zm-1.4 4.2c-.2-.2-.3-.3-.5-.4-.2-.1-.4-.1-.6-.1-.2 0-.4 0-.6.1-.2.1-.3.2-.4.4l-.3.6c-.1.3-.1.6-.1.9 0 .3 0 .6.1.9.1.2.1.4.2.6.1.2.2.3.4.3.2.1.3.1.5.1.3 0 .6-.1.8-.2.2-.1.4-.3.6-.5V9.2zM49.9 8.4c.2-.3.5-.5.8-.6.3-.1.6-.2 1-.2.3 0 .7.1.9.2.3.1.5.3.7.6.2.3.3.6.5.9.1.4.2.8.2 1.2 0 .5-.1.9-.2 1.3s-.3.7-.5 1c-.2.3-.5.5-.8.7s-.7.2-1 .2c-.2 0-.4 0-.5-.1-.2 0-.3-.1-.4-.2-.1-.1-.2-.1-.4-.2l-.3-.3-.1.4c0 .1-.1.2-.1.2-.1 0-.1.1-.2.1h-.9V5H50v3.4zm0 3.7c.2.2.3.3.5.4.2.1.4.1.6.1.2 0 .4 0 .6-.1.2-.1.3-.2.5-.4l.3-.6c.1-.2.1-.6.1-.9 0-.7-.1-1.1-.3-1.4-.2-.3-.5-.4-.9-.4-.3 0-.5.1-.7.2-.2.1-.4.3-.6.5v2.6zM60.3 7.7l-3.2 7.6c0 .1-.1.2-.2.2-.1.1-.2.1-.3.1h-1.1l1.1-2.4-2.4-5.5h1.3c.1 0 .2 0 .3.1.1.1.1.1.1.2l1.3 3.1c0 .1.1.2.1.3 0 .1.1.2.1.3 0-.1.1-.2.1-.3 0-.1.1-.2.1-.3L58.8 8c0-.1.1-.1.2-.2s.2-.1.2-.1h1.1z"
+                        class="st2" />
+                <g>
+                    <path
+                            d="M63.6 19.3v-2.7c.9.4 2.3.7 3.5.7 1.3 0 1.8-.4 1.8-1 0-.8-1.1-.9-2.6-1.4-1.5-.5-2.8-1.5-2.8-3.6 0-2.6 2-3.7 4.8-3.7 1.2 0 2.5.2 3.2.5v2.7c-.8-.2-1.8-.5-3-.5-1.1 0-1.6.3-1.6.8 0 .6.5.8 2.1 1.2 1.7.5 3.3 1.4 3.3 3.8 0 2.5-1.9 3.9-4.8 3.9-1.7 0-3-.3-3.9-.7M73.1 13.8c0-3.2 1.9-6.2 6-6.2 4 0 5.9 2.7 5.9 6.2 0 3.2-1.9 6.2-6 6.2-4 0-5.9-2.7-5.9-6.2m8.1 0c0-2.1-.6-3.5-2.1-3.5S77 11.6 77 13.8s.6 3.4 2.1 3.4 2.1-1.2 2.1-3.4M91.4 0H95l-7.3 20h-3.6zM92.9 7.8h3.9l1.7 6.4c.2.7.4 1.9.4 2 0-.2.3-1.4.4-2l1.7-6.4h3.8l-3.9 12h-4.2l-3.8-12zM104.7 13.8c0-3.3 1.9-6.2 5.8-6.2 4 0 5.3 2.7 5.3 5.7 0 .4 0 .8-.1 1.2h-7.2c0 1.7.7 2.7 2.8 2.7 1.5 0 2.8-.3 3.6-.7v2.8c-1.1.4-2.4.7-3.9.7-4.4 0-6.3-2.6-6.3-6.2m7.5-1.4v-.1c0-1-.5-2-1.7-2s-1.8.9-1.9 2.1h3.6zM117.1 7.8h3.6v.9c.7-.5 1.7-1.1 3.3-1.1 2.9 0 3.9 1.8 3.9 4.2v8h-3.7v-7.4c0-1.3-.4-1.9-1.7-1.9-.7 0-1.3.3-1.8.7v8.6H117v-12zM89.9 17.8c0-1.2.9-2.1 2.2-2.1 1.3 0 2.2.9 2.2 2.1s-.8 2.2-2.1 2.2-2.3-1-2.3-2.2"
+                            class="st2" />
+                </g>
+            </svg>
+        </div>
+
+    </main>
+
+    <th:block>
+        <style>
+            @media only screen and (min-width: 500px) {
+                .modal .modal-dialog {
+                    max-width: 90%;
+                }
+            }
+
+            @media only screen and (min-width: 900px) {
+                .modal .modal-dialog {
+                    max-width: 70%;
+                }
+            }
+
+            @media only screen and (min-width: 1215px) {
+                .modal .modal-dialog {
+                    max-width: 55%;
+                }
+            }
+
+            @media only screen and (min-width: 625px) and ( max-width: 800px) {
+                #logoBAZ {
+                    display: flex !important;
+                }
+            }
+
+            @media only screen and ( max-width: 624px) {
+                #logoBAZ span img {
+                    display: none;
+                }
+            }
+
+            .modal-open{
+                overflow-x: hidden !important;
+                overflow-y: hidden !important;
+            }
+
+            .modal {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            .modal {
+                background: rgba(0,0,0,0.4);
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 1050;
+                display: none;
+                -webkit-overflow-scrolling: touch;
+                outline: 0;
+            }
+            .modal-header{
+                display: flex;
+                justify-content: flex-end;
+                padding: 1rem 1rem;
+                border-bottom:1px solid #e5e5e5;
+            }
+            .modal-body {
+                position: relative;
+                padding: 15px;
+                line-height: 1.42857143;
+            }
+            .text-justify {
+                text-align: justify;
+            }
+            .modal-body p {
+                margin-bottom: 10px;
+                text-align: justify;
+                width: 100%;
+                display: flex;
+                font-size: 14px;
+            }
+            .modal ol, ul {
+                margin-top: 0;
+                margin-bottom: 10px;
+                padding-left: 2rem;
+            }
+            .modal li {
+                font-size: 14px;
+                margin-left: 10px;
+                /*list-style-type: disc;*/
+            }
+            #logoBAZ {
+                background-color: var(--primary-branding-color);
+                display: block;
+                margin-top: 20px;
+                margin-bottom: 30px;
+                text-align: left;
+                padding: 15px;
+                color: #FFF;
+                font-size: 25px;
+                font-weight: bold;
+            }
+        </style>
+        <div class="modal fade" id="modalAzteca" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body text-justify">
+                        <th:block th:replace="politica-privacidad-modal :: politica-privacidad-modal"></th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <div class="azteca-footer" th:if="false" style="text-align: center;background-color: #fff;width: 100%;align-items: center;flex: 1;min-width: 100%;justify-content: center;flex-direction: column;justify-content: center;margin-left: auto;margin-right: auto;">
+        <div style="margin:10px 0; border-top: #000 2px solid; border-bottom: #000 2px solid;width: 100%;">
+            <table style="background-color:#fff" width="100%">
+                <tbody class="" style="width: 100%;">
+                <tr style="display: flex; flex-direction: row; justify-content:center; align-items: center">
+                    <!-- <td id="aztecaRowTCEA">
+                         <img src="https://solven-public.s3.amazonaws.com/img/alfin/PAGOS_TREA.png" alt="" style="max-width:150px;float:right;vertical-align:middle;"/>
+                     </td>-->
+                    <td style="max-width: 950px;padding:10px;font-size:11pt;text-align:left;">
+                        Para mayor información sobre tasas de interés, comisiones y gastos consulte en www.Alfinbanco.pe
+                    </td>
+                    <td id="azteca-compromiso-base">
+                        <img src="https://solven-public.s3.amazonaws.com/img/alfin/pagos_sello_compromiso.png" alt="" style="max-width:125px;float:right;vertical-align:middle;padding:10px;"/>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</th:block>
+
+<th:block layout:fragment="js">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loanFormValidator = /*[[${userRegisterForm.validator.toJson(#locale)}]]*/ null;
+        var yearFrom = /*[[${yearFrom}]]*/ ;
+        var yearTo = /*[[${yearTo}]]*/ ;
+        var countryId = /*[[${@countryContextService.getCountryParamsByRequest(#httpServletRequest).id}]]*/ ;
+        var registerLoanUrl = /*[[@{/pagos}]]*/ ;
+        var externalParams = /*[[${externalParams}]]*/ ;
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            dataLayer.push({'event':'brandingLandingCobranzaVigenteView'});
+        });
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.customer1Ruc}"></p>
+            <div class="form-group">
+                <input class="form-control" th:field="*{ruc}"/>
+                <div class="errorContainer"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="mt-checkbox">
+                    <input type="checkbox" class="moreThan65"/> Representa más del 65% de mi facturación total.
+                    <span></span>
+                </label>
+            </div>
+
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return $.extend(questionFlow.getFormElement().serializeObject(), {
+                    moreThan65: questionFlow.find('.moreThan65').prop('checked')
+                });
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

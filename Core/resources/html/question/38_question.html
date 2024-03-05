@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.ownerBusinessRUC}"></p>
+            <div class="form-group">
+                <input class="form-control" th:field="*{ruc}"/>
+                <div class="errorContainer"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="mt-checkbox">
+                    <input type="checkbox" class="notLegal"/> No estoy constituido legalmente.
+                    <span></span>
+                </label>
+            </div>
+            <div class="form-group">
+                <select class="form-control" th:field="*{regime}">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option th:each="regime : ${regimes}" th:value="${regime.code}" th:text="${regime.description}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return $.extend(questionFlow.getFormElement().serializeObject(), {
+                    notLegal: questionFlow.find('.notLegal').is(':checked')
+                });
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+            questionFlow.find(".notLegal").click(function () {
+                if ($(this).is(':checked')) {
+                    questionFlow.find('input[name=regime]').prop('disabled', true);
+                    questionFlow.find('input[name=ruc]').prop('disabled', true);
+                    questionFlow.find('input[name=ruc]').val('');
+                    questionFlow.getFormElement().data('validatorJson').rules.ruc.required = false;
+                    questionFlow.getFormElement().data('validatorJson').rules.regime.required = false;
+                } else {
+                    questionFlow.find('input[name=regime]').prop('disabled', false);
+                    questionFlow.find('input[name=ruc]').prop('disabled', false);
+                    questionFlow.getFormElement().data('validatorJson').rules.ruc.required = true;
+                    questionFlow.getFormElement().data('validatorJson').rules.regime.required = true;
+                }
+                questionFlow.getFormElement().validateForm(questionFlow.getFormElement().data('validatorJson'));
+                questionFlow.getFormElement().data('validator').resetForm();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

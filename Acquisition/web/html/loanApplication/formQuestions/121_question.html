@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" th:object="${form}" class="forms q121" autocomplete="off">
+            <p>Cuéntanos acerca de tu auto...</p>
+            <div class="wrap-121">
+                <div class="field inline">
+                    <select th:field="*{brand}" data-width="140" data-placeholder="Marca">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="carBrand : ${@catalogService.getMaintainedCarBrands()}"
+                                th:value="${carBrand.id}" th:text="${carBrand.brand}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline">
+                    <select th:field="*{model}" data-width="220" data-placeholder="Modelo">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="modelIt : ${modelList}"
+                                th:value="${modelIt}" th:text="${modelIt}">
+                        </option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline">
+                    <select th:field="*{year}" data-width="140" data-placeholder="Año">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="year : ${yearList}"
+                                th:value="${year.substring(0,4)}" th:text="${year}">
+                        </option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline">
+                    <select th:field="*{mileage}" data-width="140" data-placeholder="Kilometraje">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="mileage : ${@catalogService.getMileages()}"
+                                th:value="${mileage.id}" th:text="${mileage.mileage}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+                <div class="field inline placa">
+                    <input th:field="*{plate}" type="text" class="input-outline"/>
+                    <small class="input-help">Placa</small>
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+            <div class="field inline r-field">
+                <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+            <div class="display-block">
+                <div class="errorContainer"></div>
+            </div>
+            <div class="m-top">
+                <a href="#" class="not-interested link-not-interested">No tengo auto</a>
+            </div>
+        </form>
+
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        // function isComplete() {
+        //     return $('#brand').val() != ''
+        //         && $('#model').val() != ''
+        //         && $('#year').val() != ''
+        //         && $('#mileage').val() != '';
+        // }
+
+        function uploadData() {
+            if($('#questionForm').valid()){
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: {
+                        brand: $('#brand').val(),
+                        model: $('#model').val(),
+                        year: $('#year').val().substring(0,4),
+                        mileage: $('#mileage').val(),
+                        plate: $('#plate').val()
+                    }
+                }, "");
+            }
+        }
+
+        $('#brand').on('change', function () {
+            var brandId = $('#brand').val();
+            defaultAjax({
+                url: /*[[@{/guaranteed-vehicle/model}]]*/null,
+                data: {
+                    brandId: brandId
+                },
+                type: 'POST',
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        // html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                        html += '<option value="' + arr[i] + '">' + arr[i] + '</option>';
+                    }
+                    $('#model').html(html);
+                },
+                error: function (data) {
+                    showErrorModal('Hubo un problema al obtener el modelo.');
+                }
+            });
+
+//            if (isComplete()) {
+//                uploadData();
+//            }
+        });
+
+        $('#model').on('select2:select', function () {
+            var brandId = $('#brand').val();
+            var model = $('#model').val();
+
+            if ($('#brand').val() == ''){
+                defaultAjax({
+                    url: /*[[@{/guaranteed-vehicle/brand}]]*/null,
+                    data: {
+                        model: model
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        var arr = JSON.parse(data);
+                        console.info(arr);
+                        var html;
+                        var len = arr.length;
+                        if(len>0){
+                            if(len==1){
+                                html = '<option value="' + arr[0].id + '" hidden="hidden">'+ arr[0].brand +'</option>';
+                            }else{
+                                html = '<option value="" hidden="hidden"></option>';
+                                for (var i = 0; i < len; i++) {
+                                    html += '<option value="' + arr[i].id  + '">' + arr[i].brand + '</option>';
+                                }
+                            }
+                            $('#brand').html(html);
+                        }else{
+
+                            showErrorModal('No se encontro la marca para ese modelo');
+                        }
+                    },
+                    error: function (data) {
+                        showErrorModal('Hubo un problema al obtener la marca');
+                    }
+                });
+
+            }
+            //else{
+            //     var year =$('#year').val();
+            //     defaultAjax({
+            //         url: /*[[@{/guaranteed-vehicle/year}]]*/null,
+            //         data: {
+            //             brandId: brandId,
+            //             model: model
+            //         },
+            //         type: 'POST',
+            //         success: function (data) {
+            //             var arr = JSON.parse(data);
+            //             console.info(arr);
+            //             var html ;
+            //             var htmlHead= '<option value="" hidden="hidden"></option>';
+            //             var len = arr.length;
+            //             for (var i = 0; i < len; i++) {
+            //                 // html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+            //                 html += '<option value="' + arr[i] + '">' + arr[i] + '</option>';
+            //                 if(arr[i]==year){
+            //                     htmlHead= '<option value="'+year+'" hidden="hidden">'+year+'</option>';
+            //                 }
+            //             }
+            //             $('#year').html(htmlHead+html);
+            //         },
+            //         error: function (data) {
+            //             showErrorModal('Hubo un problema al obtener el año');
+            //         }
+            //     });
+            // }
+
+            // if($('#year').val() == ''){
+            //     defaultAjax({
+            //         url: /*[[@{/guaranteed-vehicle/modelyear}]]*/null,
+            //         data: {
+            //             model: model
+            //         },
+            //         type: 'POST',
+            //         success: function (data) {
+            //             var arr = JSON.parse(data);
+            //             console.info(arr);
+            //             var html;
+            //             var len = arr.length;
+            //             if(len>0){
+            //                 if(len==1){
+            //                     html = '<option value="' + arr[0] + '" hidden="hidden">'+ arr[0] +'</option>';
+            //                 }else{
+            //                     html = '<option value="" hidden="hidden"></option>';
+            //                     for (var i = 0; i < len; i++) {
+            //                         html += '<option value="' + arr[i]  + '">' + arr[i] + '</option>';
+            //                     }
+            //                 }
+            //                 $('#year').html(html);
+            //             }else{
+
+            //                 showErrorModal('No se encontro los años para ese modelo');
+            //             }
+            //         },
+            //         error: function (data) {
+            //             showErrorModal('Hubo un problema al obtener el año');
+            //         }
+            //     });
+            // }
+
+//            if (isComplete()) {
+//                uploadData();
+//            }
+        });
+
+        $('#year').on('select2:select', function () {
+            var brandId = $('#brand').val();
+            var model = $('#model').val();
+            var year = $('#year').val().substring(0,4);
+
+            // if($('#model').val() == ''){
+            //     defaultAjax({
+            //         url: /*[[@{/guaranteed-vehicle/modelsbyyear}]]*/null,
+            //         data: {
+            //             year: year
+            //         },
+            //         type: 'POST',
+            //         success: function (data) {
+            //             var arr = JSON.parse(data);
+            //             console.info(arr);
+            //             var html;
+            //             var len = arr.length;
+            //             if(len>0){
+            //                 if(len==1){
+            //                     html = '<option value="' + arr[0] + '" hidden="hidden">'+ arr[0] +'</option>';
+            //                 }else{
+            //                     html = '<option value="" hidden="hidden"></option>';
+            //                     for (var i = 0; i < len; i++) {
+            //                         html += '<option value="' + arr[i]  + '">' + arr[i] + '</option>';
+            //                     }
+            //                 }
+            //                 $('#model').html(html);
+            //             }else{
+            //                 showErrorModal('No se encontro modelos de ese año');
+            //             }
+            //         },
+            //         error: function (data) {
+            //             showErrorModal('Hubo un problema al obtener los modelos');
+            //         }
+            //     });
+            // }
+
+            if($('#brand').val() == ''){
+                defaultAjax({
+                    url: /*[[@{/guaranteed-vehicle/brandsbyyear}]]*/null,
+                    data: {
+                        year: year
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        var arr = JSON.parse(data);
+                        console.info(arr);
+                        var html;
+                        var len = arr.length;
+                        if(len>0){
+                            if(len==1){
+                                html = '<option value="' + arr[0].id + '" hidden="hidden">'+ arr[0].brand +'</option>';
+                            }else{
+                                html = '<option value="" hidden="hidden"></option>';
+                                for (var i = 0; i < len; i++) {
+                                    html += '<option value="' + arr[i].id  + '">' + arr[i].brand + '</option>';
+                                }
+                            }
+                            $('#brand').html(html);
+                        }else{
+                            showErrorModal('No se encontro marcas de ese año');
+                        }
+                    },
+                    error: function (data) {
+                        showErrorModal('Hubo un problema al obtener las marcas');
+                    }
+                });
+            }
+
+//            if (isComplete()) {
+//                uploadData();
+//            }
+        });
+
+        $('#mileage').on('select2:select', function () {
+
+//            if (isComplete()) {
+//                uploadData();
+//            }
+        });
+
+        $('#sendButton').click(function(){
+            uploadData();
+        });
+
+        $('.not-interested').click(function(){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "notInterested");
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+</html>

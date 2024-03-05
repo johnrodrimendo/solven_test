@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:utext="#{questions.block.notGiveTips(${personFirstName})}"></p>
+            <p style="margin-top: -10px">¡Ánimo! No es el fin del mundo.</p>
+            <a th:unless="${@brandingService.isBranded(#httpServletRequest)}" th:href="@{/blog}"
+               class="anchor-button bg-red">BLOG</a>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:utext="#{questions.block.whatIsYourOccupation}"></p>
+
+            <div class="form-group col-md-12">
+                <small>Selecciona tu ocupaci&oacute;n</small>
+                <select th:field="*{ocupation}" class="form-control">
+                    <option value="" hidden="hidden"></option>
+                        <option th:each="ocupation : ${@catalogService.getOcupations(#locale)}" th:value="${ocupation.id}" th:text="${ocupation.ocupation}"></option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('select[name=ocupation]').on('change', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

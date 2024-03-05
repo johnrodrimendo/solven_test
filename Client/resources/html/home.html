@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/assets/owl.carousel.min.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/assets/owl.theme.default.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/owl.carousel.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(function(){
+
+            $('.sooner').on('click', function(ee){
+                ee.preventDefault();
+                $('.sooner .icon').addClass('soon');
+            });
+
+        });
+        /*]]>*/
+    </script>
+    <script th:if="${@configuration.TOKY_ACTIVE()}">
+
+        (function (v, p) {
+            var s = document.createElement('script');
+            s.src = 'https://app.toky.co/resources/widgets/toky-widget.js?v=' + v;
+            s.onload = function () {
+                Toky.load(p);
+            };
+            document.head.appendChild(s);
+        })('6800f1c', {"$username": "Solven", "$bubble": false, "$color": "#f7323f,#00aabb,#ffffff"});
+
+    </script>
+
+</head>
+<body>
+<!-- Header -->
+    <th:block layout:fragment="header">
+            <th:block th:replace="fragments/headers :: landingHome(itemSelected='home')"></th:block>
+    </th:block>
+<!-- Header ends -->
+
+<!-- Content -->
+    <th:block layout:fragment="content">
+
+        <section class="landing homepage">
+                <div class="hero-content content-left">
+                    <div class="wrap">
+                        <div class="hero-text">
+                            <h2 class="landing-title text-bold" th:utext="#{static.landing.home.heroTitle}"></h2>
+                        </div>
+                        <div class="divisor-bar"></div>
+                        <div class="hero-pharagraph">
+                            <p th:utext="#{static.landing.home.heroPharagraph}"></p>
+                        </div>
+                        <div class="actions" th:if="false">
+                            <a th:href="@{/__${T(com.affirm.acquisition.controller.ComparisonController).URL}__}" class="anchor-button bg-lightblue" th:text="#{button.compare}"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <div class="main-icons">
+                        <ul>
+                            <li>
+                                <a th:href="@{/adelanto-de-sueldo}">
+                                    <i class="icon icon-salary-advance"></i>
+                                    <span th:utext="#{static.product.salaryAdvance}"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <th:block th:switch="${soon}">
+                                    <a th:case="${false}" th:href="@{/credito-vehicular}">
+                                        <i class="icon icon-vehicle"></i>
+                                        <span th:utext="#{static.product.carFinancing}"></span>
+                                    </a>
+                                    <a th:case="${true}" class="sooner">
+                                        <i class="icon icon-vehicle"></i>
+                                        <span th:utext="#{static.product.carFinancing}"></span>
+                                    </a>
+                                </th:block>
+                            </li>
+                            <li>
+                                <a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__}">
+                                    <i class="icon icon-loan"></i>
+                                    <span th:utext="#{static.product.personalLoan}"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+        </section>
+        <!-- Press -->
+        <section class="press">
+            <div class="container">
+                <th:block layout:fragment="pressCarousel">
+                    <th:block th:replace="fragments/pressCarousel :: pressCarousel"></th:block>
+                </th:block>
+            </div>
+        </section>
+        <!-- / Press -->
+
+        <section class="how-it-works hw-home">
+            <div class="container">
+                <article>
+                    <div class="top-info" th:utext="#{static.landing.home.stepTitle}"></div>
+                    <div class="process">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-6 column">
+                                <div class="box-step">
+                                    <div class="top">
+                                        <i class="icon icon icon-step-1"></i>
+                                    </div>
+                                    <h3 th:text="#{static.landing.home.step1}"></h3>
+                                    <p th:text="#{static.landing.home.step1.desc}"></p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 column">
+                                <div class="box-step">
+                                    <div class="top">
+                                        <i class="icon icon icon-step-2"></i>
+                                    </div>
+                                    <h3 th:text="#{static.landing.home.step2}"></h3>
+                                    <p th:text="#{static.landing.home.step2.desc}"></p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 column">
+                                <div class="box-step">
+                                    <div class="top">
+                                        <i class="icon icon icon-step-3"></i>
+                                    </div>
+                                    <h3 th:text="#{static.landing.home.step3}"></h3>
+                                    <p th:text="#{static.landing.home.step3.desc}"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions" th:if="false">
+                            <a th:href="@{/__${T(com.affirm.acquisition.controller.ComparisonController).URL}__}" class="anchor-button bg-lightblue min-w-150" th:text="#{button.compare}"></a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+        <section class="faqs-home">
+            <div class="container">
+                <article>
+                    <div class="top-info">
+                        <h2 th:text="#{static.landing.home.needHelp}"></h2>
+                        <div class="divisor-bottom"></div>
+                    </div>
+                    <p th:utext="#{static.landing.home.haveQuestions}"></p>
+                    <div class="display-block"><small th:utext="#{static.landing.home.workingHours}"></small></div>
+                    <div class="display-block"><small th:utext="#{static.landing.home.askAnything}"></small></div>
+                    <div class="actions">
+                        <a th:href="@{/centro-de-ayuda}" class="anchor-button bg-lightblue" th:text="#{static.landing.home.askYouNeedButton}"></a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </th:block>
+<!-- Content Ends -->
+<!-- footer -->
+    <th:block layout:fragment="footer">
+        <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+    </th:block>
+<!-- footer ends -->
+</body>
+</html>

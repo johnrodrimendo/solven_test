@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q31">
+            <p th:utext="#{questions.block.variableIncome}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <div class="centrado">
+                    <div>
+
+                        <div class="field field-amount inline">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                </div>
+                                <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <input type="text" class="input-outline amount-input" th:field="*{variableIncome}" th:attr="maxlength=${9 + (9 / 3 - 1) + 1 + 2 - 1}" style="max-width: 107px;width: 100%;"/>
+                                </th:block>
+                                <th:block th:unless="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <input type="text" class="input-outline amount-input" th:field="*{variableIncome}"/>
+                                </th:block>
+
+                            </div>
+                            <small class="input-help">Ingreso variable</small>
+                        </div>
+
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <hr class="divisor-bottom"/>
+    <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            var $questionForm = $('#questionForm');
+            var $variableIncome = $("#variableIncome");
+            $('.amount-input').maskNumber({
+                thousands: '.',
+                integer: true
+            });
+            $('#sendButton').click(function () {
+                if ($('#questionForm').valid()) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $('#questionForm'),
+                        data: $.extend($questionForm.serializeObject(), {
+                            variableIncome:$('.amount-input').val().replace(/(\.|\,)+\d{1,2}$/g, '').replace(/\.|\,/g, ''),
+                        })
+                    }, "");
+                }
+            });
+            /*]]>*/
+
+        </script>
+    </th:block>
+    <th:block th:unless="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+            $('#sendButton').click(function () {
+                if ($('#questionForm').valid()) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $('#questionForm'),
+                        data: $('#questionForm').serializeObject()
+                    }, "");
+                }
+            });
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+</th:block>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:text="#{questions.compare.autoEvaluationTitle}"></p>
+        <div class="note">
+            <span th:utext="#{questions.compare.autoEvaluationNote}"></span>
+        </div>
+        <div class="forms">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="field inline">
+                    <select data-width="70" th:field="*{docType}">
+                        <option value="1">DNI</option>
+                        <option value="2">CE</option>
+                    </select>
+                </div>
+                <div class="field inline">
+                    <input type="text" class="input-outline document-input" th:field="*{docNumber}"/>
+                </div>
+                <div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-lightblue"
+                            th:text="#{button.selfEvaluation}"></button>
+                </div>
+                <div class="display-block">
+                    <div class="errorContainer"></div>
+                </div>
+            </form>
+        </div>
+        <div class="block text-center">
+            <hr class="or-divisor"/>
+            <small><a id="skipButton" href="javascript:;" class="text-lightblue">Omitir</a></small>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        var docType = $('#docType');
+        var docNumber = $('#docNumber');
+
+        var firstOnChange = true;
+        docType.on('change', function () {
+            if (!firstOnChange) {
+                docNumber.val('');
+            } else {
+                firstOnChange = false;
+            }
+            if ($(this).val() == 2) {
+                $('#docNumber').removeClass('document-input').addClass('document-input-ce');
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 9;
+                $('')
+            } else {
+                $('#docNumber').removeClass('document-input-ce').addClass('document-input');
+                $('#questionForm').data('validatorJson').rules.docNumber.maxlength = 8;
+            }
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+        docType.change();
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    button: $('#sendButton'),
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+        $('#skipButton').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

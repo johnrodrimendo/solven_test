@@ -1,0 +1,125 @@
+.carousel-container {
+  margin: 0 auto;
+  max-width: 90%;
+  position: relative;
+  .owl-carousel {
+    .owl-wrapper-outer {
+      .owl-wrapper {
+        .owl-item {
+          li {
+            img {
+              -webkit-filter: grayscale(100%);
+              filter: grayscale(100%);
+              opacity: .4;
+              @include transition(all .5s ease);
+            }
+          }
+          &:hover {
+            li {
+              img {
+                -webkit-filter: none;
+                filter: none;
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    .owl-controls {
+      .owl-buttons{
+        .owl-prev, .owl-next {
+          background: none;
+          bottom: 0;
+          color: $black_color_sec;
+          font-size: 1.5em;
+          margin: auto 0;
+          position: absolute;
+          height: 42px;
+          top:0;
+          .left-arrow-icon:before {
+            content: '\f101';
+            font-size: .75em;
+          }
+          .right-arrow-icon:before {
+            content: '\f100';
+            font-size: .75em;
+          }
+          &:hover {
+            color: $black_color_main;
+          }
+        }
+        .owl-prev {
+          left: -52px;
+        }
+        .owl-next {
+          right: -52px;
+        }
+      }
+    }
+  }
+}
+
+/* Vertical Carousel */
+.control-items {
+  li {
+    [type="radio"] { display : none; }
+    label {
+      background : #f0f0f0;
+      @include border-radius(15px 0 15px 0);
+      color: $black_color_main;
+      padding : 1em;
+      @include transition(all .3s ease);
+      display : block;
+    }
+    [type="radio"]:checked + label {
+      background : white;
+      @include border-radius( 0 15px 0 15px);
+      @include box-shadow(0, 1px, 4px, rgba(0,0,0,.2));
+    }
+  }
+}
+.mockup-container {
+  .vc-items {
+    li {
+      display : none;
+    }
+    .active {
+      display: block;
+    }
+  }
+}
+
+/* Responsive */
+@media only screen and(min-width: 481px) and(max-width: 768px) {
+  .carousel-container {
+    #carousel-press {
+      .owl-controls {
+        .owl-buttons {
+          .owl-prev {
+            left: -30px;
+          }
+          .owl-next {
+            right: -30px;
+          }
+        }
+      }
+    }
+  }
+}
+@media only screen and(max-width: 480px) {
+  .carousel-container {
+    #carousel-press {
+      .owl-controls {
+        .owl-buttons {
+          .owl-prev {
+            left: 0px;
+          }
+          .owl-next {
+            right: 0px;
+          }
+        }
+      }
+    }
+  }
+}

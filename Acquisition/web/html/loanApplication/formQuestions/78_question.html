@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div id="assessment" style="display: none;height: 80vh;max-height: 90%;margin-top: 80px;position:relative;"></div>
+    <div class="questions-section animated fadeInRight">
+        <div class="iframe-content-container q78">
+            <div class="row iframe-row">
+                <div class="span12 iframe-span12" ng-controller="getTokenCtrl as token">
+                    <div id="container" class="iframe-hero-unit hero-unit transparent text-center">
+                        <div id="personal-loan">
+                            <p data-l10n-id="personal">Tenemos el crédito para ti</p>
+                            <div class="note">
+                                <p data-l10n-id="access">El financiador necesita conocer un poco más acerca tuyo.</p>
+                                <p data-l10n-id="interest">La siguiente serie de juegos le ayudará a conocerte mejor
+                                    (puede demorar hasta 10 minutos). </p>
+                                <p data-l10n-id="credit">¿De acuerdo?</p>
+                            </div>
+                            <div class="actions">
+                                <button id="comeBack2" type="button" class="button bg-black">&iexcl;Regreso luego!
+                                </button>
+                                <button id="apply2Button" type="button" class="button bg-red">&iexcl;Estoy listo!
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var q78 = $('.q78');
+            q78.closest('.loan-process').find('.adviser-section').addClass('show-img').removeAttr('style');
+
+
+            (function () {
+                window.addEventListener('message', handlePostMessage, false);
+            })();
+
+            function reziseIframe(obj) {
+                obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+            }
+
+            var homeUrl = /*[[ ${T(com.affirm.system.configuration.Configuration).getClientDomain()} ]]*/null;
+            var eflHostedPlayer = /*[[ ${@configuration.getEFLHostedPlayer(loanApplication.id)} ]]*/null;
+
+            $('#comeBack2').on('click', function (e) {
+                e.preventDefault();
+                window.location.href = homeUrl;
+            });
+
+            $('#apply2Button').on('click', function () {
+
+                q78.closest('.loan-process').find('.adviser-section').removeClass('show-img');
+                q78.closest('body').addClass('body-efl');
+
+
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#apply2Button'),
+                    type: "POST",
+                    success: function (data) {
+                        questionFw.showHideAgent(false);
+                        var data = JSON.parse(data);
+                        var sessionUid = data.uid;
+                        $('#personal-loan').hide();
+                        $('#assessment').show();
+                        $('#container').addClass('with-iframe');
+                        $('#assessment').append('<iframe src="' + eflHostedPlayer + "=" + b64EncodeUnicode(sessionUid) + '" height="100%" width="100%" style="border: 0;"></iframe>');
+                        var containerHeight = parseInt($('#container').css('min-height'), 10);
+                        $('#assessment iframe').css('min-height', containerHeight);
+                        $('#assessment iframe').load(function () {
+                            sendInitPostMessage();
+                        });
+                    }
+                }, "");
+            });
+
+            function b64EncodeUnicode(str) {
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+                    return String.fromCharCode('0x' + p1);
+                }));
+            }
+
+            function sendInitPostMessage() {
+                var iframeWindow = $('#assessment iframe')[0].contentWindow;
+                sendPostMessage(iframeWindow, 'INIT_CONTAINER');
+            }
+
+            function sendPostMessage(window, type, data) {
+                var domain = /*[[ ${T(com.affirm.system.configuration.Configuration).getEFLDomain()} ]]*/null;
+                if (window !== undefined && type !== undefined) {
+                    var eventData = {
+                        type: type
+                    };
+                    if (data !== undefined) {
+                        eventData.data = data;
+                    }
+                    window.postMessage(JSON.stringify(eventData), domain);
+                }
+            }
+
+            function handlePostMessage(event) {
+                if (event.data != undefined) {
+                    var eventData = JSON.parse(event.data);
+                    if (eventData.type != undefined) {
+                        switch (eventData.type) {
+                            case 'JOURNEY_END':
+                                console.log('Call JOURNEY_END');
+                                journeyFinished(eventData);
+                                var eflId;
+                                if (eventData.data) {
+                                    eflId = eventData.data.eflId;
+                                }
+                                console.log('EFL ID: ' + eflId);
+                                break;
+                            case 'JOURNEY_STARTED':
+                                var sessionUid;
+                                if (eventData.data) {
+                                    sessionUid = eventData.data.sessionUid;
+                                }
+                                console.log('Session Uid: ' + sessionUid);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            function journeyFinished(eventData) {
+                console.log('Call FINISHED TEST');
+                $('#assessment').hide();
+                $('#container').removeClass('with-iframe');
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {info: eventData}
+                }, "journeyFinished");
+            }
+
+            /*]]>*/
+
+        </script>
+        <th:block th:if="${canSkip != null and canSkip}">
+            <div class="display-block">
+                <a href="#" class="text-lightblue" id="skipButton">Omitir</a>
+            </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                $('#skipButton').click(function () {
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST"
+                    }, "skipped");
+                });
+                /*]]>*/
+
+            </script>
+        </th:block>
+    </div>
+
+</th:block>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="form-group">
+            <p th:text="#{questions.block.services}"></p>
+            <div class="field inline">
+                <select class="form-control" th:field="*{serviceType}">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option th:each="services : ${@catalogService.getServiceTypes(#locale)}"
+                            th:value="${services.id}" th:text="${services.serviceType}"></option>
+                </select>
+            </div>
+            <div class="errorContainer"></div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('select[name=serviceType]').on('change', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

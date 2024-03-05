@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_client_grouped">
+    <div class="inner-question" th:attr="data-question=${q}">
+        <div class="questions-section animated fadeInRight">
+
+            <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                <form th:object="${attr.form}" class="flex-form-map question-arg inner-question-form" autocomplete="off">
+                    <p th:text="${q} == 22 ? #{questions.block.address} : #{questions.block.companyAddress}"></p>
+                    <label th:attr="for='complete_info_'+${q}" class="custom-check" th:if="${attr.questionId == 61 or attr.questionId == 82 or attr.questionId == 100}">
+                        <span class="check-inner"><i class="icon icon-check"></i></span>
+                        <span class="check-label">Trabajo donde vivo</span>
+                        <input type="checkbox" class="real-check" th:id="'complete_info_' + ${q}" name="homeAddress"/>
+                    </label>
+
+                    <div class="first">
+                        <div class="field inline" >
+                            <th:block th:if="${q == 22}">
+                                <input th:if="${attr.tittle == null}" id="roadName" name="roadName" type="text" class="input-outline" th:placeholder="#{questions.block.address}"/>
+                                <input th:if="${attr.tittle != null}" id="roadName" name="roadName" type="text" class="input-outline" th:placeholder="${tittle}"/>
+                            </th:block>
+                            <input th:if="${q == 61 or q == 82 or q == 100}" id="roadName" name="roadName" type="text" class="input-outline" th:placeholder="#{questions.block.companyAddress}"/>
+                        </div>
+
+                        <div class="field inline">
+                            <input id="houseNumber" name="houseNumber" typee="text" class="input-outline" />
+                            <div class="wrap">
+                                <small class="input-help" th:utext="#{question.map.nrohouse}" ></small>
+                                <label for="withoutNumberId" class="custom-check">
+                                    <span class="check-inner"><i class="icon icon-check"></i></span>
+                                    <span class="check-label">s/n</span>
+                                    <input type="checkbox" class="real-check" id="withoutNumberId" name="withoutNumber"/>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="field inline">
+                            <input id="floor" name="floor" type="text" class="input-outline" />
+                            <small class="input-help" th:utext="#{question.map.floor}"></small>
+                        </div>
+
+                        <div class="field inline" th:if="${attr.questionId == 22 or questionId == 100}">
+                            <input id="interior" name="interior" type="text" class="input-outline" />
+                            <small class="input-help" th:utext="#{question.map.nrointerior}" ></small>
+                        </div>
+
+                        <div class="field inline" th:if="${attr.questionId == 61 or questionId == 82}">
+                            <input id="interior" name="interior" type="text" class="input-outline" />
+                            <small class="input-help" th:utext="#{question.map.nro.office}" ></small>
+                        </div>
+
+                        <div class="field inline">
+                            <input id="postalCode" name="postalCode" type="text" class="input-outline" />
+                            <small class="input-help" th:utext="#{question.map.postal}"></small>
+                        </div>
+                    </div>
+
+                    <div class="third">
+
+                        <div class="field inline">
+                            <select id="provincia" name="provincia" data-width="230"  th:attr="data-placeholder=#{question.map.province}" >
+                                <option value="" hidden="hidden"></option>
+                                <option th:each="province : ${@catalogService.getGeneralProvince(54)}"
+                                        th:value="${province.provinceId}" th:text="${province.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="field inline">
+                            <select class="selec2-item" id="district" name="distrito" data-width="230"  th:attr="data-placeholder=#{question.map.district}"></select>
+                        </div>
+                    </div>
+
+                    <div class="field inline" >
+                        <textarea id="reference" name="reference" class="input-outline"></textarea>
+                        <small class="input-help" th:utext="#{question.map.reference}" max="100"></small>
+                    </div>
+
+                    <div class="errorContainer"></div>
+                </form>
+            </th:block>
+            <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                <form th:object="${attr.form}" class="flex-form-map inner-question-form">
+                    <p>
+                        <span th:text="${q} == 22 ? #{questions.block.address} : #{questions.block.companyAddress}"></span>
+                        <!--label th:attr="for='complete_info_' + ${q}" class="custom-check" th:if="${attr.questionId == 61 or attr.questionId == 82 or attr.questionId == 100}">
+                            <span class="check-inner"><i class="icon icon-check"></i></span>
+                            <span class="check-label">Trabajo donde vivo</span>
+                            <input type="checkbox" class="real-check" th:id="'complete_info_' + ${q}" name="homeAddress" th:attr="data-question=${q}"/>
+                        </label-->
+                    </p>
+                    <div class="first">
+                        <div class="field inline">
+                            <input id="roadName" name="roadName" type="text" class="input-outline"/>
+                        </div>
+                    </div>
+                    <div class="third">
+                        <div class="field inline ">
+                            <select id="departamento" name="departamento" data-width="230"
+                                    th:attr="data-placeholder=#{question.map.department}" >
+                                <option value="" hidden="hidden"></option>
+                                <option th:each="top : ${attr.topDepartments}" th:value="${top.id}" th:text="${top.name}"></option>
+                                <option value="null" disabled="disabled">----------</option>
+                                <option th:each="deparment : ${attr.allDepartments}" th:value="${deparment.id}" th:text="${deparment.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="field inline">
+                            <select id="provincia" name="provincia" data-width="230" th:attr="data-placeholder=#{question.map.province}"></select>
+                        </div>
+                        <div class="field inline">
+                            <select class="selec2-item" id="district" name="distrito" data-width="230"  th:attr="data-placeholder=#{question.map.district}"></select>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </form>
+            </th:block>
+        </div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                innerQuestion.find('input[name=withoutNumber]').click(function(){
+                    if (this.checked){
+                        innerQuestion.find('input[name=houseNumber]').prop('readonly', true);
+                        innerQuestion.find('input[name=houseNumber]').val('');
+                    }else
+                        innerQuestion.find('input[name=houseNumber]').prop('readonly', false);
+                });
+            })();
+            /*]]>*/
+        </script>
+
+        <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            /*<![CDATA[*/
+            (function() {
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+
+                var $departameto = innerQuestion.find('select[name=departamento]');
+                var $provincia = innerQuestion.find('select[name=provincia]');
+                var $distric = innerQuestion.find('select[name=distrito]');
+                var s = true;
+
+                $provincia.select2({
+                    "language": {
+                        "noResults": function () {
+                            return "No se encontró algún resultado";
+                        }
+                    },
+                    escapeMarkup: function (markup) {
+                        return markup;
+                    }
+                });
+
+                innerQuestion.find('input[name=roadName]').keydown(function (e) {
+                    if (e.which == 9) {
+                        $departameto.select2('open');
+                    }
+                });
+
+                var changeDepartment = function() {
+                    $departameto.attr('disabled', 'disabled');
+                    $provincia.attr('disabled', 'disabled');
+                    $distric.attr('disabled', 'disabled');
+                    defaultAjax({
+                        url: /*[[@{/address/province}]]*/null,
+                        data: {
+                            departmentId: $departameto.val()
+                        },
+                        type: 'POST',
+                        success: function (data) {
+                            var arr = JSON.parse(data);
+                            var topProvince = arr.find(function (item) {return item.id == "01"});
+                            arr.splice(arr.indexOf(topProvince), 1);
+                            var html = '<option value="" hidden="hidden"></option>';
+                            html += '<option value="' + topProvince.id + '">' + topProvince.name + '</option>';
+                            html += '<option value="null" disabled="disabled">----------</option>';
+                            var len = arr.length;
+                            for (var i = 0; i < len; i++) {
+                                html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                            }
+                            $provincia.html(html);
+                            setTimeout(function() {
+                                $provincia.select2('open');
+                            }, 100);
+                        },
+                        error: function (data) {
+                            showErrorModal('Hubo un problema al obtener las provincias.');
+                        },
+                        complete: function() {
+                            $departameto.removeAttr('disabled');
+                            $provincia.removeAttr('disabled');
+                            $distric.removeAttr('disabled');
+                        }
+                    });
+                };
+
+                var changeProvince = function () {
+                    $departameto.attr('disabled', 'disabled');
+                    $provincia.attr('disabled', 'disabled');
+                    $distric.attr('disabled', 'disabled');
+                    defaultAjax({
+                        url: /*[[@{/address/district}]]*/null,
+                        data: {
+                            departmentId: $departameto.val(),
+                            provinceId: $provincia.val()
+                        },
+                        type: 'POST',
+                        success: function (data) {
+                            var arr = JSON.parse(data);
+                            var html = '<option value="" hidden="hidden"></option>';
+                            var len = arr.length;
+                            for (var i = 0; i < len; i++) {
+                                html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                            }
+                            $distric.html(html);
+
+                            setTimeout(function() {
+                                $distric.select2('open');
+                            }, 100);
+                        },
+                        error: function (data) {
+                            showErrorModal('Hubo un problema al obtener las provincias.');
+                        },
+                        complete: function() {
+                            $departameto.removeAttr('disabled');
+                            $provincia.removeAttr('disabled');
+                            $distric.removeAttr('disabled');
+                        }
+                    });
+                };
+
+                $departameto.on('change', changeDepartment);
+                $provincia.on('change', changeProvince);
+
+            })();
+            /*]]>*/
+        </script>
+
+        <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            /*<![CDATA[*/
+            (function() {
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+
+                var $provincia = innerQuestion.find('select[name=provincia]');
+                var $distric = innerQuestion.find('select[name=distrito]');
+                var $postalCode = innerQuestion.find('input[name=postalCode]');
+
+                $postalCode.focusout(function() {
+                    var postalCode = $postalCode.val().trim();
+                    if(postalCode !== '') {
+                        defaultAjax({
+                            url: /*[[@{/address/provinceByPostalCode}]]*/null,
+                            data: {
+                                postalCode: postalCode
+                            },
+                            type: 'POST',
+                            success: function (data) {
+                                var arr = JSON.parse(data);
+                                var html = '<option value="" hidden="hidden"></option>';
+                                var len = arr.length;
+                                for (var i = 0; i < len; i++) {
+                                    html += '<option value="' + arr[i].provinceId + '">' + arr[i].name + '</option>';
+                                }
+                                $provincia.html(html);
+                                $distric.empty();
+
+                                if(len == 1){
+                                    $provincia.find('option:eq(1)').attr("selected", "selected");
+                                    $provincia.change();
+                                }
+                            },
+                            error: function (data) {
+                                showErrorModal('Hubo un problema al obtener las provincias.');
+                            }
+                        });
+                    }
+                });
+
+                $provincia.select2({
+                    "language": {
+                        "noResults": function () {
+                            return "No se encontró algún resultado";
+                        }
+                    },
+                    escapeMarkup: function (markup) {
+                        return markup;
+                    }
+                });
+                $provincia.on('change', function () {
+                    var provinciaId = $provincia.val();
+                    var postalCode = $postalCode.val();
+                    defaultAjax({
+                        url: /*[[@{/address/generalDistrict}]]*/null,
+                        data: {
+                            countryId: 54,
+                            provinceId: provinciaId,
+                            postalCode : postalCode
+                        },
+                        type: 'POST',
+                        success: function (data) {
+                            var arr = JSON.parse(data);
+                            var html = '<option value="" hidden="hidden"></option>';
+                            var len = arr.length;
+                            for (var i = 0; i < len; i++) {
+                                html += '<option value="' + arr[i].districtId + '">' + arr[i].name + '</option>';
+                            }
+                            $distric.html(html);
+
+                            if(len == 1){
+                                $distric.find('option:eq(1)').attr("selected", "selected");
+                                $distric.change();
+                            }
+                        },
+                        error: function (data) {
+                            showErrorModal('Hubo un problema al obtener las provincias.');
+                        }
+                    });
+                });
+
+            })();
+            /*]]>*/
+        </script>
+
+
+        <script th:inline="javascript" th:if="${attr.questionId == 82 or attr.questionId == 61 or attr.questionId == 100}">
+            /*<![CDATA[*/
+            (function() {
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+
+                var $homeaddress = innerQuestion.find('input[name=homeAddress]');
+                $homeaddress.click(function () {
+                    var $departameto = innerQuestion.find('select[name=departamento]');
+                    var $provincia = innerQuestion.find('select[name=provincia]');
+                    var $distric = innerQuestion.find('select[name=distrito]');
+                    var $manzana = innerQuestion.find('input[name=manzana]');
+                    var $lote = innerQuestion.find('input[name=lote]');
+                    var $postalCode = innerQuestion.find('input[name=postalCode]');
+                    var $interior = innerQuestion.find('input[name=interior]');
+                    var $roadType = innerQuestion.find('select[name=roadType]');
+                    var $roadName = innerQuestion.find('input[name=roadName]');
+                    var $houseNumber = innerQuestion.find('input[name=houseNumber]');
+                    var $floor = innerQuestion.find('input[name=floor]');
+                    var $withoutNumberId = innerQuestion.find('input[name=withoutNumber]');
+                    var $zoneType = innerQuestion.find('select[name=zoneType]');
+                    var $zoneName = innerQuestion.find('input[name=zoneName]');
+                    var $reference = innerQuestion.find('textarea[name=reference]');
+
+                    if (this.checked) {
+                        questionFw.ajaxToCurrentQuestionController({
+                            type: "GET",
+                            success: function (data) {
+                                $manzana.val('');
+                                $lote.val('');
+                                var json = JSON.parse(data);
+                                if (json.roadType != null){
+                                    $roadType.find('option[value="'+json.roadType+'"]').prop('selected', true);
+                                    $roadType.trigger('change.select2');
+                                }
+                                $roadType.val(json.roadType);
+                                if (json.roadName != null)
+                                    $roadName.val(json.roadName);
+                                if (json.houseNumber != null)
+                                    $houseNumber.val(json.houseNumber);
+                                if (json.floor != null)
+                                    $floor.val(json.floor);
+                                if (json.withoutNumber != null){
+                                    $withoutNumberId.prop('checked', json.withoutNumber);
+                                    if(json.withoutNumber)
+                                        $withoutNumberId.closest('.custom-check').addClass('checked');
+                                    else
+                                        $withoutNumberId.closest('.custom-check').removeClass('checked');
+                                }
+                                if (json.manzana != null)
+                                    $manzana.val(json.manzana);
+                                if (json.lote != null)
+                                    $lote.val(json.lote);
+                                if (json.zoneType != null){
+                                    $zoneType.find('option[value="'+json.zoneType+'"]').prop('selected', true);
+                                    $zoneType.trigger('change.select2');
+                                }
+                                if (json.zoneName != null)
+                                    $zoneName.val(json.zoneName);
+                                if (json.reference != null)
+                                    $reference.val(json.reference);
+                                if (json.departamento != null){
+                                    $departameto.find('option[value="'+json.departamento+'"]').prop('selected', true);
+                                    $departameto.trigger('change.select2');
+                                }
+                                if (json.provincia != null){
+                                    if($provincia.find('option[value="'+json.provincia+'"]').length > 0){
+                                        $provincia.find('option[value="'+json.provincia+'"]').prop('selected', true);
+                                        $provincia.trigger('change.select2');
+                                    }else{
+                                        $provincia.html('<option value="' + json.provincia + '">' + json.provinciaLabel + '</option>');
+                                        $provincia.find('option[value="'+json.provincia+'"]').prop('selected', true);
+                                        $provincia.trigger('change.select2');
+                                    }
+
+                                }
+                                if (json.distrito != null){
+                                    $distric.html('<option value="' + json.distrito + '">' + json.distritoLabel + '</option>');
+                                    $distric.find('option[value="'+json.distrito+'"]').prop('selected', true);
+                                    $distric.trigger('change.select2');
+                                }
+                                if (json.postalCode != null)
+                                    $postalCode.val(json.postalCode);
+                                if (json.interior != null)
+                                    $interior.val(json.interior);
+                                autocompletedPlace = true;
+                            }
+                        }, "homeAddress");
+                        innerQuestion.find('.mask').remove();
+                    }
+                    innerQuestion.find('#roadType,#zoneType,#departamento,#provincia,#district').on('select2:select', function(){
+                        $homeaddress.prop('checked', false);
+                        $homeaddress.checked();
+                    });
+                    innerQuestion.find('#roadName,#houseNumber,#manzana,#lote,#zoneName,#reference,#postalCode').on('input', function(){
+                        $homeaddress.prop('checked', false);
+                        $homeaddress.checked();
+                    });
+                    $withoutNumberId.change(function() {
+                        $homeaddress.prop('checked', false);
+                        $homeaddress.checked();
+                    });
+                });
+
+            })();
+            /*]]>*/
+        </script>
+
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:if="${questionId == 22}" th:utext="#{questions.block.address}"></p>
+            <p th:if="${questionId == 61 or questionId == 82}" th:utext="#{questions.block.companyAddress}"></p>
+            <th:block th:if="${questionId == 100}">
+                <th:block th:switch="${ocupation?.activityType?.id}">
+                    <p th:case="${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA}"
+                       th:text="#{questions.block.independentWorkplaceAdress}"></p>
+                    <p th:case="${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT}"
+                       th:text="#{questions.block.independentWorkplaceAdress}"></p>
+                    <p th:case="*" th:text="#{questions.block.companyAddress}"></p>
+                </th:block>
+            </th:block>
+
+            <th:block
+                    th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+
+                <!--<label for="complete_info" class="custom-check" th:if="${questionId == 61 or questionId == 82 or questionId == 100}">-->
+                <!--<span class="check-inner"><i class="icon icon-check"></i></span>-->
+                <!--<span class="check-label">Trabajo donde vivo</span>-->
+                <!--<input type="checkbox" class="real-check" id="complete_info" th:field="*{homeAddress}"/>-->
+                <!--</label>-->
+
+                <div class="form-group col-md-3">
+                    <small th:utext="#{question.map.nameroad}"></small>
+                    <input th:field="*{roadName}" type="text" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <div class="wrap">
+                        <small class="input-help" th:utext="#{question.map.nrohouse}"></small>
+                        <label for="withoutNumberId" class="custom-check">
+                            <span class="check-inner"><i class="icon icon-check"></i></span>
+                            <span class="check-label">s/n</span>
+                            <input type="checkbox" class="real-check" id="withoutNumberId" th:field="*{withoutNumber}"/>
+                        </label>
+                    </div>
+                    <input th:field="*{houseNumber}" type="text" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <small th:utext="#{question.map.floor}"></small>
+                    <input th:field="*{floor}" type="text" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3" th:if="${questionId == 22 or questionId == 100}">
+                    <small th:utext="#{question.map.nrointerior}"></small>
+                    <input th:field="*{interior}" type="text" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3" th:if="${questionId == 61 or questionId == 82}">
+                    <small th:utext="#{question.map.nro.office}"></small>
+                    <input th:field="*{interior}" type="text" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <small th:utext="#{question.map.postal}"></small>
+                    <input th:field="*{postalCode}" type="text" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <select th:field="*{provincia}" class="form-control">
+                        <option value="" hidden="hidden" th:text="#{question.map.province}"></option>
+                        <option th:each="province : ${@catalogService.getGeneralProvince(54)}"
+                                th:value="${province.provinceId}" th:text="${province.name}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <select th:field="*{distrito}" class="form-control"></select>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <small th:utext="#{question.map.reference}"></small>
+                    <textarea th:field="*{reference}" class="form-control"></textarea>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+
+            </th:block>
+
+            <th:block
+                    th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+
+                <!--<label for="complete_info" class="custom-check" th:if="${questionId == 61 or questionId == 82 or questionId == 100}">-->
+                <!--<span class="check-inner"><i class="icon icon-check"></i></span>-->
+                <!--<span class="check-label">Trabajo donde vivo</span>-->
+                <!--<input type="checkbox" class="real-check" id="complete_info" th:field="*{homeAddress}"/>-->
+                <!--</label>-->
+
+                <div class="form-group col-md-12">
+                    <small th:utext="#{question.map.nameroad}"></small>
+                    <input th:field="*{roadName}" class="form-control"/>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-4 nopadding">
+                    <small th:text="#{question.map.department}"></small>
+                    <select th:field="*{departamento}" class="form-control">
+                        <option value="" hidden="hidden"></option>
+                        <option th:each="deparment : ${@catalogService.getDepartments()}"
+                                th:value="${deparment.id}" th:text="${deparment.name}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-4 nopadding">
+                    <small th:text="#{question.map.province}"></small>
+                    <select th:field="*{provincia}" class="form-control">
+                        <option th:if="${form.provincia != null}"
+                                th:value="${form.provincia}" th:text="${@catalogService.getProvinceById(form.departamento, form.provincia).name}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div class="form-group col-md-4 nopadding">
+                    <small th:text="#{question.map.district}"></small>
+                    <select th:field="*{distrito}" class="form-control">
+                        <option th:if="${form.distrito != null}"
+                                th:value="${form.distrito}" th:text="${@catalogService.getDistrictById(form.departamento, form.provincia, form.distrito).name}"></option>
+                    </select>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+
+            </th:block>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+        })();
+        /*]]>*/
+    </script>
+    <script th:inline="javascript" th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+        /*<![CDATA[*/
+        (function() {
+            var $Form = getQuestionFlowByRandomId([[${randomId}]]);
+            $Form.find('input[name=postalCode]').focusout(function () {
+                var postalCode = $Form.find('#postalCode').val();
+                $Form.callCustomMethod('provinceByPostalCode', {
+                    postalCode: postalCode
+                }, function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].provinceId + '">' + arr[i].name + '</option>';
+                    }
+                    $Form.find('select[name=provincia]').html(html);
+                    $Form.find('select[name=district]').empty();
+                }, function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                });
+            });
+
+            $Form.find('select[name=provincia]').on('change', function () {
+                var provinciaId = $Form.find('#provincia').val();
+                var postalCode = $Form.find('#postalCode').val();
+                $Form.callCustomMethod('generalDistrict', {
+                    countryId: 54,
+                    provinceId: provinciaId,
+                    postalCode: postalCode
+                }, function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].districtId + '">' + arr[i].name + '</option>';
+                    }
+                    $Form.find('select[name=district]').html(html);
+                    $Form.find('select[name=district]').empty();
+                }, function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                });
+            });
+
+        })();
+        /*]]>*/
+    </script>
+    <script th:inline="javascript" th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+        /*<![CDATA[*/
+        (function() {
+            var $Form = getQuestionFlowByRandomId([[${randomId}]]);
+            $Form.find('select[name=departamento]').on('change', function () {
+                $Form.callCustomMethod('province', {
+                    departmentId: $(this).val()
+                }, function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                    }
+                    $Form.find('select[name=provincia]').html(html);
+                }, function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                });
+            });
+
+            $Form.find('select[name=provincia]').on('change', function () {
+                var departmentId = $Form.find('select[name=departamento]').val();
+                var provinciaId = $(this).val();
+
+                $Form.callCustomMethod('district', {
+                    departmentId: departmentId,
+                    provinceId: provinciaId
+                }, function (data) {
+                    var arr = JSON.parse(data);
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].id + '">' + arr[i].name + '</option>';
+                    }
+                    $Form.find('select[name=distrito]').html(html);
+                }, function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                });
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

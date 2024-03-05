@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q30">
+            <p th:utext="#{questions.block.netoIncome}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+
+                <div class="centrado">
+                    <div>
+
+                        <div class="field field-amount inline">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                </div>
+                                <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <input type="text" class="input-outline amount-input ignore_validation" th:field="*{income}" th:attr="maxlength=${9 + (9 / 3 - 1) + 1 + 2 - 1}" style="max-width: 107px;width: 100%;"/>
+                                </th:block>
+                                <th:block th:unless="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <input type="text" class="input-outline amount-input" th:field="*{income}"/>
+                                </th:block>
+                            </div>
+                            <small th:utext="#{questions.help.netoIncome}" class="input-help"></small>
+                        </div>
+
+                        <div class="field inline">
+                            <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+
+                    </div>
+                    <div>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+            </form>
+            <div class="terms"
+                 th:if="${loanApplication?.entityId == null or loanApplication?.entityId != T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                <label for="variableIncome" class="custom-check">
+                            <span class="check-inner">
+                                <i class="icon icon-check"></i>
+                            </span>
+                    <span class="check-label"> Recibo adem&aacute;s un salario variable.</span>
+                    <input type="checkbox" class="real-check" id="variableIncome"/>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <hr class="divisor-bottom"/>
+    <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            var $income = $('#income');
+            var $variableIncome = $('#variableIncome');
+            var $sendButton = $('#sendButton');
+            var $questionForm = $('#questionForm');
+            setTimeout(function () {
+                $income.focus();
+            }, 300);
+            $sendButton.click(function () {
+                sendForm();
+            });
+
+            $('.amount-input').maskNumber({
+                thousands: '.',
+                integer: true
+            });
+
+            function sendForm() {
+                if ($questionForm.valid()) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $questionForm,
+                        data: $.extend($questionForm.serializeObject(), {
+                            income:$('.amount-input').val().replace(/(\.|\,)+\d{1,2}$/g, '').replace(/\.|\,/g, ''),
+                            variableIncome: $variableIncome.is(':checked')
+                        })
+                    }, "");
+                }
+            }
+
+            /*]]>*/
+
+        </script>
+    </th:block>
+    <th:block th:unless="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            var $income = $('#income');
+            var $variableIncome = $('#variableIncome');
+            var $sendButton = $('#sendButton');
+            var $questionForm = $('#questionForm');
+            setTimeout(function () {
+                $income.focus();
+            }, 300);
+            $sendButton.click(function () {
+                sendForm();
+            });
+
+            function sendForm() {
+                if ($questionForm.valid()) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $questionForm,
+                        data: $.extend($questionForm.serializeObject(), {
+                            variableIncome: $variableIncome.is(':checked')
+                        })
+                    }, "");
+                }
+            }
+
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+
+</th:block>
+</html>

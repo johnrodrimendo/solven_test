@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>Elije la marca que deseas</title>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+</head>
+<body>
+<!-- Header begins -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader(showHelp=false)"></th:block>
+</th:block>
+<!-- Header ends -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+    <div class="chooseBrand">
+        <div class="container">
+            <div class="brands">
+                <h2 th:utext="#{static.langing.carFinancing.chooseBrand.title}"></h2>
+                <div class="divisor-bottom"></div>
+                <ul class="brand-lists">
+                    <li th:each="brand : ${@catalogService.getVehicleBrands()}">
+                        <a href= "#" class="brandSelected" th:attr="data-id=${brand.id}">
+                            <div class="circle-img  ">
+                                <img src="https://s3.amazonaws.com/solven-public/img/brands/solven_ford.png" alt="Ford"/>
+                            </div>
+                            <h3 th:text="${brand.brand}"></h3>
+                        </a>
+                    </li>
+                </ul>
+                <div class="text-center">
+                    <button id="btnNext" class="button bg-red hidden" th:text="#{button.next}"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(function () {
+            var toSend = [];
+
+            $('.brandSelected').on('click' , function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                if( $.inArray(id, toSend) != -1){
+                    $(this).removeClass('brand-active');
+
+                    for(i=0; i<toSend.length; i++){
+                        if( toSend[i] == id){
+                           toSend.remove(toSend[i]);
+                        }
+                    }
+                }else{
+                    toSend.push(id);
+                    $(this).addClass('brand-active');
+                }
+               (toSend.length > 0) ? $('#btnNext').removeClass('hidden') : $('#btnNext').addClass('hidden');
+            });
+
+            $('#btnNext').on('click', function(e){
+                e.preventDefault();
+                $('#btnNext').loading();
+                defaultAjax({
+                    url: /*[[@{/chooseBrand}]]*/,
+                    data: {brands: JSON.stringify(toSend)},
+                    type: 'POST',
+                    error: function () {
+                        $('#btnNext').unloading();
+                    }
+                });
+            });
+
+        });
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $(document).ready(function () {
+            var validator = /*[[${processContactForm.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                var jsonValidator = JSON.parse(validator);
+                $('#modalContactForm').validateForm(createFormValidationJson(jsonValidator, $('#modalContactForm')));
+            }
+
+            $('#sendMessage').on('click', function (event) {
+                event.preventDefault();
+                validate();
+            });
+
+        });
+
+        function validate() {
+            debugger;
+            if ($('#modalContactForm').valid()) {
+                grecaptcha.reset();
+                grecaptcha.execute();
+            }
+        }
+
+        function submit() {
+            $('#sendMessage').loading();
+            defaultAjax({
+                url: /*[[@{/processContact}]]*/,
+                type: 'POST',
+                formValidation: $('#modalContactForm').data('validator'),
+                data: $('#modalContactForm').serializeObject(),
+                success: function (data) {
+                    $('#sendMessage').unloading();
+                    $('#modalContactForm').data('validator').resetForm();
+                    $('#modalContactForm')[0].reset();
+                    $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                    setTimeout(function(){
+                        $('#hlp-modal').modal('hide');
+                    }, 1500);
+                }, error: function(){
+                    $('#sendMessage').unloading();
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+<!-- End Content -->
+
+<!-- footer -->
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+</th:block>
+<!-- footer ends -->
+
+</body>
+</html>

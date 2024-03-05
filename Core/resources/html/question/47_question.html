@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p th:text="#{questions.block.rentierIncomes}"></p>
+            <div class="form-group">
+                <small>Neto</small>
+                <div class="input-group">
+                    <span class="input-group-addon" th:text="${loanApplication.country.currency.symbol}"></span>
+                    <input class="form-control" type="text" th:field="*{rent}"/>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group">
+                <div class="mt-checkbox-list">
+                    <label class="mt-checkbox mt-checkbox-outline" th:each="belonging : ${@catalogService.getBelongings(#locale)}">
+                        <input type="checkbox" th:value="${belonging.id}" name="belongings"/>
+                        <th:block th:text="${belonging.name}"></th:block>
+                        <span></span>
+                    </label>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                var belongings = [];
+                questionFlow.find('input[name=belongings]:checked').each(function(){
+                    belongings[belongings.length] = $(this).val();
+                });
+                return {belongings: belongings, rent: questionFlow.find('input[name=rent]').val()};
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

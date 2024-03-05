@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <form id="questionForm" th:object="${form}" class="form" autocomplete="off">
+                <div class="block" id="social-networks" th:if="${loanApplication.entityUserId == null}">
+                    <p th:text="#{questions.block.athenticateWithEmails}"></p>
+                    <!-- outline-box-active -->
+                    <a id="gmail" class="outline-box" th:classappend="${gmail != null ? 'outline-box-active' : ''}"
+                       onclick="login('google')"><i class="icon icon-gmail"></i></a>
+                    <a id="windows" class="outline-box" th:classappend="${windows != null ? 'outline-box-active' : ''}"
+                       onclick="login('windows')"><i class="icon icon-outlook"></i></a>
+                    <a id="yahoo" class="outline-box" th:classappend="${yahoo != null ? 'outline-box-active' : ''}"
+                       onclick="login('yahoo')"><i class="icon icon-yahoo"></i></a>
+                    <div class="display-block">
+                        <a href="#" class="change-block text-lightblue" data-target="#block-manual">Ingresar correo
+                            manual.</a>
+                    </div>
+                </div>
+                <div class="block" id="block-manual"
+                     th:classappend="${loanApplication.entityUserId == null ? 'block-hidden' : ''}">
+                    <p th:text="#{questions.block.joinWithEmail}"></p>
+                    <div class="field inline">
+                        <input type="text" class="input-outline fullname-input" th:field="*{email}" autocorrect="off"
+                               autocapitalize="none"/>
+                    </div>
+                    <div class="field inline">
+                        <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                    <div class="display-block">
+                        <div class="errorContainer"></div>
+                        <a th:if="${loanApplication.entityUserId == null}" href="#" class="change-block text-lightblue"
+                           data-target="#social-networks">Prefiero con mis redes sociales</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $('.change-block').on('click', function (e) {
+            e.preventDefault();
+            switch ($(this).data('target')) {
+                case '#block-manual':
+                    $(this).closest('.block').addClass('block-hidden');
+                    $($(this).data('target')).removeClass('block-hidden');
+                    break;
+                case '#social-networks':
+                    $(this).closest('.block').addClass('block-hidden');
+                    $($(this).data('target')).removeClass('block-hidden');
+                    break;
+            }
+        });
+
+        oauthy.setupNetwork('google',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('windows',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getDefaultPermission()}]]*/null);
+        oauthy.setupNetwork('yahoo',
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getClientId()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getRedirectUri()}]]*/null,
+            /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getDefaultPermission()}]]*/null);
+
+
+        function login(network) {
+            oauthy.login(network, function (code) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: 'POST',
+                    data: {
+                        networkProvider: network == 'google' ? 'G' : network == 'windows' ? 'W' : network == 'yahoo' ? 'Y' : null,
+                        authCode: code
+                    }
+                }, "");
+            }, function () {
+                showErrorModal('Se produjo un error al intentar vincular tus redes, <br/>por favor int&eacute;ntalo nuevamente o cont&aacute;ctanos.');
+            });
+        }
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

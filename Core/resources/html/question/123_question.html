@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+
+        <th:block th:switch="${reason}">
+            <p th:case="A" th:utext="#{questions.123a}"></p>
+            <p th:case="R" th:utext="#{questions.123b}"></p>
+        </th:block>
+
+        <div class="actions" id="wenance-result">
+            <div class="field inline">
+                <a href="#" class="anchor-button bg-black" onclick="notInterested()">No me interesa</a>
+            </div>
+            <div class="field inline">
+                <a th:href="${url_wenance}" class="anchor-button bg-red" onclick="sendPost()">Me interesa</a>
+                <small class="input-help">Ser&aacute;s redirigido a <b><a th:href="${url_wenance}" onclick="sendPost()" target="_blank">app.welp.com</a></b></small>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function sendPost() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "");
+        }
+
+        function notInterested() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "notInterested");
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Autoevaluación</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>AutoEvaluaciones</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">AutoEvaluaciones</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button-clean'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Limpiar Filtros</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/loanApplication/selfEvaluation/list}">
+
+                                    <div class="form-row">
+                                        <!-- Fecha de registro -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Fecha registro</b><br />Desde</label>
+                                                <input id="creationFromFilter" name="creationFrom" type="text" class="form-control form-control-sm" placeholder="Desde" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationToFilter" name="creationTo" type="text" class="form-control form-control-sm" placeholder="Hasta" />
+                                            </div>
+                                        </div>
+                                        <script th:inline="javascript">
+                                            /*<![CDATA[*/
+                                            var creationFromFilter = $('#creationFromFilter');
+                                            var creationToFilter = $('#creationToFilter');
+                                            datepicker(creationFromFilter);
+                                            datepicker(creationToFilter);
+                                            function datepicker( obj ){
+                                                obj.datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                            }
+                                            creationFromFilter.on('change', function () {
+                                                creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                            });
+                                            /*]]>*/
+                                        </script>
+
+                                        <!-- Monto solicitado -->
+                                        <div class="form-row col-md-3">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Monto solicitado</b><br />Desde</label>
+                                                <input id="amountFromFilter" name="amountFrom" type="text" class="form-control form-control-sm"/>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="amountToFilter" name="amountTo" type="text" class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- DNI -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>DNI</label>
+                                            <input name="document_number" type="text" class="form-control form-control-sm"/>
+                                        </div>
+
+                                        <!-- Motivo -->
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Motivo de crédito</label>
+                                            <select name="reason" class="form-control form-control-sm">
+                                                <option value=""></option>
+                                                <option th:each="reason : ${@catalogService.getLoanApplicationReasons(#locale)}"
+                                                        th:value="${reason.id}"
+                                                        th:text="${reason.reason}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Score -->
+                                        <div class="form-group col-md-1">
+                                            <label class="control-label"><b></b><br/>Score</label>
+                                            <select name="score" class="form-control form-control-sm">
+                                                <option value=""></option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(wrapper?.results)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: list(wrapper=${wrapper})"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <table id="tableResults" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>País</th>
+            <th>Fecha de Registro</th>
+            <th>Fecha de Expiración</th>
+            <th>Tipo doc.</th>
+            <th>Numero doc.</th>
+            <th>Nombre completo</th>
+            <th>Motivo del Crédito</th>
+            <th>Monto Solicitado</th>
+            <th>Sueldo Bruto (S/)</th>
+            <th>Uso del Vehículo</th>
+            <th>Cuota Inicial</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Pregunta Actual</th>
+            <th>Agente</th>
+        </tr>
+        </thead>
+        <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+            <tr th:each="selfEvaluation, iterLoan1 : ${wrapper?.results}">
+                <td th:text="${selfEvaluation?.rowNumber}"></td>
+                <td>
+                    <div class="choose-country">
+                        <span th:class="'c-language c' + ${selfEvaluation?.country?.id}"></span>
+                    </div>
+                </td>
+                <td th:text="${@utilService.datetimeShortFormatByCountry(selfEvaluation?.registerDate,selfEvaluation?.country?.id)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(selfEvaluation?.registerDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(selfEvaluation?.expirationDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(selfEvaluation?.expirationDate)}"></td>
+                <td th:text="${selfEvaluation?.documentType?.name}"></td>
+                <td th:text="${selfEvaluation?.documentNumber}"></td>
+                <td><a th:href="@{/person(personId=${selfEvaluation?.personId}, tab='applications')}" th:text="${selfEvaluation?.getFullName()}"></a></td>
+                <td th:text="${selfEvaluation?.reason?.getReason()}"></td>
+                <td th:text="${selfEvaluation?.getLoanApplicationAmmount(@utilService)}"></td>
+                <td th:text="${selfEvaluation?.fixedGrossIncome}"></td>
+                <td th:text="${selfEvaluation?.ussage?.getUsage()}"></td>
+                <td th:text="${selfEvaluation?.downPayment}"></td>
+                <td>
+                    <th:block th:if="${selfEvaluation?.score != null}">
+                        <div th:id="row + ${selfEvaluation?.rowNumber}" class="stars">
+                            <!-- positive, negative -->
+                            <i class="fa fa-star star-1" style="color: #bac3d0;"></i>
+                            <i class="fa fa-star star-2" style="color: #bac3d0;"></i>
+                            <i class="fa fa-star star-3" style="color: #bac3d0;"></i>
+                            <i class="fa fa-star star-4" style="color: #bac3d0;"></i>
+                            <i class="fa fa-star star-5" style="color: #bac3d0;"></i>
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+                                var rowId = 'row' + /*[[ ${selfEvaluation?.rowNumber} ]]*/;
+                                var calification = /*[[ ${selfEvaluation?.score/2} ]]*/;
+                                for (var i = 0; i <= calification; i++) {
+                                    $('#' + rowId + ' .star-' + i).css({color: '#26CAD3'});
+                                }
+
+                                /*]]>*/
+                            </script>
+                        </div>
+                    </th:block>
+                </td>
+                <td th:text="${selfEvaluation?.selfEvaluationStatus}"></td>
+                <td th:if="${selfEvaluation?.currentProcessQuestion != null}">
+                    <span th:text="${selfEvaluation?.currentProcessQuestion}"></span>
+                </td>
+                <td th:unless="${selfEvaluation?.currentProcessQuestion != null}">
+                    <span>Comparador</span>
+                </td>
+                <td th:text="${selfEvaluation?.agent?.name}"></td>
+            </tr>
+        </tbody>
+    </table>
+</th:block>
+
+</body>
+
+</html>

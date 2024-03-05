@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+  <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+  <div class="questions-section animated fadeInRight">
+    <div class="forms q11 form-q-11">
+      <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+        <th:block th:if="${showBDSFailedEvaluation != null}">
+          <p>Tuvimos un inconveniente al procesar tu solicitud, por favor, comunicate con Soporte al Productor para solicitar el reproceso</p>
+        </th:block>
+        <th:block th:if="${showBDSFailedEvaluation == null}">
+          <th:block th:if="${customMessage != null}">
+            <p th:utext="${customMessage}"></p>
+          </th:block>
+          <th:block th:if="${customMessage == null}">
+            <p th:utext="#{questions.block.rejectionTittle.bds(${personFirstName ?: 'el cliente'})}"></p>
+          </th:block>
+        </th:block>
+      </th:block>
+
+      <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).PRISMA) or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+        <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).PRISMA)}">
+          <p th:utext="#{questions.block.rejectionTittle.custom(${personFirstName ?: 'Hola'})}"></p>
+        </th:block>
+        <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+          <p th:if="${customMessage != null}" th:utext="${customMessage}"></p>
+          <p th:if="${customMessage == null}" th:utext="#{bd.preliminaryEvaluation.pre_approved_azteca}"></p>
+        </th:block>
+        <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+          <p th:if="${customMessage != null}" th:utext="${customMessage}"></p>
+          <th:block th:if="${customMessage == null}">
+            <p th:if="${preEvaluation != null}" th:utext="${preEvaluation.hardFilterMessage}"></p>
+            <p th:if="${evaluation != null}" th:utext="${evaluation.policyMessage}"></p>
+          </th:block>
+        </th:block>
+      </th:block>
+      <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).PRISMA) or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) or @brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+        <th:block th:if="${!@brandingService.isBranded(#httpServletRequest) or
+                    (!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL) and
+                    !@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB))}">
+
+          <th:block th:if="${!@brandingService.isBranded(#httpServletRequest) or
+                    (!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER))}">
+            <th:block th:if="${!marketplaceRejection}">
+              <th:block th:switch="${(preEvaluation != null and preEvaluation.hardFilterMessage != null) or (evaluation != null and evaluation.policyMessage != null)}">
+                <th:block th:case="false">
+                  <p th:utext="#{questions.block.rejectionTittle.generic(${personFirstName ?: 'Hola'})}"></p>
+                </th:block>
+                <th:block th:case="true">
+                  <p th:utext="#{questions.block.rejectionTittle(${personFirstName ?: 'Hola'})}"></p>
+                </th:block>
+              </th:block>
+            </th:block>
+            <div th:if="${marketplaceRejection}" class="rejectionMarketplace" th:utext="#{questions.block.rejectionMarketplace}"></div>
+          </th:block>
+          <p th:if="${preEvaluation != null}" th:utext="${preEvaluation.hardFilterMessage}"></p>
+          <p th:if="${evaluation != null}" th:utext="${evaluation.policyMessage}"></p>
+        </th:block>
+
+        <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB)}">
+          <p th:utext="#{questions.block.rejectionTittle.credigob(${personFirstName ?: 'el cliente'})}"></p>
+        </th:block>
+      </th:block>
+
+      <div th:if="${helpMessage != null}"
+           class="calculation-response forms-mrg">
+        <div class="result">
+          <hr class="result-hr"/>
+          <div class="actions action-border" id="negative-result">
+            <p th:utext="#{questions.block.giveTips}"></p>
+            <div class="forms q13 q13-f">
+              <div th:if="${helpMessage != null}" class="q13-note">
+                <div id="helpMessageTitle" th:utext="${helpMessage.tittle}"></div>
+                <div id="helpMessageBody" th:utext="${helpMessage.body}"></div>
+                <a th:unless="${@brandingService.isBranded(#httpServletRequest)}" th:href="@{/blog}"
+                   class="anchor-button bg-red">BLOG</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-back" th:if="${showHasRescueOffers}" >
+        <label class="input-radio">
+          <a href="#" class="anchor-link" onclick="goBackToRescue()">
+            <div class="btn-img">
+              <img src="/img/banner-back.png"/>
+            </div>
+
+            <div class="btn-text">
+              <span>&iexcl;VOLVER A OFERTAS!</span>
+            </div>
+          </a>
+        </label>
+      </div>
+
+      <th:block th:if="${showAgencies}">
+
+        <!--                <button type="button" class="button bg-red show-map">Ver Agencias</button>-->
+        <div class="map-agencies">
+          <div id="loanApplicationMap163" style="height: 300px;width: 70%;margin-left: auto;margin-right: auto;"></div>
+          <div id="selectedAgency" style="display: none; margin-top: 10px;margin-bottom: 10px;">
+            <h5 style="margin-bottom: 5px;">Agencia: <span id="agencyName"></span></h5>
+            <h5 style="margin-bottom: 5px;">Dirección: <span id="agencyAddress"></span></h5>
+            <h5>Distrito: <span id="agencyDistrict"></span></h5>
+          </div>
+        </div>
+
+        <script th:inline="javascript">
+          /*<![CDATA[*/
+          var agencies = /*[[ ${agencies} ]]*/[];
+          var navLatitude = /*[[ ${navLatitude} ]]*/null;
+          var navLongitude = /*[[ ${navLongitude} ]]*/null;
+          var closestAgency = /*[[ ${closestAgency} ]]*/null;
+          var markers = [];
+          var selectedAgency =/*[[ ${selectedAgency} ]]*/null;
+          var prevInfoWindow = false;
+
+          function showAgencyData(agency){
+            $("#sendButtonNext").removeClass("disabled-option");
+            $("h5 > span#agencyName").text(agency.agency);
+            $("h5 > span#agencyAddress").text(agency.address);
+            $("h5 > span#agencyDistrict").text(agency.district);
+            $("#selectedAgency").show();
+          }
+
+          function selectAgency(codAgency){
+            for (let marker of markers) {
+              if(marker.codAgency == codAgency){
+                marker.setIcon("https://solven-public.s3.amazonaws.com/img/markers/marker_alfin.png");
+                selectedAgency = codAgency;
+                let agency = agencies.find(x => x.codAgency == codAgency);
+                if(agency) showAgencyData(agency);
+              }
+              else marker.setIcon(null);
+            }
+          }
+
+          $(document).ready(function () {
+            if(selectedAgency) $("#sendButtonNext").removeClass("disabled-option");
+            // Mapa
+            if (agencies) {
+
+              var loanApplicationMap = new google.maps.Map(document.getElementById('loanApplicationMap163'), {
+                center: { lat: navLatitude, lng: navLongitude },
+                zoom: 11
+              });
+              var bounds = new google.maps.LatLngBounds();
+
+              // Marker IP
+              for (let agency of agencies) {
+                if (!agency.geolocation) continue;
+                let agencyLocationMaper = new google.maps.Marker({
+                  map: loanApplicationMap,
+                  draggable: false,
+                  animation: google.maps.Animation.DROP,
+                  position: { lat: agency.geolocation.latitude, lng: agency.geolocation.longitude },
+                  title: agency.agency,
+                  codAgency : agency.codAgency,
+                  icon : agency.codAgency == selectedAgency ? "https://solven-public.s3.amazonaws.com/img/markers/marker_alfin.png" : null
+                });
+
+                if(agency.codAgency == selectedAgency) showAgencyData(agency);
+
+                let link = createLinkGoogleMaps(agency.geolocation.latitude, agency.geolocation.longitude)
+                let infowindow = new google.maps.InfoWindow({
+                  content: `${agency.agency} <br> ${agency.address || ''} <br> ${link}`
+                });
+
+                // <br> <a href='#' data='${agency.codAgency}' className="select-agency">Seleccionar agencia</a>
+
+                google.maps.event.addListener(agencyLocationMaper, 'click', function () {
+                  infowindow.open(loanApplicationMap, agencyLocationMaper);
+                  if(prevInfoWindow && prevInfoWindow.content != infowindow.content) prevInfoWindow.close();
+                  prevInfoWindow = infowindow;
+                  if(agencyLocationMaper.codAgency) selectAgency(agencyLocationMaper.codAgency);
+                });
+
+                google.maps.event.addListener(infowindow, 'domready', function(){
+                  $("a.select-agency").click(function(e){
+                    let codAgency = $(this).attr("data");
+                    selectAgency(codAgency);
+                  })
+                });
+
+                markers.push(agencyLocationMaper);
+              }
+
+              var showError = function (e) {
+                console.log(e);
+              };
+
+              function createLinkGoogleMaps(lat, lng) {
+                return `<a target="_blank" href='https://www.google.com/maps/search/?api=1&query=${lat},${lng}'><span>Ver en Google Maps</span> </a>`
+              }
+
+              function findClosestMarker(lat, lng) {
+                var distances = [];
+                var closest = -1;
+                for (i = 0; i < markers.length; i++) {
+                  var d = google.maps.geometry.spherical.computeDistanceBetween(markers[i].position, new google.maps.LatLng(lat, lng));
+                  distances.push({
+                    distance: d,
+                    marker: markers[i]
+                  })
+                  if (closest == -1 || d < distances[closest]["distance"]) {
+                    closest = i;
+                  }
+                }
+                let closest_markers = distances.sort((a, b) => { return a.distance - b.distance }).slice(0, 2)
+                return closest_markers.map((item) => { return item.marker })
+              }
+
+              function showPosition(lat, long) {
+                var latlng = new google.maps.LatLng(lat, long);
+                let closestMarker = findClosestMarker(lat, long);
+                if (closestMarker.length) {
+                  bounds = new google.maps.LatLngBounds();
+                  loanApplicationMap.setCenter(closestMarker[0].position);
+                  bounds.extend(closestMarker[0].position);
+                  loanApplicationMap.fitBounds(bounds);
+                  loanApplicationMap.setZoom(11);
+                }
+              }
+
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                  showPosition(position.coords.latitude, position.coords.longitude);
+                }, showError);
+              }
+
+              $("#allBranches").click(function () {
+                bounds = new google.maps.LatLngBounds();
+                for (let marker of markers) {
+                  bounds.extend(marker.position);
+                }
+                loanApplicationMap.fitBounds(bounds);
+              })
+
+              // bounds.extend(new google.maps.LatLng( closestAgency ? closestAgency.latitude : (navLatitude || -12.046465), closestAgency ? closestAgency.longitude : (navLongitude || -77.042767)));
+              // DIspara el Resize del mapa despues de 1000ms
+              setTimeout(function () {
+                google.maps.event.trigger(loanApplicationMap, "resize");
+                // Centrar mapa con puntos
+                showPosition(navLatitude, navLongitude);
+              }, 1000);
+            }
+          })
+
+          /*]]>*/
+        </script>
+      </th:block>
+    </div>
+  </div>
+  <hr class="divisor-bottom"/>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    function goBackToRescue() {
+      questionFw.ajaxToCurrentQuestionController({
+        type: "POST"
+      }, "backToRescue");
+    };
+
+    function wantToAffiliate(affiliation) {
+      questionFw.ajaxToCurrentQuestionController({
+        type: "POST",
+        data: {affiliation: affiliation},
+        success: function(data) {
+          location.reload();
+        }
+      }, "affiliation");
+    }
+
+    /*]]>*/
+
+  </script>
+</th:block>
+</html>

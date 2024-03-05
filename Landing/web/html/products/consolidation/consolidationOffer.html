@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <!-- / Jquery Validation-->
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+    <!-- / Jquery Numeric-->
+
+    <!-- jQuery Accordion -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/jquery-accordion/css/jquery.accordion.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-accordion/js/jquery.accordion.js'}"></script>
+    <!-- / jQuery Accordion -->
+
+    <!-- CounterUp -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}" type="text/javascript"></script>
+    <!-- / CounterUp -->
+
+    <!-- Accordion -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).on('ready', function () {
+
+            updateAll();
+
+            <!-- counterUp -->
+            counterUpInit();
+            <!-- / counterUp -->
+
+            <!-- Accordion -->
+            $('.accordion').accordion({
+                "transitionSpeed": 400
+            });
+            <!-- / Accordion -->
+
+            if ($('.consume-li').length != 0) {
+
+                $('.consume-li').each(function() {
+                    if($(this).find('.pendingInstallments').val() == '' || $(this).find('.pendingInstallments').val() == 0) {
+                        $(this).closest('.accordion').addClass('open');
+                        $(this).find('.pendingInstallments').css({'border-color' : 'red'});
+                    } else {
+                        $(this).find('.pendingInstallments').css({'border-color' : '#ececec'});
+                    }
+
+                });
+            }
+
+            <!-- Answers -->
+            $('.boolean-button').on('click', function (event) {
+                event.preventDefault();
+                console.log($(this).data('answer'));
+                switch ($(this).data('answer')) {
+                    case 'si':
+
+                        $(this).closest('#cash-block').find('.boolean-button').removeClass('active');
+                        $(this).addClass('active');
+                        $(this).closest('.credit-card-li').find('.' + $(this).data('target')).fadeIn();
+                        break;
+
+                    case 'no':
+                        $('.rateDE').css({'border-color' : '#ececec'});
+                        $('.balanceDE-value').val('');
+                        $('.rateDE').val('');
+                        $(this).closest('#cash-block').find('.boolean-button').removeClass('active');
+                        $(this).addClass('active');
+                        $(this).closest('.credit-card-li').find('.' + $(this).data('target')).fadeOut();
+                        break;
+
+                    case 'yes':
+
+                        $(this).closest('#line-block').find('.boolean-button').removeClass('active');
+                        $(this).addClass('active');
+                        $(this).closest('.credit-card-li').find('.' + $(this).data('target')).fadeIn();
+                        break;
+
+                    case 'not':
+                        $('.rateLP').css({'border-color' : '#ececec'});
+                        $('.balanceLP-value').val('');
+                        $('.rateLP').val('');
+                        $(this).closest('#line-block').find('.boolean-button').removeClass('active');
+                        $(this).addClass('active');
+                        $(this).closest('.credit-card-li').find('.' + $(this).data('target')).fadeOut();
+                        break;
+                }
+
+            });
+            <!-- / Answers -->
+
+            <!-- Submit -->
+            $('#calculateButton').on('click', function (event) {
+                event.preventDefault();
+
+                // Custom fields validation
+                if ($('.credit-card-li').length != 0) {
+
+                    $('.credit-card-li').each(function(){
+
+                        if ($(this).find('.balanceDE-value').val() != 0) {
+
+                            if ($(this).find('.rateDE').val() == 0 || $(this).find('.rateDE').val() == '') {
+                                $(this).find('.rateDE').css({'border-color' : 'red'});
+                                return;
+                            } else {
+                                $(this).find('.rateDE').css({'border-color' : '#ececec'});
+                            }
+
+                        }
+
+                        if ($(this).find('.balanceLP-value').val() != 0) {
+                            if ($(this).find('.rateLP').val() == 0 || $(this).find('.rateLP').val() == '') {
+                                $(this).find('.rateLP').css({'border-color' : 'red'});
+                            } else {
+                                $(this).find('.rateLP').css({'border-color' : '#ececec'});
+                            }
+                        }
+
+                    });
+
+                }
+
+
+                if ($('.consume-li').length != 0) {
+
+                    $('.consume-li').each(function() {
+                        if($(this).find('.pendingInstallments').val() == '' || $(this).find('.pendingInstallments').val() == 0) {
+                            $(this).closest('.accordion').addClass('open');
+                            $(this).find('.pendingInstallments').css({'border-color' : 'red'});
+                        } else {
+                            $(this).find('.pendingInstallments').css({'border-color' : '#ececec'});
+                        }
+
+                    });
+                }
+
+
+                if (!$('#terms').prop('checked')) {
+                    $('#error-response').html('Debe aceptar los t&eacute;rminos y condiciones.');
+                } else {
+                    $('#error-response').html('');
+                    // Validate
+                    var valid = true;
+                    $('.credit-card-li,.consume-li,.commerce-li').each(function () {
+                            if (!$(this).find('form').valid()) {
+                            valid = false;
+                            return false;
+                        }
+                    });
+                    if (!valid){
+                        return;
+                    }
+
+                    // Get the data
+                    var jsonData = [];
+                    $('.credit-card-li').each(function () {
+                        var formJson = $(this).find('form').serializeObject();
+                        jsonData[jsonData.length] = formJson;
+                    });
+                    $('.consume-li').each(function () {
+                        var formJson = $(this).find('form').serializeObject();
+                        jsonData[jsonData.length] = formJson;
+                    });
+                    $('.commerce-li').each(function () {
+                        var formJson = $(this).find('form').serializeObject();
+                        jsonData[jsonData.length] = formJson;
+                    });
+                    debugger;
+                    console.log(jsonData);
+
+                    $('#calculateButton').loading();
+                    defaultAjax({
+                        url: /*[[@{/debtconsolidationloanapplication/__${loanApplicationToken}__/registerconsolidation}]]*/null,
+                        type: 'POST',
+                        data: {
+                            consolidation: JSON.stringify(jsonData)
+                        },
+                        error: function () {
+                            $('#calculateButton').unloading();
+                        }
+                    });
+                }
+
+            });
+            <!-- / Submit -->
+
+            <!-- Actions -->
+            $('.updateable-input').on('blur', function (event) {
+                event.preventDefault();
+                updateAll();
+            });
+
+            $('.updateable-input').on('keypress', function (event) {
+                if (event.which == 13) {
+                    event.preventDefault();
+                    updateAll();
+                }
+            });
+
+            $('.credit-card-li,.consume-li,.commerce-li').each(function () {
+                var formValidator = /*[[${T(com.affirm.client.model.form.ConsolidableDebtForm).newInstance().validator.toJson(#locale)}]]*/null;
+                var formValidatorJson = createFormValidationJson(JSON.parse(formValidator), $(this).find('form'));
+                $(this).find('form').validateForm(formValidatorJson);
+
+            });
+            <!-- / Actions -->
+        });
+
+        function updateAll() {
+            total1 = updateCredtCardDebts();
+            total2 = updateConsumeDebts();
+            total3 = updateCommerceDebts();
+
+            var total = total1 + total2 + total3;
+            $('#consolidation-total').attr('data-value', total);
+            $('#consolidation-total').data('value', total);
+            if ($('#consolidation-total').data('past-value') != null && $('#consolidation-total').data('past-value') != total) {
+                $('#consolidation-total').counterUp({
+                    delay: 10,
+                    time: 500
+                });
+            }
+            $('#consolidation-total').data('past-value', total);
+        }
+
+        function updateCredtCardDebts() {
+            var total = 0;
+            $('.credit-card-li').each(function () {
+                var balance = parseFloat($(this).find('.balance-value').val());
+                var balanceDE = parseFloat($(this).find('.balanceDE-value').val() != ''?$(this).find('.balanceDE-value').val():0);
+                var balanceLP = parseFloat($(this).find('.balanceLP-value').val() != ''?$(this).find('.balanceLP-value').val():0);
+
+                var subtotal = balance + balanceDE + balanceLP;
+                $(this).find('.subtotal-value').html(thousandWithSpace(subtotal));
+                total = total + subtotal;
+            });
+            $('#credit-card-total').attr('data-value', total);
+            $('#credit-card-total').data('value', total);
+            if ($('#credit-card-total').data('past-value') != null && $('#credit-card-total').data('past-value') != total) {
+                $('#credit-card-total').counterUp({
+                    delay: 10,
+                    time: 500
+                });
+            }
+            $('#credit-card-total').data('past-value', total);
+            return total;
+        }
+
+        function updateConsumeDebts() {
+            var total = 0;
+            $('.consume-li').each(function () {
+                var balance = parseFloat($(this).find('.balance-value').val());
+                $(this).find('.subtotal-value').html(thousandWithSpace(balance));
+                total = total + balance;
+            });
+            $('#consume-total').attr('data-value', total);
+            $('#consume-total').data('value', total);
+            if ($('#consume-total').data('past-value') != null && $('#consume-total').data('past-value') != total) {
+                $('#consume-total').counterUp({
+                    delay: 10,
+                    time: 500
+                });
+            }
+            $('#consume-total').data('past-value', total);
+            return total;
+        }
+
+        function updateCommerceDebts() {
+            var total = 0;
+            $('.commerce-li').each(function () {
+                var balance = parseFloat($(this).find('.balance-value').val());
+                $(this).find('.subtotal-value').html(thousandWithSpace(balance));
+                total = total + balance;
+            });
+            $('#commerce-total').attr('data-value', total);
+            $('#commerce-total').data('value', total);
+            if ($('#commerce-total').data('past-value') != null && $('#commerce-total').data('past-value') != total) {
+                $('#commerce-total').counterUp({
+                    delay: 10,
+                    time: 500
+                });
+            }
+            $('#commerce-total').data('past-value', total);
+            return total;
+        }
+
+        /*]]>*/
+    </script>
+    <!-- / Accordion -->
+
+</head>
+<body>
+
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader"></th:block>
+</th:block>
+<!-- /Header -->
+
+<!-- Content -->
+<th:block layout:fragment="content">
+
+    <div class="consolidation">
+        <div class="container">
+            <div class="consolidation-container">
+                <div class="box-inner">
+                    <div class="top-box">
+                        <h2 class="title">Consolida tus deudas</h2>
+                        <div class="square-amount">
+                            <span class="prefix">S/</span>
+                            <h3 id="consolidation-total" data-counter="counterup" data-value="2500">2 500</h3>
+                        </div>
+                        <div class="help-message">Revisa las deudas que hemos obtenido para poder calcular la tasa de inter&eacute;s de tu nuevo cr&eacute;dito.</div>
+                    </div>
+                    <div class="accordion-container" data-accordion-group="true">
+                        <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(creditCardDebts)}">
+                            <div data-control="true" class="head-accordion">
+                                <div class="hero-details">
+                                    <h2><span class="circle-step">1</span> <span class="circle-text">Tarjetas de cr&eacute;dito</span>
+                                    </h2>
+                                    <div class="total-amount">
+                                        <div class="wrap">
+                                            <div class="prefix">S/</div>
+                                            <h3 id="credit-card-total" data-counter="counterup" data-value="2500">
+                                                0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-content="true" class="accordion-content">
+                                <div class="help-notification">Para un correcto c&aacute;lculo del ahorro por consolidar tus deudas a trav&eacute;s de Solven, podr&iacute;a ser necesario que tengas que ajustar el/los saldo/s de tu/s tarjeta/s de cr&eacute;dito, as&iacute; como la/s tasa/s de inter&eacute;s.
+                                </div>
+                                <ul>
+                                    <li class="credit-card-li" th:each="creditCardDebt : ${creditCardDebts}">
+                                        <form>
+                                            <input type="hidden" name="consolidationAccountType"
+                                                   th:value="${creditCardDebt.consolidationAccounttype}"/>
+                                            <input type="hidden" name="entityCode"
+                                                   th:value="${creditCardDebt.entity.code}"/>
+                                            <h4 th:text="${creditCardDebt.entity.fullName}"></h4>
+                                            <hr class="divisor"/>
+                                            <div class="debts-details">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                                                    <label for="">Saldo Consumo</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                                                    <div class="field-wrap">
+                                                                        <span class="prefix">S/ </span>
+                                                                        <input class="balance-value updateable-input"
+                                                                               type="text" name="balance"
+                                                                               th:value="${creditCardDebt.balance}"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                                                    <label for="">Tasa inter&eacute;s</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text updateable-input"
+                                                                               name="rate"
+                                                                               th:value="${creditCardDebt.rate}"/>
+                                                                        <span class="prefix">%</span>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row dotted">
+                                                    <div class="question-block">
+                                                        <p class="question-text">&iquest;Realizaste disposiciones de
+                                                            efectivo?</p>
+                                                        <div class="answers" id="cash-block">
+                                                            <button class="boolean-button" data-answer="no"
+                                                                    data-target="dispCash"
+                                                                    th:classappend="${creditCardDebt.balanceDE > 0?'': 'active'}">
+                                                                No
+                                                            </button>
+                                                            <button class="boolean-button" data-answer="si"
+                                                                    data-target="dispCash"
+                                                                    th:classappend="${creditCardDebt.balanceDE > 0?'active': ''}">
+                                                                Si
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 dispCash text-left full"
+                                                         th:style="${creditCardDebt.balanceDE > 0?'display: block': ''}">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                                                    <label for="">Saldo DE</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                                                    <div class="field-wrap">
+                                                                        <span class="prefix">S/</span>
+                                                                        <input class="balanceDE-value updateable-input"
+                                                                               type="text" name="balanceDE"
+                                                                               th:value="${creditCardDebt.balanceDE > 0?creditCardDebt.balanceDE:''}"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 dispCash text-left full"
+                                                         th:style="${creditCardDebt.balanceDE > 0?'display: block': ''}">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                                                    <label for="">Tasa inter&eacute;s DE</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text" class="rateDE updateable-input"
+                                                                               name="rateDE"
+                                                                               th:value="${creditCardDebt.rateDE}"/>
+                                                                        <span class="prefix">%</span>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row dotted">
+                                                    <div class="question-block">
+                                                        <p class="question-text">&iquest;Tienes saldo en tu l&iacute;nea
+                                                            paralela?</p>
+                                                        <div class="answers" id="line-block">
+                                                            <button class="boolean-button" data-answer="not"
+                                                                    data-target="paralelaLine"
+                                                                    th:classappend="${creditCardDebt.balanceLP > 0?'': 'active'}">
+                                                                No
+                                                            </button>
+                                                            <button class="boolean-button" data-answer="yes"
+                                                                    data-target="paralelaLine"
+                                                                    th:classappend="${creditCardDebt.balanceLP > 0?'active': ''}">
+                                                                Si
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 paralelaLine text-left full"
+                                                         th:style="${creditCardDebt.balanceLP > 0?'display: block': ''}">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                                                    <label for="">Saldo LP</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                                                    <div class="field-wrap">
+                                                                        <span class="prefix">S/</span>
+                                                                        <input class="balanceLP-value updateable-input"
+                                                                               type="text" name="balanceLP"
+                                                                               th:value="${creditCardDebt.balanceLP > 0?creditCardDebt.balanceLP:''}"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 paralelaLine text-left full"
+                                                         th:style="${creditCardDebt.balanceLP > 0?'display: block': ''}">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                                                    <label for="">Tasa inter&eacute;s LP</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text" class="rateLP updateable-input"
+                                                                               name="rateLP"
+                                                                               th:value="${creditCardDebt.rateLP}"/>
+                                                                        <span class="prefix">%</span>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="divisor"/>
+                                            <div class="subtotal">
+                                                <p>Subtotal</p>
+                                                <div class="wrap">
+                                                    <span class="prefix">S/ </span>
+                                                    <h3 class="subtotal-value">2 500</h3>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(consumeDebts)}">
+                            <div data-control="true" class="head-accordion">
+                                <div class="hero-details">
+                                    <h2><span class="circle-step">2</span> <span class="circle-text">Cr&eacute;ditos de consumo</span>
+                                    </h2>
+                                    <div class="total-amount">
+                                        <div class="wrap">
+                                            <div class="prefix">S/</div>
+                                            <h3 id="consume-total" data-counter="counterup" data-value="25000">
+                                                0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-content="true" class="accordion-content">
+                                <div class="help-notification">Podr&iacute;a ser necesario que tengas que ajustar el saldo de tu/s cr&eacute;dito/s, as&iacute; como la/s tasa/s de inter&eacute;s.
+                                </div>
+                                <ul>
+                                    <li class="consume-li" th:each="consumeDebt : ${consumeDebts}">
+                                        <form>
+                                            <input type="hidden" name="consolidationAccountType"
+                                                   th:value="${consumeDebt.consolidationAccounttype}"/>
+                                            <input type="hidden" name="entityCode"
+                                                   th:value="${consumeDebt.entity.code}"/>
+                                            <h4 th:text="${consumeDebt.entity.fullName}"></h4>
+                                            <hr class="divisor"/>
+                                            <div class="debts-details">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <label for="">Saldo Consumo</label>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <div class="field-wrap">
+                                                                        <span class="prefix">S/ </span>
+                                                                        <input class="balance-value updateable-input"
+                                                                               type="text" name="balance"
+                                                                               th:value="${consumeDebt.balance}"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-6">
+                                                                    <label for="">Tasa Inter&eacute;s</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-6">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text" class="updateable-input"
+                                                                               name="rate"
+                                                                               th:value="${consumeDebt.rate}"/>
+                                                                        <span class="prefix">%</span>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <label for="">Cuotas Pendientes</label>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text" class="pendingInstallments updateable-input"
+                                                                               name="pendingInstallments"
+                                                                               th:value="${consumeDebt.installments}" th:attr="maxlength=3"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="divisor"/>
+                                            <div class="subtotal">
+                                                <p>Subtotal</p>
+                                                <div class="wrap">
+                                                    <span class="prefix">S/ </span>
+                                                    <h3 class="subtotal-value">2 500</h3>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="accordion" data-accordion="true" th:if="${!#lists.isEmpty(commerceDebts)}">
+                            <div data-control="true" class="head-accordion">
+                                <div class="hero-details">
+                                    <h2><span class="circle-step">3</span> <span class="circle-text">Cr&eacute;ditos para mi negocio</span>
+                                    </h2>
+                                    <div class="total-amount">
+                                        <div class="wrap">
+                                            <div class="prefix">S/</div>
+                                            <h3 id="commerce-total" data-counter="counterup" data-value="25000">
+                                                0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-content="true" class="accordion-content">
+                                <div class="help-notification">Podr&iacute;a ser necesario que tengas que ajustar el saldo de tu/s cr&eacute;dito/s, as&iacute; como la/s tasa/s de inter&eacute;s.
+                                </div>
+                                <ul>
+                                    <li class="commerce-li" th:each="commerceDebt : ${commerceDebts}">
+                                        <form>
+                                            <input type="hidden" name="consolidationAccountType"
+                                                   th:value="${commerceDebt.consolidationAccounttype}"/>
+                                            <input type="hidden" name="entityCode"
+                                                   th:value="${commerceDebt.entity.code}"/>
+                                            <h4 th:text="${commerceDebt.entity.fullName}"></h4>
+                                            <hr class="divisor"/>
+                                            <div class="debts-details">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <label for="">Saldo Consumo</label>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <div class="field-wrap">
+                                                                        <span class="prefix">S/ </span>
+                                                                        <input class="balance-value updateable-input"
+                                                                               type="text" name="balance"
+                                                                               th:value="${commerceDebt.balance}"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-6">
+                                                                    <label for="">Tasa Inter&eacute;s</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-6">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text" class="updateable-input"
+                                                                               name="rate"
+                                                                               th:value="${commerceDebt.rate}"/>
+                                                                        <span class="prefix">%</span>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left full">
+                                                        <div class="field">
+                                                            <div class="row">
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <label for="">Cuotas Pendientes</label>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                    <div class="field-wrap">
+                                                                        <input type="text" class="pendingInstallments updateable-input"
+                                                                               name="pendingInstallments"
+                                                                               th:value="${commerceDebt.installments}"/>
+                                                                        <div class="errorContainer"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="divisor"/>
+                                            <div class="subtotal">
+                                                <p>Subtotal</p>
+                                                <div class="wrap">
+                                                    <span class="prefix">S/ </span>
+                                                    <h3 class="subtotal-value">2 500</h3>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="field">
+                                <label for="terms" class="terms-text">
+                                    <input type="checkbox" id="terms"/>
+                                    <span>Acepto los <a rel="noopener noreferrer" th:href="@{/terminos-y-condiciones}" target="_blank">T&eacute;rminos y Condiciones</a> y la <a
+                                            th:href="@{/politica-de-privacidad}" target="_blank" rel="noopener noreferrer">Pol&iacute;tica de Privacidad</a>.</span>
+                                </label>
+                                <div class="generalError" id="error-response"></div>
+                            </div>
+                            <button class="button red-button" id="calculateButton">Calcular</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+<!-- /Content -->
+
+<!-- Footer -->
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+<!-- / Footer -->
+
+</body>
+</html>

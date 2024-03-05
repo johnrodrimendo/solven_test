@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+
+    <title>Iniciar Sesi&oacute;n</title>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <!--Oauthy-->
+    <script th:src="@{/js/Oauthy.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        system.unloadAlert = false;
+
+        $(document).on('ready', function () {
+            $('#loginButton').click(function (evt) {
+                evt.preventDefault();
+                $(this).loading('', 2);
+                defaultAjax({
+                    url: /*[[@{/client/login}]]*/null,
+                    type: 'POST',
+                    data: $('#loginForm').serializeObject(),
+                    success: function (data) {
+                        $('#loginButton').unloading();
+                    },
+                    error: function() {
+                        $('#loginButton').unloading();
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+<th:block layout:fragment="content">
+    <section class="login-page">
+        <div class="hero-content">
+            <h1>
+                <a th:href="@{/}">
+                    <i class="icon icon-solven"></i>
+                    <i class="icon icon-solven-iso"></i>
+                    <span class="hidden">Solven</span>
+                </a>
+            </h1>
+            <div class="form-wrap">
+                <div class="login-username">
+                    <form action="#" id="loginForm" autocomplete="off">
+                        <div class="field">
+                            <input type="text" class="input-landing" name="email" placeholder="Correo electr&oacute;nico"/>
+                        </div>
+                        <div class="field">
+                            <input type="password" class="input-landing" name="password" placeholder="Contrase&ntilde;a" autocomplete="off"/>
+                        </div>
+                        <div class="actions">
+                            <button id="loginButton" class="button bg-red">Ingresar</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="divisor-or">
+                    <hr/>
+                    <span class="circle">o</span>
+                </div>
+                <div class="login-socials">
+                    <div class="socials">
+                        <a href="#" class="square-icon facebook-bg social-icon" data-social="facebook"><i
+                                class="icon icon-facebook"></i></a>
+                        <a href="#" class="square-icon linkedin-bg social-icon" data-social="linkedin"><i
+                                class="icon icon-linkedin"></i></a>
+                        <a href="#" class="square-icon google-bg social-icon" data-social="google">
+                            <i class="icon icon-google-plus" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="square-icon windows-bg social-icon" data-social="windows"><i
+                                class="icon icon-outlook"></i></a>
+                        <a href="#" class="square-icon yahoo-bg social-icon" data-social="yahoo"><i
+                                class="icon icon-yahoo"></i></a><!-- TODO SET PROPER ICONS -->
+                        <script th:inline="javascript">
+                            /*<![CDATA[*/
+                            oauthy.setupNetwork('facebook',
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getClientId()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getRedirectUri()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).FACEBOOK.getDefaultPermission()}]]*/null);
+                            oauthy.setupNetwork('linkedin',
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getClientId()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getRedirectUri()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).LINKEDIN.getDefaultPermission()}]]*/null);
+                            oauthy.setupNetwork('google',
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getClientId()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getRedirectUri()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).GOOGLE.getDefaultPermission()}]]*/null);
+                            oauthy.setupNetwork('windows',
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getClientId()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getRedirectUri()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).WINDOWS.getDefaultPermission()}]]*/null);
+                            oauthy.setupNetwork('yahoo',
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getClientId()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getRedirectUri()}]]*/null,
+                                    /*[[${T(com.affirm.system.configuration.Configuration.OauthNetwork).YAHOO.getDefaultPermission()}]]*/null);
+
+                            $(document).on('ready', function () {
+                                $('.social-icon').on('click', function () {
+                                    var social = $(this).data('social');
+                                    oauthy.login(social, function (code) {
+                                        defaultAjax({
+                                            url: /*[[@{/client/login}]]*/null,
+                                            type: 'POST',
+                                            data: {
+                                                fbAccessToken: social == 'facebook' ? code : null,
+                                                liAccessToken: social == 'linkedin' ? code : null,
+                                                goAccessToken: social == 'google' ? code : null,
+                                                wiAccessToken: social == 'windows' ? code : null,
+                                                yaAccessToken: social == 'yahoo' ? code : null
+                                            },
+                                            success: function (data) {
+                                            }
+                                        })
+                                    }, function () {
+                                        alert('error');
+                                    });
+                                });
+                            });
+
+                            /*]]>*/
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>
+
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

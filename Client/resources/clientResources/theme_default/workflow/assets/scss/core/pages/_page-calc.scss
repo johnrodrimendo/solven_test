@@ -1,0 +1,873 @@
+/*$black-6: #ececee;
+
+#main-calc{
+    color: $black_color_main;
+    background-color: #fff;
+    font-size: 16px;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+
+    #footer{
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .cnt-input{
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-wrap:wrap;
+        margin-bottom: 2em;
+        input{
+            height: 40px;
+            flex-grow: 1;
+            width: 78%;
+            padding-left: 10px;
+            &:focus{
+                border-color: $lightblue-3 !important;
+            }
+        }
+        .input-type{
+            background-color: $black-6;
+            color: $black_color_main;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            height: 40px;
+            width: 22%;
+        }
+        label{
+            width: 100%;
+            text-align: left;
+            order:  3;
+            font-family: 'Lato Light', 'Helvetica', sans-serif;
+            font-size: .75rem;
+            margin-top: .25em;
+        }
+        .SumoSelect{
+            height: 40px;
+            >.CaptionCont{
+                height: 40px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                border: 2px solid $black-4;
+                box-shadow: none !important;
+                border-radius: 4px;
+                span{
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                }
+                .opt{
+                    cursor: pointer;
+                }
+                label{
+                    cursor: pointer;
+                    margin-top: 0;
+                    i{
+                        left: inherit;
+                        right: 10px;
+                    }
+                }
+                &:hover, &.open{
+                    box-shadow: none;
+                }
+            }
+            .optWrapper{
+                .options{
+                    .opt{
+                        cursor: pointer;
+                    }
+                }
+            }
+            &.open{
+                >.CaptionCont{
+                    border-color: $lightblue-3;
+                }
+            }
+        }
+        .errorContainer{
+            order: 4;
+        }
+        &.input-right{
+            input{
+                border-top: 2px solid $black-4;
+                border-bottom: 2px solid $black-4;
+                border-left: 2px solid $black-4;
+                border-right: 1px solid $black-4;
+                border-radius: 4px 0 0 4px;
+            }
+            .input-type{
+                order: 1;
+                border-radius: 0 4px 4px 0;
+                border-left: 1px solid $black-4;
+                border-right: 2px solid $black-4;
+                border-top: 2px solid $black-4;
+                border-bottom: 2px solid $black-4;
+            }
+        }
+        &.input-left{
+            input{
+                border-top: 2px solid $black-4;
+                border-bottom: 2px solid $black-4;
+                border-right: 2px solid $black-4;
+                border-left: 1px solid $black-4;
+                border-radius: 0 4px 4px 0;
+            }
+            .input-type{
+                order: -1;
+                border-radius: 4px 0 0 4px;
+                border-right: 1px solid $black-4;
+                border-left: 2px solid $black-4;
+                border-top: 2px solid $black-4;
+                border-bottom: 2px solid $black-4;
+            }
+        }
+        .list-fee{
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100%;
+            .item-fee{
+                width: 25%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-left: 2px solid $black-4;
+                border-top: 2px solid $black-4;
+                border-bottom: 2px solid $black-4;
+                a{
+                    width: 44px;
+                    height: 40px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                &.active{
+                    background-color: $lightblue-1;
+                    color: #ffffff;
+                }
+                &:first-child{
+                    border-radius: 4px 0 0 4px;
+                }
+                &:last-child{
+                    border-radius: 0 4px 4px 0;
+                    border-right: 2px solid $black-4;
+                }
+            }
+        }
+    }
+}
+
+#calc{
+    margin-top: 6em;
+    font-size: 16px;
+    overflow: initial;
+    padding: 0 1em;
+    position: relative;
+    .arrow{
+        color: #b3b9c1;
+        position: absolute;
+        top: 50%;
+        font-size: 3em;
+        transition: .3s ease;
+        transform: translateY(-50%) scale(1);
+        display: block;
+        z-index: 9;
+        span{
+            font-size: 0;
+        }
+        &.left{
+            left: -2.5%;
+        }
+        &.right{
+            right: -2.5%;
+        }
+        &:active{
+            transform: translateY(-50%) scale(.96);
+        }
+        &.hide{
+            display: none;
+        }
+    }
+    #sliderCalc{
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+        
+        .list-calc-display{
+            display: flex;
+            align-items: center;
+            width: 300%;
+            position: relative;
+            .item-calc-display{
+                width: 33.333%;
+                transition: margin .4s ease;
+                @media screen and (max-width: 960px){
+                    position: absolute;
+                    top: 0;
+                    opacity: 0;
+                    visibility: hidden;
+                    z-index: -1;
+                }
+                
+                h2{
+                    &.title{
+                        font-family: $lato-bold;
+                        font-size: 1.2rem;
+                        text-align: center;
+                        margin-bottom: 2em;
+                    }
+                }
+                .g-btn{
+                    display: table;
+                    margin: 2em auto 0 auto;
+                    text-align: center;
+                }
+                article{
+                    text-align: center;
+                    margin-bottom: 3rem;
+                    h1{
+                        font-family: $lato-bold;
+                        text-transform: uppercase;
+                        font-size: 1.5em;
+                        margin-bottom: 1em;
+                        br{
+                            display: none;
+                        }
+                    }
+                    p{
+                        font-family: $lato-medium;
+                        font-size: 1em;
+                    }
+                }
+                .list-calc-option{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    .item-calc-option{
+                        .radio-option{
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            flex-direction: column;
+                            text-align: center;
+
+                            border-radius: 5px;
+                            cursor: pointer;
+                            padding: .5em;
+                            width: 140px;
+                            min-height: 170px;
+                            border: 2px solid $black-4;
+                            margin-right: 1em;
+                            transition: border .3s ease;
+                            input{ display: none; }
+                            h2{
+                                font-size: .7rem;
+                                text-transform: uppercase;
+                                width: 88px;
+                                margin-bottom: 1em;
+                            }
+                            span{
+                                color: $black-4;
+                                font-size: 6em;
+                                height: 90px;
+                                line-height: 90px;
+                                transition: color .3s ease;
+                                &:before{
+                                    height: 90px;
+                                    line-height: 90px;
+                                }
+                                &.radio{
+                                    border: 1px solid $black-4;
+                                    line-height: inherit;
+                                    height: 18px;
+                                    width: 18px;
+                                    border-radius: 100%;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    &:before{
+                                        content: '';
+                                        background-color: $black-4;
+                                        line-height: inherit;
+                                        transition: background-color .3s ease;
+                                        width: 12px;
+                                        height: 12px;
+                                        border-radius: 100%;
+                                    }
+                                }
+                                &.icon-nuevo-credito{
+                                    font-size: 7em;
+                                }
+                            }
+                        }
+                        &:active, &:hover{
+                            .radio-option{
+                                border: 2px solid $red-1;
+                                span{
+                                    color: $red-1;
+                                }
+                                span{
+                                    &.radio{
+                                        &:before{
+                                            background-color: $red-1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        &:last-child{
+                            .radio-option{
+                                margin-right: 0;
+                            }
+                        }
+                    }
+                }
+                .list-type-credit{
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                    .item-type-credit {
+                        width: 50%;
+                        position: relative;
+                        &:first-child{
+                            &:after{
+                                content: '';
+                                position: absolute;
+                                top: 52%;
+                                right: 0;
+                                transform: translateY(-50%);
+                                width: 1px;
+                                height: 60%;
+                                background-color: #ccc;
+                            }
+                        }
+                        >*{
+                            max-width: 400px;
+                            margin-left: auto;
+                            margin-right: auto;
+                        }
+                        .wrap-components{
+                            max-width: 400px;
+                            width: 100%;
+                            display: flex;
+                            align-items: flex-start;
+                            justify-content: flex-start;
+                            flex-wrap: wrap;
+                            >.cnt{
+                                font-size: 9px;
+                                font-family: 'Lato Light', 'Helvetica', sans-serif;
+                                text-align: justify;
+                                position: relative;
+                                padding-left: 10px;
+                                max-width: 300px;
+                                &:before{
+                                    content: '';
+                                    height: 90%;
+                                    position: absolute;
+                                    top: 50%;
+                                    left: 0;
+                                    transform: translateY(-50%);
+                                    width: 2px;
+                                    background-color:  $lightblue-1;
+                                }
+                            }
+                            .cnt-input{
+                                width: 46%;
+                                margin-right: 8%;
+                                &:nth-child(2n){
+                                    margin-right: 0;
+                                }
+                            }
+                            .cnt-select{
+                            
+                            }
+                        }
+                        &:last-child{
+                            width: 100%;
+                        }
+                        .list-month{
+                            display: flex;
+                            align-items: flex-start;
+                            justify-content: space-between;
+                            max-width: 100%;
+                            padding: 0 4em;
+                            .item-month{
+                                width: 22%;
+                                margin-right: 5%;
+                                border: 2px solid $black-4;
+                                border-radius: 4px;
+                                .wrap{
+                                    .header{
+                                        background-color: $black-6;
+                                        padding: 10px 0;
+                                        h3{
+                                            font-size: .75em;
+                                            text-transform: uppercase;
+                                            text-align: center;
+                                            font-weight: bold;
+                                        }
+                                        span{
+                                            font-size: .75em;
+                                            text-align: center;
+                                            display: block;
+                                        }
+                                    }
+                                    .cnt{
+                                        padding: 1em;
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        span{
+                                            font-size: 2em;
+                                            font-weight: bold;
+                                        }
+                                        input{
+                                            width: 120px;
+                                            font-size: 2em;
+                                            background-color: #FFFFFF;
+                                        }
+                                    }
+                                }
+                                &:last-child{
+                                    margin-right: 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                &.nth-2{
+                    margin-left: -33.333%;
+                }
+                &.nth-3{
+                    .list-type-credit{
+                        justify-content: center;
+                        .item-type-credit{
+                            &:first-child{
+                                &:after{
+                                    top: 34%;
+                                    height: 70%;
+                                }
+                            }
+                            .wrap-components{
+                                display: flex;
+                                flex-direction: column;
+                                margin-left: auto;
+                                margin-right: auto;
+                                .cnt-input{
+                                    margin-right: 0;
+                                    margin-left: auto;
+                                }
+                            }
+                            .list-month{
+                                justify-content: center;
+                            }
+                            &:nth-child(2){
+                                .wrap-components{
+                                    .cnt-input{
+                                        margin-left: 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                &.slide-active{
+                    @media screen and (max-width: 960px){
+                        position: relative;
+                        opacity: 1;
+                        visibility: visible;
+                        z-index: 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.tabs{
+    .head-tab{
+        border-bottom: 1px solid #e7e7e7;
+        margin-bottom: 2em;
+        overflow: auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+        ul{
+            width: 500px;
+            display: flex;
+            justify-content: flex-start;
+            li{
+                a{
+                    text-transform: uppercase;
+                    font-size: .75em;
+                    padding: 2em 0;
+                    margin-right: 1.2em;
+                    display: block;
+                    font-family: "Lato-Medium",sans-serif;
+                    position: relative;
+                    transition: all 300ms ease;
+                    &:after{
+                        content: '';
+                        background-color: $red-1;
+                        position: absolute;
+                        bottom: -1px;
+                        left: 0;
+                        right: 0;
+                        width: auto;
+                        height: 2px;
+                        opacity: 0;
+                        transition: all .3s ease;
+                    }
+                    &:hover{
+                        color: $red-1;
+                    }
+                    &.head-active{
+                        &:after{
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    .content-tabs{
+        position: relative;
+        .item-tab-cnt{
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            >ul{
+                >li{
+                    margin-bottom: 1.99em;
+                    display: flex;
+                    align-items: flex-start;
+                    h3{
+                        width: 35%;
+                        font-size: 2em;
+                        font-family: 'Lato Light', 'Helvetica', sans-serif;
+                    }
+                    .cnt{
+                        width: 65%;
+                    }
+                }
+            }
+            &.tab-active{
+                position: relative;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+}
+
+
+@media screen and (max-width: 1024px){
+    #calc{
+        #sliderCalc{
+            .list-calc-display{
+                .item-calc-display{
+                    .list-type-credit{
+                        .item-type-credit{
+                            .wrap-components{
+                                .cnt-input{
+                                    margin-right: 2%;
+                                    margin-left: 2%;
+                                }
+                                >.cnt{
+                                    margin-left: 2%;
+                                }
+                            }
+                            .list-month{
+                                padding: 0;
+                                .item-month{
+                                    margin-right: 0;
+                                }
+                            }
+                        }
+                    }
+                    &.nth-3{
+                        .list-type-credit{
+                            .item-type-credit{
+                                .wrap-components{
+                                    .cnt-input{
+                                        margin-right: 1em;
+                                    }
+                                }
+                                .list-month{
+                                    .item-month{
+                                        margin-right: 2%;
+                                    }
+                                }
+                                &:nth-child(2){
+                                    .wrap-components{
+                                        .cnt-input{
+                                            margin-left: 1em;
+                                            margin-right: 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 960px){
+    
+    #calc{
+        #sliderCalc{
+            .list-calc-display{
+                .item-calc-display{
+                    article{
+                        h1{
+                            font-size: 1.2em;
+                        }
+                        p{
+                            font-size: .75em;
+                        }
+                    }
+                    &.slide-active{
+                        margin-bottom: 2em;
+                    }
+                }
+            }
+        }
+    }
+    
+    #main-calc{
+        .cnt-input{
+            .list-fee{
+                .item-fee{
+                    a{
+                        width: 36px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 767px){
+    #main-calc{
+        .cnt-input{
+            .list-fee{
+                width: 100%;
+                .item-fee{
+                    flex-grow: 1;
+                    width: 100%;
+                    a{
+                        width: 20px;
+                    }
+                }
+            }
+        }
+    }
+    #calc{
+        #sliderCalc{
+            .list-calc-display{
+                .item-calc-display{
+                    .list-type-credit{
+                        .item-type-credit{
+                            width: 100%;
+                            margin-bottom: 3em;
+                            .list-month{
+                                flex-wrap: wrap;
+                                .item-month{
+                                    width: 48%;
+                                    margin-bottom: 1.5em;
+                                }
+                            }
+                            &:first-child{
+                                margin-bottom: 1em;
+                                &:after{
+                                    top: inherit;
+                                    bottom: 0;
+                                    left: 0;
+                                    right: 0;
+                                    height: 1px;
+                                    width: 100%;
+                                    max-width: 380px;
+                                    margin: 0 auto;
+                                }
+                            }
+                        }
+                    }
+                    &.nth-3{
+                        .list-type-credit{
+                            .item-type-credit{
+                                .list-month{
+                                    .item-month{
+                                        width: 32%;
+                                        margin-right: 1.5%;
+                                        &:last-child{
+                                            margin-right: 0;
+                                        }
+                                    }
+                                }
+                                .wrap-components{
+                                    flex-direction: row;
+                                    flex-wrap: nowrap;
+                                    .cnt-input{
+                                        &:first-child{
+                                            margin-left: 0;
+                                        }
+                                    }
+                                    >.cnt{
+                                        margin-left: 2em;
+                                    }
+                                }
+                                &:first-child{
+                                    &:after{
+                                        height: 1px;
+                                        top: inherit;
+                                        bottom: 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 600px){
+    .tabs{
+        .content-tabs{
+            .item-tab-cnt{
+                >ul{
+                    >li{
+                        flex-wrap: wrap;
+                        h3{
+                            width: 100%;
+                            font-size: 1.2em;
+                            margin-bottom: .5em;
+                        }
+                        .cnt{
+                            width: 100%;
+                            text-align: justify;
+                            margin-bottom: .25em;
+                            font-size: .75em;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #calc{
+        padding: 0;
+        .arrow{
+            transform: none;
+            top: -10px;
+            font-size: 2em;
+        }
+        #sliderCalc{
+            .list-calc-display{
+                .item-calc-display{
+                    h2{
+                        &.title{
+                            font-size: 1em;
+                            margin-bottom: 1em;
+                        }
+                    }
+                    .g-btn{
+                        margin: 0 auto 2em auto;
+                    }
+                    .list-calc-option{
+                        .item-calc-option{
+                            .radio-option{
+                                width: 120px;
+                                min-height: 140px;
+                                span{
+                                    font-size: 3.5em;
+                                    height: 60px;
+                                    &:before{
+                                        height: 60px;
+                                        line-height: 60px;
+                                    }
+                                    &.icon-nuevo-credito{
+                                        font-size: 4.2em;
+                                    }
+                                    &.radio{
+                                    
+                                    }
+                                }
+                                h2{
+                                    width: 70px;
+                                    font-size: .6rem;
+                                    margin-top: 1em;
+                                }
+                            }
+                        }
+                    }
+                    .list-type-credit{
+                        .item-type-credit{
+                            margin-bottom: 1.8em;
+                            .list-month{
+                                .item-month{
+                                    margin-bottom: 1em;
+                                    .wrap{
+                                        .header{
+                                            h3{
+                                                font-size: .65em;
+                                            }
+                                        }
+                                        .cnt{
+                                            span{
+                                                font-size: 1.2em;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+    
+    
+                    &.nth-3{
+                        .list-type-credit{
+                            .item-type-credit{
+                                .list-month{
+                                    justify-content: flex-start;
+                                    .item-month{
+                                        width: 48%;
+                                        margin-right: 1.5%;
+                                        &:nth-child(2n){
+                                            margin-right: 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #main-calc{
+        .cnt-input{
+            margin-bottom: 1em;
+        }
+    }
+}*/

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q35">
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <p th:utext="#{questions.block.customer1Ruc}"></p>
+                <div class="centrado">
+                    <div>
+                        <div class="field inline">
+                            <input type="text" class="input-outline document-input-ruc" th:field="*{ruc}" pattern="[0-9]*"/>
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+
+                <div class="display-block">
+                    <label for="moreThan65" class="custom-check">
+                                <span class="check-inner">
+                                    <i class="icon icon-check"></i>
+                                </span>
+                        <span class="check-label"> Representa más del 65% de mi facturación total.</span>
+                        <input type="checkbox" class="real-check" id="moreThan65"/>
+                    </label>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var $ruc = $('#ruc');
+        setTimeout(function () {
+            $ruc.focus();
+        }, 300);
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {
+                        moreThan65: $('#moreThan65').prop('checked')
+                    })
+                }, "");
+            }
+        });
+
+
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

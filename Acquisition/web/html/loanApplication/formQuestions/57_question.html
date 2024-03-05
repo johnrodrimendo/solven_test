@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:utext="#{questions.block.lastAddress}"></p>
+            <form id="questionForm" autocomplete="off">
+                <div class="display-block">
+                    <div class="field inline">
+                        <label class="h-input-check">
+                            <input type="checkbox" class="checkbox" name="housingType"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <div class="radio inline"></div>
+                                    <h5 class="inline">Direcci&oacute;n 1</h5>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="h-input-check">
+                            <input type="checkbox" class="checkbox" name="housingType"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <div class="radio inline"></div>
+                                    <h5 class="inline">Direcci&oacute;n 2</h5>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="h-input-check">
+                            <input type="checkbox" class="checkbox" name="housingType"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <div class="radio inline"></div>
+                                    <h5 class="inline">Dinero</h5>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="h-input-check">
+                            <input type="checkbox" class="checkbox" name="housingType"/>
+                            <div class="option-wrapper">
+                                <div class="iconic-option-inner">
+                                    <div class="radio inline"></div>
+                                    <h5 class="inline">Direcci&oacute;n 3</h5>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="actions text-center">
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#sendButton').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST"
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

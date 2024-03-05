@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationWizardTemplate" th:with="step = 3">
+<head>
+</head>
+<body>
+
+<th:block layout:fragment="head">
+    <!--Range slider-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/js/ion.rangeSlider.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.skinNice.css'}"/>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!--Own-->
+    <script th:inline="javascript" charset="ISO-8859-1">
+        /*<![CDATA[*/
+        var errorMessage = /*[[${errorMessage}]]*/null;
+        var jsonUpdModalFormValidation;
+        var jsonProductTraditional = {
+            maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).TRADITIONAL).getMaxAmount()} ]]*/,
+            minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).TRADITIONAL).getMinAmount()} ]]*/
+        };
+        var jsonProductShortTerms = {
+            maxValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMaxAmount()} ]]*/,
+            minValue: /*[[ ${@catalogService.getProduct(T(com.affirm.common.model.catalog.Product).SHORT_TERM).getMinAmount()} ]]*/
+        };
+
+        var dependentType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).DEPENDENT} ]]*/;
+        var independentType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT} ]]*/;
+        var houseKeeperType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).HOUSEKEEPER} ]]*/;
+        var rentierType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).RENTIER} ]]*/;
+        var stockHolderType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).STOCKHOLDER} ]]*/;
+        var pensionerType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).PENSIONER} ]]*/;
+        var studentType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).STUDENT} ]]*/;
+        var unemployedType = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).UNEMPLOYED} ]]*/;
+
+        $(document).ready(function () {
+
+            if (errorMessage != null) {
+                $('#errorModal').find('p').html(errorMessage);
+                $('#errorModal').modal('show');
+            }
+
+            //Set the validations
+            var validator = /*[[${loanApplicationStep3Form.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                console.log(validator);
+                var jsonValidator = JSON.parse(validator);
+
+                $('#frmRegister').validateForm(createFormValidationJson(jsonValidator, $('#frmRegister')));
+            }
+
+            $('#principalActivityType').on('change', function () {
+                this.value == dependentType ? $('#principalDependent').show(300) : $('#principalDependent').hide(300);
+                this.value == dependentType ? $('#principalDependentSummary').show(300) : $('#principalDependentSummary').hide(300);
+                this.value == dependentType ? $('#principalDependent').find('input,select').removeClass('ignore_validation') : $('#principalDependent').find('input,select').addClass('ignore_validation');
+                this.value == independentType ? $('#principalIndependent').show(300) : $('#principalIndependent').hide(300);
+                this.value == independentType ? $('#principalIndependentSummary').show(300) : $('#principalIndependentSummary').hide(300);
+                this.value == independentType ? $('#principalIndependent').find('input,select').removeClass('ignore_validation') : $('#principalIndependent').find('input,select').addClass('ignore_validation');
+                this.value == rentierType ? $('#principalRentier').show(300) : $('#principalRentier').hide(300);
+                this.value == rentierType ? $('#principalRentierSummary').show(300) : $('#principalRentierSummary').hide(300);
+                this.value == rentierType ? $('#principalRentier').find('input,select').removeClass('ignore_validation') : $('#principalRentier').find('input,select').addClass('ignore_validation');
+                this.value == stockHolderType ? $('#principalShareholder').show(300) : $('#principalShareholder').hide(300);
+                this.value == stockHolderType ? $('#principalShareholderSummary').show(300) : $('#principalShareholderSummary').hide(300);
+                this.value == stockHolderType ? $('#principalShareholder').find('input,select').removeClass('ignore_validation') : $('#principalShareholder').find('input,select').addClass('ignore_validation');
+                this.value == pensionerType ? $('#principalPensioner').show(300) : $('#principalPensioner').hide(300);
+                this.value == pensionerType ? $('#principalPensionerSummary').show(300) : $('#principalPensionerSummary').hide(300);
+                this.value == pensionerType ? $('#principalPensioner').find('input,select').removeClass('ignore_validation') : $('#principalPensioner').find('input,select').addClass('ignore_validation');
+                this.value == houseKeeperType ? $('#principalHousekeeper').show(300) : $('#principalHousekeeper').hide(300);
+                this.value == houseKeeperType ? $('#principalHousekeeperSummary').show(300) : $('#principalHousekeeperSummary').hide(300);
+                this.value == houseKeeperType ? $('#principalHousekeeper').find('input,select').removeClass('ignore_validation') : $('#principalHousekeeper').find('input,select').addClass('ignore_validation');
+                $('#frmRegister').data('validator').resetForm();
+//                debugger;
+                var current = $('#principalActivityType option:selected').text();
+
+                switch (current) {
+                    case 'Dependiente':
+                    case 'dependiente':
+                        clearElementsInContainer($('#principalIndependent'));
+                        clearElementsInContainer($('#principalRentier'));
+                        clearElementsInContainer($('#principalShareholder'));
+                        clearElementsInContainer($('#principalPensioner'));
+                        clearElementsInContainer($('#principalHousekeeper'));
+                        break;
+                    case 'Independiente':
+                    case 'independiente':
+                        clearElementsInContainer($('#principalDependent'));
+                        clearElementsInContainer($('#principalRentier'));
+                        clearElementsInContainer($('#principalShareholder'));
+                        clearElementsInContainer($('#principalPensioner'));
+                        clearElementsInContainer($('#principalHousekeeper'));
+                        break;
+                    case 'Rentista':
+                    case 'rentista':
+                        clearElementsInContainer($('#principalDependent'));
+                        clearElementsInContainer($('#principalIndependent'));
+                        clearElementsInContainer($('#principalShareholder'));
+                        clearElementsInContainer($('#principalPensioner'));
+                        clearElementsInContainer($('#principalHousekeeper'));
+                        break;
+                    case 'Accionista':
+                    case 'accionista':
+                        clearElementsInContainer($('#principalDependent'));
+                        clearElementsInContainer($('#principalIndependent'));
+                        clearElementsInContainer($('#principalRentier'));
+                        clearElementsInContainer($('#principalPensioner'));
+                        clearElementsInContainer($('#principalHousekeeper'));
+                        break;
+                    case 'Pensionista':
+                    case 'pensionista':
+                        clearElementsInContainer($('#principalDependent'));
+                        clearElementsInContainer($('#principalIndependent'));
+                        clearElementsInContainer($('#principalRentier'));
+                        clearElementsInContainer($('#principalShareholder'));
+                        clearElementsInContainer($('#principalHousekeeper'));
+                        break;
+                    case 'Empleada del Hogar':
+                    case 'empleada del hogar':
+                        clearElementsInContainer($('#principalDependent'));
+                        clearElementsInContainer($('#principalIndependent'));
+                        clearElementsInContainer($('#principalRentier'));
+                        clearElementsInContainer($('#principalShareholder'));
+                        clearElementsInContainer($('#principalPensioner'));
+                        break;
+                }
+                if (current != "") {
+                    $('.answers-incomes').css({'display': 'block'});
+                }
+            });
+
+            $('#secundaryActivityType').on('change', function () {
+                this.value == dependentType ? $('#secundaryDependent').show(300) : $('#secundaryDependent').hide(300);
+                this.value == dependentType ? $('#secundaryDependentSummary').show(300) : $('#secundaryDependentSummary').hide(300);
+                this.value == dependentType ? $('#secundaryDependent').find('input,select').removeClass('ignore_validation') : $('#secundaryDependent').find('input,select').addClass('ignore_validation');
+                this.value == independentType ? $('#secundaryIndependent').show(300) : $('#secundaryIndependent').hide(300);
+                this.value == independentType ? $('#secundaryIndependentSummary').show(300) : $('#secundaryIndependentSummary').hide(300);
+                this.value == independentType ? $('#secundaryIndependent').find('input,select').removeClass('ignore_validation') : $('#secundaryIndependent').find('input,select').addClass('ignore_validation');
+                this.value == rentierType ? $('#secundaryRentier').show(300) : $('#secundaryRentier').hide(300);
+                this.value == rentierType ? $('#secundaryRentierSummary').show(300) : $('#secundaryRentierSummary').hide(300);
+                this.value == rentierType ? $('#secundaryRentier').find('input,select').removeClass('ignore_validation') : $('#secundaryRentier').find('input,select').addClass('ignore_validation');
+                this.value == stockHolderType ? $('#secundaryShareholder').show(300) : $('#secundaryShareholder').hide(300);
+                this.value == stockHolderType ? $('#secundaryShareholderSummary').show(300) : $('#secundaryShareholderSummary').hide(300);
+                this.value == stockHolderType ? $('#secundaryShareholder').find('input,select').removeClass('ignore_validation') : $('#secundaryShareholder').find('input,select').addClass('ignore_validation');
+                this.value == pensionerType ? $('#secundaryPensioner').show(300) : $('#secundaryPensioner').hide(300);
+                this.value == pensionerType ? $('#secundaryPensionerSummary').show(300) : $('#secundaryPensionerSummary').hide(300);
+                this.value == pensionerType ? $('#secundaryPensioner').find('input,select').removeClass('ignore_validation') : $('#secundaryPensioner').find('input,select').addClass('ignore_validation');
+                this.value == houseKeeperType ? $('#secundaryHousekeeper').show(300) : $('#secundaryHousekeeper').hide(300);
+                this.value == houseKeeperType ? $('#secundaryHousekeeperSummary').show(300) : $('#secundaryHousekeeperSummary').hide(300);
+                this.value == houseKeeperType ? $('#secundaryHousekeeper').find('input,select').removeClass('ignore_validation') : $('#secundaryHousekeeper').find('input,select').addClass('ignore_validation');
+                $('#frmRegister').data('validator').resetForm();
+                //debugger;
+                var current = $('#secundaryActivityType option:selected').text();
+
+                switch (current) {
+                    case 'Dependiente':
+                    case 'dependiente':
+                        clearElementsInContainer($('#secundaryIndependent'));
+                        clearElementsInContainer($('#secundaryRentier'));
+                        clearElementsInContainer($('#secundaryShareholder'));
+                        clearElementsInContainer($('#secundaryPensioner'));
+                        clearElementsInContainer($('#secundaryHousekeeper'));
+                        break;
+                    case 'Independiente':
+                    case 'independiente':
+                        clearElementsInContainer($('#secundaryDependent'));
+                        clearElementsInContainer($('#secundaryRentier'));
+                        clearElementsInContainer($('#secundaryShareholder'));
+                        clearElementsInContainer($('#secundaryPensioner'));
+                        clearElementsInContainer($('#secundaryHousekeeper'));
+                        break;
+                    case 'Rentista':
+                    case 'rentista':
+                        clearElementsInContainer($('#secundaryDependent'));
+                        clearElementsInContainer($('#secundaryIndependent'));
+                        clearElementsInContainer($('#secundaryShareholder'));
+                        clearElementsInContainer($('#secundaryPensioner'));
+                        clearElementsInContainer($('#secundaryHousekeeper'));
+                        break;
+                    case 'Accionista':
+                    case 'accionista':
+                        clearElementsInContainer($('#secundaryDependent'));
+                        clearElementsInContainer($('#secundaryIndependent'));
+                        clearElementsInContainer($('#secundaryRentier'));
+                        clearElementsInContainer($('#secundaryPensioner'));
+                        clearElementsInContainer($('#secundarylHousekeeper'));
+                        break;
+                    case 'Pensionista':
+                    case 'pensionista':
+                        clearElementsInContainer($('#secundaryDependent'));
+                        clearElementsInContainer($('#secundaryIndependent'));
+                        clearElementsInContainer($('#secundaryRentier'));
+                        clearElementsInContainer($('#secundaryShareholder'));
+                        clearElementsInContainer($('#secundaryHousekeeper'));
+                        break;
+                    case 'Empleada del Hogar':
+                    case 'empleada del hogar':
+                        clearElementsInContainer($('#secundaryDependent'));
+                        clearElementsInContainer($('#secundaryIndependent'));
+                        clearElementsInContainer($('#secundaryRentier'));
+                        clearElementsInContainer($('#secundaryShareholder'));
+                        clearElementsInContainer($('#secundaryPensioner'));
+                        break;
+                }
+            });
+
+            configureSummaryPanel([
+                $('#principalActivityType'),
+                $('#principalDependentRuc'),
+                $('#principalDependentCompany'),
+                $('#principalDependentTime'),
+                $('#principalDependentGrossIncome'),
+                $('#principalDependentNetIncome'),
+                $('#principalDependentPhoneNumber'),
+                $('#principalIndependentRuc'),
+                $('#principalIndependentVouchers'),
+                $('#principalIndependentTime'),
+                $('#principalIndependentGrossIncome'),
+                $('#principalIndependentNetIncome'),
+                $('#principalRentierRuc'),
+                $('#principalRentierBelonging'),
+                $('#principalRentierTime'),
+                $('#principalRentierGrossIncome'),
+                $('#principalRentierNetIncome'),
+                $('#principalShareholderRuc'),
+                $('#principalShareholderCompany'),
+                $('#principalShareholderShareholding'),
+                $('#principalShareholderResultU12M'),
+                $('#principalShareholderNetIncome'),
+                $('#principalPensionerFrom'),
+                $('#principalPensionerNetIncome'),
+                $('#principalHousekeeperEmployer'),
+                $('#principalHousekeeperTime'),
+                $('#principalHousekeeperNetIncome'),
+            ]);
+
+            configureSummaryPanel([
+                $('#secundaryActivityType'),
+                $('#secundaryDependentRuc'),
+                $('#secundaryDependentCompany'),
+                $('#secundaryDependentTime'),
+                $('#secundaryDependentGrossIncome'),
+                $('#secundaryDependentNetIncome'),
+                $('#secundaryDependentPhoneNumber'),
+                $('#secundaryIndependentRuc'),
+                $('#secundaryIndependentVouchers'),
+                $('#secundaryIndependentTime'),
+                $('#secundaryIndependentGrossIncome'),
+                $('#secundaryIndependentNetIncome'),
+                $('#secundaryRentierRuc'),
+                $('#secundaryRentierBelonging'),
+                $('#secundaryRentierTime'),
+                $('#secundaryRentierGrossIncome'),
+                $('#secundaryRentierNetIncome'),
+                $('#secundaryShareholderRuc'),
+                $('#secundaryShareholderCompany'),
+                $('#secundaryShareholderShareholding'),
+                $('#secundaryShareholderResultU12M'),
+                $('#secundaryShareholderNetIncome'),
+                $('#secundaryPensionerFrom'),
+                $('#secundaryPensionerNetIncome'),
+                $('#secundaryHousekeeperEmployer'),
+                $('#secundaryHousekeeperTime'),
+                $('#secundaryHousekeeperNetIncome'),
+            ]);
+//            configureSummaryPanel([
+//                $('#otherIncomes')
+//            ]);
+
+            $("#principalActivityType").change();
+            $("#secundaryActivityType").change();
+            $("#otherActivityIncomes").change();
+            $("#otherIncomeCheckBox").change();
+
+            initSummaryPanel();
+
+            $('.incomes').on('click', function (event) {
+                event.preventDefault();
+                var data = $(this).data('answer');
+                switch (data) {
+                    case 'si':
+                        $('#second-state').css({'display': 'block'});
+                        $('#second-state').removeClass('fadeOutUp');
+                        $('#second-state').addClass('fadeInDown');
+                        $('.incomes').removeClass('focus');
+                        $(this).addClass('focus');
+                        break;
+                    case 'no':
+                        $('.incomes').removeClass('focus');
+                        $(this).addClass('focus');
+                        $('#second-state').removeClass('fadeInDown');
+                        $('#second-state').addClass('fadeOutUp');
+                        $('#second-state').css({'display': 'none'});
+                        $('#otherIncomePanel').hide(300);
+                        clearElementsInContainer($('#otherIncomePanel'));
+                        $('#secundaryActivityPanel').hide(300);
+                        clearElementsInContainer($('#secundaryActivityPanel'));
+                        $('#secundaryActivityPanel').find('input,select').addClass('ignore_validation');
+                        $('.youCan').removeClass('focus');
+                        break;
+                }
+            });
+
+            $('.youCan').on('click', function (event) {
+                event.preventDefault();
+                var data = $(this).data('can');
+                switch (data) {
+                    case 'si':
+                        $('#secundaryActivityType').removeClass('ignore_validation');
+                        $('#secundaryActivityPanel').show(300, function () {
+                            $('#secundaryActivityPanel .summarypanel-tittle').click();
+                        });
+                        $("#secundaryActivityType").change();
+                        clearElementsInContainer($('#otherIncomePanel'));
+                        $('#ammount-answer').removeClass('visible');
+                        $('#ammount-answer').removeClass('bounceIn');
+                        $('#ammount-answer').addClass('no-visible');
+                        $('#otherIncomes').val('');
+                        $('.youCan').removeClass('focus');
+                        $(this).addClass('focus');
+                        break;
+                    case 'no':
+                        $('#secundaryActivityType').addClass('ignore_validation');
+                        $('#ammount-answer').removeClass('no-visible');
+                        $('#ammount-answer').addClass('bounceIn');
+                        $('#ammount-answer').addClass('visible');
+                        $('#otherIncomes').val('');
+                        $('#otherIncomes').focus();
+                        $('#secundaryActivityPanel').hide(300);
+                        clearElementsInContainer($('#secundaryActivityPanel'));
+                        $('.youCan').removeClass('focus');
+                        $(this).addClass('focus');
+                        break;
+                }
+            });
+
+            $('#btnSubmit').click(function (e) {
+                e.preventDefault();
+                if ($('#frmRegister').valid()) {
+                    $('#loading-ajax').removeClass('loading-ajax-invisible');
+                    $('#loading-ajax').addClass('loading-ajax-visible');
+                    $('#text-button').text('Espere...');
+                    $(this).prop('disabled', true);
+                    defaultAjax({
+                        url: /*[[@{/loanapplication/ocupationalInformation/__${loanAplicationToken}__}]]*/null,
+                        type: 'POST',
+                        form: $('#frmRegister'),
+                        data: $('#frmRegister').serializeObject(),
+                        error: function (result) {
+                            console.log('Yeaah');
+                            $('#loading-ajax').addClass('loading-ajax-invisible');
+                            $('#loading-ajax').removeClass('loading-ajax-visible');
+                            $('#text-button').text('Continuar');
+                            $('#btnSubmit').prop('disabled', false);
+                        }
+                    });
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="contentTab3">
+
+    <div class="container" id="registerLoanForm3">
+
+        <form role="form" action="#" th:object="${loanApplicationStep3Form}" id="frmRegister" autocomplete="off">
+
+            <!-- PRINCIPAL PANEL -->
+            <div id="principalActivityPanel" class="panel panel-default summarypanel">
+                <div class="panel-body">
+                    <div class="summarypanel-tittle">
+                        <h4>Actividad principal</h4>
+                    </div>
+                    <div class="summarypanel-summary" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.activityType}"></label>
+                                        <span id="principalActivityTypeSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div id="principalDependentSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="principalDependentRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Empresa</label>
+                                            <span id="principalDependentCompanySummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tel&eacute;fono fijo</label>
+                                            <span id="principalDependentPhoneNumberSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="principalDependentTimeSummaryPanelContainer">
+                                            <span id="principalDependentTimeSummaryPanel"></span><span> meses</span>
+                                        </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Bruto</label>
+                                            <span id="principalDependentGrossIncomeSummaryPanelContainer">
+                                            <span>S/. </span><span
+                                                    id="principalDependentGrossIncomeSummaryPanel"></span>
+                                        </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="principalDependentNetIncomeSummaryPanelContainer">
+                                            <span>S/. </span><span id="principalDependentNetIncomeSummaryPanel"></span>
+                                        </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="principalIndependentSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="principalIndependentRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Empresa</label>
+                                            <span id="principalIndependentVouchersSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="principalIndependentTimeSummaryPanelContainer">
+                                            <span id="principalIndependentTimeSummaryPanel"></span><span> meses</span>
+                                        </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Bruto</label>
+                                            <span id="principalIndependentGrossIncomeSummaryPanelContainer">
+                                        <span>S/. </span><span id="principalIndependentGrossIncomeSummaryPanel"></span>
+                                    </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="principalIndependentNetIncomeSummaryPanelContainer">
+                                        <span>S/. </span><span id="principalIndependentNetIncomeSummaryPanel"></span>
+                                    </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="principalRentierSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="principalRentierRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Bien</label>
+                                            <span id="principalRentierBelongingSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="principalRentierTimeSummaryPanelContainer">
+                                                <span id="principalRentierTimeSummaryPanel"></span><span> meses</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Bruto</label>
+                                            <span id="principalRentierGrossIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="principalRentierGrossIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="principalRentierNetIncomeSummaryPanelContainer">
+                                        <span>S/. </span><span id="principalRentierNetIncomeSummaryPanel"></span>
+                                    </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="principalShareholderSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="principalShareholderRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Empresa</label>
+                                            <span id="principalShareholderCompanySummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Acciones</label>
+                                            <span id="principalShareholderShareholdingSummaryPanelContainer">
+                                                <span id="principalShareholderShareholdingSummaryPanel"></span><span> %</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Resultados 12 meses</label>
+                                            <span id="principalShareholderResultU12MSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="principalShareholderResultU12MSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="principalShareholderNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="principalShareholderNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="principalPensionerSummary">
+                                <div class="col-lg-4 col-lg-4">
+                                    <ul>
+                                        <li>
+                                            <label>De quien?</label>
+                                            <span id="principalPensionerFromSummaryPanel"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <label>Ingreso Neto</label>
+                                    <span id="principalPensionerNetIncomeSummaryPanelContainer">
+                                        <span>S/. </span><span id="principalPensionerNetIncomeSummaryPanel"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="principalHousekeeperSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Empleador</label>
+                                            <span id="principalHousekeeperEmployerSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="principalHousekeeperTimeSummaryPanelContainer">
+                                                <span id="principalHousekeeperTimeSummaryPanel"></span><span> meses</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="principalHousekeeperNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="principalHousekeeperNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="summarypanel-body" style="display: none">
+                        <div class="row p-activity">
+                            <div class="col-lg-2 col-md-2" style="padding-top: .65em;">
+                                <div class="form-group"
+                                     th:classappend="*{validator.principalActivityType.hasErrors?'has-error has-feedback':''}"
+                                     style="margin-top: 0">
+                                    <label class="control-label" for="principalActivityType"
+                                           th:text="#{form.field.activityType}"></label>
+                                    <select th:field="*{principalActivityType}" class="form-control">
+                                        <option value="" hidden="hidden"></option>
+                                        <option th:each="activity : ${@catalogService.getActivityTypes(#locale, true)}"
+                                                th:value="${activity.id}" th:text="${activity.type}"></option>
+                                    </select>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.principalActivityType.hasErrors}"
+                                              th:text="*{validator.principalActivityType.errors}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-10 col-md-10">
+                                <!--row_dependiente-->
+                                <div class="row" id="principalDependent">
+                                    <div class="inputs-wrapper" style="margin-botom: 20px;">
+                                        <div class="cl wp" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalDependentRuc.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalDependentRuc">RUC</label>
+                                                    <input type="text" th:field="*{principalDependentRuc}"
+                                                           class="form-control medium-number-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalDependentRuc.hasErrors}"
+                                                              th:text="*{validator.principalDependentRuc.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 20600606043</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalDependentCompany.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label"
+                                                           for="principalDependentCompany">Empresa</label>
+                                                    <input type="text" th:field="*{principalDependentCompany}"
+                                                           class="form-control input-name"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalDependentCompany.hasErrors}"
+                                                              th:text="*{validator.principalDependentCompany.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: ACME SAC</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalDependentPhoneNumber">Tel&eacute;fono
+                                                        fijo</label>
+                                                    <input type="text" th:field="*{principalDependentPhoneNumber}"
+                                                           class="form-control input-number"/>
+                                                    <div class="errorContainer"></div>
+                                                    <small class="help-block muted">Ej: 700-9830</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalDependentTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalDependentTime">Tiempo en el
+                                                    empleo</label>
+                                                <div class="form-group label-floating">
+                                                    <input type="text" th:field="*{principalDependentTime}"
+                                                           class="form-control times tidy-input-number"/>
+                                                    <div class="postfix"> (meses)</div>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalDependentTime.hasErrors}"
+                                                              th:text="*{validator.principalDependentTime.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 18 (meses)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalDependentGrossIncome.hasErrors?'has-error has-feedback':''}">
+
+                                                <label class="control-label" for="principalDependentGrossIncome">Ingreso
+                                                    Bruto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalDependentGrossIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                            <span class="help-block form-field-error-message"
+                                                  th:if="*{validator.principalDependentGrossIncome.hasErrors}"
+                                                  th:text="*{validator.principalDependentGrossIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 500</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalDependentNetIncome.hasErrors?'has-error has-feedback':''}">
+
+                                                <label class="control-label" for="principalDependentNetIncome">Ingreso
+                                                    Neto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalDependentNetIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalDependentNetIncome.hasErrors}"
+                                                              th:text="*{validator.principalDependentNetIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 000</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_dependiente-->
+
+                                <!--row_independiente-->
+                                <div class="row" id="principalIndependent">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalIndependentRuc.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label"
+                                                           for="principalIndependentRuc">RUC</label>
+                                                    <input type="text" th:field="*{principalIndependentRuc}"
+                                                           class="form-control medium-number-input"/>
+                                                    <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.principalIndependentRuc.hasErrors}"
+                                                      th:text="*{validator.principalIndependentRuc.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 20600606043</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalIndependentVouchers.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalIndependentVouchers"
+                                                           th:text="#{form.field.vouchers}"></label>
+                                                    <select th:field="*{principalIndependentVouchers}"
+                                                            class="form-control">
+                                                        <option value="" hidden="hidden"></option>
+                                                        <option th:each="vou : ${@catalogService.getVoucherTypes(#locale)}"
+                                                                th:value="${vou.id}"
+                                                                th:text="${vou.name}"></option>
+                                                    </select>
+                                                    <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.principalIndependentVouchers.hasErrors}"
+                                                      th:text="*{validator.principalIndependentVouchers.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: Facturas</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalIndependentTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalIndependentTime">Tiempo en la
+                                                    actividad</label>
+                                                <div class="form-group label-floating">
+                                                    <input type="text" th:field="*{principalIndependentTime}"
+                                                           style="width: 160px;"
+                                                           class="form-control times tidy-input-number"/>
+                                                    <span class="postfix"> (meses)</span>
+                                                    <div class="errorContainer">
+                                                    <span class="help-block form-field-error-message"
+                                                          th:if="*{validator.principalIndependentTime.hasErrors}"
+                                                          th:text="*{validator.principalIndependentTime.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 18 (meses)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalDependentGrossIncome.hasErrors?'has-error has-feedback':''}">
+
+                                                <label class="control-label" for="principalIndependentGrossIncome">Ingreso
+                                                    Bruto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalIndependentGrossIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                    <span class="help-block form-field-error-message"
+                                                          th:if="*{validator.principalIndependentGrossIncome.hasErrors}"
+                                                          th:text="*{validator.principalIndependentGrossIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 500</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalIndependentNetIncome.hasErrors?'has-error has-feedback':''}">
+
+                                                <label class="control-label" for="principalIndependentNetIncome">Ingreso
+                                                    Neto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalIndependentNetIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.principalIndependentNetIncome.hasErrors}"
+                                                      th:text="*{validator.principalIndependentNetIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 000</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_independiente-->
+
+                                <!--row_rentista-->
+                                <div class="row" id="principalRentier">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalRentierRuc.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalRentierRuc">RUC</label>
+                                                    <input type="text" th:field="*{principalRentierRuc}"
+                                                           class="form-control medium-number-input"/>
+                                                    <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.principalRentierRuc.hasErrors}"
+                                                      th:text="*{validator.principalRentierRuc.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 20600606043</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalRentierBelonging.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalRentierBelonging"
+                                                           th:text="#{form.field.belongings}"></label>
+                                                    <select th:field="*{principalRentierBelonging}" class="form-control"
+                                                            style="width: 260px;">
+                                                        <option value="" hidden="hidden"></option>
+                                                        <option th:each="bel : ${@catalogService.getBelongings(#locale)}"
+                                                                th:value="${bel.id}"
+                                                                th:text="${bel.name}"></option>
+                                                    </select>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalRentierBelonging.hasErrors}"
+                                                              th:text="*{validator.principalRentierBelonging.errors}"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalRentierTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalRentierTime">Tiempo en la
+                                                    actividad</label>
+                                                <div class="form-group label-floating">
+                                                    <input type="text" th:field="*{principalRentierTime}"
+                                                           class="form-control times tidy-input-number"/>
+                                                    <span class="postfix"> (meses)</span>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalRentierTime.hasErrors}"
+                                                              th:text="*{validator.principalRentierTime.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 18 (meses)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalRentierGrossIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalRentierGrossIncome">Ingreso
+                                                    Bruto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalRentierGrossIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalRentierGrossIncome.hasErrors}"
+                                                              th:text="*{validator.principalRentierGrossIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2,500</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalRentierNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalRentierNetIncome">Ingreso
+                                                    Neto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalRentierNetIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalRentierNetIncome.hasErrors}"
+                                                              th:text="*{validator.principalRentierNetIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 000</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_rentista-->
+
+                                <!--row_accionista-->
+                                <div class="row" id="principalShareholder">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalShareholderRuc.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label"
+                                                           for="principalShareholderRuc">RUC</label>
+                                                    <input type="text" th:field="*{principalShareholderRuc}"
+                                                           class="form-control medium-number-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalShareholderRuc.hasErrors}"
+                                                              th:text="*{validator.principalShareholderRuc.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 20600606043</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 2em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalShareholderCompany.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalShareholderCompany">Empresa</label>
+                                                    <input type="text" th:field="*{principalShareholderCompany}"
+                                                           class="form-control input-email"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalShareholderCompany.hasErrors}"
+                                                              th:text="*{validator.principalShareholderCompany.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: ACME SAC</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalShareholderShareholding.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalShareholderShareholding">Participacion
+                                                    accionarial</label>
+                                                <div class="form-group label-floating">
+                                                    <input type="text" th:field="*{principalShareholderShareholding}"
+                                                           class="form-control small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalShareholderShareholding.hasErrors}"
+                                                              th:text="*{validator.principalShareholderShareholding.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 50%</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em;">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalShareholderResultU12M.hasErrors?'has-error has-feedback':''}">
+                                                <div class="input-group">
+                                                    <label class="control-label" for="principalShareholderGrossIncome">Ingreso
+                                                        Bruto</label>
+                                                    <div class="form-group label-floating">
+                                                        <span class="prefix">S/. </span>
+                                                        <input type="text" th:field="*{principalShareholderResultU12M}"
+                                                               class="form-control incomes small-input"/>
+                                                        <div class="errorContainer">
+                                                            <span class="help-block form-field-error-message"
+                                                                  th:if="*{validator.principalShareholderResultU12M.hasErrors}"
+                                                                  th:text="*{validator.principalShareholderResultU12M.errors}"></span>
+                                                        </div>
+                                                        <small class="help-block muted">Ej: 100 000</small>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <label class="control-label" for="principalShareholderNetIncome">Ingreso
+                                                        Neto</label>
+                                                    <div class="form-group label-floating">
+                                                        <span class="prefix">S/. </span>
+                                                        <input type="text" th:field="*{principalShareholderNetIncome}"
+                                                               class="form-control small-input"/>
+                                                        <div class="errorContainer">
+                                                            <span class="help-block form-field-error-message"
+                                                                  th:if="*{validator.principalShareholderNetIncome.hasErrors}"
+                                                                  th:text="*{validator.principalShareholderNetIncome.errors}"></span>
+                                                        </div>
+                                                        <small class="help-block muted">Ej: 100 000</small>
+                                                    </div>
+                                                </div>
+                                                <label class="control-label" for="principalShareholderResultU12M">Ganancia
+                                                    &uacute;ltimos 12 meses</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_accionista-->
+
+                                <!--row_pensionista-->
+                                <div class="row" id="principalPensioner">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalPensionerFrom.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalPensionerFrom">&#191;De quien
+                                                    recibes el pago?</label>
+                                                <div class="form-group label-floating">
+                                                    <select th:field="*{principalPensionerFrom}" class="form-control">
+                                                        <option value="" hidden="hidden"></option>
+                                                        <option th:each="pen : ${@catalogService.getPensionPayers(#locale)}"
+                                                                th:value="${pen.id}"
+                                                                th:text="${pen.name}"></option>
+                                                    </select>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalPensionerFrom.hasErrors}"
+                                                              th:text="*{validator.principalPensionerFrom.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: AFP</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalPensionerNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalPensionerNetIncome">Ingreso
+                                                    Neto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalPensionerNetIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalPensionerNetIncome.hasErrors}"
+                                                              th:text="*{validator.principalPensionerNetIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 000</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_pensionista-->
+
+                                <!--row_empleada-->
+                                <div class="row" id="principalHousekeeper">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl" style="margin-top: 2em">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalHousekeeperEmployer.hasErrors?'has-error has-feedback':''}">
+                                                <div class="form-group label-floating">
+                                                    <label class="control-label" for="principalHousekeeperEmployer">Nombre
+                                                        del empleador</label>
+                                                    <input type="text" th:field="*{principalHousekeeperEmployer}"
+                                                           class="form-control input-name"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalHousekeeperEmployer.hasErrors}"
+                                                              th:text="*{validator.principalHousekeeperEmployer.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: Camila D&iacute;az Flores</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalHousekeeperTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalHousekeeperTime">Tiempo en el
+                                                    empleo</label>
+                                                <div class="form-group label-floating">
+                                                    <input type="text" th:field="*{principalHousekeeperTime}"
+                                                           class="form-control times tidy-input-number"/>
+                                                    <span class="postfix"> (meses)</span>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalHousekeeperTime.hasErrors}"
+                                                              th:text="*{validator.principalHousekeeperTime.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: 18 (meses)</small>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="cl" style="margin-top: 1.3em">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.principalHousekeeperNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="principalHousekeeperNetIncome">Ingreso
+                                                    Neto</label>
+                                                <div class="form-group label-floating">
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{principalHousekeeperNetIncome}"
+                                                           class="form-control incomes small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.principalHousekeeperNetIncome.hasErrors}"
+                                                              th:text="*{validator.principalHousekeeperNetIncome.errors}"></span>
+                                                    </div>
+                                                    <small class="help-block muted">Ej: S/ 2 000</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_empleada-->
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Checkbox active Secudary Activity -->
+                    <div class="answers-incomes">
+                        <div class="questions">
+                            <div id="first-state">
+                                <p>Tienes otros ingresos?</p>
+                                <div class="anwsers-buttons">
+                                    <button class="incomes"
+                                            th:classappend="*{secundaryActivityType != null}  or *{otherIncomes != null} ? 'focus':''"
+                                            data-answer="si">Si
+                                    </button>
+                                    <button class="incomes" data-answer="no">No</button>
+                                </div>
+                            </div>
+                            <div id="second-state" class="animated"
+                                 th:style="*{secundaryActivityType != null}  or *{otherIncomes != null} ? 'display: block':''">
+                                <p>Los puedes demostrar?</p>
+                                <div class="anwsers-buttons">
+                                    <button class="youCan"
+                                            th:classappend="*{secundaryActivityType} != null ? 'focus':''"
+                                            data-can="si">Si
+                                    </button>
+                                    <button class="youCan" th:classappend="*{otherIncomes} != null ? 'focus':''"
+                                            data-can="no">No
+                                    </button>
+                                    <div id="ammount-answer" class="no-visible animated">
+                                        <div class="inputs-wrapper">
+                                            <div class="cl">
+                                                <div class="fields"
+                                                     th:classappend="*{validator.otherIncomes.hasErrors?'has-error has-feedback':''}">
+                                                    <label class="control-label" for="otherIncomes"
+                                                           th:text="#{registerLoanForm3.otherIncomes}"></label>
+                                                    <span class="prefix">S/. </span>
+                                                    <input type="text" th:field="*{otherIncomes}"
+                                                           class="form-control small-input"/>
+                                                    <div class="errorContainer">
+                                                        <span class="help-block form-field-error-message"
+                                                              th:if="*{validator.otherIncomes.hasErrors}"
+                                                              th:text="*{validator.otherIncomes.errors}"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECUNDARY PANEL -->
+            <div id="secundaryActivityPanel" class="panel panel-default summarypanel"
+                 th:style="*{secundaryActivityType != null} ? 'display: block':'display: none'">
+                <div class="panel-body">
+                    <div class="summarypanel-tittle">
+                        <h4>Actividad Secundaria</h4>
+                    </div>
+                    <div class="summarypanel-summary" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-4 col-sm-4">
+                                <label th:text="#{form.field.activityType}"></label>
+                                <span id="secundaryActivityTypeSummaryPanel"></span>
+                            </div>
+
+                            <div id="secundaryDependentSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="secundaryDependentRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Empresa</label>
+                                            <span id="secundaryDependentCompanySummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tel&eacute;fono fijo</label>
+                                            <span id="secundaryDependentPhoneNumberSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="secundaryDependentTimeSummaryPanelContainer">
+                                                <span id="secundaryDependentTimeSummaryPanel"></span><span> meses</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Bruto</label>
+                                            <span id="secundaryDependentGrossIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryDependentGrossIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="secundaryDependentNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryDependentNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="secundaryIndependentSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="secundaryIndependentRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Empresa</label>
+                                            <span id="secundaryIndependentVouchersSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="secundaryIndependentTimeSummaryPanelContainer">
+                                                <span id="secundaryIndependentTimeSummaryPanel"></span><span> meses</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Bruto</label>
+                                            <span id="secundaryIndependentGrossIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryIndependentGrossIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="secundaryIndependentNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryIndependentNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="secundaryRentierSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="secundaryRentierRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Propieddad</label>
+                                            <span id="secundaryRentierPropertySummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="secundaryRentierTimeSummaryPanelContainer">
+                                                <span id="secundaryRentierTimeSummaryPanel"></span><span> meses</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Bruto</label>
+                                            <span id="secundaryRentierGrossIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryRentierGrossIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="secundaryRentierNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryRentierNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="secundaryShareholderSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>RUC</label>
+                                            <span id="secundaryShareholderRucSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Empresa</label>
+                                            <span id="secundaryShareholderCompanySummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Acciones</label>
+                                            <span id="secundaryShareholderShareholdingSummaryPanelContainer">
+                                                <span id="secundaryShareholderShareholdingSummaryPanel"></span><span> %</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Resultados 12 meses</label>
+                                            <span id="secundaryShareholderResultU12MSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryShareholderResultU12MSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="secundaryShareholderNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryShareholderNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="secundaryPensionerSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>De quien?</label>
+                                            <span id="secundaryPensionerFromSummaryPanel"></span>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="secundaryPensionerNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryPensionerNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="secundaryHousekeeperSummary">
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Empleador</label>
+                                            <span id="secundaryHousekeeperEmployerSummaryPanel"></span>
+                                        </li>
+                                        <li>
+                                            <label>Tiempo</label>
+                                            <span id="secundaryHousekeeperTimeSummaryPanelContainer">
+                                                <span id="secundaryHousekeeperTimeSummaryPanel"></span><span> meses</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <ul>
+                                        <li>
+                                            <label>Ingreso Neto</label>
+                                            <span id="secundaryHousekeeperNetIncomeSummaryPanelContainer">
+                                                <span>S/. </span><span
+                                                    id="secundaryHousekeeperNetIncomeSummaryPanel"></span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="summarypanel-body" style="display: none">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group label-floating"
+                                     th:classappend="*{validator.secundaryActivityType.hasErrors?'has-error has-feedback':''}">
+                                    <label class="control-label" for="secundaryActivityType"
+                                           th:text="#{form.field.activityType}"></label>
+                                    <select th:field="*{secundaryActivityType}" class="form-control ignore_validation">
+                                        <option value="" hidden="hidden"></option>
+                                        <option th:each="activity : ${@catalogService.getActivityTypes(#locale, false)}"
+                                                th:value="${activity.id}" th:text="${activity.type}"></option>
+                                    </select>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.secundaryActivityType.hasErrors}"
+                                              th:text="*{validator.secundaryActivityType.errors}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <!--row_dependiente-->
+                                <div class="row" id="secundaryDependent">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryDependentRuc.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryDependentRuc">RUC</label>
+                                                <input type="text" th:field="*{secundaryDependentRuc}"
+                                                       class="form-control medium-number-input"/>
+                                                <div class="errorContainer">
+                                                    <span class="help-block form-field-error-message"
+                                                          th:if="*{validator.secundaryDependentRuc.hasErrors}"
+                                                          th:text="*{validator.secundaryDependentRuc.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 20600606043.</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryDependentCompany.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label"
+                                                       for="secundaryDependentCompany">Empresa</label>
+                                                <input type="text" th:field="*{secundaryDependentCompany}"
+                                                       class="form-control"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryDependentCompany.hasErrors}"
+                                                      th:text="*{validator.secundaryDependentCompany.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: ACME SAC</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryDependentPhoneNumber.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label"
+                                                       for="secundaryDependentPhoneNumber">Tel&eacute;fono Fijo</label>
+                                                <input type="text" th:field="*{secundaryDependentPhoneNumber}"
+                                                       class="form-control"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryDependentPhoneNumber.hasErrors}"
+                                                      th:text="*{validator.secundaryDependentPhoneNumber.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 700-9830</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryDependentTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryDependentTime">Tiempo en el
+                                                    empleo</label>
+                                                <input type="text" th:field="*{secundaryDependentTime}"
+                                                       class="form-control tidy-input-number"/>
+                                                <span class="postfix"> (meses)</span>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryDependentTime.hasErrors}"
+                                                      th:text="*{validator.secundaryDependentTime.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 18 (meses)</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryDependentGrossIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryDependentGrossIncome">Ingreso
+                                                    Bruto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryDependentGrossIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryDependentGrossIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryDependentGrossIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 500</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryDependentNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryDependentNetIncome">Ingreso
+                                                    Neto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryDependentNetIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryDependentNetIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryDependentNetIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 000</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_dependiente-->
+                                <!--row_independiente-->
+                                <div class="row" id="secundaryIndependent">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryIndependentRuc.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryIndependentRuc">RUC</label>
+                                                <input type="text" th:field="*{secundaryIndependentRuc}"
+                                                       class="form-control medium-number-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryIndependentRuc.hasErrors}"
+                                                      th:text="*{validator.secundaryIndependentRuc.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 20600606043</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryIndependentVouchers.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryIndependentVouchers"
+                                                       th:text="#{form.field.vouchers}"></label>
+                                                <select th:field="*{secundaryIndependentVouchers}" class="form-control">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="vou : ${@catalogService.getVoucherTypes(#locale)}"
+                                                            th:value="${vou.id}"
+                                                            th:text="${vou.name}"></option>
+                                                </select>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryIndependentVouchers.hasErrors}"
+                                                      th:text="*{validator.secundaryIndependentVouchers.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: Facturas</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryIndependentTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryIndependentTime">Tiempo en la
+                                                    actividad</label>
+                                                <input type="text" th:field="*{secundaryIndependentTime}"
+                                                       class="form-control tidy-input-number"/>
+                                                <span class="postfix"> (meses)</span>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryIndependentTime.hasErrors}"
+                                                      th:text="*{validator.secundaryIndependentTime.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 18 (meses)</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryIndependentGrossIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryIndependentGrossIncome">Ingreso
+                                                    Bruto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryIndependentGrossIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryIndependentGrossIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryIndependentGrossIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 500</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryIndependentNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryIndependentNetIncome">Ingreso
+                                                    Neto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryIndependentNetIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryIndependentNetIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryIndependentNetIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 000</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_independiente-->
+                                <!--row_rentista-->
+                                <div class="row" id="secundaryRentier">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryRentierRuc.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryRentierRuc">RUC</label>
+                                                <input type="text" th:field="*{secundaryRentierRuc}"
+                                                       class="form-control medium-number-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryRentierRuc.hasErrors}"
+                                                      th:text="*{validator.secundaryRentierRuc.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 20600606043</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryRentierBelonging.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryRentierBelonging"
+                                                       th:text="#{form.field.belongings}"></label>
+                                                <select th:field="*{secundaryRentierBelonging}" class="form-control">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="bel : ${@catalogService.getBelongings(#locale)}"
+                                                            th:value="${bel.id}"
+                                                            th:text="${bel.name}"></option>
+                                                </select>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryRentierBelonging.hasErrors}"
+                                                      th:text="*{validator.secundaryRentierBelonging.errors}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryRentierTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryRentierTime">Tiempo en la
+                                                    actividad</label>
+                                                <input type="text" th:field="*{secundaryRentierTime}"
+                                                       class="form-control tidy-input-number"/>
+                                                <span class="postfix"> (meses)</span>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryRentierTime.hasErrors}"
+                                                      th:text="*{validator.secundaryRentierTime.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 18 (meses)</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryRentierGrossIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryRentierGrossIncome">Ingreso
+                                                    Bruto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryRentierGrossIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryRentierGrossIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryRentierGrossIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 500</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryRentierNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryRentierNetIncome">Ingreso
+                                                    Neto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryRentierNetIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryRentierNetIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryRentierNetIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 000</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_rentista-->
+                                <!--row_accionista-->
+                                <div class="row" id="secundaryShareholder">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col-md-2">
+                                            <div class="form-group label-floating"
+                                                 th:classappend="*{validator.secundaryShareholderRuc.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryShareholderRuc">RUC</label>
+                                                <input type="text" th:field="*{secundaryShareholderRuc}"
+                                                       style="width: 100px;"
+                                                       class="form-control"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryShareholderRuc.hasErrors}"
+                                                      th:text="*{validator.secundaryShareholderRuc.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 20600606043</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group label-floating"
+                                                 th:classappend="*{validator.secundaryShareholderCompany.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label"
+                                                       for="secundaryShareholderCompany">Empresa</label>
+                                                <input type="text" th:field="*{secundaryShareholderCompany}"
+                                                       class="form-control"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryShareholderCompany.hasErrors}"
+                                                      th:text="*{validator.secundaryShareholderCompany.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: ACME SAC</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group label-floating"
+                                                 th:classappend="*{validator.secundaryShareholderShareholding.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryShareholderShareholding">Participacion
+                                                    accionarial</label>
+                                                <input type="text" th:field="*{secundaryShareholderShareholding}"
+                                                       class="form-control"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryShareholderShareholding.hasErrors}"
+                                                      th:text="*{validator.secundaryShareholderShareholding.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 50%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col-md-5">
+                                            <div class="form-group label-floating"
+                                                 th:classappend="*{validator.secundaryShareholderResultU12M.hasErrors?'has-error has-feedback':''}">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">S/. </span>
+                                                    <label class="control-label" for="secundaryShareholderResultU12M">Ganancia
+                                                        &uacute;ltimos 12 meses</label>
+                                                    <input type="text" th:field="*{secundaryShareholderResultU12M}"
+                                                           class="form-control"/>
+                                                </div>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryShareholderResultU12M.hasErrors}"
+                                                      th:text="*{validator.secundaryShareholderResultU12M.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 100 000</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group label-floating"
+                                                 th:classappend="*{validator.secundaryShareholderNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">S/. </span>
+                                                    <label class="control-label" for="secundaryShareholderNetIncome">Ingreso
+                                                        Neto</label>
+                                                    <input type="text" th:field="*{secundaryShareholderNetIncome}"
+                                                           class="form-control"/>
+                                                </div>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryShareholderNetIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryShareholderNetIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 100 000</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_accionista-->
+                                <!--row_pensionista-->
+                                <div class="row" id="secundaryPensioner">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryPensionerFrom.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryPensionerFrom">&#191;De quien
+                                                    recibes el pago?</label>
+                                                <select th:field="*{secundaryPensionerFrom}" class="form-control">
+                                                    <option value="" hidden="hidden"></option>
+                                                    <option th:each="pen : ${@catalogService.getPensionPayers(#locale)}"
+                                                            th:value="${pen.id}"
+                                                            th:text="${pen.name}"></option>
+                                                </select>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryPensionerFrom.hasErrors}"
+                                                      th:text="*{validator.secundaryPensionerFrom.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: AFP</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryPensionerNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryPensionerNetIncome">Ingreso
+                                                    Neto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryPensionerNetIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryPensionerNetIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryPensionerNetIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 000</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_pensionista-->
+                                <!--row_empleada-->
+                                <div class="row" id="secundaryHousekeeper">
+                                    <div class="inputs-wrapper">
+                                        <div class="cl wp">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryHousekeeperEmployer.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryHousekeeperEmployer">Nombre
+                                                    del empleador</label>
+                                                <input type="text" th:field="*{secundaryHousekeeperEmployer}"
+                                                       class="form-control input-name"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryHousekeeperEmployer.hasErrors}"
+                                                      th:text="*{validator.secundaryHousekeeperEmployer.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: Camila D&iacute;az Flores</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryHousekeeperTime.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryHousekeeperTime">Tiempo en el
+                                                    empleo</label>
+                                                <input type="text" th:field="*{secundaryHousekeeperTime}"
+                                                       class="form-control tidy-input-number"/>
+                                                <span class="postfix"> (meses)</span>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryHousekeeperTime.hasErrors}"
+                                                      th:text="*{validator.secundaryHousekeeperTime.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: 18 (meses)</small>
+                                            </div>
+                                        </div>
+                                        <div class="cl">
+                                            <div class="fields"
+                                                 th:classappend="*{validator.secundaryHousekeeperNetIncome.hasErrors?'has-error has-feedback':''}">
+                                                <label class="control-label" for="secundaryHousekeeperNetIncome">Ingreso
+                                                    Neto</label>
+                                                <span class="prefix">S/. </span>
+                                                <input type="text" th:field="*{secundaryHousekeeperNetIncome}"
+                                                       class="form-control small-input"/>
+                                                <div class="errorContainer">
+                                                <span class="help-block form-field-error-message"
+                                                      th:if="*{validator.secundaryHousekeeperNetIncome.hasErrors}"
+                                                      th:text="*{validator.secundaryHousekeeperNetIncome.errors}"></span>
+                                                </div>
+                                                <small class="help-block muted">Ej: S/ 2 000</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--/.row_empleada-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="btnSubmit" type="submit" class="button red-button">
+                    <div id="loading-ajax" class="loading-ajax-invisible">
+                        <div class="sk-circle">
+                            <div class="sk-circle1 sk-child"></div>
+                            <div class="sk-circle2 sk-child"></div>
+                            <div class="sk-circle3 sk-child"></div>
+                            <div class="sk-circle4 sk-child"></div>
+                            <div class="sk-circle5 sk-child"></div>
+                            <div class="sk-circle6 sk-child"></div>
+                            <div class="sk-circle7 sk-child"></div>
+                            <div class="sk-circle8 sk-child"></div>
+                        </div>
+                        <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                    <span id="text-button">Continuar</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</th:block>
+</body>
+</html>

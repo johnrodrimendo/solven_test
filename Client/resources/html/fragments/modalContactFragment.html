@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+</head>
+<body>
+    <th:block th:fragment="modalContactFragment" th:with="processContactForm=${T(com.affirm.client.model.form.ProcessContactForm).newInstance()}" >
+        <div class="modal fade" id="hlp-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal" >
+            <div class="modal-dialog" role="help">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal" th:text="#{static.landing.modal.title}"></h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-middle">
+                        <div class="block-content">
+                            <div class="contact-form">
+                                <form id="modalContactForm">
+                                    <div id="response-block"></div>
+                                    <div class="field">
+                                        <input type="text" id="contactFullName" name="contactFullName" class="input-outline"
+                                               placeholder="Nombre completo"/>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                    <div class="field">
+                                        <input type="text" name="contactTelephone" id="contactTelephone" class="input-outline"
+                                               placeholder="Tel&eacute;fono"/>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                    <div class="field">
+                                        <input autocorrect="off" autocapitalize="none" type="text"
+                                               id="contactEmail" name="contactEmail" class="input-outline"
+                                               placeholder="Correo electr&oacute;nico"/>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                    <div class="field">
+                                        <input type="text" name="contactSubject" id="contactSubject" class="input-outline"
+                                               placeholder="Asunto"/>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                    <div class="field">
+                                        <textarea id="contactMessage" name="contactMessage" class="input-outline" rows="5"
+                                              placeholder="Mensaje..."></textarea>
+                                        <div class="errorContainer text-left"></div>
+                                    </div>
+                                    <div class="field text-center">
+                                        <div class="g-recaptcha"
+                                             th:attr="data-sitekey=${@configuration.invisibleCaptchaPublicKey()}"
+                                             data-callback="submit" data-size="invisible"></div>
+                                        <button class=" button bg-red" id="sendMessage">Enviar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            $(document).ready(function () {
+                var validator = /*[[${processContactForm.validator.toJson(#locale)}]]*/null;
+                if (validator != null) {
+                    var jsonValidator = JSON.parse(validator);
+                    $('#modalContactForm').validateForm(createFormValidationJson(jsonValidator, $('#modalContactForm')));
+                }
+
+                $('#helpSign').on('click', function (event) {
+                    event.preventDefault();
+                    $('#hlp-modal').modal({backdrop: 'static', keyboard: false, show: true});
+                });
+
+                $('#sendMessage').on('click', function (event) {
+                    event.preventDefault();
+                    validate();
+                });
+            });
+
+            function validate() {
+                debugger;
+                if ($('#modalContactForm').valid()) {
+                    grecaptcha.reset();
+                    grecaptcha.execute();
+                }
+            }
+
+            function submit() {
+                $('#sendMessage').loading();
+                defaultAjax({
+                    url: /*[[@{/processContact}]]*/,
+                    type: 'POST',
+                    formValidation: $('#modalContactForm').data('validator'),
+                    data: $('#modalContactForm').serializeObject(),
+                    success: function (data) {
+                        $('#sendMessage').unloading();
+                        $('#modalContactForm').data('validator').resetForm();
+                        $('#modalContactForm')[0].reset();
+                        $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                        setTimeout(function(){
+                            $('#hlp-modal').modal('hide');
+                            $('#response-block').html("");
+                        }, 1500);
+                    }, error: function(){
+                        $('#sendMessage').unloading();
+                    }
+                });
+            }
+
+            /*]]>*/
+        </script>
+    </th:block>
+</body>
+</html>

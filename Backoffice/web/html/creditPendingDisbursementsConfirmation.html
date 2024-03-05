@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Confirmaciones de Desembolso</title>
+
+    <!-- TableFilter -->
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+
+    <!-- TablePaginator -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function gtag_report_conversion(id, url) {
+            dataLayer.push({
+                'event': 'conversion',
+                'transaction_id': id+''
+            });
+            return false;
+        }
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var $frmRegisterDisbursementConfirmationModalValidator;
+
+        $(document).ready(function () {
+            $('.creditsPendingTable').find('.group-checkable').change(function () {
+                var set = $(this).attr("data-set");
+                var checked = $(this).is(":checked");
+                $(set).each(function () {
+                    if (checked) {
+                        $(this).prop("checked", true);
+                    } else {
+                        $(this).prop("checked", false);
+                    }
+                });
+            });
+
+            $('.creditsPendingTable').find('input[type="checkbox"]').change(function () {
+                var cheks = $('.creditsPendingTable').find('input[type="checkbox"][data-credit-id]:checked');
+                if (cheks.length > 0) {
+                    $('#registerSelectedDisbursementConfirmationButton').show(300);
+                } else {
+                    $('#registerSelectedDisbursementConfirmationButton').hide(300);
+                }
+            });
+
+            $('#registerSelectedDisbursementConfirmationButton').click(registerSelectedDisbursementConfirmation)
+        });
+
+        function showRegisterDisbursementRejectionModal(creditId) {
+            $('#registerDisbursementRejectionModal').modal();
+            $('#registerDisbursementRejectionModal .loading').hide();
+            $('#registerDisbursementRejectionModal .content').show();
+            $('#registerRejectedDisbursementButton').click(function () {
+                registerDisbursementConfirmation(creditId, $('#creditRejectionReason').val(), $('#creditRejectionComment').val());
+            });
+        }
+
+        function showRegisterDisbursementConfirmationModal(creditId) {
+            var url = /*[[@{/credit/registerDisbursement/modal}]]*/;
+            $('#registerDisbursementModal').modal();
+            $('#registerDisbursementModal .loading').show();
+            $('#registerDisbursementModal .content').hide();
+            $('#registerDisbursementModal .content').load(url + "?creditsId=" + creditId.join(','), null, function () {
+                $('#registerDisbursementModal .loading').hide(300);
+                $('#registerDisbursementModal .content').show(300);
+            });
+            getTagManagerKeyByCreditId(creditId)
+        }
+
+        function registerDisbursement(credits) {
+            var jsonData = $('#frmRegisterDisbursementModal').serializeObject();
+            jsonData.credits = credits;
+            defaultAjax({
+                url: /*[[@{/credit/registerDisbursementConfirmation}]]*/,
+                type: 'POST',
+                formValidation: $frmRegisterDisbursementConfirmationModalValidator,
+                data: jsonData,
+                success: function (data) {
+                    debugger;
+                    for(var i=0; i< credits.length; i++){
+                        gtag_report_conversion(credits[i],/*[[@{/credit/registerDisbursementConfirmation}]]*/);
+                    }
+                    $('#registerDisbursementModal').modal('hide');
+                    refreshPendingDisbursementsConfirmation();
+                }
+            })
+        }
+
+        function registerDisbursementConfirmation(creditId, creditRejectionReason, creditRejectionComment) {
+            var baseUrl = /*[[@{/credit/}]]*/;
+            swal({
+                title: "&iquest;Est&aacute;s seguro?",
+                text: "No podr&aacute;s revertir el cambio.",
+                type: "warning",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#36c6d3",
+                confirmButtonText: "Si, Aprobar!",
+                closeOnConfirm: true
+            },
+            function(){
+                defaultAjax({
+                    url: baseUrl + creditId + "/registerDisbursementRejection/",
+                    type: 'POST',
+                    data: {
+                        creditRejectionReasonId: creditRejectionReason,
+                        creditRejectionComment: creditRejectionComment
+                    },
+                    success: function (data) {
+                        $('#registerDisbursementRejectionModal').modal('hide');
+                        refreshPendingDisbursementsConfirmation();
+                        swal("Aprobado.", "", "success");
+                    }
+                })
+            });
+
+
+        }
+
+        function registerSelectedDisbursementConfirmation() {
+            var creditsSelected = $('.creditsPendingTable').find('input[type="checkbox"][data-credit-id]:checked');
+            if (creditsSelected.length > 0) {
+                var credits = [];
+                creditsSelected.each(function () {
+                    credits[credits.length] = $(this).attr("data-credit-id");
+                });
+                showRegisterDisbursementConfirmationModal(credits);
+            }
+        }
+
+        function refreshPendingDisbursementsConfirmation() {
+            var baseUrl = /*[[@{/disbursement/confirmation2/list}]]*/;
+            $('#portletCreditsPendingConfirmationDisbursement').load(baseUrl + ' #portletCreditsPendingConfirmationDisbursement > *', null, function () {
+            });
+        }
+        function getTagManagerKeyByCreditId(creditsId) {
+            var url = /*[[ @{/credit/getTagManagerKeyByCreditId} ]]*/;
+            defaultAjax({
+                url: url,
+                type: 'GET',
+                data: {
+                    creditsId: creditsId.join(',')
+                },
+                success: function (data) {
+                    var tagManagerKey = JSON.parse(data).tagManagerKey;
+                    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                    })(window,document,'script','dataLayer', tagManagerKey);
+                    return data;
+                }
+            })
+        }
+        /*]]>*/
+    </script>
+
+
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Desembolsos</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Confirmaciones</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletCreditsPendingConfirmationDisbursement" th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Confirmaciones de Desembolso</span>
+                                </div>
+                                <div class="paginator"></div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'"
+                                       href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button-clean'" href="javascript:;">
+                                        <i class="fa fa-filter"></i> Limpiar Filtros</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                    <a id="registerSelectedDisbursementConfirmationButton" href="javascript:;"
+                                       style="display: none"
+                                       th:class="${@frontEndService.getDefaultActionButtonClass()}">Confirmar
+                                        Selec.</a>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/disbursement/confirmation/list}">
+                                    <div class="form-row">
+                                        <!-- DNI -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>DNI</label>
+                                            <input name="document_number" type="text" class="form-control form-control-sm"/>
+                                        </div>
+
+                                        <!-- Producto -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>Producto</label>
+                                            <select name="product" class="form-control form-control-sm">
+                                                <option value="" hidden="hidden">Selecciona Producto</option>
+                                                <option th:each="product : ${@catalogService.getProducts()}"
+                                                        th:value="${product.id}"
+                                                        th:text="${product.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Financiador -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>Financiador</label>
+                                            <select name="entity" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona financiador</option>
+                                                <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Empleador -->
+                                        <div class="form-group col-md-3">
+                                            <label class="control-label"><b></b><br/>Empleador</label>
+                                            <select name="reason" class="form-control form-control-sm">
+                                                <option value="" hidden="">Selecciona Empleador</option>
+                                                <option th:each="employer : ${@catalogService.getEmployers()}" th:value="${employer.id}" th:text="${employer.name}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(credits)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive">
+                                    <th:block th:replace="this :: list"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="registerDisbursementModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="loading">
+                    <div class="modal-body">
+                        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+                        <span> &nbsp;&nbsp;Loading... </span>
+                    </div>
+                </div>
+                <div class="content">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="registerDisbursementRejectionModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterDisbursementRejectionModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="creditRejectionReason">Razón de rechazo</label>
+                                    <select class="form-control" name="creditRejectionReason"
+                                            id="creditRejectionReason">
+                                        <option th:each="reason : ${@catalogService.getCreditRejectionReasons(true)}"
+                                                th:value="${reason.id}" th:text="${reason.reason}"></option>
+                                    </select>
+                                    <label class="control-label" for="creditRejectionComment">Comentarios</label>
+                                    <textarea class="form-control" name="creditRejectionComment" id="creditRejectionComment" maxlength="200"></textarea>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button id="registerRejectedDisbursementButton" type="button" class="btn btn-info">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+<th:block th:fragment="list">
+    <th:block th:switch="${#lists.isEmpty(credits?.results)}">
+        <p th:case="true">No hay resultados</p>
+        <table th:case="false" id="tableResults" class="table table-bordered table-hover table-checkable order-column creditsPendingTable">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>País</th>
+                <th>
+                    <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                        <input type="checkbox" class="group-checkable" data-set=".creditsPendingTable .checkboxes"/>
+                        <span></span>
+                    </label>
+                </th>
+                <th>Crédito</th>
+                <th>Fecha de Firma</th>
+                <th>Tipo Doc.</th>
+                <th>Número Doc.</th>
+                <th>Nombre Completo</th>
+                <th>Producto</th>
+                <th>Empleador</th>
+                <th>Créditos<br/>activos</th>
+                <th>Condiciones</th>
+                <th>Banco</th>
+                <th>Cuenta</th>
+                <th>CCI</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody th:attr="data-table-paginator-total=${credits?.meta?.total}">
+                <tr th:each="credit, iterCredC : ${credits?.results}">
+                    <td th:text="${iterCredC.count}"></td>
+                    <td>
+                        <div class="choose-country">
+                            <span th:class="'c-language c' + ${credit?.country?.id}"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                            <input type="checkbox" class="checkboxes" value="1" th:attr="data-credit-id=${credit?.id}"/>
+                            <span></span>
+                        </label>
+                    </td>
+                    <td><a th:href="@{/person(personId=${credit?.personId}, tab='credits', creditId=${credit?.id})}" th:text="${credit?.code}"></a></td>
+                    <td th:text="${@utilService.datetimeShortFormat(credit?.signatureDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.signatureDate)}"></td>
+                    <td th:text="${credit?.personDocumentType?.name}"></td>
+                    <td th:text="${credit?.personDocumentNumber}"></td>
+                    <td th:text="${credit?.getFullName()}"></td>
+                    <td th:text="${credit?.getProduct()?.getShortName()}"></td>
+                    <td th:text="${credit?.getProduct()?.getId() == credit?.getProduct()?.SALARY_ADVANCE and credit?.employer != null ? credit?.employer?.name : ''}"></td>
+                    <td th:text="${credit?.getActiveCredits()}"></td>
+                    <td th:text="${credit?.getCreditDescription(@utilService)}"></td>
+                    <td th:text="${credit?.bank?.name}"></td>
+                    <td th:text="${credit?.bankAccount}"></td>
+                    <td th:text="${credit?.cciCode}"></td>
+                    <td th:if="false">
+                        <span class="label label-xs label-primary" th:text="Desembolso"></span>
+                        <th:block th:if="${credit?.disbursementType} == 'C'">
+                            <span th:text="' | Cheque | '"></span>
+                            <span th:text="'Nro. ' + ${credit?.disbursementCheckNumber}"></span>
+                        </th:block>
+                        <span th:if="${credit?.disbursementType} == 'T'" th:text="' | Transferencia'"></span>
+                        <span th:if="${credit?.bankAccountType} == 'S'" th:text="' | Cta. de Ahorros | '"></span>
+                        <span th:if="${credit?.bankAccountType} == 'C'" th:text="' | Cta. Corriente| '"></span>
+                        <span th:text="${credit?.bankAccount}"></span>
+                    </td>
+                    <td>
+                        <a href="javascript:;" th:class="${@frontEndService.getDefaultInsidePortletRejectButtonClass()}" th:onclick="'showRegisterDisbursementRejectionModal('+${credit?.id}+')'">Rechazar</a>
+                        <a href="javascript:;" th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}" th:onclick="'showRegisterDisbursementConfirmationModal(['+${credit?.id}+'])'">Confirmar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+            UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+    </th:block>
+</th:block>
+</body>
+
+</html>

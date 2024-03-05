@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+
+        <p th:utext="#{static.question.title.94}"></p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>Entidad</th>
+                    <th>Nro. Tarjeta/ Préstamo</th>
+                    <th>Marca</th>
+                    <th>Ubigeo</th>
+                    <th>Monto</th>
+                    <th>Tasa</th>
+                    <th>Cuotas</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${debts != null}" th:each="debt : ${debts}">
+                    <td>
+                        <span th:text="${debt?.entity?.shortName}"></span>
+                        <small th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).CREDITO_CONSUMO}">(Cr&eacute;dito personal)</small>
+                        <small th:if="${debt.consolidationAccounttype == T(com.affirm.common.model.catalog.ConsolidationAccountType).TARJETA_CREDITO}">(Tarjeta de cr&eacute;dito)</small>
+                    </td>
+                    <td th:text="${debt.accountCardNumber}"></td>
+                    <td th:text="${debt.creditCardBrand?.name}"></td>
+                    <td th:text="${debt.department?.name}"></td>
+                    <td th:text="${debt.balanceDouble}"></td>
+                    <td class="numeric" th:text="${@utilService.percentFormat(debt?.rate)}"></td>
+                    <td class="numeric" th:text="${debt.installments}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.questionNode.addClass('full-width');
+            questionFlow.questionNode.addClass('last-question');
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Configurar Speech</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Configurar Speech</span>
+                </li>
+            </ul>
+            <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div id="portletBufferTransactions">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Configurar Speech</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label" for="entity"><b></b><br/>Entidad</label>
+                                        <select id="entity" class="form-control form-control-sm">
+                                            <option value="" hidden="hidden">Selecciona la Entidad</option>
+                                            <option th:each="entity : ${@catalogService.getEntities()}" th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label" for="product"><b></b><br/>Producto</label>
+                                        <select class="form-control form-control-sm" id="product"></select>
+                                    </div>
+
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label" for="speechType"><b></b><br/>Tipo de Speech</label>
+                                        <select class="form-control form-control-sm" id="speechType">
+                                            <option value="" hidden="hidden">Selecciona el tipo de speech</option>
+                                            <option value="1" >Welcome call</option>
+                                            <option value="2" >Contrato</option>
+                                        </select>
+                                    </div>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        $('#speechType').on('change', function () {
+                                            $('#summernote').summernote('code', '');
+                                            // var entityId = $('#entity').val();
+                                            // var productId = $('#product option:selected').data('product');
+                                            var entityProductId = $('#product').val();
+                                            var speechTypeId = $('#speechType').val();
+                                            baseUrl = /*[[@{/speech/get}]]*/;
+                                            // $('#summernote').defaultLoad(baseUrl + '?entityId=' + entityId + '&productId=' + productId + '&speechTypeId=' + speechTypeId, null, function () {});
+                                            $('#summernote').defaultLoad(baseUrl + '?entityProductId=' + entityProductId + '&speechTypeId=' + speechTypeId, null, function () {});
+                                        });
+
+                                        $('#product').on('change', function () {
+                                            $('#speechType').val('');
+                                            $('#summernote').summernote('code', '');
+                                        });
+
+                                        $('#entity').on('change', function () {
+                                            $('#product').selectedIndex = 0;
+                                            $('#speechType').val('');
+                                            $('#summernote').summernote('code', '');
+
+                                            var entityId = $('#entity').val();
+                                            defaultAjax({
+                                                url: /*[[@{/entity/product}]]*/null,
+                                                data: {
+                                                    entityId: entityId
+                                                },
+                                                type: 'POST',
+                                                success: function (data) {
+                                                    var arr = JSON.parse(data);
+                                                    var html = '<option value="" hidden="hidden">Selecciona el Producto</option>';
+                                                    var len = arr.length;
+                                                    for (var i = 0; i < len; i++) {
+                                                        html += '<option value="' + arr[i].id + '" data-product="' + arr[i].product.id + '">' + arr[i].entityProduct + '</option>';
+                                                    }
+                                                    $('#product').html(html);
+                                                },
+                                                error: function (data) {
+                                                    showErrorModal('Hubo un problema al obtener los productos por entidad.');
+                                                }
+                                            });
+                                        });
+                                        /*]]>*/
+                                    </script>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <th:block th:replace="this :: summerNote"></th:block>
+
+                                <div class="dl-horizontal dl-user-data">
+                                    <ul style="list-style-type:none">
+                                        <li class="title"><label><b>Posibles variables a reemplazar</b></label></li>
+                                        <!-- Listado -->
+                                        <li>PERSONNAME</li>
+                                        <li>WAITINGAPPROVAL</li>
+                                        <li>AMOUNT</li>
+                                        <li>INSTALLMENTS</li>
+                                        <li>INSTALLMENTSAMOUNTAVG</li>
+                                        <li>TEA</li>
+                                        <li>TCEA</li>
+                                        <li>TOTALINTEREST</li>
+                                        <li>TOTALINSURANCE</li>
+                                        <li>2NDINSURANCE (menor a 8000)</li>
+                                        <li>CURRENTTIMESTAMP</li>
+                                        <li>USEREMAIL</li>
+                                        <li>BANK</li>
+                                        <li>BANK_ACCOUNT_NUMBER</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="form-row">
+                                <button id="save" class="btn btn-primary" onclick="save()" type="button">Guardar</button>
+                                <button id="clear" class="btn btn-primary" type="button">Limpiar</button>
+                            </div>
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+                                var save = function() {
+                                    var speech = $('#summernote').summernote('code');
+                                    // var entityId = $('#entity').val();
+                                    // var productId = $('#product option:selected').data('product');
+                                    var entityProductId = $('#product').val();
+                                    var speechTypeId = $('#speechType').val();
+                                    defaultAjax({
+                                        url: /*[[@{/speech/save}]]*/null,
+                                        type: 'POST',
+                                        data: {
+                                            // entityId: entityId,
+                                            // productId: productId,
+                                            entityProductId: entityProductId,
+                                            speechTypeId:speechTypeId,
+                                            speech: speech
+                                        },
+                                        success: function (data) {
+                                            swal(
+                                                'Enhorabuena',
+                                                '¡Se registró el speech correctamente!',
+                                                'success'
+                                            )
+                                        },
+                                        error: function (data) {
+                                            showErrorModal('Hubo un problema al registrar la información');
+                                        }
+                                    });
+                                };
+                                $('#clear').on('click', function(){
+                                    $('#summernote').summernote('code', '');
+                                });
+                                /*]]>*/
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="summerNote">
+    <div id="summernote" name="summernote"> </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#summernote').summernote({
+            height: 300,
+            width: 1400,
+            lang: 'es-ES'
+        });
+        $('#summernote').summernote('code', /*[[${speech}]]*/'');
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

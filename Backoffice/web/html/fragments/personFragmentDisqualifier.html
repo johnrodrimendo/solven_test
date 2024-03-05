@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<th:block th:fragment="tab-disqualifier-body" th:remove="tag">
+        <form  method="post" class="form-horizontal" role="form" id="pepOfacForm">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <p class="text-muted">
+                                <a href="https://app.accelus.com" target="_blank">PEP</a>
+                            </p>
+                            <div>
+                                <div class="btn-group" data-toggle="buttons">
+                                                    <span th:if="${null != disqualifiers?.pep}">
+                                                            <label name="lbl1" class="btn btn-default" th:style="${disqualifiers?.pep?.disqualified == true ? 'background-color: #32c5d2;': ''}">
+                                                                    <input type="radio" name="isPep" value="1" th:text="Si"  th:checked="${disqualifiers?.pep?.disqualified}"/>
+                                                            </label>
+                                                            <label name="lbl2" class="btn btn-default" th:style="${disqualifiers?.pep?.disqualified == false ? 'background-color: #32c5d2;': ''}">
+                                                                    <input type="radio" name="isPep" value="0" th:text="No"  th:checked="${!disqualifiers?.pep?.disqualified}"/>
+                                                            </label>
+                                                    </span>
+                                    <span th:if="${null == disqualifiers?.pep}">
+                                                            <label name="lbl1" class="btn btn-default">
+                                                                    <input type="radio" name="isPep" value="1" th:text="Si"/>
+                                                            </label>
+                                                            <label name="lbl2" class="btn btn-default">
+                                                                    <input type="radio" name="isPep" value="0" th:text="No"/>
+                                                            </label>
+                                                    </span>
+                                </div>
+                            </div>
+                            <span th:if="${!onlyView}">
+                                        <div >
+                                            <label href="javascript:;" class="btn btn-sm green" for="pepImageUploader"> Subir Imágen
+                                                <i class="fa fa-edit"></i>
+                                                <input type="file" accept="image/*" style="display: none" name="pepImage" id="pepImageUploader" th:attr="data-maxfilesize=${1024 * 1024 * 1}"/>
+                                            </label>
+                                            <div class="smaller">Tama&ntilde;o m&aacute;ximo <span>1MB</span></div>
+                                        </div>
+                                        </span>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <div th:if="${null != disqualifiers?.pep}" style="display:flex">
+                                <a th:href="${disqualifiers?.pep?.fileUrl}" target="_blank" style="min-width:65%;">
+                                    <img id="pepImagePreview" alt="click para ver image"  style="max-height: 250px;width:85%" th:if="${null != disqualifiers?.pep}" th:src="${disqualifiers?.pep?.fileUrl}"/>
+                                </a>
+                                <div th:if="${onlyView}" style="min-width:35%">
+                                    <textarea readonly="true" name="pepReason" class="form-control form-control-sm" cols="30" rows="5" maxlength="500" placeholder="Motivo" th:if="${null != disqualifiers?.pep}" th:text="${disqualifiers?.pep?.detail}"></textarea>
+                                </div>
+                                <div th:if="${!onlyView}" style="min-width:35%">
+                                    <textarea  name="pepReason" class="form-control form-control-sm" cols="30" rows="5" maxlength="500" placeholder="Motivo" th:if="${null != disqualifiers?.pep}" th:text="${disqualifiers?.pep?.detail}"></textarea>
+                                </div>
+
+                            </div>
+                            <div th:if="${null == disqualifiers?.pep}" style="display:flex">
+                                <img id="pepImagePreview" style="max-height: 220px;min-width: 350px;"/>
+                                <textarea name="pepReason" class="form-control form-control-sm" cols="30" rows="5" maxlength="500" placeholder="Motivo"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <p class="text-muted">
+                                <a href="https://sanctionssearch.ofac.treas.gov/" target="_blank">PLD/OFAC</a>
+                            </p>
+                            <div>
+                                <div class="btn-group" data-toggle="buttons">
+                                                    <span th:if="${null != disqualifiers?.ofac}">
+                                                        <label name="lbl3" class="btn btn-default" th:style="${disqualifiers?.ofac?.disqualified == true ? 'background-color: #32c5d2;': ''}">
+                                                                <input type="radio" name="isOfac" value="1" th:text="Si"  th:checked="${disqualifiers?.ofac?.disqualified}"/>
+                                                        </label>
+                                                        <label name="lbl4" class="btn btn-default" th:style="${disqualifiers?.ofac?.disqualified == false ? 'background-color: #32c5d2;': ''}">
+                                                                <input type="radio" name="isOfac" value="0" th:text="No"  th:checked="${!disqualifiers?.ofac?.disqualified}"/>
+                                                        </label>
+                                                    </span>
+                                    <span th:if="${null == disqualifiers?.ofac}">
+                                                        <label name="lbl3" class="btn btn-default">
+                                                                <input type="radio" name="isOfac" value="1" th:text="Si"/>
+                                                        </label>
+                                                        <label name="lbl4" class="btn btn-default">
+                                                                <input type="radio" name="isOfac" value="0" th:text="No"/>
+                                                        </label>
+                                                    </span>
+                                </div>
+                            </div>
+                            <span th:if="${!onlyView}">
+                                        <div>
+                                            <label href="javascript:;" class="btn btn-sm green" for="ofacImageUploader"> Subir Imágen
+                                                <i class="fa fa-edit"></i>
+                                                <input type="file" accept="image/*" style="display: none" name="ofacImage" id="ofacImageUploader" th:attr="data-maxfilesize=${1024 * 1024 * 1}"/>
+                                            </label>
+                                            <div class="smaller">Tama&ntilde;o m&aacute;ximo <span>1MB</span></div>
+                                        </div>
+                                        </span>
+                        </div>
+
+                        <div class="form-group col-md-8">
+                            <div th:if="${null != disqualifiers?.ofac}" style="display:flex">
+                                <a th:href="${disqualifiers?.ofac?.fileUrl}" target="_blank" style="min-width:65%;">
+                                    <img id="ofacImagePreview" alt="click para ver image"  style="max-height: 250px;width:85%" th:if="${null != disqualifiers?.ofac}" th:src="${disqualifiers?.ofac?.fileUrl}"/>
+                                </a>
+                                <div th:if="${onlyView}" style="min-width:35%">
+                                    <textarea readonly="true" name="ofacReason" class="form-control form-control-sm" cols="30" rows="5" maxlength="500" placeholder="Motivo" th:if="${null != disqualifiers?.ofac}" th:text="${disqualifiers?.ofac?.detail}"></textarea>
+                                </div>
+                                <div th:if="${!onlyView}" style="min-width:35%">
+                                    <textarea name="ofacReason" class="form-control form-control-sm" cols="30" rows="5" maxlength="500" placeholder="Motivo" th:if="${null != disqualifiers?.ofac}" th:text="${disqualifiers?.ofac?.detail}"></textarea>
+                                </div>
+                            </div>
+                            <div th:if="${null == disqualifiers?.ofac}" style="display:flex">
+                                <img id="ofacImagePreview" style="max-height: 220px;min-width: 350px;"/>
+                                <textarea name="ofacReason" class="form-control form-control-sm" cols="30" rows="5" maxlength="500" placeholder="Motivo"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <span th:if="${!onlyView}">
+                        <button type="button" id="disqualificationButton" class="btn btn-sm green"> Guardar</button>
+            </span>
+        </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var isOnlyView = /*[[ ${onlyView} ]]*/null;
+            if(isOnlyView === true){
+                $("[name='lbl1']").click(function(){
+                    return false;
+                });
+                $("[name='lbl2']").click(function(){
+                    return false;
+                });
+                $("[name='lbl3']").click(function(){
+                    return false;
+                });
+                $("[name='lbl4']").click(function(){
+                    return false;
+                });
+            }
+
+            $('input[type=radio][name=isPep]').change(function() {
+                if(this.value === '1'){
+                    $("[name='lbl1']").css('background-color', '#32c5d2');
+                    $("[name='lbl2']").css('background-color', 'unset');
+
+                }else if(this.value === '0'){
+                    $("[name='lbl1']").css('background-color', 'unset');
+                    $("[name='lbl2']").css('background-color', '#32c5d2');
+                }
+            });
+            $('input[type=radio][name=isOfac]').change(function() {
+                if(this.value === '1'){
+                    $("[name='lbl3']").css('background-color', '#32c5d2');
+                    $("[name='lbl4']").css('background-color', 'unset');
+                }else if(this.value === '0'){
+                    $("[name='lbl3']").css('background-color', 'unset');
+                    $("[name='lbl4']").css('background-color', '#32c5d2');
+                }
+            });
+
+            var loanApplicationCode = /*[[ ${'#' + loanApplication?.code + ' '} ]]*/null;
+            var pepUpload , ofacUpload;
+            var pepReason = $(loanApplicationCode + 'textarea[name=pepReason]');
+            var pepImageUploader = $(loanApplicationCode + '#pepImageUploader');
+            var pepImagePreview = $(loanApplicationCode + '#pepImagePreview');
+
+            var ofacReason = $(loanApplicationCode + 'textarea[name=ofacReason]');
+            var ofacImageUploader = $(loanApplicationCode + '#ofacImageUploader');
+            var ofacImagePreview = $(loanApplicationCode + '#ofacImagePreview');
+            var disqualificationButton = $(loanApplicationCode + '#disqualificationButton');
+
+
+            pepImageUploader.on('change', function () {
+                pepReason.show();
+                var fileSize = pepImageUploader[0].files[0].size;
+                var maxFileSize = pepImageUploader.data('maxfilesize');
+                if(!validateMaxFileSize(fileSize, maxFileSize)) {
+                    return;
+                }
+                pepUpload = pepImageUploader[0].files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    pepImagePreview.attr('src', e.target.result);
+                };
+                reader.readAsDataURL(pepUpload);
+            });
+            ofacImageUploader.on('change', function () {
+                ofacReason.show();
+                var fileSize = ofacImageUploader[0].files[0].size;
+                var maxFileSize = ofacImageUploader.data('maxfilesize');
+                if(!validateMaxFileSize(fileSize, maxFileSize)) {
+                    return;
+                }
+                ofacUpload = ofacImageUploader[0].files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    ofacImagePreview.attr('src', e.target.result);
+                };
+                reader.readAsDataURL(ofacUpload);
+            });
+
+            disqualificationButton.on('click', function() {
+                var disqualificationArray = [];
+                var isPep = $(loanApplicationCode + 'input[name=isPep]:checked');
+                var isOfac = $(loanApplicationCode + 'input[name=isOfac]:checked');
+
+                if((isPep.val() === undefined && isOfac.val() === undefined)) {
+                    swal({
+                        title: '',
+                        text: "Debes seleccionar al menos 1 opcion",
+                        type: "warning",
+                        confirmButtonText: "Entendido",
+                        closeOnConfirm: false
+                    });
+                    return;
+                }
+
+                if(isPep.val() === '1' && pepImagePreview.attr('src') === undefined) {
+
+                    swal({
+                        title: '',
+                        text: "Debes subir la imágen de PEP",
+                        type: "warning",
+                        confirmButtonText: "Entendido",
+                        closeOnConfirm: false
+                    });
+                    return;
+                }
+                if(isOfac.val() === '1' && ofacImagePreview.attr('src') === undefined) {
+                    swal({
+                        title: '',
+                        text: "Debes subir la imágen de PLD/OFAC",
+                        type: "warning",
+                        confirmButtonText: "Entendido",
+                        closeOnConfirm: false
+                    });
+                    return;
+                }
+
+                if(isPep !== undefined) {
+                    disqualificationArray.push({
+                        type: 'P',
+                        detail: pepReason.val(),
+                        isDisqualified: isPep.val() === '1',
+                        person_id: personId,
+                        loan_app_id: /*[[ ${loanApplication?.id} ]]*/null,
+                    });
+                }
+                if(isOfac !== undefined) {
+                    disqualificationArray.push({
+                        type: 'O',
+                        detail: ofacReason.val(),
+                        isDisqualified: isOfac.val() === '1',
+                        person_id: personId,
+                        loan_app_id: /*[[ ${loanApplication?.id} ]]*/null,
+                    });
+                }
+
+                var formData = new FormData();
+                formData.append("data", JSON.stringify(disqualificationArray));
+                formData.append("pepImage", pepUpload);
+                formData.append("ofacImage", ofacUpload);
+
+                defaultAjax({
+                    url: /*[[ @{/person/disqualifier} ]]*/null,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        console.log(data);
+                        location.reload();
+                    },
+                    error: function (data) {
+                        console.error(data);
+                    }
+                });
+
+                return false;
+            });
+
+            function validateMaxFileSize(size, maxSize) {
+                console.log('File size: ' + size);
+                console.log('MaxFile size: ' + maxSize);
+                if(size > maxSize) {
+                    swal({
+                        title: '',
+                        text: "El archivo excede el limite de tamaño de " + (maxSize / 1024 / 1024)+ 'mb',
+                        type: "warning",
+                        confirmButtonText: "Entendido",
+                        closeOnConfirm: false
+                    });
+                    return false;
+                }
+                return true;
+            }
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+<th:block th:fragment="tab-disqualifier" th:remove="tag">
+    <div id="tabLoading" style="display: none">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información
+            </li>
+        </ul>
+    </div>
+    <div th:if="${firstCall == null or !firstCall}" id="tabData">
+        <div class="portlet box green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <div th:remove="tag" th:text="'PEP - PLD/OFAC'"/>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="reload" data-original-title="" title="Actualizar" th:id="disqualifierReload+${loanApplication.id}"> </a>
+                    <a href="javascript:;" class="expand" data-original-title="" title="" th:id="disqualifierToggle+${loanApplication.id}"> </a>
+                </div>
+            </div>
+            <div th:id="tab-disqualifier+${loanApplication.id}" class="portlet-body"></div>
+
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var loanApplicationId = /*[[${loanApplication.id}]]*/;
+
+            $('#disqualifierToggle'+loanApplicationId).one('click',function(){
+                if($(this).hasClass('expand'))
+                    loadDisqualifierFragment(parseInt($(this).attr('id').substring(18),10));
+            });
+
+            $('#disqualifierReload'+loanApplicationId).on('click',function(){
+                    loadDisqualifierFragment(parseInt($(this).attr('id').substring(18),10));
+            });
+            function loadDisqualifierFragment(id) {
+                defaultAjax({
+                    url: /*[[@{/person/disqualifier}]]*/null,
+                    type: 'GET',
+                    data : {
+                        loanApplicationId: id,
+                        onlyView : /*[[ ${onlyView} ]]*/null
+                    },
+                    success: function (data) {
+                        $('#tab-disqualifier'+id).html(data);
+                    }
+
+                })
+            }
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+
+</html>

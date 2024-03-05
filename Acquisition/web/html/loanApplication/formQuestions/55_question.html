@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q55">
+            <th:block th:switch="${loan?.requiredReferrals}">
+                <p th:case="1" th:text="#{questions.block.OneReferenceNumber}"></p>
+                <p th:case="*" th:text="#{questions.block.referenceNumber}"></p>
+            </th:block>
+            <small class="input-help subtitle"
+                   th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                   th:utext="#{questions.message.cellphone.phone}"></small>
+
+            <div class="dynamic-field"></div>
+            <div class="text-small display-block text-center">
+                <a href="#" class="text-lightblue" id="addField">
+                    <i class="icon icon-plus"></i>
+                    Agregar otra referencia
+                </a>
+            </div>
+            <div class="actions text-center">
+                <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        /*<![CDATA[*/
+        function configureValidatorForForm(form) {
+            var staticPhoneNumberMaxlength = form.data('validatorJson').rules.phoneNumber.maxlength;
+            form.on('keyup', 'input[name=phoneCode]', function () {
+                form.data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+                form.validateForm(form.data('validatorJson'));
+                form.data('validator').resetForm();
+                questionFw.initializeFormInputs();
+            });
+
+            form.find('input[name=phoneNumber]').mask('000-#');
+
+            form.find('select[name=typePhone]').on('change select2:select', function () {
+                console.log('cambió');
+                var phoneCode = form.find('input[name=phoneCode]');
+
+                if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}]]*/) {
+                    console.log('Es teléfono');
+                    form.data('validatorJson').rules.phoneCode.required = true;
+                    phoneCode.val('');
+                    phoneCode.keyup();
+                    form.find('.code-field').show();
+                } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}]]*/) {
+                    console.log('Es celular');
+                    form.data('validatorJson').rules.phoneCode.required = false;
+                    phoneCode.val('');
+                    phoneCode.keyup();
+                    form.find('.code-field').hide();
+                }
+                form.validateForm(form.data('validatorJson'));
+                form.data('validator').resetForm();
+                questionFw.initializeFormInputs();
+            });
+            form.find('input[name=typePhone]').change();
+        }
+
+        /*]]>*/
+
+    </script>
+
+    <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        /*<![CDATA[*/
+        function configureValidatorForForm(form) {
+            var staticPhoneNumberMaxlength = form.data('validatorJson').rules.phoneNumber.maxlength;
+
+            form.on('keyup', 'input[name=phoneCode]', function () {
+                form.data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+                form.data('validatorJson').rules.phoneNumber.minlength = staticPhoneNumberMaxlength - $(this).val().length;
+                form.validateForm(form.data('validatorJson'));
+                form.data('validator').resetForm();
+                questionFw.initializeFormInputs();
+
+                var actualCodeLength = $(this).val().length;
+                if (actualCodeLength == 2) {
+                    phoneNumber.mask('0000-#');
+                } else if (actualCodeLength > 2) {
+                    phoneNumber.mask('000-#');
+                }
+            });
+
+            var phoneNumber = form.find('input[name=phoneNumber]');
+            phoneNumber.mask('000-#');
+        }
+
+        /*]]>*/
+
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var isArgentina = /*[[${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}]]*/false;
+        var relationshipArray = new Array();
+        $('select').each(function () {
+            relationshipArray.push($(this).val());
+        });
+        var relationshipsList = /*[[ ${@catalogService.getRelationships(#locale)} ]]*/;
+        var blackList = [];
+        var WIFE = /*[[${T(com.affirm.common.model.catalog.Relationship).WIFE}]]*/;
+        var COHABITANT = /*[[${T(com.affirm.common.model.catalog.Relationship).COHABITANT}]]*/;
+        var MOTHER = /*[[${T(com.affirm.common.model.catalog.Relationship).MOTHER}]]*/;
+        var FATHER =
+        /*[[${T(com.affirm.common.model.catalog.Relationship).FATHER}]]*/
+        var mapBlackList = {};
+        mapBlackList[WIFE] = COHABITANT;
+        mapBlackList[COHABITANT] = WIFE;
+        var reverseMap = {};
+        var uniqueList = [
+            WIFE, COHABITANT, MOTHER, FATHER
+        ];
+        var selectedOptions = [null, null, null];
+        var total = 0;
+        var requiredReferrals = /*[[${loan?.requiredReferrals}]]*/;
+        var alreadyReferrals = /*[[ ${referrals} ]]*/null;
+        var totalAlreadyReferrals = 0;
+        if (alreadyReferrals !== null) {
+            // console.log(alreadyReferrals);
+            alreadyReferrals = JSON.parse(alreadyReferrals);
+            totalAlreadyReferrals = alreadyReferrals.length - requiredReferrals;
+        } else {
+            alreadyReferrals = [];
+        }
+
+        function updateOptions(index) {
+            var selected = selectedOptions[index];
+            var options = '<option></option>';
+            var iterator = 0;
+            for (var relationshipIndex = 0; relationshipIndex < relationshipsList.length; ++relationshipIndex) {
+                relationship = relationshipsList[relationshipIndex];
+                if (reverseMap[relationship.id] != index) {
+                    if (selected != relationship.id && blackList.indexOf(relationship.id) > -1) {
+                        continue;
+                    }
+                }
+                var select = "";
+                if (relationship.id == selected) {
+                    select = 'selected="selected"';
+                    if (uniqueList.indexOf(relationship.id) > -1) {
+                        blackList.push(relationship.id);
+                    }
+                    selectedOptions[index] = relationship.id;
+                    selected = relationship.id;
+                }
+                var option = '<option value="' + relationship.id + '" ' + select + '>' + relationship.relationship + '</option>';
+                if($("#" + (index)).find(`option[value='${relationship.id}']`).length && !blackList.length) continue;
+                options += option;
+                iterator++;
+            }
+            if (mapBlackList[selected] !== undefined) {
+                blackList.push(mapBlackList[selected]);
+                reverseMap[mapBlackList[selected]] = index;
+            }
+            var idx = "#" + (index);
+            if (blackList.length) {
+                // SOLO LIMPIA SI ES POSIBLE QUE EL MISMO ELEMENTO SE ENCUENTRE EN EL OTRO COMBO
+                $(idx).empty();
+            }
+            $(idx).append(options);
+        }
+
+        function updateOtherOptions(idx) {
+            for (var index = 1; index <= total; ++index) {
+                if(index != idx) {
+                    updateOptions(index);
+                }
+            }
+        }
+
+        function optionSelected(index) {
+            var value = $("#" + index).val();
+        }
+
+        function addField(del) {
+            total++;
+            var alreadyReferral = !alreadyReferrals[total - 1] ? {} : alreadyReferrals[total - 1];
+            // console.log(alreadyReferral);
+            var idx = "#" + total;
+            var id = 0 + total;
+            var eliminar = '<a href="#" class="text-red" id="removeField"><i class="icon icon-trash"></i>Eliminar</a>';
+            var selectTipoTelefono = '<div class="field inline cbo-field">' +
+                '<select id="phone_type_' + total + '" data-placeholder="Tipo de Teléfono" class="kindred phonetype" data-width="160" name="typePhone">' +
+                '<option></option>' +
+                '<option value="L">Fijo</option>' +
+                '<option value="M">Celular</option>' +
+                '</select>' +
+                '<div class="errorContainer"></div>' +
+                '</div>';
+            var html = $('<div class="dynamic-field">' +
+                '<form class="relationshipForm" id="questionForm_' + total + '" autocomplete="off">' +
+                '<div class="wrap-form">' +
+                selectTipoTelefono +
+                '<div class="field inline name-field">' +
+                '<input type="text" class="input-outline fullname-input" name="fullname" value="' + (!alreadyReferral['fullName'] ? '' : alreadyReferral['fullName']) + '" placeholder="Nombres y Apellidos"/>' +
+                '<div class="errorContainer"></div>' +
+                '</div>' +
+                '<div class="field inline code-field">' +
+                '<input type="text" class="input-outline small-input codeInput" name="phoneCode" placeholder="Codigo"/>' +
+                '<small class="input-help">Cod. Area (Ej:' + (isArgentina ? "11" : "01") + ')</small>' +
+                '<div class="errorContainer"></div>' +
+                '</div>' +
+                '<div class="field inline phone-field" style="border: none">' +
+                '<div class="wrap-input">' +
+                '<input type="text" class="phoneInput"  placeholder="Tel/ Cel" name="phoneNumber"/>' +
+                '</div>' +
+                '<small class="input-help">Nro. Celular (Ej. 123 4567)</small>' +
+                '<div class="errorContainer"></div>' +
+                '</div>' +
+                '<div class="field inline last">' +
+                '<select id="' + total + '" data-placeholder="Vínculo" name="referenceId"  class="kindred" data-width="120"></select>' +
+                '<div class="errorContainer"></div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="btn-delete display-block text-left">' +
+                (del ? eliminar : '') + '</div>' +
+                '<div class="display-block"> ' +
+                '<div class="errorContainer"></div>' +
+                '</div>' +
+                '</form>' +
+                '</div>');
+
+            if ($('.dynamic-field').size() > 0) {
+                html.insertAfter($('.dynamic-field').last());
+            }
+            else {
+                $(".forms").append(html);
+            }
+
+            $('.phonetype').select2({
+                placeholder: "Tipo de Teléfono"
+            });
+            $(idx).change(function () {
+                var value = selectedOptions[id];
+                selectedOptions[id] = $(idx).val();
+
+                var blackListIndex = blackList.indexOf(value);
+                while (blackListIndex > -1) {
+                    blackList.splice(blackListIndex, 1);
+                    blackListIndex = blackList.indexOf(value);
+                }
+                blackListIndex = blackList.indexOf(mapBlackList[value]);
+                while (blackListIndex > -1) {
+                    blackList.splice(blackListIndex, 1);
+                    blackListIndex = blackList.indexOf(mapBlackList[value]);
+                }
+                for (var index in reverseMap) {
+                    if (reverseMap[index] == id) {
+                        delete reverseMap[index];
+                    }
+                }
+                updateOptions(id);
+                updateOtherOptions(id);
+            });
+            questionFw.validateForm($('#questionForm_' + total), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            $(idx).select2({
+                minimumResultsForSearch: -1,
+                placeholder: $(this).data('placeholder'),
+                width: $(this).data('width') + 'px'
+            });
+            updateOptions(id);
+            updateOtherOptions(id);
+            configureValidatorForForm($('#questionForm_' + total));
+        }
+        $(document).on('blur', 'input.fullname-input', function () {
+            if (new RegExp(/\s$/g).test($(this).val())) {// only if text has an space at the end
+                $(this).val($(this).val().trim());// trim text
+                // revalidate forms
+                $('.relationshipForm').each(function () {
+                    $(this).valid();
+                });
+            }
+        });
+
+        for (var ref = 0; ref < requiredReferrals + totalAlreadyReferrals; ref++) {
+            addField(ref >= requiredReferrals);// IF COUNTER IS GT REQUIRED REFERRALS, SHOW DELETE BUTTON
+
+            // SET VALUE FOR PHONE TYPE COMBO AND CONDITIONALLY SET (CELL)PHONE NUMBER
+            if (alreadyReferrals.length) {
+                var form_row = ref + 1;
+                var alreadyReferral = !alreadyReferrals[ref] ? {} : alreadyReferrals[ref];
+
+                $('#phone_type_' + form_row + '[name=typePhone]').find('option[value="' + alreadyReferral['phoneType'] + '"]').prop('selected', true);
+                $('#phone_type_' + form_row + '[name=typePhone]').trigger('change.select2');
+                $('#phone_type_' + form_row + '[name=typePhone]').change();
+
+                var areaAndNumber = (!Object.keys(alreadyReferral).length || alreadyReferral['phoneNumber'] === null ? '' : alreadyReferral['phoneNumber']).replace(/\(|\)/g, '').split(' ');
+                // console.log(areaAndNumber);
+
+                if (alreadyReferral['phoneType'] === /*[[${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}]]*/null) {
+                    $('#questionForm_' + form_row).find('[name=phoneCode]').val(areaAndNumber[0]);
+                    $('#questionForm_' + form_row).find('[name=phoneNumber]').val(areaAndNumber[1]);
+                } else if (alreadyReferral['phoneType'] === /*[[${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}]]*/null) {
+                    $('#questionForm_' + form_row).find('[name=phoneNumber]').val(areaAndNumber[0]);
+                }
+
+                // FINALLY SET RELATIONSHIP
+                $('#' + form_row + '[name=referenceId]').find('option[value="' + alreadyReferral['relationship']['id'] + '"]').prop('selected', true);
+                $('#' + form_row + '[name=referenceId]').trigger('change.select2');
+            }
+        }
+        //TODO: DYNAMIC. REFACTOR
+        $(function () {
+            var i = $('.dynamic-field').size() + 1;
+            $('#addField').on('click', function () {
+                if (total == 3) {
+                    return;
+                }
+                addField(true)
+            });
+            $('.forms').on('click', '#removeField', function (e) {
+                e.preventDefault();
+                if (total > requiredReferrals) {
+                    blackList = blackList.filter(function (item) { return item != selectedOptions[selectedOptions.length - 1] });
+                    updateOtherOptions(total);
+                    $(this).closest('.relationshipForm').remove();
+                    i--;
+                    total--;
+                }
+                return false;
+            });
+        });
+        $('#sendButton').click(function () {
+            var valid = true;
+            var forms = [];
+            $('.relationshipForm').each(function () {
+                if (!$(this).valid()) {
+                    valid = false;
+                }
+            });
+            if (valid) {
+                $('.relationshipForm').each(function () {
+                    forms.push($(this).serializeObject());
+                });
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    data: {referrals: JSON.stringify(forms)}
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

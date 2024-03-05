@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationTemplate">
+<head>
+    <title>El cr&eacute;dito que mereces</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ ${agent?.avatarUrl} ]]*/;
+        $(document).on('ready', function () {
+            var size = 130;
+            if ($(window).width() <= 1280 && $(window).width() > 768) {
+                size = 100;
+            } else if ($(window).width() <= 768) {
+                size = 60;
+            }
+            $('.avatar-advisor').doOnce(function () {
+                $(".avatar-advisor").imgProgress({
+                    img_url: url, // path to the image
+                    size: size, // size in pixels
+                    barSize: 10, // bar size
+                    backgroundColor: $StrokeSolvenColor, // background color - brand
+                    foregroundColor: $FillSolvenColor, // foreground color - brand
+                    backgroundSize: 'cover', // CSS background-size property
+                    percent: 100 // current percentage value
+                });
+            });
+            updateBranding();
+        });
+        /*]]>*/
+    </script>
+</head>
+<body th:classappend="${@brandingService.isBranded(#httpServletRequest) ? 'wrap-pages brand' : 'wrap-pages'}">
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: processHeader"></th:block>
+</th:block>
+<th:block layout:fragment="content">
+    <section class="loan-process">
+        <div class="container">
+            <div class="adviser-section animated fadeIn" th:if="true">
+                <div class="avatar-progress" >
+                    <div class="avatar-advisor"></div>
+                </div>
+                <div class="horizontal-line">
+                    <div class="line brand-bg-colorweb"></div>
+                </div>
+            </div>
+            <div class="questions-section animated fadeInRight">
+                <div class="block">
+                    <p th:utext="#{questions.block.rejectionTittle(${personFirstName ?: 'Hola'})}"></p>
+                    <p><span class="reasonMail" th:text="${credit.rejectionReason.reasonMail}"></span>, por lo que
+                        lamentablemente no podemos continuar con el proceso.</p>
+                    <script>
+                        /*<![CDATA[*/
+                            var newText = $(".reasonMail").text().substr(0,1).toUpperCase().concat($(".reasonMail").text().substr(1));
+                            $(".reasonMail").text(newText);
+                        /*]]>*/
+                    </script>
+                </div>
+            </div>
+        </div>
+        <hr class="divisor-bottom"/>
+    </section>
+    <!-- Footer begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooter"></th:block>
+    </th:block>
+    <!-- Footer ends -->
+    <!-- Footer begins -->
+    <th:block layout:fragment="footers">
+        <th:block th:replace="fragments/footers :: processFooterChooseAgent"></th:block>
+    </th:block>
+    <!-- Footer ends -->
+</th:block>
+<!-- Header ends -->
+</body>
+</html>

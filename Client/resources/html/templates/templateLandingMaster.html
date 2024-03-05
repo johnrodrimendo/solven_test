@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <th:block layout:fragment="title-pe" />
+    </th:block>
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <th:block layout:fragment="title-ar" />
+    </th:block>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="Resource-type" content="Document" />
+    <meta name="Author" content="SOLVEN FUNDING SAC" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+        <th:block layout:fragment="keywords-pe"/>
+        <meta name="google-site-verification" content="txqJLVmZKqIDznpHRlmJhz8vYZhjahoajQXKwxC18gA" />
+    </th:block>
+    <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+        <th:block layout:fragment="keywords-ar"/>
+        <meta name="google-site-verification" content="s_EKmuew6NO0ZzyXEN6rPDvXEgHTX7qBhWi2mCpyWYA" />
+    </th:block>
+    <meta name="norton-safeweb-site-verification"
+        content="3aewqfzfxfk051dgd6fz79kuw0-0jztb1risjnh425ysb7kioj5ozis2yh9bykk1kepq5s0dbj8223o1r7t0ox-ebzgs5fc9hp4dpzsbn5cpiu7r0le-efyrrsqmdyrf" />
+    <meta name="wot-verification" content="23065a2966d539311018" />
+    <meta name="detectify-verification" content="a6429d4cc053eaf318223516bffb2767" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#F7323F" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="#F7323F" />
+    <meta name="msapplication-navbutton-color" content="#F7323F" />
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/crypto-js/core.js'}"></script>
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} != null" rel="shortcut icon" type="image/x-icon" th:href="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)}" />
+    <link th:if="${@brandingService.getBrandingFavicon(#httpServletRequest, #locale)} == null" rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon/favicon.png}" />
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.onload = function () {
+            var e = new XMLHttpRequest;
+            e.open("GET", "https://fonts.googleapis.com/css?family=Lato:300,400,700,900", !0), e
+                .onreadystatechange = function () {
+                    if (4 == e.readyState && 200 == e.status) {
+                        var t = document.createElement("style");
+                        t.innerHTML = e.responseText, document.head.appendChild(t)
+                    }
+                }, e.send();
+        };
+        var Yv4vDHAmzdWv = /*[[${@configuration.getAESEncrypt()}]]*/null;
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+    <th:block layout:fragment="header" />
+    <th:block layout:fragment="content" />
+    <th:block th:if="${!@brandingService.isBranded(#httpServletRequest)}" layout:fragment="footer">
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingFooter :: landingFooterArgentina"></th:block>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingFooter :: landingFooter"></th:block>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingFooter :: landingFooter"></th:block>
+        </th:block>
+    </th:block>
+    <th:block layout:fragment="modal">
+        <th:block th:replace="fragments/globalModalFragment :: globalModalContact"></th:block>
+    </th:block>
+    <th:block layout:fragment="js" />
+    <!-- <script  defer="true" async="true" src="https://www.google.com/recaptcha/api.js"></script>-->
+    <th:block th:replace="components/tracking :: all" />
+    <th:block th:replace="fragments/countryInformation :: metadata" />
+</body>
+
+</html>

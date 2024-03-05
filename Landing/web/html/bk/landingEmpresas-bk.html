@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/landingTemplate">
+<head>
+    <title th:text="#{static.title.empresas}"></title>
+    <meta name="description" th:attr="content=#{static.description.empresas}" />
+</head>
+<body class="main-empresas">
+<header id="header">
+    <div class="gwr">
+        <a th:href="@{/}" class="logo"><i class="icon-solven"></i>Solven</a>
+        <nav>
+            <ul class="list">
+                <li class="link link-nosotros"><a th:href="@{/nosotros}">Nosotros</a></li>
+                <li class="link current-menu">
+                    <a href="#">Solicítalo</a>
+                    <ul class="list-products sub-menu">
+                        <li><a th:href="@{/adelanto-de-sueldo}" class="product icon-adelanto-sueldo"><span th:utext="#{static.product.salaryAdvance}"></span></a></li>
+                        <li><a th:href="@{/credito-vehicular}" class="product icon-credito-vehicular "><span th:utext="#{static.product.carFinancing}"></span></a></li>
+                        <li><a th:href="@{/__${T(com.affirm.common.model.catalog.ProductCategory).CONSUMO_CATEGORY_URL}__/evaluacion}" class="product icon-credito-personal"><span th:utext="#{static.product.personalLoan}"></span></a></li>
+                    </ul>
+                </li>
+                <li class="link-autoevaluacion"><a th:href="@{/autoevaluacion}" th:text="#{button.selfEvaluation}" class="g-btn btn-contacto bg-skyeblue"></a></li>
+                <li class="link">
+                    <a th:href="@{/company/login}">Ingresa</a>
+                </li>
+            </ul>
+            <ul id="available-languages">
+                <li class="peru active">
+                    <button data-iso="pe" title="Perú"><span>PE</span></button>
+                </li>
+            </ul>
+            <button id="hamburger"><span>menu</span></button>
+        </nav>
+    </div>
+</header>
+<th:block layout:fragment="content">
+    <main class="main-banner">
+        <article>
+            <h1>Recarga los Beneficios de tu empresa</h1>
+            <p>Te ayudamos a cuidar el bienestar de tus colaboradores, a través de los productos financieros que merecen.</p>
+            <span>¿Eres un colaborador? <a href="#contact" class="go-contact">Refiérenos</a> o solicita <a th:href="@{/}">aquí</a>.</span>
+        </article>
+        <ul class="list-benefits">
+            <li>
+                <span>Tasas especiales</span>
+            </li>
+            <li>
+                <span>Flexibilidad crediticia</span>
+            </li>
+            <li>
+                <span>Realmente rápido</span>
+            </li>
+            <li>
+                <span>Sin costos ocultos</span>
+            </li>
+        </ul>
+        <button id="downe" class="icon-bottom">Abajo</button>
+        <img id="bannerPrincipal" th:attr="data-src=@{img/bgprincipal.jpg}" alt="" class="lazy"/>
+        <img id="bannerResponsive" th:attr="data-src=@{img/bgprincipal-responsive.jpg}" alt=""/>
+    </main>
+    <section class="sec-benefits wait-view">
+        <article>
+            <h2>Aumenta el paquete de beneficios de tus colaboradores</h2>
+            <p>Condiciones realmente justas, con la mayor flexibilidad crediticia.</p>
+            <img class="lazy solven01" data-src="img/solven-01.jpg" alt=""/>
+            <img class="lazy solven02" data-src="img/solven-02.jpg" alt=""/>
+        </article>
+        <ul class="list-steps">
+            <li>
+                <article>
+                    <h3>Foco en tu negocio</h3>
+                    <p>Simplificamos tus tareas administrativas. Les brindamos facilidades crediticias justas a todos tus colaboradores.</p>
+                    <span class="steps icon-step-1">1</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Reducimos tus costos</h3>
+                    <p>Reducimos tu carga operativa en más de 90% y te damos mayor liquidez para tu negocio, con créditos sin burocracia, ni tanto papeleo.</p>
+                    <span class="steps icon-step-2">2</span>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Máxima seguridad</h3>
+                    <p>Controles robustos a lo largo de todo el proceso, para proteger la información de tus colaboradores. Te damos todo el control solo con un click.</p>
+                    <span class="steps icon-step-3">3</span>
+                </article>
+            </li>
+            <img class="lazy solven03" data-src="img/solven-03.png" alt=""/>
+        </ul>
+    </section>
+    <section class="sec-testimonial wait-view">
+        <div class="gwr">
+            <ul id="slideTestimonial" class="list-testimonial owl-carousel">
+                <li>
+                    <div class="cnt">
+                        <h2>Robert Jhonsonn</h2>
+                        <span>San Francisco Bay Area</span>
+                        <img data-src="" alt="" class="lazy"/>
+                    </div>
+                    <p>
+                        01 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit omnis quas provident maxime laudantium facere ipsam illum distinctio earum accusamus inventore praesentium
+                    </p>
+                </li>
+                <li>
+                    <div class="cnt">
+                        <h2>Robert Jhonsonn</h2>
+                        <span>San Francisco Bay Area</span>
+                        <img data-src="" alt="" class="lazy"/>
+                    </div>
+                    <p>
+                        02 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit omnis quas provident maxime laudantium facere ipsam illum distinctio earum accusamus inventore praesentium
+                    </p>
+                </li>
+                <li>
+                    <div class="cnt">
+                        <h2>Robert Jhonsonn</h2>
+                        <span>San Francisco Bay Area</span>
+                        <img data-src="" alt="" class="lazy"/>
+                    </div>
+                    <p>
+                        03 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit omnis quas provident maxime laudantium facere ipsam illum distinctio earum accusamus inventore praesentium
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </section>
+    <section class="sec-services wait-view">
+        <article class="gwr">
+            <h2>Colaboradores más Felices y Productivos</h2>
+            <span>Menos tiempo preocupándose por sus finanzas.</span>
+        </article>
+        <ul class="list-services">
+            <li>
+                <article>
+                    <h3>Adelanto</h3>
+                    <p><span>Tranquilidad</span> para todos tus colaborades, los sacamos de cualquier imprevisto. Tenemos la comisión más baja de todo el mercado y un proceso realmente rápido, en sólo 60 segundos.</p>
+                    <i class="icon-adelanto-sueldo"></i>
+                    <img data-src="img/img01.jpg" alt="" class="lazy"/>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Consolidación de Deudas</h3>
+                    <p><span>Ayuda</span> para ordenar las finanzas personales, no dejamos que se ahoguen en deudas. Agrupamos todos sus créditos en uno solo y le permitimos ahorrar en el pago de intereses.</p>
+                    <i class="icon-consolidacion-deudas"></i>
+                    <img data-src="img/img02.jpg" alt="" class="lazy"/>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Crédito de Libre Disponibilidad</h3>
+                    <p><span>Apoyo</span> en los proyectos personales de tus colaboradores, para hacerlos realidad. Seguir sus estudios, remodelar su casa o unas vacaciones. Financiamos lo que necesiten, en tan sólo 5 minutos.</p>
+                    <i class="icon-credito-personal"></i>
+                    <img data-src="img/img03.jpg" alt="" class="lazy"/>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <h3>Crédito Vehicular</h3>
+                    <p><span>Acceso</span> al auto de sus sueños, con el financiamiento más flexible del mercado. Tenemos la forma más fácil y rápida, 100% en línea. Ellos eligen su auto, el crédito lo damos nosotros.</p>
+                    <i class="icon-credito-vehicular"></i>
+                    <img data-src="img/img04.jpg" alt="" class="lazy"/>
+                </article>
+            </li>
+        </ul>
+    </section>
+    <section class="sec-question wait-view">
+        <div class="gwr">
+            <div class="title">
+                <h2>¿Aún no tienes <span class="icon-solven">solven</span> en tu empresa?</h2>
+            </div>
+            <ul class="list-info">
+                <li>
+                    <div class="cnt">
+                        <p>Desarrollamos los productos de financiamiento que las personas realmente merecen.</p>
+                        <span class="step-number"><div>1</div><span></span></span>
+                    </div>
+                </li>
+                <li>
+                    <div class="cnt">
+                        <p>Tenemos un equipo de soporte extraordinario, los ayudamos en las buenas y también en las malas.</p>
+                        <span class="step-number"><div>2</div><span></span></span>
+                    </div>
+                </li>
+                <li>
+                    <div class="cnt">
+                        <p>Te libramos del trabajo de dar créditos a tus colaboradores. Mantén el dinero en tu negocio.</p>
+                        <span class="step-number"><div>3</div><span></span></span>
+                    </div>
+                </li>
+                <li>
+                    <div class="cnt">
+                        <p>Ofrecemos productos justos, con altos ratios de aprobación y un proceso 100% digital. </p>
+                        <span class="step-number"><div>4</div><span></span></span>
+                    </div>
+                </li>
+            </ul>
+            <span class="fintech">Por eso, y por mucho más, somos la FinTech <span class="c-red">#1</span> de Perú.</span>
+        </div>
+    </section>
+    <section id="contact" class="sec-contact wait-view">
+        <div class="gwr">
+            <h2>Formulario de <span>contacto</span></h2>
+            <form th:object="${contactForm}" id="contactForm">
+                <ul class="gform">
+                    <li class="gfield field">
+                        <div class="ginput_container">
+                            <input th:field="*{contactFullName}" type="text" placeholder="Nombres y Apellidos"/>
+                        </div>
+                        <div class="errorContainer text-left"></div>
+                    </li>
+                    <li class="gfield field gfield-select">
+                        <select th:field="*{ocupation}" class="SlectBox" >
+                            <option value="" selected="selected" hidden="hidden">Cargo</option>
+                            <option value="RR.HH.">RR.HH.</option>
+                            <option value="Finanzas">Finanzas</option>
+                            <option value="Gerente General">Gerente General</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                        <div class="errorContainer text-left"></div>
+                    </li>
+                    <li class="gfield gfield-select field">
+                        <select th:field="*{reason}" class="SlectBox" >
+                            <option value="" selected="selected" hidden="hidden">Motivo</option>
+                            <option value="Me interesa">Me interesa</option>
+                            <option value="Tengo una duda">Tengo una duda</option>
+                            <option value="Contactame">Contáctame</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                        <div class="errorContainer text-left"></div>
+                    </li>
+                    <li class="gfield field">
+                        <div class="ginput_container">
+                            <input th:field="*{email}" type="text" placeholder="Email"/>
+                        </div>
+                        <div class="errorContainer text-left"></div>
+                    </li>
+                    <li class="gfield field ">
+                        <div class="ginput_container">
+                            <input type="text" th:field="*{phoneNumber}" placeholder="Teléfono"/>
+                        </div>
+                        <div class="errorContainer text-left"></div>
+                    </li>
+                </ul>
+                <ul class="gform gformarea field">
+                    <li class="gfield field">
+                        <div class="ginput_container">
+                            <textarea th:field="*{message}" cols="30" rows="10" placeholder="Mensaje..."></textarea>
+                        </div>
+                        <div class="errorContainer text-left"></div>
+                    </li>
+                    <div class="cnt-button">
+                        <button id="contactButton" type="button" class="g-btn btn-enviar bg-green" >Enviar</button>
+                    </div>
+                </ul>
+                <div id="response-block"></div>
+            </form>
+        </div>
+    </section>
+    <section class="wait-view"></section>
+</th:block>
+</body>
+
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.addEventListener('load', function () {
+            var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/null;
+            $('#contactForm').validateForm(createFormValidationJson(JSON.parse(validator), $('#contactForm')));
+            $("#contactButton").on('click', function (event) {
+                event.preventDefault();
+                validate();
+            });
+        });
+        function validate() {
+            if ($('#contactForm').valid()) {
+                $('#contactButton').loading('');
+                defaultAjax({
+                    url: /*[[@{/companyContact}]]*/,
+                    type: 'POST',
+                    formValidation: $('#contactForm').data('validator'),
+                    data: $('#contactForm').serializeObject(),
+                    success: function (data) {
+                        $('#contactButton').unloading();
+                        $('#contactForm').data('validator').resetForm();
+                        $('#contactForm')[0].reset();
+                        /*
+                        $('#ocupation').select2({
+                            placeholder: "Cargo",
+                            initSelection: function(element, callback) {
+                            }
+                        });
+
+                        $('#reason').select2({
+                            placeholder: "Motivo",
+                            initSelection: function(element, callback) {
+                            }
+                        });
+                        */
+
+                        $('#response-block').html(successAjaxMessage('Gracias, te responderemos a la brevedad.'));
+                    },
+                    error: function () {
+                        $('#contactButton').unloading();
+                    }
+                });
+            }
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</html>

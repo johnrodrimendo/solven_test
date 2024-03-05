@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q108" id="document-block">
+            <form id="questionForm" th:object="${form}" class="form" autocomplete="off">
+                <!-- <p id="message"></p> -->
+                <p th:text="#{question.108.title}"></p>
+
+                <div id="idForm" class="w">
+                    <div class="field inline"
+                         th:if="${loanApplication.countryId != T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                        <select th:field="*{partnerDocType}" data-width="80">
+                            <option th:each="type : ${@catalogService.getIdentityDocumentTypeByCountry(loanApplication.countryId, false)}"
+                                    th:value="${type.id}" th:text="${type.name}"></option>
+                        </select>
+                    </div>
+                    <div class="field inline field-cuit">
+                        <label th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                               class="type-doc">CUIT / CUIL / CDI</label>
+                        <input type="text" class="input-outline document-input" th:field="*{partnerDocNumber}"/>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div id="noIdForm" class="w">
+                    <div class="field inline">
+                        <input type="text" class="input-outline"  th:field ="*{partnerName}"/>
+                        <small class="input-help">Nombre</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field inline">
+                        <input type="text" class="input-outline"  th:field ="*{partnerFirstSurname}"/>
+                        <small class="input-help">Apellido Paterno</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field inline" id="partnerLastSurnameField">
+                        <input type="text" class="input-outline"   th:field ="*{partnerLastSurname}"/>
+                        <small class="input-help">Apellido Materno</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field inline gender">
+                        <select th:field="*{gender}">
+                            <option th:value="'M'" th:text="Hombre"></option>
+                            <option th:value="'F'" th:text="Mujer"></option>
+                        </select>
+                        <small class="input-help">G&eacute;nero</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field field-birthdate inline" th:unless="${loanApplication?.entityId == T(com.affirm.common.model.catalog.Entity).AZTECA or
+                        @brandingService.getEntityBranding(#httpServletRequest)?.entity?.id == T(com.affirm.common.model.catalog.Entity).AZTECA}">
+                        <div class="wrap-field">
+                            <div class="box-icon tiny-input"><i class="icon icon-cake"></i></div>
+                            <input type="text" th:field="*{partnerDay}" class="input-outline tiny-input" placeholder="dd"
+                                   pattern="[0-9]*" />
+                            <input type="text" th:field="*{partnerMonth}" class="input-outline tiny-input" placeholder="mm"
+                                   pattern="[0-9]*" />
+                        </div>
+                        <small class="input-help">Dia y Mes de Nacimiento</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <th:block th:unless="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <div class="field display-block display-check">
+                        <label for="noIdcheckedBox" class="custom-check">
+                            <span class="check-inner"><i class="icon icon-check"></i></span>
+                            <span class="check-default text-red"> No lo recuerdo</span>
+                            <input type="checkbox" class="real-check" id="noIdcheckedBox" name="noIdcheckedBox"/>
+                        </label>
+                    </div>
+
+                </th:block>
+                <div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <div class="display-block text-center">
+                    <a href="#" class="text-lightblue" id="noPartner">No tengo c&oacute;nyugue/ conviviente</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        function dynamicFieldValidator(ischecked){
+            var validator = $('#questionForm').data('validatorJson')
+
+            validator.rules.partnerDocNumber.required = !ischecked;
+            validator.rules.partnerDocType.required = !ischecked;
+
+            validator.rules.partnerName.required = ischecked;
+            validator.rules.partnerFirstSurname.required = ischecked;
+            validator.rules.partnerLastSurname.required = ischecked;
+            validator.rules.partnerDay.required = ischecked;
+            validator.rules.partnerMonth.required = ischecked;
+            validator.rules.gender.required = ischecked;
+            $('#questionForm').validateForm(validator);
+            $('#partnerDay').keyup(function (event) {
+                if ($(this).val().length == 2)
+                    $('#partnerMonth').focus();
+            });
+            $('#questionForm').data('validator').resetForm();
+        }
+
+        var partnerIdMessage = "&iquest;Cu&aacute;l es el n&uacute;mero de documento de tu esposo(a) o conviviente?";
+        var partnerNoIdMessage = "Ingresa los datos de tu esposo(a) o conviviente";
+
+        var partnerDocNumber = $('#partnerDocNumber');
+        var docType = $('#partnerDocType');
+        var noIdcheckedBox = $("#noIdcheckedBox");
+        var checked = false;
+
+        $("#noIdForm").hide();
+        $("#message").html(partnerIdMessage);
+        $('#partnerDay').forceIntegerOnly(true, 1, 31);
+        $('#partnerMonth').forceIntegerOnly(true, 1, 12);
+
+        setTimeout(function () {
+            partnerDocNumber.focus();
+        }, 300);
+
+        $('#noPartner').on('click', function (e) {
+            e.preventDefault();
+            questionFw.backwards();
+        });
+
+        $('#sendButton').on('click', function (e) {
+            e.preventDefault();
+            sendForm($(this));
+        });
+
+        $('#partnerDay').keyup(function (event) {
+            if ($(this).val().length == 2) {
+                $('#partnerMonth').focus();
+            }
+        });
+
+        noIdcheckedBox.on('change', function () {
+            if(this.checked){
+                $("#message").html(partnerNoIdMessage);
+                checked = true;
+                $('#partnerDocNumber').val('');
+                $("#idForm").hide();
+                $("#noIdForm").show();
+                setTimeout(()=>{
+                    if($("#partnerLastSurnameField input") && $("div.field.gender .select2")){
+                        if($("#partnerLastSurnameField input").outerWidth() > 0) $("div.field.gender .select2").outerWidth($("#partnerLastSurnameField input").outerWidth())
+                    }
+                },100)
+            }else{
+                $("#message").html(partnerIdMessage)
+                checked = false;
+                $('#partnerDay').val('');
+                $('#partnerMonth').val('');
+                $('#partnerLastSurname').val('');
+                $('#partnerFirstSurname').val('');
+                $('#partnerName').val('');
+                $("#noIdForm").hide();
+                $("#idForm").show();
+
+            }
+            dynamicFieldValidator(checked);
+
+        })
+        docType.on('change', function () {
+            partnerDocNumber.val('');
+            $('#questionForm').data('validatorJson').rules.partnerDocNumber.maxlength = $(this).val() == 2 ? 9 : 8 ;
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+
+        $("#reset").on('click', function (e) {
+            var url = system.contextPath + "/" + questionFw.categoryUrl + '/evaluacion/reset/' + questionFw.token;
+            $("#resetProcess").attr('action', url);
+            defaultAjax({
+                url: url,
+                type: 'POST',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+
+        function sendForm(button) {
+            if ($('#questionForm').valid()) {
+                if(checked == false){
+                    // First ask is it needs names
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: button,
+                        type: "POST",
+                        data: $.extend($('#questionForm').serializeObject(), {}),
+                        success: function (data) {
+                            if (data != null && data == 'true') {
+                                $("#message").html(partnerNoIdMessage);
+                                checked = true;
+                                $("#idForm").hide();
+                                $("#noIdForm").show();
+                                $('.display-check').hide()
+                                dynamicFieldValidator(checked);
+                            }else{
+                                sendFinalForm();
+                            }
+                        }
+                    }, "askFormNames");
+                }else{
+                    sendFinalForm(button);
+                }
+            }
+        }
+
+        function sendFinalForm(button){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: button,
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {}),
+                    success: function (data) {
+                        if (data != null && data == 'askNames') {
+                            $("#message").html(partnerNoIdMessage);
+                            checked = true;
+                            $("#idForm").hide();
+                            $("#noIdForm").show();
+                            $('.display-check').hide()
+                            dynamicFieldValidator(checked);
+                        }
+                    }
+                }, "");
+            }
+        }
+        dynamicFieldValidator(false);
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

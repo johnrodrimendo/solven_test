@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+
+        <div th:if="${showFirstDueDate != null and showFirstDueDate}">
+            <p th:text="#{questions.title.date}"></p>
+
+            <div class="form-group">
+                <input id="firstDueDate" name="firstDueDate" type="text" class="form-control"/>
+                <div class="errorContainer"></div>
+
+            </div>
+            <button type="button" class="btn default btn-xs button-first-due-date">Continuar</button>
+        </div>
+
+
+        <div th:if="${showFirstDueDate == null || !showFirstDueDate}">
+            <div>
+                <p class="offer-title" th:text="#{questions.50.offer.title(${personName != null and !personName.isEmpty() ? personName : 'Hola'})}"></p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Entidad</th>
+                        <th>Monto</th>
+                        <th>Cuota promedio</th>
+                        <th>Plazo</th>
+                        <th>TEA</th>
+                        <th>TCEA</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="offer : ${offers}">
+                        <td th:text="${offer?.entity?.shortName}"></td>
+                        <td class="numeric" th:text="${@utilService.integerMoneyFormat(offer?.ammount, offer.currency?.symbol)}"></td>
+                        <td class="numeric" th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer.currency?.symbol)}"></td>
+                        <td class="numeric" th:text="${offer.installments}"></td>
+                        <td class="numeric" th:text="${@utilService.percentFormat(offer.effectiveAnualRate)}"></td>
+                        <td class="numeric" th:text="${@utilService.percentFormat(offer.effectiveAnnualCostRate)}"></td>
+                        <td>
+                            <a href="javascript:;" class="btn default btn-xs button-offer" th:attr="data-offer-id=${offer?.id}">
+                                <i class="fa fa-check"></i>Seleccionar</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+        })();
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${showFirstDueDate != null and showFirstDueDate}">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = getQuestionFlowByRandomId([[${randomId}]]);
+            var minDate = [[${minDate}]];
+            var maxDate = [[${maxDate}]];
+            var enableDates = [[${enableDates}]];
+
+            var jsonDatePicker = {
+                format:'DD/MM/YYYY',
+                inline: true,
+                sideBySide: true
+            };
+            if(minDate != null && maxDate != null) {
+                jsonDatePicker.minDate = moment(minDate, "DD/MM/YYYY");
+                jsonDatePicker.maxDate = moment(maxDate, "DD/MM/YYYY");
+                jsonDatePicker.defaultDate = moment(minDate, "DD/MM/YYYY");
+            }
+            if(enableDates != null){
+                for(i=0; i<enableDates.length; i++){
+                    enableDates[i] = moment(enableDates[i], "DD/MM/YYYY");
+                }
+                jsonDatePicker.enabledDates = enableDates;
+                jsonDatePicker.defaultDate = enableDates[0];
+            }
+            questionFlow.find('input[name=firstDueDate]').datetimepicker(jsonDatePicker);
+
+            questionFlow.find('.button-first-due-date').on('click', function (e) {
+                questionFlow.callCustomMethod('firstDueDate', {
+                    firstDueDate: questionFlow.find('input[name=firstDueDate]').val()
+                }, function (data) {
+                    showAsistedModal(questionFlow.loanApplicationId);
+                }, function (data) {
+                    showErrorModal('Hubo un problema al obtener las provincias.');
+                });
+            });
+        })();
+        /*]]>*/
+    </script>
+    <script th:inline="javascript" th:if="${showFirstDueDate == null || showFirstDueDate}">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = getQuestionFlowByRandomId([[${randomId}]]);
+            var selectedOffer;
+
+            questionFlow.find('.button-offer').on('click', function () {
+                selectedOffer = $(this).data('offer-id');
+                questionFlow.loadNextQuestions();
+            });
+            questionFlow.getFormValuesJson = function(){
+                return {selectedOffer: selectedOffer};
+            };
+
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

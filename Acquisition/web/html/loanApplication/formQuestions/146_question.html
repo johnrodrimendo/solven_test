@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <form id="questionForm" th:object="${form}" class="forms q146" autocomplete="off">
+            <p th:utext="#{questions.block.familyInformation}"></p>
+            <div class="forms">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-left question-subtitle" style="margin-top: 15px;">
+                            <span class="text-lightblue">Datos de tu padre</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field col-md-6 div-names q-my30">
+                        <input type="text" class="input-outline width-100" th:field="*{fatherNames}"/>
+                        <small class="input-help">Nombres completos</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field col-md-6 q-my30">
+                        <input type="text" class="input-outline width-100" th:field="*{fatherSurnames}"/>
+                        <small class="input-help">Apellidos completos</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-left question-subtitle">
+                            <span class="text-lightblue">Datos de tu madre</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field col-md-6 div-names q-my30">
+                        <input type="text" class="input-outline width-100" th:field="*{motherNames}"/>
+                        <small class="input-help">Nombres completos</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field col-md-6 q-my30">
+                        <input type="text" class="input-outline width-100" th:field="*{motherSurnames}"/>
+                        <small class="input-help">Apellidos completos</small>
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+                <div class="field inline r-field btn-continue">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div>
+                <div class="display-block">
+                    <div class="errorContainer"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        $(".footer-159").hide();
+        $('#sendButton').on('click', function(){
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+
+        var $inputname = $('#fatherNames');
+        setTimeout(function () {
+            $inputname.focus();
+        }, 300);
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:utext="#{questions.block.onlyAmount}"></p>
+
+            <div class="form-group col-md-6 nopadding">
+                <small>Monto a solicitar</small>
+                <div class="input-group">
+                    <span class="input-group-addon" th:if="${loanApplication != null}" th:text="${loanApplication.country.currency.symbol}"></span>
+                    <span class="input-group-addon" th:if="${selfEvaluation != null}" th:text="${selfEvaluation.countryParam.currency.symbol}"></span>
+                    <input class="form-control" type="text" th:field="*{amount}"/>
+                </div>
+                <div class="errorContainer"></div>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

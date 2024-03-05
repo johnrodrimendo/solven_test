@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <style >
+        svg {
+            fill:#20A6FF;
+        }
+        .row-icon-mobile {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            margin: auto;
+            text-align: center;
+            width: 90%;
+            background: white;
+
+        }
+
+        .box-icon-mobile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .box-radius-icon{
+            border: 1px solid #20A6FF;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .div-button-radio-span{
+            background: white;
+            border-color: #20A6FF!important;
+        }
+        .conditions{
+            margin-left: 2px;
+            text-align: justify;
+        }
+        .box{
+            background: #20a6ff45;
+            padding: 10px;
+            width: 80%;
+            margin: auto;
+        }
+
+        .iLike{
+            font-size: 16px;
+            color:#ffffff;
+            background-color: #20A6FF;
+            min-width: 120px !important;
+        }
+
+        @media only screen and (max-width: 768px){
+            .conditions{
+                padding-right: 1.4rem;
+            }
+            .box{
+                width: 100%;
+            }
+
+            .iLike{
+                font-size: 0.88em !important;
+                width: 85% !important;
+                margin: auto !important;
+            }
+            .rejectOffers{
+                font-size: 0.88em !important;
+            }
+        }
+
+    </style>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q158">
+            <form id="questionForm" class="title-margin" th:object="${form}">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div>
+                            <b th:text="'¡Felicitaciones, ' + ${personName} + '!'"></b>
+                        </div>
+                        <div style="margin-bottom: 30px;font-size: 15px;">
+                            <span>Tienes una tarjeta de crédito +Efectivo aprobada:</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-offset-2 col-lg-8">
+                        <div class="row q158-row">
+                            <div class="col-xs-12 col-md-7" style="padding-right: 0;padding-left: 0">
+                                <div style="display: flex;">
+                                    <div style="width: 45%">
+                                        <img th:src="${T(com.affirm.common.model.transactional.BanbifPreApprovedBase).BANBIF_MAS_EFECTIVO_IMG_URL}" class="img-card" style="max-width: 100%; max-height: 228px;" alt=""/>
+                                    </div>
+                                    <div class="q158-option option-card-data-offer " style="width:55%;">
+                                        <div style="width:100%;color:white;border-radius: 6px; background-color: #20A6FF;border: 2px solid #20A6FF;">
+                                            <div style="margin-top: 10px;margin-bottom: 10px;">
+                                                <b>L&iacute;nea Ofrecida</b>
+                                            </div>
+                                            <div>
+                                                <div style="display: inline-block;padding-bottom: 10px;" class="amount-q158">
+                                                    <b style="font-size: 28px" th:text="${@utilService.doubleMoneyFormat(approvedBase.linea)}"></b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="width:100%;color:#20A6FF;border-radius: 6px; background-color: #c6e7fc;border: 2px solid #c6e7fc;margin-top: 20px">
+                                            <div style="margin-top: 10px;margin-bottom: 10px;">
+                                                Elige la fecha de facturación:
+                                            </div>
+                                            <div class="field" style="margin-bottom: 10px;">
+                                                <label style="margin-right: 10px">
+                                                    <input type="radio" name="firstDueDay" value="9" class="div-button-radio"/>
+                                                    <span class="div-button-radio-span"></span>
+                                                    <span style="font-weight: normal;">09</span>
+                                                </label>
+                                                <label>
+                                                    <input type="radio" name="firstDueDay" value="23" class="div-button-radio"/>
+                                                    <span class="div-button-radio-span"></span>
+                                                    <span style="font-weight: normal;">23</span>
+                                                </label>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-sm-1 col-md-1">
+                                <div  class="q158-option card-height-size" style="display: flex;justify-content: center;align-items: center;">
+                                    <svg width="30" height="30" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                        <rect width="30" height="30" id="icon-bound" fill="none" />
+                                        <polygon points="13,8 5,16 5,0" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-9 col-md-4 bonus-container-q158 card-height-size card-bonus-detail" style="display:grid;align-items: center;color: var(--branding-loading-color);">
+                                <div style="text-align: start;font-size: 13px">
+                                    <div style="color: black">
+                                        <b>PUEDES RETIRAR<sup>(1)</sup></b>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex;flex-direction: column;margin-top: 10px">
+                                            <label style="display: flex;align-items: center;" th:each="offer, iter : ${offers}">
+                                                <input type="radio" name="offerId" class="div-button-radio" th:value="${offer.id}" th:checked="${iter.index == 0}"/>
+                                                <span style="margin-right: 15px" class="div-button-radio-span"></span>
+                                                <div style="font-weight: bold;" th:inline="text">[[${@utilService.doubleMoneyFormat(offer.ammount)}]] a [[${offer.installments}]] meses: <br/> Cuota aproximada = [[${@utilService.doubleMoneyFormat(offer.installmentAmmount)}]]</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex;margin-top: 5px;margin-bottom: 5px;color: black">
+                                        <span><sup>(1)</sup></span>
+                                        <div class="conditions" >La cuota aproximada no incluye el seguro de desgravamen. Si deseas solicitar un monto menor, comunícate a nuestra banca telefónica
+                                            al 01 631-9000 (Lima) o 0-801-0-0456 (provincias).
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span>TCEA máxima <sup>(2)</sup>:  <th:block th:text="${@utilService.percentFormat(maxTcea)}"></th:block></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-offset-2 col-lg-8">
+                        <div style="margin-top: 20px; margin-bottom: 10px;">
+                          <span>¡Deja a un lado las dudas! Conoce todo lo que necesitas <b> <a href="https://www.banbif.com.pe/Personas/Tarjeta-de-Credito/Mas-Efectivo" style="text-decoration: underline; color: #20A6FF">Aquí</a></b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-offset-2 col-lg-8">
+                        <div class="row accept-reject-buttons">
+                            <div class="field inline field-button container-options-mobile" style="margin-top: 25px; margin-bottom: 20px;padding-left: 10px;padding-right: 10px">
+                                <button id="sendButton" style="font-size: 16px;color:#ffffff;background-color: #20A6FF;min-width: 120px !important;"
+                                        type="button" class="button iLike" th:text="'¡La quiero!'"></button>
+                                <a href="javascript:void(0);" class="remove-position-absolute-mobile rejectOffers" style="color: gray; text-decoration: underline; position: absolute;top: 50%;right: 28%;">No deseo</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 text-center">
+                        <span style="margin-bottom: 5px;font-size: 18px;color: #20A6FF"> <b>Beneficios:</b></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 text-center">
+                        <div class="box">
+                            <div class="row-icon-mobile">
+                                <div class="box-icon-mobile">
+                                    <div class="box-radius-icon">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_18/Tc-ico4.png" alt=""
+                                             style="height: 20px;"/>
+                                    </div>
+
+                                    <h5>Es digital</h5>
+                                </div>
+                                <div class="box-icon-mobile">
+                                    <div class="box-radius-icon">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_18/Tc-ico2.png" alt=""
+                                             style="height: 25px;"/>
+                                    </div>
+
+                                    <h5>Retiro hasta el 100% de tu línea</h5>
+                                </div>
+                                <div class="box-icon-mobile">
+                                    <div class="box-radius-icon">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_18/Tc-ico3.png" alt=""
+                                             style="height: 25px;"/>
+                                    </div>
+                                    <h5>Prepagos sin costo</h5>
+                                </div>
+                                <div class="box-icon-mobile">
+                                    <div class="box-radius-icon">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_18/Tc-ico1.png" alt=""
+                                             style="height: 30px;"/>
+                                    </div>
+
+                                    <h5>Disponible en soles</h5>
+                                </div>
+                                <div class="box-icon-mobile">
+                                    <div class="box-radius-icon">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_18/Tc-ico3.png" alt=""
+                                             style="height: 25px;"/>
+                                    </div>
+
+                                    <h5>Sin pagos por membresía</h5>
+                                </div>
+                                <div class="box-icon-mobile">
+                                    <div class="box-radius-icon">
+                                        <img src="https://solven-public.s3.amazonaws.com/img/banbif/landing_18/Tc-ico1.png" alt=""
+                                             style="height: 30px;"/>
+                                    </div>
+                                    <h5>Cuotas fijas</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<!--                <div class="row justify-content-center">-->
+<!--                    <div class="col-lg-8 col-lg-offset-2" style="margin-top: 10px">-->
+<!--                        <img style="width: 100%" src="https://solven-public.s3.amazonaws.com/img/banbif/banner-bono_2022.png" alt=""/>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+            </form>
+
+            <div>
+
+            </div>
+            <div class="divider"></div>
+            <div class="footer-container-q181">
+                <div class="offer-container">
+                    <section class="section-footer-q181">
+                        <div class="description-example" style="margin-top: 12px">
+                            <p>
+                                La Tarjeta de crédito +Efectivo es una Tarjeta de marca propia (no es, por ejemplo, ni Visa ni MasterCard) que tiene representación electrónica o digital y una línea de crédito en soles. Esta Tarjeta solo está habilitada para brindar los servicios de disposición de efectivo y compra de deuda, previa evaluación creditica
+                                y ambos financiados en cuotas. Estos servicios serán habilitados con la aceptación de EL CLIENTE, previa evaluación crediticia y conforme a la oferta realizada por EL BANCO al momento de contratar o posteriormente, por el monto y tiempo ofrecidos por el BANCO. Los servicios adicionales asociados a esta tarjeta
+                                como: Compras por Internet, sobregiro y Compras en el extranjero, estarán deshabilitados, por lo que con la Tarjeta de Crédito +Efectivo no se podrá realizar consumos en establecimientos, compras por internet, sobregiros, ni compras presenciales en el extranjero. La Tarjeta tendrá una vigencia de 4 años
+                                calendario contados desde el mes de activación de la tarjeta. La Tarjeta será activada automáticamente dentro de las 48 horas de recibida, salvo que sea entregada en una oficina BanBif, donde la activación es inmediata. Si desea conocer la fecha y el estado de la activación de su Tarjeta puede llamar a nuestra
+                                Banca Telefónica.
+                            </p>
+                            <p>
+                                El cliente puede ejercer su derecho de endosar un seguro de vida en reemplazo del seguro de desgravamen que le ofrece el banco. En tal caso, deberá realizar el endoso una vez que se emita la tarjeta de crédito y por el valor de la línea de crédito aprobada. El procedimiento para realizar el endoso se encuentra
+                                publicado en nuestra página web: https://www.banbif.com.pe/Personas/Fondos-Mutuos-y-Seguros/Seguros/Seguros-Asociados-a-la-Contratacion-de-un-Producto o en nuestras oficinas BanBif. Para que no aplique el cobro del seguro de desgravamen, deberá de haber cumplido con entregar la póliza de vida y el
+                                endoso a favor del banco, debiendo contarse con la aceptación del banco.
+                            </p>
+                            <p>
+                                <sup>(2)</sup> Esta TCEA ha sido calculada conforme a lo parámetros estandarizados establecidos en el Anexo 1-A del Reglamento de Gestión de Conducta de Mercado, aprobado por Resolución N° 3274-2017, por lo que no corresponde necesariamente a la TCEA del financiamiento aquí ofrecido. TEA máxima de 82.00%, que corresponde a Tarjeta de crédito +Efectivo, plan cuotas, moneda de la
+                                línea, consumo de S/ 1,000 realizado a 30 días antes de la fecha de facturación, cancelado en un plazo de 12 cuotas mensuales constantes, considerando: intereses, no se cobra membresía ni por envío electrónico de estado de cuenta; y gasto por seguro de desgravamen de mensual a una tasa porcentual de 0.08% aplicable proporcionalmente al promedio de los saldos deudores
+                                diarios registrados en la cuenta tarjeta en el periodo de facturación. Umbral mínimo de amortización de capital del pago mínimo: S/ 30.00. No considera deuda anterior. De no pagar por lo menos el Pago Mínimo dentro de la fecha límite de pago se cobrará el interés compensatorio efectivo anual hasta la fecha de pago más la tasa de interés moratoria nominal anual de 12.51% en
+                                soles por cada día de retraso. Estas tasas de interés compensatoria y moratoria podrán ser modificadas por el Banco Central de Reserva del Perú conforme a lo dispuesto en el artículo 6 de la Ley N° 28587, el artículo 51 del Decreto Ley N° 26123 y la circular N° 0008-2021-BCRP. Tasa de Costo Efectivo Anual (TCEA), Tasa de Interés compensatoria Efectiva Anual (TEA) y Tasa de interés
+
+                                moratoria anual calculadas a 360 días. ITF de 0.005%, según D.S No150-2007-EF. Se podrá elegir libremente contratar el seguro de desgravamen con BanBif o directamente con una empresa de seguros de su libre elección. Mayor información sobre seguros, derecho de endoso y su procedimiento, en nuestra página web: https://www.banbif.com.pe/Personas/Fondos-Mutuos-y-
+                                Seguros/Seguros/Seguros-Asociados-a-la-Contratacion-de-un-Producto. La Tarjeta de crédito +Efectivo es una Tarjeta de marca propia (no es, por ejemplo, ni Visa ni MasterCard) que tiene representación electrónica o digital y una línea de crédito en soles. Esta Tarjeta solo está habilitada para brindar los servicios de disposición de efectivo y compra de deuda, previa evaluación
+
+                                creditica y ambos financiados en cuotas. Estos servicios serán habilitados con la aceptación de EL CLIENTE, previa evaluación crediticia y conforme a la oferta realizada por EL BANCO al momento de contratar o posteriormente, por el monto y tiempo ofrecidos por el BANCO. Los servicios adicionales asociados a esta tarjeta como: Compras por Internet, sobregiro y Compras en el
+                                extranjero, estarán deshabilitados, por lo que con la Tarjeta de Crédito +Efectivo no se podrá realizar consumos en establecimientos, compras por internet, sobregiros, ni compras presenciales en el extranjero.
+
+                            </p>
+                        </div>
+                    </section>
+                    <br/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.initializeFormInputs();
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').on('click', function(){
+            var selectedOffer = $('input[name=offerId]:checked').val();
+            if (selectedOffer != undefined) {
+                if ($('#questionForm').valid()) {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        form: $('#questionForm'),
+                        data: $('#questionForm').serializeObject()
+                    }, "");
+                }
+            }
+        });
+
+        $('.rejectOffers').on('click', function (event) {
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    offerId: -1
+                },
+                success: function () {
+                    questionFw.refreshQuestion();
+                }
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

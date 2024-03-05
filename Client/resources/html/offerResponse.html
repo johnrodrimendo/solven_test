@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var status = /*[[${status}]]*/null;
+        var loanAplicationToken = /*[[${loanAplicationToken}]]*/null;
+        var statusRequestTimeout;
+        var redirectTimeout = 5;
+
+        var statusJson;
+        if (status != null) {
+            statusJson = JSON.parse(status);
+        }
+
+        $(window).load(function () {
+            //Set redirect timeout
+            var approved = /*[[${loanApplication.status.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).APPROVED}]]*/false;
+            if (approved) {
+                setSuccessRedirectTimeout();
+            }
+        });
+
+        function setSuccessRedirectTimeout() {
+            setTimeout(function () {
+                redirectTimeout = redirectTimeout - 1;
+                $('#successRedirectionTime').html(redirectTimeout);
+                if (redirectTimeout == 1) {
+                    var form = document.forms['frmSuccess'];
+                    form.submit();
+                } else {
+                    setSuccessRedirectTimeout();
+                }
+            }, 1000);
+        }
+
+        function preventBack() {
+            window.history.forward();
+        }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () {
+            null
+        };
+
+        /*]]>*/
+    </script>
+
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader "></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+
+    <div class="main-content">
+        <div class="container">
+            <div class="wrap">
+                <div class="offer-response">
+                    <div id="offerResponse">
+                        <div id="runningDiv"
+                             th:if="${loanApplication.status.id} == ${T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL}">
+                            <div class="message-container">
+                                <i class="icon clock-icon"></i>
+                                <h2 class="responseTitle" th:text="#{loanOffer.waitingApproval}"></h2>
+                                <br/>
+                                <span th:text="#{loanOffer.waitingApprovalDetail}"></span>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <p style="color: #34465d;">¿Quieres aprender m&aacute;s de finanzas? <br/>Visita nuestro blog <a href="https://www.solven.pe/blog">aquí</a>.</p>
+                            </div>
+                        </div>
+
+                        <div id="successDiv"
+                             th:if="${loanApplication.status.id} == ${T(com.affirm.common.model.catalog.LoanApplicationStatus).APPROVED}"
+                             class="aff-line-height">
+                            <div class="message-container">
+                                <div class="gif-solven-container">
+                                    <div class="sk-cube-grid">
+                                        <div class="sk-cube sk-cube1"></div>
+                                        <div class="sk-cube sk-cube2"></div>
+                                        <div class="sk-cube sk-cube3"></div>
+                                        <div class="sk-cube sk-cube4"></div>
+                                        <div class="sk-cube sk-cube5"></div>
+                                        <div class="sk-cube sk-cube6"></div>
+                                        <div class="sk-cube sk-cube7"></div>
+                                        <div class="sk-cube sk-cube8"></div>
+                                        <div class="sk-cube sk-cube9"></div>
+                                    </div>
+                                </div>
+                                <h2 class="responseTitle">Solicitud aprobada</h2>
+                                <span>Tu solicitud ha sido aprobada. Te estamos redireccionando a la pantalla de firma</span>
+
+                                <form role="form" action="#"
+                                      th:action="@{/loanapplication/__${loanAplicationToken}__/signature}"
+                                      method="get" id="frmSuccess"></form>
+                            </div>
+                        </div>
+
+                        <div id="failDiv"
+                             th:if="${loanApplication.status.id} == ${T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED}">
+                            <div class="well">
+                                <h2 class="aff-line-height">Su solicitud ha sido rechazada</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

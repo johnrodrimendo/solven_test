@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<th:block th:fragment="tabs">
+    <ul class="nav nav-pills nav-justified">
+        <li th:class="${step == 1 } ? 'active':''">
+            <a th:href="${step &lt;= 1 }?'#':@{/loanapplication/personalInformation/__${loanAplicationToken}__}"
+               th:text="#{registerLoanForm.tabs.personalInfo}"></a>
+        </li>
+        <li th:class="${step == 2 } ? 'active':''">
+            <a th:href="${step &lt;= 2 }?'#':@{/loanapplication/addressInformation/__${loanAplicationToken}__}"
+               th:text="#{registerLoanForm.tabs.address}"></a>
+        </li>
+        <li th:class="${step == 3 } ? 'active':''">
+            <a th:href="${step &lt;= 3 }?'#':@{/loanapplication/ocupationalInformation/__${loanAplicationToken}__}"
+               th:text="#{registerLoanForm.tabs.ocupation}"></a>
+        </li>
+        <li th:class="${step == 4 } ? 'active':''">
+            <a th:href="${step &lt;= 4 }?'#':@{/loanapplication/socialNetworksInformation/__${loanAplicationToken}__}"
+               th:text="#{registerLoanForm.tabs.socialNetworks}"></a>
+        </li>
+    </ul>
+</th:block>
+
+</body>
+</html>

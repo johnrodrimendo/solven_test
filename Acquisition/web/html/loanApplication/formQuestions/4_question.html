@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <p th:utext="#{questions.block.useFor}"></p>
+            <div class="field inline" th:each="usage : ${@catalogService.getCreditUsages(#locale)}">
+                <label class="input-radio">
+                    <input type="radio" name="use" th:value="${usage.id}"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <i class="icon icon-business"
+                               th:classappend="${#strings.toUpperCase(usage.usage) == T(com.affirm.common.model.catalog.CreditUsage).PARTICULAR ? 'icon-independent' : 'icon-dependent'}"></i>
+                            <h5 th:text="${usage.usage}"></h5>
+                            <div class="radio"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('input[name=use]:radio').change(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {usageId: $(this).val()}
+            }, "");
+        });
+        var inputRadio = $('.input-radio');
+        inputRadio.hover(function () {
+            $(this).addClass("hover-input");
+        }, function () {
+            $(this).removeClass("hover-input");
+        });
+        inputRadio.on('click', function () {
+            var $this = $(this);
+            $this.addClass('active');
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Reporte de Retenciones</title>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Reportes</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Reporte de Retenciones</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Reporte de Retenciones</span>
+                                </div>
+                                <div class="actions">
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(wrapper?.results)}">
+                                <div th:case="true">
+                                    <p>No hay resultados</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: list"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Pa&iacute;s</th>
+            <th>Cr&eacute;dito</th>
+            <th>Libor</th>
+            <th>Libor mensual + 7</th>
+            <th>Libor diario + 7</th>
+            <th>D&iacute;as</th>
+            <th>Inter&eacute;s Libor + 7</th>
+            <th>I.G.V.</th>
+            <th>Retenci&oacute;n ISR</th>
+            <th>SubTotal Entidad</th>
+            <th>SubTotal Acumulado Entidad</th>
+            <th>Distribuci&oacute;n a Solven</th>
+            <th>Neto a Entidad</th>
+        </tr>
+        </thead>
+        <tbody th:attr="data-table-paginator-total=${#wrapper?.meta?.total}">
+        <tr th:each="credit, iterCredit : ${wrapper?.results}">
+            <td th:text="${iterCredit?.count}"></td>
+            <td>
+                <div class="choose-country">
+                    <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+                </div>
+            </td>
+            <td th:text="${credit?.creditCode}"></td>
+            <td th:text="${credit?.liborValue}"></td>
+            <td th:text="${credit?.liborMonthlyPlusSeven}"></td>
+            <td th:text="${credit?.liborDailyPlusSeven}"></td>
+            <td th:text="${credit?.loanDays}"></td>
+            <td th:text="${credit?.interestLiborPlusSeven}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.interestTax)}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.taxWithHolding)}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.entitySubTotal)}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.entityCumulativeTotal)}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.solvenDistribution)}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.netToEntity)}"></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+</body>
+
+</html>

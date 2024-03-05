@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var showCellPhone = /*[[${showCellPhone}]]*/;
+            console.log(showCellPhone);
+            /*]]>*/
+
+        </script>
+        <div class="forms q54">
+            <p th:text="#{questions.block.validatePIN}" th:if="${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} and ${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}"></p>
+            <p th:utext="#{questions.block.validatePINAzteca}" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CONSUMO}"></p>
+            <p th:utext="#{questions.block.validatePINAztecaIdentidad}" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}"></p>
+            <p th:utext="#{questions.block.validatePINAztecaGeneral}" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and loanApplication?.productCategoryId != T(com.affirm.common.model.catalog.ProductCategory).CONSUMO and loanApplication?.productCategoryId != T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}"></p>
+            <p th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">Ingresa el PIN que te enviamos por SMS</p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="centrado">
+                    <div>
+                        <div class="field inline">
+                            <input type="text" class="input-outline pin-input" placeholder="PIN" th:field="*{pin}"
+                                   pattern="[0-9]*"/>
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <div th:if="${showCellPhone}" class="fadeIn" id="arentYou">
+                    <p>
+                        <small th:text="#{question.54.small}"></small>
+                        <small>
+                            <a href="#" id="reset" th:text="${phoneNumber}"/>?
+                        </small>
+
+                    </p>
+                </div>
+                <small th:class="input-help">
+                    <a href="#" class="text-lightblue fadeIn hidden"
+                       id="resendToken"><i class="icon icon-reload"></i>Reenviar</a>
+                    <a href="#" class="text-lightblue fadeIn hidden" id="callMe">
+                        <i class="icon icon-reload"></i><span th:text="#{questions.block.q54.callme}"></span><span
+                            class="timeout"></span>
+                    </a>
+                </small>
+
+                <th:block th:if="${callRequested != null}">
+                    <div th:style="${callRequested} ? '' : 'display: none'" class="w">
+                        <a href="#" class="btn-link" id="needHelp" th:text="#{questions.block.q54.qs}"></a>
+                    </div>
+                    <div th:style="${!callRequested} ? '' : 'display: none'" class="w" id="helpRequested">
+                        <p>Te llamaremos en las próximas 24hrs. hábiles</p>
+                    </div>
+                </th:block>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        var url = /*[[@{/loanapplication}]]*/;
+        var loanApplicationToken;
+        var retrySms = /*[[${retrySms}]]*/;
+        var retryCall = /*[[${retryCall}]]*/;
+        var timeoutSms = /*[[${timeoutSms}]]*/;
+        var timeoutCall = /*[[${timeoutCall}]]*/;
+        var timeoutAvailableCall = /*[[${timeoutAvailableCall}]]*/;
+        var sentSms = /*[[${sentSms}]]*/;
+        var canRetry = /*[[${canRetry}]]*/;
+        var timeouts = [];
+        var voiceCallInterval;
+
+        var $pininput = $('.pin-input');
+        /**setTimeout(function () {
+            $pininput.focus();
+        }, 300);*/
+
+        /*if (!retryCall) {
+            var callTimeout = setTimeout(function () {
+                $("#callMe").removeClass('hidden');
+                retryCall = !retryCall;
+                timeoutCall = 0;
+                debugger;
+            }, timeoutCall);
+            timeouts.push(callTimeout);
+        }*/
+
+        if (retrySms && canRetry) {
+            var smsTimeout = setTimeout(function () {
+                $("#resendToken").removeClass('hidden');
+                // retrySms = !retrySms;
+                timeoutSms = 0;
+            }, timeoutSms);
+            timeouts.push(smsTimeout);
+        }
+
+        if (retryCall && sentSms && canRetry) {
+            $("#callMe").addClass('hidden');
+            // retryCall = !retryCall;
+
+            var availableTimeout = setTimeout(function () {
+                $("#callMe").removeClass('hidden');
+                // retryCall = !retryCall;
+                timeoutAvailableCall = 0;
+                $('#callMe .timeout').html('');
+                clearTimeout(voiceCallInterval);
+            }, timeoutAvailableCall);
+            timeouts.push(availableTimeout);
+
+            var secondsLeft = timeoutAvailableCall;
+            voiceCallInterval = setInterval(function () {
+                secondsLeft -= 1 * 1000;
+                $('#callMe .timeout').text(' (' + new Date(secondsLeft).getSeconds() + ')');
+            }, 1000);
+        }
+
+        function killTimeouts() {
+            timeouts.forEach(function (timeout) {
+                clearTimeout(timeout);
+            });
+        }
+
+        $('#reset').on('click', function (e) {
+            e.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#reset'),
+                type: "POST",
+                form: $('#questionForm')
+            }, "wrongphonenumber");
+        });
+
+        $('#resendToken').on('click', function (e) {
+            e.preventDefault();
+            // if(retrySms) {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#resendToken'),
+                type: "POST",
+                form: $('#questionForm'),
+                success: function(){
+                    questionFw.refreshQuestion();
+                    killTimeouts();
+                }
+            }, "resendsms");
+            // }
+        });
+        $('#callMe').on('click', function (e) {
+            e.preventDefault();
+
+            // if(retryCall) {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#callMe'),
+                type: "POST",
+                form: $('#questionForm'),
+                success: function(){
+                    questionFw.refreshQuestion();
+                    killTimeouts();
+                }
+            }, "voicecall");
+            // }
+        });
+        $('#needHelp').on('click', function (e) {
+            e.preventDefault();
+            var needHelpButton = $(this);
+
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#needHelp'),
+                type: "POST",
+                form: $('#questionForm')
+            }, "callrequest");
+
+            needHelpButton.hide();
+            $("#helpRequested").show();
+        });
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject(),
+                    complete: function(){
+                        dataLayer.push({
+                            'event': 'pinValidated'
+                        });
+                    }
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

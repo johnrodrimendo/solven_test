@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<div th:fragment="tab-fraud-log-alerts-body" th:remove="tag">
+    <div class="tab-content">
+        <div class="table-responsive"  >
+            <table class="table table-bordered table-striped table-hover" id="fraudsLogTable">
+                <thead>
+                <tr>
+                    <th>Elemento de Alarma</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>LA ID</th>
+                    <th>Nombres</th>
+                    <th>Apellido</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Flag de Fraude</th>
+                    <th>Acción</th>
+                    <th th:if="${showActions}">Asignar flag de fraude</th>
+                    <th th:if="${!showActions}">Operador</th>
+                    <th th:if="${!showActions}">Fecha</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="loanApplicationFraudAlert,iter : ${loanApplicationFraudAlerts}" th:style="'background-color:'+ ${loanApplicationFraudAlert?.fraudAlert?.supervisionRequired ? '#FFE5CC' : '#FFFFCC' }">
+                    <td th:text="${loanApplicationFraudAlert?.fraudAlert?.fraudAlertElemnt}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.fraudAlert?.fraudAlertCode}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.fraudAlert?.fraudAlertDescription}"></td>
+                    <td>
+                        <a th:href="@{/person(personId=${loanApplicationFraudAlert?.relatedLoanApplication?.personId}, tab='applications', applicationId=${loanApplicationFraudAlert?.relatedLoanApplication?.id})} + ${'#' + loanApplicationFraudAlert?.relatedLoanApplication?.code}"
+                           th:text="${loanApplicationFraudAlert?.relatedLoanApplication?.code}"></a></td>
+                    <td th:text="${loanApplicationFraudAlert?.firstName}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.lastName}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.department}"></td>
+                    <td th:text="${loanApplicationFraudAlert?.relatedLoanApplication?.status?.status}"></td>
+                    <td th:text="${@catalogService.getFraudFlag(loanApplicationFraudAlert?.relatedLoanApplication?.fraudFlagId)?.flag}"></td>
+                    <td th:if="${showActions}">
+                        <div th:if="${!loanApplicationFraudAlert?.fraudAlert?.supervisionRequired and loanApplication.creditAnalystSysUserId != null}">
+                            <a class="btn green btn-outline btn-xs"
+                               th:onclick="'rejectLoanApplicationFraudAlert('+${loanApplicationFraudAlert?.id}+','+${iter.index}+')'">Desestimar</a>
+                        </div>
+                        <div th:if="${loanApplicationFraudAlert?.fraudAlert?.supervisionRequired and loanApplication.creditAnalystSysUserId != null} ">
+                            <a shiro:hasPermission="person:fraudAlert:reject" class="btn green btn-outline btn-xs"
+                               th:onclick="'rejectLoanApplicationFraudAlert('+${loanApplicationFraudAlert?.id}+','+${iter.index}+')'">Desestimar</a>
+                        </div>
+                    </td>
+                    <td th:if="${!showActions}"><div  th:text="Desestimado"></div></td>
+                    <td th:if="${showActions}"><a th:if="${loanApplicationFraudAlert?.relatedLoanApplication?.id != null}" class="btn green btn-outline btn-xs"
+                                                  th:onclick="'showModalLoanApplicationFraudAlert('+${loanApplicationFraudAlert?.relatedLoanApplication?.id} + ', \'' + ${loanApplicationFraudAlert?.relatedLoanApplication?.code} + '\', \'' + ${loanApplicationFraudAlert?.firstName != null ? loanApplicationFraudAlert?.firstName : ''} +  ' ' + ${loanApplicationFraudAlert?.lastName != null ? loanApplicationFraudAlert?.lastName : ''} + '\', \'' + ${loanApplicationFraudAlert?.dni}  + '\')'">Asignar</a></td>
+                    <td th:if="${!showActions}" th:text="${loanApplicationFraudAlert?.operatorName} + ' ' + ${loanApplicationFraudAlert?.operatorLastName} "></td>
+                    <td th:if="${!showActions}" th:text="${@utilService.datetimeShortFormat(loanApplicationFraudAlert?.registeredDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplicationFraudAlert?.registeredDate)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div th:fragment="tab-fraud-log-alerts" th:remove="tag">
+    <div id="tabLoading" style="display: none">
+        <ul class="fa-ul">
+            <li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información de alertas
+            </li>
+        </ul>
+    </div>
+    <div th:if="${firstCall == null or !firstCall}" id="tabData">
+
+        <div class="portlet box" th:classappend="green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-files-o"></i>
+                    <div th:remove="tag" th:text="${sectionName}"></div>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="reload" data-original-title="" title="Actualizar" th:id="fraudLogReload+${loanApplication.id}"> </a>
+                    <a href="javascript:;" class="expand" data-original-title="" title="" th:id="fraudLogToggle+${loanApplication.id}"> </a>
+                </div>
+            </div>
+            <div th:id="fraud-alerts-log-body+${loanApplication.id}" class="portlet-body" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="registerModalLoanApplicationFraudAlert" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form role="form" action="#" id="frmRegisterApplicationRejectionModal" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" for="fraudFlagId">Flag de Fraude</label>
+                                    <select class="form-control" name="fraudFlagId"
+                                            id="fraudFlagLogId">
+                                        <option th:each="flag : ${@catalogService.getFraudFlags()}"
+                                                th:value="${flag.id}" th:text="${flag.flag}"></option>
+                                    </select>
+                                    <label class="control-label" for="commentary">
+                                        Comentarios / Detalles
+                                    </label>
+                                    <div>
+                                        <dl class="dl-horizontal dl-loan-application">
+                                            <dt>LA ID</dt>
+                                            <dd id="laId"></dd>
+                                            <dt>Nombre y Apellido</dt>
+                                            <dd id="fullName"></dd>
+                                            <dt>Dni</dt>
+                                            <dd id="documentNumber"></dd>
+                                        </dl>
+                                    </div>
+                                    <textarea class="form-control" name="fraudFlagCommetary"
+                                              id="commentary"></textarea>
+                                    <input type="hidden" id="loanApplicationId"/>
+                                    <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-info" th:if="${showActions}"
+                       th:onclick="'closeLoanApplicationFraudAlertModal()'">Cancelar</a>
+                    <a id="btnSaveFraudAlert" class="btn btn-info" th:if="${showActions}"
+                       th:onclick="'rejectLoanApplicationFraudAlertModal()'">Guardar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var loanApplicationId = /*[[${loanApplication.id}]]*/null;
+
+        $('#fraudLogToggle'+loanApplicationId).one('click',function(){
+            if($(this).hasClass('expand'))
+                loadLoanApplicationLogFraudAlertsFragment(parseInt($(this).attr('id').substring(14),10));
+        });
+
+        $('#fraudLogReload'+loanApplicationId).on('click',function(){
+                loadLoanApplicationLogFraudAlertsFragment(parseInt($(this).attr('id').substring(14),10));
+        });
+
+        function loadLoanApplicationLogFraudAlertsFragment(id) {
+            defaultAjax({
+                url: /*[[@{/person/reject/loanApplicationFraudLogAlert}]]*/null,
+                type: 'GET',
+                data : {
+                    loanApplicationId: id,
+                    showActions : /*[[${showActions}]]*/null
+
+                },
+                success: function (data) {
+                    $('#fraud-alerts-log-body'+id).html(data);
+                }
+            })
+        };
+        /*]]>*/
+    </script>
+</div>
+</html>

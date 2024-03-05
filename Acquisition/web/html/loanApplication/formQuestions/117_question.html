@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <form th:unless="${reasonGiven}" id="questionForm" th:object="${form}" class="form q117" autocomplete="off">
+        <th:block th:if="${loanApplication.entityId == T(com.affirm.common.model.catalog.Entity).BANBIF}">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="text-align: center;">
+                                <p class="rejection-msg-banbif">
+                                    <b class="msg-person-name">
+                                        <span th:utext="${personFirstName} + ', '"></span>
+                                        <span>muchas gracias por visitar BanBif.</span>
+                                    </b>
+                                    <span class="msg-desc-1">Estamos trabajando para ofrecerte los mejores beneficios.</span>
+
+                                    <span class="msg-desc-2">&iquest;Cu&aacute;l es el principal motivo por el cual no te interesa la tarjeta que tenemos para tí?</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-offset-1 col-sm-10">
+                            <div class="select-motivos-banbif">
+                                <select th:field="*{offerRejectionReason}" data-placeholder="Selecciona un motivo" data-width="100%">
+                                    <option value="" hidden="hidden">Motivo</option>
+                                    <option th:each="reason : ${offerRejectionReasons}"
+                                            th:value="${reason.id}" th:text="#{${reason.reason}}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-offset-1 col-sm-5">
+                            <div class="btn-full-width">
+                                <button type="button" id="sendButton" class="button bg-red">Enviar</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="btn-full-width">
+                                <button type="button" id="goBack" class="button bg-outline">Ver las ofertas nuevamente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:unless="${loanApplication.entityId == T(com.affirm.common.model.catalog.Entity).BANBIF}">
+
+            <th:block th:if="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).GATEWAY}">
+                <p th:utext="#{questions.block.offerRejectionCollection(${personFirstName ?: 'Hola'})}"></p>
+            </th:block>
+            <th:block th:unless="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).GATEWAY}">
+                <p th:utext="#{questions.block.offerRejection(${personFirstName ?: 'Hola'}, ${entityShort ?: 'Solven'})}"></p>
+            </th:block>
+
+
+            <select th:field="*{offerRejectionReason}" data-width="360" data-placeholder="Motivo">
+                <option value="" hidden="hidden">Motivo</option>
+                <option th:each="reason : ${offerRejectionReasons}"
+                        th:value="${reason.id}" th:text="#{${reason.reason}}"></option>
+            </select>
+            <div class="w">
+                <th:block th:unless="${loanApplication.entityId == T(com.affirm.common.model.catalog.Entity).FINANSOL}">
+                    <button type="button" id="sendButton" class="button bg-black">Enviar</button>
+                </th:block>
+                <th:block th:if="${loanApplication.entityId == T(com.affirm.common.model.catalog.Entity).FINANSOL}">
+                    <button type="button" id="sendButton" class="button bg-red">Enviar</button>
+                </th:block>
+                <button type="button" id="goBack" class="button bg-red">Ver las ofertas nuevamente</button>
+            </div>
+        </th:block>
+    </form>
+    <div id="thanks" th:style="${reasonGiven} ? '' : 'display: none'" class="form q117">
+        <p style="display: block; text-align:center" th:utext="#{questions.117.p(${personFirstName ?: 'Hola'})}"></p>
+        <button type="button" id="goBack1" class="button bg-red">Ver las ofertas nuevamente</button>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#sendButton').click(function () {
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            var reason = $('#offerRejectionReason').val();
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    data: {
+                        offerRejectionReason: reason
+                    },
+                    success: function (data) {
+                        $('#thanks').show();
+                        $('#questionForm').hide();
+                    }
+                }, "registerOfferRejection");
+            } else {
+                swal({
+                    title: "",
+                    text: "Seleccione un motivo, por favor.",
+                    type: "error"
+                });
+            }
+        });
+        $('#goBack').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "backToOffers");
+        });
+        $('#goBack1').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "backToOffers");
+        });
+        /*]]>*/
+
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q123">
+            <div th:unless="${notInterested}" class="actions" id="wenance-result">
+                <th:block th:switch="${reason}">
+                    <p th:case="A" th:utext="#{questions.123a}"></p>
+                    <p th:case="R" th:utext="#{questions.123b}"></p>
+                </th:block>
+
+                <div class="field inline">
+                    <a href="#" onclick="notInterested()" style="cursor: pointer;">
+                        <button class="button anchor-button bg-black">No me interesa</button>
+                    </a>
+                </div>
+                <div th:if="${url_wenance}" class="field inline">
+                    <a th:attr="data-href=${url_wenance}" style="cursor: pointer;"
+                       onclick="sendPost(this)">
+                        <button class="button anchor-button bg-red">Me interesa</button>
+                        <small class="input-help">Ser&aacute;s redirigido a
+                            <b>
+                                app.welp.com
+                            </b>
+                        </small>
+                    </a>
+                </div>
+            </div>
+            <div id="thanks" th:style="${notInterested} ? '' : 'display: none'">
+                <p style="display: block; text-align:center"
+                   th:utext="#{questions.117.p(${personFirstName ?: 'Hola'})}"></p>
+            </div>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function sendPost(e) {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                success: function () {
+                    window.location.href = e.dataset.href;
+                }
+            }, "");
+        }
+
+        function notInterested() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                success: function (data) {
+                    $('#thanks').show();
+                    $('#wenance-result').hide();
+                }
+            }, "notInterested");
+        }
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

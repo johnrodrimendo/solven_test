@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div id="chooseBankCode" class="questions-section animated fadeInRight arg">
+        <div class="note">
+            <span>Indicános el banco donde percibís tus ingresos</span>
+        </div>
+        <div class="forms">
+            <form id="questionForm" th:object="${form}" autocomplete="off" class="q141">
+                <div class="field inline">
+                    <small th:text="#{form.field.bank}" class="input-help"></small>
+                    <select name="bankId" id="bankId" data-placeholder="Selecciona el banco"
+                            data-width="300">
+                        <option value="" hidden="hidden"></option>
+                        <th:block th:each="bank : ${banks}">
+                            <option value="" disabled="disabled" selected="selected"></option>
+                            <option th:value="${bank.id}" th:text="${bank.name}"></option>
+                        </th:block>
+                    </select>
+                    <div class="errorContainer text-left"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('select[name=bankId]').on('change', function () {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST",
+                data: {
+                    bankId: $('select[name=bankId]').val()
+                }
+            }, "");
+        });
+        /*]]>*/
+    </script>
+
+</th:block>
+</html>

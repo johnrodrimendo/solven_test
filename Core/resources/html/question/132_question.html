@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+    <th:block th:replace="loanApplication/formQuestions/formQuestions :: question_config"></th:block>
+
+    <style>
+        #sendButton {
+            margin-top: 0.5em;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function questionValidationAndPreSave(questionId, questionJson, getDataFunction) {
+            var innerQuestionElement = $('.inner-question[data-question=' + questionId + ']');
+            var innerQuestionFormElement = innerQuestionElement.find('.inner-question-form');
+
+            questionFw.validateForm(innerQuestionFormElement, JSON.parse(questionJson));
+            innerQuestionFormElement.data('getData', getDataFunction != null ? getDataFunction : function () {
+                return innerQuestionFormElement.serializeObject();
+            });
+        }
+
+        var isCountryArgentina = /*[[${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}]]*/false;
+        var activityTypeDependent = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).DEPENDENT} ]]*/;
+        var activityTypeIndependent = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT} ]]*/;
+        var subActivityTypeProfessionalService = /*[[ ${T(com.affirm.common.model.catalog.SubActivityType).PROFESSIONAL_SERVICE} ]]*/;
+        var subActivityTypeOwnBusiness = /*[[ ${T(com.affirm.common.model.catalog.SubActivityType).OWN_BUSINESS} ]]*/;
+        var subActivityTypeRent = /*[[ ${T(com.affirm.common.model.catalog.SubActivityType).RENT} ]]*/;
+        var activityTypePensioner = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).PENSIONER} ]]*/;
+        var subActivityTypeShareholder = /*[[ ${T(com.affirm.common.model.catalog.SubActivityType).SHAREHOLDER} ]]*/
+        var activityTypeMonotributista = /*[[ ${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA} ]]*/
+
+        var routes = {};
+        if(!isCountryArgentina) {
+            routes[activityTypeDependent] = [27, 88, 82, 28, 29, 30, 31, 131];
+            routes[activityTypeIndependent] = {};
+            routes[activityTypeIndependent][subActivityTypeOwnBusiness] = [38, 90, 61, 46];
+            routes[activityTypeIndependent][subActivityTypeProfessionalService] = [33, 89, 34, 37, 131];
+            routes[activityTypeIndependent][subActivityTypeRent] = [92, 89, 34, 131];
+            routes[activityTypePensioner] = [98];
+        } else {
+            routes[activityTypeDependent] = [27, 88, 82, 28, 29, 30, 31, 120];
+            routes[activityTypeIndependent] = {};
+            routes[activityTypeIndependent][subActivityTypeOwnBusiness] = [90, 40, 41, 42, 43, 44, 45];
+            routes[activityTypeIndependent][subActivityTypeProfessionalService] = [89, 34, 35, 36, 37];
+            routes[activityTypeIndependent][subActivityTypeRent] = [47, 91];
+            routes[activityTypeIndependent][subActivityTypeShareholder] = [38, 104, 39, 61, 40, 41, 42, 43, 44, 45, 46];
+            routes[activityTypePensioner] = [98];
+            routes[activityTypeMonotributista] = [99, 100, 101, 103];
+        }
+        console.log(routes);
+
+        // QUESTION DEPENDENTS
+        function showQuestionsRoute(show, route) {
+            if (route != null && route.length) {
+                route.map(function (question) {
+                    if (show) {
+                        //$('.inner-question[data-question=' + question + ']').show();
+                        $('.inner-question[data-question=' + question + ']').closest('.grid-item').show();
+                        $('.inner-question[data-question=' + question + ']').removeClass('disabled');
+                    }
+                    else {
+                        //$('.inner-question[data-question=' + question + ']').hide();
+                        $('.inner-question[data-question=' + question + ']').closest('.grid-item').hide();
+                        $('.inner-question[data-question=' + question + ']').addClass('disabled');
+                    }
+                });
+            }
+        }
+
+        function resetRoute() {
+            console.log('resetRoute');
+            $('.inner-question:not([data-question=26])').map(function () {
+                //$(this).hide();
+                $(this).closest('.grid-item').hide();
+                $(this).addClass('disabled');
+            });
+        }
+
+        (resetRoute)();
+        /*]]>*/
+    </script>
+
+    <div id="q132" class="questions-section animated fadeInRight">
+        <div class="ds-fl fl-column algn-center sub-q132">
+            <div class="grid">
+                <div class="grid-container">
+                    <div class="grid-item q_26">
+                        <th:block th:with="attr=${questionAttrs.get(26)}, q=26">
+                            <div class="inner-question" th:attr="data-question=${q}" >
+                                <p>¿Cual es tu fuente de ingreso?</p>
+                                <div class="forms no-top" id="how-earn-block">
+                                    <form class="inner-question-form">
+                                        <div class="field inline">
+                                            <select data-placeholder="Tipo de actividad" data-width="200" name="activityType">
+                                                <option value="">Seleccione una fuenta de ingreso</option>
+                                                <option th:value="${T(com.affirm.common.model.catalog.ActivityType).DEPENDENT}"
+                                                        th:text="#{form.field.activityType.dependent}"></option>
+                                                <option th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                                                        th:value="${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA}"
+                                                        th:text="#{form.field.activityType.monotributista}"></option>
+                                                <option th:value="${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT}"
+                                                        th:text="#{form.field.activityType.independent}"></option>
+                                                <option th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                                                        th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}"
+                                                        th:text="#{form.field.activityType.pensioner}"></option>
+                                                <option value="null" disabled="disabled">----------</option>
+                                                <option th:value="${T(com.affirm.common.model.catalog.ActivityType).STUDENT}">Soy estudiante</option>
+                                                <option th:value="${T(com.affirm.common.model.catalog.ActivityType).PENSIONER}">Soy
+                                                    pensionista
+                                                </option>
+                                                <option th:value="${T(com.affirm.common.model.catalog.ActivityType).HOUSEKEEPER}">Soy
+                                                    empleado(a) del hogar
+                                                </option>
+                                                <option th:value="${T(com.affirm.common.model.catalog.ActivityType).UNEMPLOYED}">No tengo
+                                                    ingresos
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+                                (function() {
+                                    (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                    var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                                    innerQuestion.find('select[name=activityType]').on('change', function () {
+                                        resetRoute();
+                                        //TODO CLEAN QUESTIONS
+
+                                        switch (Number($(this).val())) {
+                                            case activityTypeDependent:
+                                                showQuestionsRoute(true, routes[activityTypeDependent]);
+                                                $('.inner-question[data-question=131]').find("select[name=customProfession]").val("");
+                                                $('.inner-question[data-question=131]').find("select[name=customProfession]").trigger('change');
+                                                $('.inner-question[data-question=31]').hide();
+                                                $('.inner-question[data-question=31]').addClass('disabled');
+                                                refresh131Question(activityTypeDependent);
+                                                break;
+                                            case activityTypePensioner:
+                                                showQuestionsRoute(true, routes[activityTypePensioner]);
+                                                break;
+                                            case activityTypeMonotributista:
+                                                showQuestionsRoute(true, routes[activityTypeMonotributista]);
+                                                break;
+                                            case activityTypeIndependent:
+                                                $('.inner-question[data-question=32]').find("select[name=subActivity]").val("");
+                                                $('.inner-question[data-question=32]').find("select[name=subActivity]").trigger('change');
+                                                showQuestionsRoute(true, [32]);
+                                                break;
+                                        }
+                                    });
+                                })();
+
+                                /*]]>*/
+                            </script>
+                        </th:block>
+                    </div>   
+                    <div class="grid-item q_32">
+                        <th:block th:with="attr=${questionAttrs.get(32)}, q=32">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <p>¿Que tipo de actividad tienes?</p>
+                                    <div class="forms">                 
+                                        <form class="inner-question-form">
+                                            <div class="field inline">
+                                                <select data-width="245" name="subActivity" data-placeholder="">
+                                                    <th:block th:each="type : ${attr.subActivities}">
+                                                        <option value="" disabled="disabled" selected="selected"></option>
+                                                        <option th:value="${type.id}" th:text="${type.type}"></option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                        var innerQuestion = $('.inner-question[data-question='+[[${q}]]+']');
+                                        var $subActivity = innerQuestion.find('select[name=subActivity]');
+
+                                        $subActivity.on('change', function () {
+                                            showQuestionsRoute(false, routes[activityTypeIndependent][subActivityTypeProfessionalService]);
+                                            showQuestionsRoute(false, routes[activityTypeIndependent][subActivityTypeOwnBusiness]);
+                                            showQuestionsRoute(false, routes[activityTypeIndependent][subActivityTypeRent]);
+                                            showQuestionsRoute(false, routes[activityTypeIndependent][subActivityTypeShareholder]);
+
+                                            showQuestionsRoute(true, routes[activityTypeIndependent][Number($(this).val())]);
+                                            refresh131Question(activityTypeIndependent);
+                                        });
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div> 
+                    <div class="grid-item q_131">
+                        <th:block th:with="attr=${questionAttrs.get(131)}">
+                            <div class="inner-question" data-question="131">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q25">
+                                        <p>¿Cuál es tu profesión u ocupación?</p>
+                                        <form th:object="${attr.form}" class="inner-question-form">
+                                            <div class="field inline">
+                                                <select name="customProfession" data-width="245" data-placeholder="">
+                                                    <th:block th:each="profession : ${attr.customProfessions}">
+                                                        <option value="" disabled="disabled" selected="selected"></option>
+                                                        <option th:value="${profession.id}" th:text="${profession.custom_profession}"></option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(131, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                    var question131 = $('.inner-question[data-question=131]');
+                                    question131.find('.inner-question-form').hide();
+
+                                    function refresh131Question(activityType) {
+                                        questionFw.ajaxToCurrentQuestionController({
+                                            type: "POST",
+                                            data: {
+                                                activityType: activityType
+                                            },
+                                            success: function(data) {
+                                                var arr = JSON.parse(data);
+                                                var html = '<option value="" disabled="disabled" hidden="hidden" selected="selected"></option>';
+                                                var len = arr.length;
+                                                for (var i = 0; i < len; i++) {
+                                                    html += '<option value="' + arr[i].id + '">' + arr[i].custom_profession + '</option>';
+                                                }
+                                                question131.find('select[name=customProfession]').html(html);
+                                                question131.find('.inner-question-form').show();
+                                            }
+                                        }, "occupation");
+                                    }
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div> 
+                    <!--INICIO BLOQUE DEPENDIENTE-->
+                    <div class="grid-item q_27">
+                        <th:block th:with="attr=${questionAttrs.get(27)}">
+                            <div class="inner-question" data-question="27">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q27">
+                                        <p>
+                                            ¿Cuál es el RUC de tu trabajo?
+                                            <small th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}"
+                                                   class=""><a
+                                                    href="http://www.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaMovil.jsp"
+                                                    class="text-lightblue" target="_blank" rel="no-referer">Búscalo</a></small>
+                                            <small th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                                                   class=""> <a
+                                                        href="https://www.cuitonline.com/" class="text-lightblue" target="_blank"
+                                                        rel="no-referer">Buscalo</a>
+                                            </small>
+                                        </p>
+                                        <form class="inner-question-form">
+                                            <div class="field inline">
+                                                <input type="text" class="input-outline document-input-ruc" name="ruc"
+                                                    pattern="[0-9]*" placeholder=""/>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(27, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                    var question27 = $('.inner-question[data-question=27]');
+                                    var $documentinputruc = question27.find('.document-input-ruc');
+                                    setTimeout(function () {
+                                        $documentinputruc.focus();
+                                    }, 300);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_88">
+                        <th:block th:with="attr=${questionAttrs.get(88)}, q=88">
+                            <th:block th:replace="question/88_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_82" >
+                        <th:block th:with="attr=${questionAttrs.get(82)}, q=82">
+                            <th:block th:replace="question/22_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_28">     
+                        <th:block th:with="attr=${questionAttrs.get(28)}, q=28">
+                            <th:block th:replace="question/28_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_29">
+                        <th:block th:with="attr=${questionAttrs.get(29)}">
+                            <div class="inner-question" data-question="29">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q29">
+                                        <p>¿Cuál es tu cargo?</p>
+                                        <form class="inner-question-form">
+                                            <div class="field inline">
+                                                <select data-width="245" name="ocupation" data-placeholder="¿Cuál es tu cargo?">
+                                                    <th:block th:each="ocupation : ${@catalogService.getOcupations(#locale)}">
+                                                        <option value="" disabled="disabled" selected="selected"></option>
+                                                        <option th:value="${ocupation.id}" th:text="${ocupation.ocupation}"></option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(29, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_30">
+                        <th:block th:with="attr=${questionAttrs.get(30)}, q=30">
+                            <div class="inner-question" th:attr="data-question=${q}" >
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q30">
+                                        <p th:utext="#{questions.block.netoIncome}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                                        <span class="prefix"
+                                                            th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="income"/>
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                        <div class="terms">
+                                            <label for="variableIncome" class="custom-check">
+                                            <span class="check-inner">
+                                                <i class="icon icon-check"></i>
+                                            </span>
+                                                <span class="check-label"> Recibo adem&aacute;s un salario variable.</span>
+                                                <input type="checkbox" class="real-check" id="variableIncome"/>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/, function(){
+                                            return $.extend(innerQuestionForm.serializeObject(), {
+                                                variableIncome: $variableIncome.is(':checked')
+                                            });
+                                        });
+
+                                        var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                                        var innerQuestionForm = innerQuestion.find('.inner-question-form');
+                                        var $variableIncome = innerQuestion.find('#variableIncome');
+                                        $variableIncome.click(function(){
+                                            if ($(this).is(':checked')){
+                                                $('.inner-question[data-question=31]').show();
+                                                $('.inner-question[data-question=31]').removeClass('disabled');;
+                                            }else{
+                                                $('.inner-question[data-question=31]').hide();
+                                                $('.inner-question[data-question=31]').addClass('disabled');;
+                                            }
+                                        });
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_31"> 
+                        <th:block th:with="attr=${questionAttrs.get(31)}, q=31">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q31">
+                                        <p th:utext="#{questions.block.variableIncome}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                            <span class="prefix"
+                                                th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="variableIncome"/>
+
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/> 
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(31, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div> 
+                    <div class="grid-item q_120"> 
+                        <th:block th:with="attr=${questionAttrs.get(120)}, q=120">
+                            <div class="inner-question" th:attr="data-question=${q}" >
+                                <div class="questions-section animated fadeInRight">
+                                    <form class="inner-question-form forms">
+                                        <p>¿Con qué frecuencia cobrás tu sueldo y hacia que fechas?</p>
+                                        <div class="forms">
+                                            <div class="field inline">
+                                                <select data-width="245" name="frequencyType" data-placeholder="Selecciona la frecuencia">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option value="S">Semanal</option>
+                                                    <option value="Q">Quincenal</option>
+                                                    <option value="M">Mensual</option>
+                                                </select>
+                                            </div>
+                                            <div class="field inline monthlyFrequencyContainer" style="display: none;">
+                                                <input type="text" class="input-outline" name="monthlyPaymentDay" maxlength="2"/>
+                                                <span>de cada mes</span>
+                                            </div>
+                                            <div class="field inline biweeklyFrequencyContainer" style="display: none;">
+                                                <input type="text" class="input-outline" name="firstBiweeklyPaymentDay"
+                                                    maxlength="2"/>
+                                                <span>y</span>
+                                                <input type="text" class="input-outline" name="secondBiweeklyPaymentDay"
+                                                    maxlength="2"/>
+                                                <span>de cada mes</span>
+                                            </div>
+                                            <div class="field inline weeklyFrequencyContainer" style="display: none;">
+                                                <div class="field inline">
+                                                    <select data-width="245" name="weeklyPaymentDay" data-placeholder="Selecciona la frecuencia">
+                                                        <option value="" disabled="disabled" selected="selected"></option>
+                                                        <option value="1">Lunes</option>
+                                                        <option value="2">Martes</option>
+                                                        <option value="3">Miercoles</option>
+                                                        <option value="4">Jueves</option>
+                                                        <option value="5">Viernes</option>
+                                                        <option value="6">S&aacute;bado</option>
+                                                        <option value="7">Domingo</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="display-block">
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                        var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+
+                                        var monthlyFrequencyContainer = innerQuestion.find('.monthlyFrequencyContainer');
+                                        var biweeklyFrequencyContainer = innerQuestion.find('.biweeklyFrequencyContainer');
+                                        var weeklyFrequencyContainer = innerQuestion.find('.weeklyFrequencyContainer');
+                                        var $frequencyType = innerQuestion.find('select[name=frequencyType]');
+
+                                        $frequencyType.change(function () {
+                                            var val = $(this).val();
+
+                                            switch (val) {
+                                                case 'M':
+                                                    biweeklyFrequencyContainer.hide();
+                                                    weeklyFrequencyContainer.hide();
+                                                    monthlyFrequencyContainer.show();
+                                                    break;
+                                                case 'Q':
+                                                    monthlyFrequencyContainer.hide();
+                                                    weeklyFrequencyContainer.hide();
+                                                    biweeklyFrequencyContainer.show();
+                                                    break;
+                                                case 'S':
+                                                    monthlyFrequencyContainer.hide();
+                                                    biweeklyFrequencyContainer.hide();
+                                                    weeklyFrequencyContainer.show();
+                                                    break;
+                                            }
+                                        });
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+
+                    <!--FIN BLOQUE DEPENDIENTE-->
+
+                    <!--INICIO BLOQUE INDEPENDIENTE-->
+
+                    <!--INDEPENDIENTE - INICIO BLOQUE NEGOCIO PROPIO-->
+                    <div class="grid-item q_38">
+                        <th:block th:with="attr=${questionAttrs.get(38)}, q=38">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q38">
+                                        <p>
+                                            <span>¿Cuál es el ruc de la empresa?</span>
+                                            <label for="imNotLegal" class="custom-check">
+                                                <span class="check-inner"><i class="icon icon-check"></i></span>
+                                                <span class="check-label"> No estoy constituido legalmente.</span>
+                                                <input type="checkbox" class="real-check" id="imNotLegal"/>
+                                            </label>
+                                        </p>
+                                        <form class="inner-question-form">
+                                            <div class="display-block w-input-ruc">
+                                                <input type="text" class="input-outline" name="ruc" placeholder="¿Cuál es el ruc de la empresa?"/>
+                                            </div>
+                                            <div class="display-block w-list-radio">
+                                                <div class="field inline">
+                                                    <select data-width="245" name="regime" data-placeholder="Selecciona el régimen">
+                                                        <th:block th:each="regime : ${attr.regimes}">
+                                                            <option value="" disabled="disabled" selected="selected"></option>
+                                                            <option th:value="${regime.code}" th:text="${regime.description}"></option>
+                                                        </th:block>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                           
+                                        </form>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/, function(){
+                                            return $.extend(innerQuestionForm.serializeObject(), {
+                                                notLegal: $check.prop('checked')
+                                            });
+                                        });
+
+                                        var innerQuestion = $('.inner-question[data-question='+[[${q}]]+']');
+                                        var innerQuestionForm = innerQuestion.find('.inner-question-form');
+
+                                        var $check = innerQuestion.find('#imNotLegal');
+                                        var $ruc = innerQuestion.find('input[name=ruc]');
+                                        var $regime = innerQuestion.find('select[name=regime]');
+                                        var enabled = false;
+
+                                        $check.click(function () {
+
+                                            if (enabled == true) {
+                                                $ruc.prop('disabled', false);
+                                                $regime.closest('.display-block').show();
+                                            }else {
+                                                $ruc.prop('disabled', true);
+                                                $ruc.val('');
+                                                $regime.closest('.display-block').hide();
+                                            }
+                                            $ruc.toggleClass('disabled');
+                                            enabled = !enabled;
+                                            if ($(this).is(':checked')) {
+                                                $ruc.val('');
+                                                innerQuestionForm.data('validatorJson').rules.regime.required = false;
+                                                innerQuestionForm.data('validatorJson').rules.ruc.required = false;
+                                                innerQuestionForm.data('validatorJson').rules.ruc.maxlength = 0;
+                                                innerQuestionForm.data('validatorJson').rules.ruc.minlength = 0;
+                                            } else {
+                                                $ruc.prop('disabled', false);
+                                                innerQuestionForm.data('validatorJson').rules.regime.required = true;
+                                                innerQuestionForm.data('validatorJson').rules.ruc.required = true;
+                                                innerQuestionForm.data('validatorJson').rules.ruc.maxlength = 11;
+                                                innerQuestionForm.data('validatorJson').rules.ruc.minlength = 11;
+                                            }
+                                            innerQuestionForm.validateForm(innerQuestionForm.data('validatorJson'));
+                                            innerQuestionForm.data('validator').resetForm();
+                                        });
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_90">
+                        <th:block th:with="attr=${questionAttrs.get(90)}, q=90">
+                            <th:block th:replace="question/88_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_61">
+                        <th:block th:with="attr=${questionAttrs.get(61)}, q=61">
+                            <th:block th:replace="question/22_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_46">                                                  
+                        <th:block th:with="attr=${questionAttrs.get(46)}, q=46">
+                            <th:block th:replace="question/37_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>   
+                    <div class="grid-item q_40">
+                        <th:block th:with="attr=${questionAttrs.get(40)}, q=40">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q40">
+                                        <p th:utext="#{questions.block.lastTwelveMonthsIncome}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                                        <span class="prefix"
+                                                            th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="sales"/>
+                                                    <small class="input-help">Ventas</small>
+                                                </div>
+                                            </div>
+                                            <div class="field inline">
+                                                <select data-width="150" name="hopeGrow" data-placeholder="Selecciona una opci&oacute;n">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option value="despite">Espero que disminuyan.</option>
+                                                    <option value="keeping">Espero que se mantengan.</option>
+                                                    <option value="grow">Espero crecer en m&aacute;s del 15%.</option>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>   
+                    <div class="grid-item q_41">    
+                        <th:block th:with="attr=${questionAttrs.get(41)}, q=41">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms q41">
+                                        <p th:utext="#{questions.block.lastResultExercise}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                                        <span class="prefix"
+                                                            th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="exerciseOutcome"/>
+                                                    <small class="input-help">Resultado neto</small>
+                                                </div>
+                                            </div>
+                                            <div class="field inline">
+                                                <select data-width="150" name="hopeGrow" data-placeholder="Selecciona una opci&oacute;n">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option value="despite">Espero que disminuyan.</option>
+                                                    <option value="keeping">Espero que se mantengan.</option>
+                                                    <option value="grow">Espero crecer en m&aacute;s del 15%.</option>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>     
+                    <div class="grid-item q_42 ">
+                        <th:block th:with="attr=${questionAttrs.get(42)}, q=42">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.percentUsedForCoveredCost}"></p>
+                                        <div class="note">
+                                            <small>(Ej. Alquileres + pago de servicios + salarios fijos, etc…)</small>
+                                        </div>
+                                        <form class="inner-question-form">
+                                            <div class="field field-percentage inline">
+                                                <div class="wrap-field">
+                                                    <input type="text" class="input-outline medium-input" name="salesPercentage"/>
+                                                    <div class="box-icon box-right prefix-box tiny-input">
+                                                        <span class="subfix"><i class="icon icon-percent"></i></span>
+                                                    </div>
+                                                    <small class="input-help">Porcentaje</small>
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_43">
+                        <th:block th:with="attr=${questionAttrs.get(43)}, q=43">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.percentUsedForCoveredCostVariable}"></p>
+                                        <div class="note">
+                                            <small>(Ej. Costo de mercadería + salarios variables, etc...)</small>
+                                        </div>
+                                        <form class="inner-question-form">
+                                            <div class="field field-percentage inline">
+                                                <div class="wrap-field">
+                                                    <input type="text" class="input-outline medium-input" name="salesPercentage"/>
+                                                    <div class="box-icon box-right prefix-box tiny-input">
+                                                        <span class="subfix"><i class="icon icon-percent"></i></span>
+                                                    </div>
+                                                    <small class="input-help">Porcentaje</small>
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_44">
+                        <th:block th:with="attr=${questionAttrs.get(44)}, q=44">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.percentSales}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-percentage inline">
+                                                <div class="wrap-field">
+                                                    <input type="text" class="input-outline medium-input" name="salesPercentage"/>
+                                                    <div class="box-icon box-right prefix-box tiny-input">
+                                                        <span class="subfix"><i class="icon icon-percent"></i></span>
+                                                    </div>
+                                                    <small class="input-help">Porcentaje</small>
+                                                </div>
+                                            </div>
+                                            <div class="field inline">
+                                                <select data-width="150" name="businessType" data-placeholder="Selecciona una opci&oacute;n">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option value="minor">Mi negocio es al por menor.</option>
+                                                    <option value="fiveCustomers">Tengo menos de 5 clientes.</option>
+                                                    <option value="minusFiveteenCustomers">Tengo menos de 15 clientes.</option>
+                                                    <option value="moreFiveteenCustomers">Tengo más de 15 clientes.</option>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_45">
+                        <th:block th:with="attr=${questionAttrs.get(45)}, q=45">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.fundsDaily}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                                        <span class="prefix"
+                                                            th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="income"/>
+                                                    <small class="input-help">Dinero al final del d&iacute;a</small>
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <!--INDEPENDIENTE - FIN BLOQUE NEGOCIO PROPIO-->
+
+                    <!--INDEPENDIENTE - INICIO BLOQUE SERVICIOS PROPIOS-->
+                    <div class="grid-item q_33">
+                        <th:block th:with="attr=${questionAttrs.get(33)}, q=33">
+                            <th:block th:replace="question/33_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_89">
+                        <th:block th:with="attr=${questionAttrs.get(89)}, q=89">
+                            <th:block th:replace="question/88_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>  
+                    <div class="grid-item q_34">   
+                        <th:block th:with="attr=${questionAttrs.get(34)}">
+                            <div class="inner-question" data-question="34">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p>¿Qué tipo de servicio ofreces?</p>
+                                        <form class="inner-question-form">
+                                            <div class="field inline">
+                                                <select data-width="245" name="serviceType" data-placeholder="¿Qué tipo de servicio ofreces?">
+                                                    <th:block th:each="services : ${@catalogService.getServiceTypes(#locale)}">
+                                                        <option value="" disabled="disabled" selected="selected"></option>
+                                                        <option th:value="${services.id}" th:text="${services.serviceType}"></option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(34, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div> 
+                    <div class="grid-item q_37">    
+                        <th:block th:with="attr=${questionAttrs.get(37)}, q=37">
+                            <th:block th:replace="question/37_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_35">    
+                        <th:block th:with="attr=${questionAttrs.get(35)}, q=35">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <form class="inner-question-form">
+                                            <p th:utext="#{questions.block.customer1Ruc}"></p>
+                                            <div class="field inline">
+                                                <input type="text" class="input-outline document-input-ruc" name="ruc" pattern="[0-9]*"/>
+                                            </div>
+                                            <div class="display-block">
+                                                <label for="moreThan65" class="custom-check">
+                                                <span class="check-inner">
+                                                    <i class="icon icon-check"></i>
+                                                </span>
+                                                    <span class="check-label"> Representa más del 65% de mi facturación total.</span>
+                                                    <input type="checkbox" class="real-check moreThan65" id="moreThan65"/>
+                                                </label>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/, function(){
+                                        return $.extend(innerQuestionForm.serializeObject(), {
+                                            moreThan65: innerQuestion.find('.moreThan65').prop('checked')
+                                        });
+                                    });
+
+                                    var innerQuestion = $('.inner-question[data-question='+[[${q}]]+']');
+                                    var innerQuestionForm = innerQuestion.find('.inner-question-form');
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div> 
+                    <div class="grid-item q_36">  
+                        <th:block th:with="attr=${questionAttrs.get(36)}, q=36">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <form class="inner-question-form">
+                                            <p th:utext="#{questions.block.customer2Ruc}"></p>
+                                            <div class="field inline">
+                                                <input type="text" class="input-outline document-input-ruc" name="ruc"/>
+                                            </div>
+                                            <div class="field inline">
+                                                <select data-width="150" name="clients" data-placeholder="Selecciona un servicio">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option value="3">Tengo entre 3 y 5 clientes.</option>
+                                                    <option value="5">Tengo m&aacute;s de 5 clientes.</option>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+                    <!--INDEPENDIENTE - FIN BLOQUE SERVICIOS PROPIOS-->
+
+                    <!--INDEPENDIENTE - INICIO BLOQUE RENTA-->
+                    <div class="grid-item q_92">
+                        <th:block th:with="attr=${questionAttrs.get(92)}, q=92">
+                            <th:block th:replace="question/33_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_91">
+                        <th:block th:with="attr=${questionAttrs.get(91)}, q=91">
+                            <th:block th:replace="question/88_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_47">
+                        <th:block th:with="attr=${questionAttrs.get(47)}, q=47">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.rentierIncomes}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                                        <span class="prefix"
+                                                            th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="rent"/>
+                                                    <small class="input-help">Neto</small>
+                                                </div>
+                                            </div>
+                                            <div class="field inline">
+                                                <select data-width="245" name="belongings" data-placeholder="Selecciona un bien" multiple="multiple">
+                                                    <th:block th:each="belonging : ${@catalogService.getBelongings(#locale)}">
+                                                        <option value="" disabled="disabled" selected="selected"></option>
+                                                        <option th:value="${belonging.id}" th:text="${belonging.name}"></option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                        var innerQuestion = $('.inner-question[data-question='+[[${q}]]+']');
+                                        var $rent = innerQuestion.find('input[name=rent]');
+                                    })();
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <!--INDEPENDIENTE - FIN BLOQUE RENTA-->
+
+                    <!--FIN BLOQUE INDEPENDIENTE-->
+
+                    <!--INICIO BLOQUE PENSIONISTA-->
+                    <div class="grid-item q_98">
+                        <th:block th:with="attr=${questionAttrs.get(98)}">
+                            <div class="inner-question" data-question="98">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.pensionerIncomes}"></p>
+                                        <form class="inner-question-form q98" th:object="${attr.form}">
+                                            <div class="wrap-field">
+                                                <div class="field field-amount inline">
+                                                    <div class="wrap-field">
+                                                        <div class="box-icon prefix-box tiny-input">
+                                            <span class="prefix"
+                                                    th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                        </div>
+                                                        <input type="text" class="input-outline amount-input" id="income" name="income"/>
+                                                        <small class="input-help">Promedio mensual</small>
+                                                    </div>
+                                                </div>
+                                                <div class="field field-birthdate inline">
+                                                    <div class="wrap-field">
+                                                        <input type="text" id="retirementMonth" name="retirementMonth" class="input-outline tiny-input" placeholder="mm"
+                                                            pattern="[0-9]*" />
+                                                        <input type="text" id="retirementYear" name="retirementYear" class="input-outline tiny-input" placeholder="yyyy"
+                                                            pattern="[0-9]*" />
+                                                    </div>
+                                                    <small class="input-help">Fecha de jubilaci&#243;n</small>
+                                                </div>
+                                                <div class="retirement">
+                                                    <div class="field inline"
+                                                        th:if="${attr.loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                                        <select name="scheme" data-placeholder="Tipo de régimen">
+                                                            <option value="" disabled="disabled" selected="selected"></option>
+                                                            <option th:each="retirement : ${@catalogService.getRetirementSchemes()}"
+                                                                    th:value="${retirement.id}" th:text="${retirement.scheme}">
+                                                            </option>
+                                                        </select>
+                                                        <small class="input-help">Regimen de jubilaci&#243;n</small>
+                                                    </div>
+                                                </div>
+                                                <div class="errorContainer"></div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (function() {
+                                        (questionValidationAndPreSave)(98, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                        var question98 = $('.inner-question[data-question=98]');
+                                        var amountinput = question98.find('#income');
+                                        var currentYear = (new Date()).getFullYear();
+
+                                        question98.find('#retirementMonth').forceIntegerOnly(true, 1, 31);
+                                        question98.find('#retirementYear').forceIntegerOnly(true, currentYear - 50, currentYear);
+                                        setTimeout(function () {
+                                            amountinput.focus();
+                                        }, 300);
+
+                                        question98.find('#retirementMonth').on('keyup', function () {
+                                            if(	$(this).val().length === 2)
+                                                question98.find('#retirementYear').focus();
+                                        });
+                                        /*]]>*/
+                                    })();
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+                    <!--FIN BLOQUE PENSIONISTA-->
+
+                    <!--INICIO BLOQUE SHAREHOLDER-->
+                    <div class="grid-item q_104">
+                        <th:block th:with="attr=${questionAttrs.get(104)}, q=104">
+                            <th:block th:replace="question/88_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>
+                    <div class="grid-item q_39">
+                        <th:block th:with="attr=${questionAttrs.get(39)}">
+                            <div class="inner-question" data-question="39">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.shareOptions}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-percentage inline">
+                                                <div class="wrap-field">
+                                                    <input type="text" class="input-outline medium-input" name="shareholding"/>
+                                                    <div class="box-icon box-right prefix-box tiny-input">
+                                                        <span class="subfix"><i class="icon icon-percent"></i></span>
+                                                    </div>
+                                                    <small class="input-help" th:text="#{static.question.participation}"></small>
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(39, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+
+                                    var question39 = $('.inner-question[data-question=39]');
+                                    var shareholding = question39.find('#shareholding');
+                                    setTimeout(function () {
+                                        shareholding.focus();
+                                    }, 320);
+                                    /*]]>*/
+
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+                    <div class="grid-item q_99">
+                        <th:block th:with="attr=${questionAttrs.get(99)}, q=99">
+                            <th:block th:replace="question/88_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>  
+                    <div class="grid-item q_100"> 
+                        <th:block th:with="attr=${questionAttrs.get(100)}, q=100">
+                            <th:block th:replace="question/22_question :: question_client_grouped"/>
+                        </th:block>
+                    </div> 
+                    <div class="grid-item q_101">   
+                        <th:block th:with="attr=${questionAttrs.get(101)}, q=101">
+                            <th:block th:replace="question/28_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>  
+                    <div class="grid-item q_103"> 
+                        <th:block th:with="attr=${questionAttrs.get(103)}, q=103">
+                            <div class="inner-question" th:attr="data-question=${q}">
+                                <div class="questions-section animated fadeInRight">
+                                    <div class="forms">
+                                        <p th:utext="#{questions.block.netIncome}"></p>
+                                        <form class="inner-question-form">
+                                            <div class="field field-amount inline">
+                                                <div class="wrap-field">
+                                                    <div class="box-icon prefix-box tiny-input">
+                                                        <span class="prefix"
+                                                            th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                                    </div>
+                                                    <input type="text" class="input-outline amount-input" name="income"/>
+                                                    <small class="input-help">Ingreso neto mensual</small>
+                                                </div>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr class="divisor-bottom"/>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div class="grid-button grid-item">  
+                        <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                </div> 
+               
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#sendButton').click(function () {
+                var isAllValid = true;
+                $('.inner-question').not('.disabled').each(function(){
+                    if(!$(this).find('.inner-question-form').valid()){
+                        isAllValid = false;
+                    }
+                });
+
+                if(isAllValid){
+                    var allFormsJson = [];
+                    $('.inner-question').not('.disabled').each(function(){
+                        var formJson = $(this).find('.inner-question-form').data('getData')();
+                        allFormsJson[allFormsJson.length] = {
+                            id: $(this).data('question'),
+                            data: formJson
+                        };
+                    });
+
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        data: {forms: JSON.stringify(allFormsJson)},
+                        error: function(xhr){
+                            unMask();
+                            if (xhr.status == 500 && isValidJson(xhr.responseText)){
+                                var jsonError = JSON.parse(xhr.responseText);
+                                if (jsonError.type == 'formValidation') {
+                                    if(jsonError.questionId != null){
+                                        var errorQuestionElemnt = $('.inner-question[data-question='+jsonError.questionId+']');
+                                        var errorQuestionForm = errorQuestionElemnt.find('.inner-question-form');
+                                        if(errorQuestionForm.length){
+                                            delete jsonError.questionId;
+                                            delete jsonError.type;
+                                            errorQuestionForm.data('validator').showErrors(jsonError);
+                                            errorQuestionForm.data('validatorJson').invalidHandler();
+                                            return false;
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }, "");
+                }
+            });
+            /*]]>*/
+        </script>
+
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <p>Esa es la pregunta de toda la data personal, no se puede ver por BO :(</p>
+</th:block>
+</html>

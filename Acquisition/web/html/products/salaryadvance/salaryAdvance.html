@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title>Adelanta tu sueldo</title>
+    <!-- Owl. Carousel -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/assets/owl.carousel.min.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/assets/owl.theme.default.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/owlCarousel2/owl.carousel.min.js'}"></script>
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/select2.4/css/select2.min.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/select2.4/js/select2.full.min.js'}"></script>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loanApplicationToken;
+
+        $(document).on('ready', function() {
+
+            $('#scrollTop').on('click', function (e) {
+                e.preventDefault();
+                var body = $("html, body");
+                body.stop().animate({scrollTop:0}, 500, 'swing');
+            });
+
+            // Early Access
+            $('#landingSubmit').doOnce(function(){
+                $('#landingSubmit').on('click', function(){
+                   letMeKnow();
+                });
+            });
+
+            // Select2
+            $('#docType').doOnce(function(){
+                $('#docType').select2({
+                    minimumResultsForSearch: -1,
+                    width: '80px'
+                });
+            });
+
+            // Landing process
+
+            var responseBlock = $('#response-block'),
+                buttonLanding = $('.button-landing');
+
+            //--Validation
+            $('#docNumber').forceLettersOnly('^[0-9]+$', true, 8, 8);
+            $('#cellphone').forceLettersOnly('^[0-9]+$', true, 9, 9);
+            $('#authToken').forceLettersOnly('^[0-9]+$', true, 4, 4);
+
+            $('#docType').on('change', function(){
+                responseBlock.html('');
+                $('#docNumber').val('');
+                if ( $(this).val() == 1 ) {
+                    $('#docNumber').removeClass('document-input-landing-ce').addClass('document-input-landing');
+                    $('#docNumber').forceLettersOnly('^[0-9]+$', true, 8, 8);
+                } else {
+                    $('#docNumber').removeClass('document-input-landing').addClass('document-input-landing-ce');
+                    $('#docNumber').forceLettersOnly('^[0-9]+$', true, 9, 9);
+                }
+
+            });
+
+            // Enter to continue
+            $('.form-container').find('input').on('keyup', function(e){
+                if(e.keyCode == 13) {
+                    $(this).closest('.block').find('.button-landing:enabled')[0].click();
+                }
+            });
+
+            // -- Resend token
+
+            // For change block
+            $('.display-target').on('click', function (event) {
+                event.preventDefault();
+                switch ($(this).data('target')) {
+                    case '#document-block':
+                        responseBlock.html('');
+                        $('#docNumber').val('');
+                        $(this).closest('.block').addClass('block-hidden');
+                        $($(this).data('target')).removeClass('block-hidden');
+                        break;
+                    case '#email-block':
+                        responseBlock.html('');
+                        $('#email').val('');
+                        $(this).closest('.block').addClass('block-hidden');
+                        $($(this).data('target')).removeClass('block-hidden');
+                        break;
+                    case 'resendToken':
+                        var url = /*[[@{/loanapplication}]]*/;
+                        var resendButtonToken = $(this);
+                        defaultAjax({
+                            url: url + "/"+ loanApplicationToken +"/resendSmsToken",
+                            type: 'POST',
+                            success: function (data) {
+                                resendButtonToken.fadeOut();
+                                setTimeout(function () {
+                                    resendButtonToken.fadeIn();
+                                }, 30000);
+                            }
+                        });
+                        break;
+                }
+            });
+
+
+            // For process
+            $('.button-landing').doOnce(function(){
+                $('.button-landing').on('click', function(e){
+                    e.preventDefault();
+                    var btn = $(this);
+                    switch(btn.data('target')) {
+
+                        case '#document-block':
+                            var v = false,
+                                msgError = 'N&uacute;mero de documento inv&aacute;lido.',
+                                docNumber = $('#docNumber');
+                            if (docNumber.val().length == 8 && $('#docType').val() == 1) {
+                                v = true;
+                            }
+
+                            if (docNumber.val().length == 9 && $('#docType').val() == 2){
+                                v = true;
+                            }
+
+                            if (v) {
+
+                                responseBlock.html('');
+                                btn.loading('', 2);
+
+                                defaultAjax({
+                                    url: /*[[@{/salaryadvanceloanapplication}]]*/null,
+                                    type: 'POST',
+                                    form: $('#frmAdelanto'),
+                                    data: {
+                                        docType: $('#docType').val(),
+                                        docNumber: $('#docNumber').val()
+                                    },
+                                    success: function (data) {
+                                        btn.unloading();
+
+                                        var json = JSON.parse(data);
+                                        loanApplicationToken = json.loanApplicationToken;
+
+                                        $('#document-block').addClass('block-hidden');
+                                        $('#cellphone-block').removeClass('block-hidden');
+
+                                    },
+                                    error: function (xhr, data) {
+                                        btn.unloading();
+                                    }
+                                });
+
+                            } else {
+                                responseBlock.html(errorAjaxMessage(msgError));
+                            }
+
+                            break;
+
+                        case '#email-block':
+                            if (!isEmail($('#email').val())) {
+                                responseBlock.html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+                            } else {
+                                responseBlock.html('');
+                                btn.loading('', 2);
+                                defaultAjax({
+                                    url: /*[[@{/salaryadvanceloanapplication}]]*/null,
+                                    type: 'POST',
+                                    form: $('#frmAdelanto'),
+                                    data: {
+                                        email: $('#email').val()
+                                    },
+                                    success: function (data) {
+                                        btn.unloading();
+                                        $('#email-block').addClass('block-hidden');
+                                        responseBlock.html(successAjaxMessage('Te enviamos un email con el link para acceder a tu crédito. Puede tardar unos segundos.'));
+                                    },
+                                    error: function () {
+                                        btn.unloading();
+                                    }
+                                });
+                            }
+                            break;
+                        case '#cellphone-block':
+
+                            var cell = $('#cellphone').validateRegex('^(9)[0-9]{8}?$');
+
+                            if ($('#cellphone').val().length == 9 && cell) {
+                                responseBlock.html('');
+                                btn.loading('', 2);
+                                defaultAjax({
+                                    url: /*[[@{/__${T(com.affirm.acquisition.controller.SalaryAdvanceController).LANDING_URL}__/cellphone}]]*/null,
+                                    type: 'POST',
+                                    form: $('#frmAdelanto'),
+                                    data: {
+                                        loanApplicationToken: loanApplicationToken,
+                                        cellphone: $('#cellphone').val()
+                                    },
+                                    success: function (data) {
+                                        btn.unloading();
+
+                                        $('#cellphone-block').addClass('block-hidden');
+                                        $('#confirmationPin-block').removeClass('block-hidden');
+                                    },
+                                    error: function () {
+                                        btn.unloading();
+                                    }
+                                });
+                            } else {
+                                responseBlock.html(errorAjaxMessage('Ingresa un n&uacute;mero v&aacute;lido.'));
+                            }
+                            break;
+                        case '#confirmationPin-block':
+
+                            if ($('#authToken').val().length === 4) {
+                                responseBlock.html('');
+                                btn.loading('', 2);
+                                defaultAjax({
+                                    url: /*[[@{/__${T(com.affirm.acquisition.controller.SalaryAdvanceController).LANDING_URL}__/cellphone/validate}]]*/null,
+                                    type: 'POST',
+                                    form: $('#frmAdelanto'),
+                                    data: {
+                                        loanApplicationToken: loanApplicationToken,
+                                        authToken: $('#authToken').val()
+                                    },
+                                    success: function (data) {
+                                        btn.unloading();
+                                    },
+                                    error: function () {
+                                        btn.unloading();
+                                    }
+                                });
+                            } else {
+                                responseBlock.html(errorAjaxMessage('El PIN no es v&aacute;lido.'));
+                            }
+
+                            break;
+
+                    }
+
+                });
+
+            });
+
+        });
+
+        function letMeKnow() {
+            var baseUrl = /*[[@{/early/3/}]]*/;
+            if (!isEmail($('#earlyEmail').val())) {
+                $('#response-block').html(errorAjaxMessage('Ingresa un email v&aacute;lido.'));
+            } else {
+                $('#response-block').html('');
+                $('#landingSubmit').loading();
+                defaultAjax({
+                    url: baseUrl,
+                    type: 'POST',
+                    data: $('#frmEarlyAccess').serializeObject(),
+                    success: function (data) {
+                        $('#landingSubmit').unloading();
+                        $('#early-block').addClass('block-hidden');
+                        $('#response-block').html(successAjaxMessage('Te avisaremos apenas estemos listos.'));
+                    },
+                    error: function () {
+                        $('#landingSubmit').unloading();
+                    }
+                });
+            }
+        }
+
+        /*]]>*/
+    </script>
+
+    <script th:if="${@configuration.TOKY_ACTIVE()}">
+
+        (function (v, p) {
+            var s = document.createElement('script');
+            s.src = 'https://app.toky.co/resources/widgets/toky-widget.js?v=' + v;
+            s.onload = function () {
+                Toky.load(p);
+            };
+            document.head.appendChild(s);
+        })('6800f1c', {"$username": "Solven", "$bubble": false, "$color": "#f7323f,#00aabb,#ffffff"});
+
+    </script>
+</head>
+<body>
+
+    <!-- Header -->
+    <th:block layout:fragment="header">
+        <th:block th:replace="fragments/headers :: landingHome"></th:block>
+    </th:block>
+    <!-- Header ends -->
+
+    <!-- Content -->
+    <th:block layout:fragment="content">
+
+        <section class="landing salary-advance">
+            <div class="hero-content content-left">
+                <div class="wrap">
+                    <div class="hero-text">
+                        <h2 class="landing-title text-bold" th:utext="#{static.landing.salaryAdvance.heroTitle}"></h2>
+                    </div>
+                    <div class="divisor-bar"></div>
+                    <div class="hero-pharagraph">
+                        <p th:utext="#{static.landing.salaryAdvance.heroPharagraph}"></p>
+                    </div>
+
+                    <!-- Process -->
+                    <div class="form-container" th:if="${product.active == true and session.countryUnlocked}">
+                        <div class="block" id="document-block">
+                            <div class="field inline">
+                                <select name="docType" id="docType">
+                                    <option value="1">DNI</option>
+                                    <option value="2">CE</option>
+                                </select>
+                            </div>
+                            <div class="field inline">
+                                <input type="text" class="input-landing document-input-landing" id="docNumber" placeholder="N&uacute;mero"/>
+                            </div>
+                            <div class="field inline">
+                                <button type="button" class="button bg-red button-landing" th:text="#{button.apply}" data-target="#document-block"></button>
+                            </div>
+                            <small class="small-text display-block" th:utext="#{static.landing.salaryAdvance.applyWithEmail}"></small>
+                        </div>
+                        <div class="block block-hidden" id="email-block">
+                            <div class="field inline">
+                                <input type="text" id="email" class="input-landing" placeholder="Correo electr&oacute;nico" autocorrect="off" autocapitalize="none"/>
+                            </div>
+                            <div class="field inline">
+                                <button type="button" class="button button-landing bg-red" th:text="#{button.apply}" data-target="#email-block"></button>
+                            </div>
+                            <small class="small-text display-block" th:utext="#{static.landing.salaryAdvance.applyWithDocument}"></small>
+                        </div>
+                        <div class="block block-hidden" id="cellphone-block">
+                            <div class="field inline">
+                                <input type="text" id="cellphone" class="input-landing cellphone-input" placeholder="Celular"/>
+                            </div>
+                            <div class="field inline">
+                                <button type="button" class="button button-landing bg-red" th:text="#{button.send}" data-target="#cellphone-block"></button>
+                            </div>
+                        </div>
+                        <div class="block block-hidden" id="confirmationPin-block">
+                            <div class="field inline">
+                                <input type="text" id="authToken" class="input-landing pin-input" placeholder="PIN"/>
+                            </div>
+                            <div class="field inline">
+                                <button type="button" class="button button-landing bg-red" th:text="#{button.confirm}" data-target="#confirmationPin-block"></button>
+                            </div>
+                            <small class="small-text display-block" th:utext="#{static.landing.salaryAdvance.enterPIN}"></small>
+                        </div>
+
+                    </div>
+
+                    <!-- Early access -->
+                    <div class="form-container" th:if="${product.active == false and session.countryUnlocked}">
+                        <form id="frmEarlyAccess" autocomplete="off">
+                            <div class="block" id="early-block">
+                                <div class="field inline">
+                                    <input type="text" id="earlyEmail" name="email" class="input-landing" placeholder="Correo Electr&oacute;nico" autocorrect="off" autocapitalize="none"/>
+                                </div>
+                                <div class="field inline">
+                                    <button type="button" class="button bg-red" id="landingSubmit">¡Avísenme!</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Forbidden -->
+                    <div class="form-container" th:if="${session.countryUnlocked == false}">
+                        <div class="small-text successMessage" th:if="${session.countryUnlocked == false}">Lo sentimos mucho, pero en este momento s&oacute;lo es posible solicitar productos desde Per&uacute;.</div>
+                    </div>
+
+                    <div class="display-block" id="response-block"></div>
+
+                </div>
+            </div>
+            <div class="button-info">
+                <div class="container">
+                    <ul>
+                        <li>
+                            <p>Desde <span th:text="${@utilService.integerMoneyFormat(product.minAmount)}"></span> a <span th:text="${@utilService.integerMoneyFormat(product.maxAmount)}"></span></p>
+                        </li>
+                        <li>
+                            <p><span>Hasta 78% m&aacute;s econ&oacute;mico</span></p>
+                        </li>
+                        <!--<li>
+                            <p>De <span th:text="${product.daysBeforeEndOfMonth}"></span> a <span th:text="${@utilService.daysOffCurrentMonth(product.daysAfterEndOfMonth)}"></span> d&iacute;as</p>
+                        </li>-->
+                        <li>
+                            <p>De 1 a 20 d&iacute;as</p>
+                        </li>
+                        <li>
+                            <span>Sin costos ocultos</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <!-- Press -->
+        <section class="press">
+            <div class="container">
+                <th:block layout:fragment="pressCarousel">
+                    <th:block th:replace="fragments/pressCarousel :: pressCarousel"></th:block>
+                </th:block>
+            </div>
+        </section>
+        <!-- / Press -->
+        <section class="how-it-works">
+            <div class="container">
+                <article>
+                    <div class="top-info" th:utext="#{static.landing.salaryAdvance.stepTitle}">
+                    </div>
+                    <div class="process">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-6 column">
+                                <div class="box-step">
+                                    <div class="top">
+                                        <i class="icon icon-step-1"></i>
+                                    </div>
+                                    <h3 th:text="#{static.landing.salaryAdvance.step1}"></h3>
+                                    <p th:text="#{static.landing.salaryAdvance.step1.desc}"></p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 column">
+                                <div class="box-step">
+                                    <div class="top">
+                                        <i class="icon icon-step-2"></i>
+                                    </div>
+                                    <h3 th:text="#{static.landing.salaryAdvance.step2}"></h3>
+                                    <p th:text="#{static.landing.salaryAdvance.step2.desc}"></p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 column">
+                                <div class="box-step">
+                                    <div class="top">
+                                        <i class="icon icon-step-3"></i>
+                                    </div>
+                                    <h3 th:text="#{static.landing.salaryAdvance.step3}"></h3>
+                                    <p th:text="#{static.landing.salaryAdvance.step3.desc}"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a href="#" id="scrollTop" class="anchor-button bg-red" th:text="#{button.applyHere}"></a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </th:block>
+    <!-- Content Ends -->
+    <!-- footer -->
+    <th:block layout:fragment="footer">
+        <th:block th:replace="fragments/footers :: footerLandings"></th:block>
+    </th:block>
+    <!-- footer ends -->
+</body>
+</html>

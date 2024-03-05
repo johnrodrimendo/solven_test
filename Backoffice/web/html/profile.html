@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Administración</title>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var widthQR = 170;
+        function uploadFile() {
+            setTimeout(function () {
+                var imageUrl = /*[[${@fileService.generateSysUserAvatarUrl('_SYSUSER_AVATAR_.jpg', #httpServletRequest, false)}]]*/null;
+                var data = new FormData();
+                data.append("file", $('#image_file')[0].files[0]);
+                $.ajax({
+                    url: imageUrl,
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function (message) {
+                        console.log(message);
+                        setTimeout(function () {
+                            var srcUrl1 = $('.avatar-principal').eq(0).attr("src")
+                            $('.avatar-principal').eq(0).attr('src', srcUrl1);
+                            var srcUrl2 = $('.avatar-principal').eq(1).attr("src")
+                            $('.avatar-principal').eq(1).attr('src', srcUrl2);
+                        },2000);
+                    }
+                });
+            }, 3000);
+        }
+        function vinculateQr() {
+            var $token = $("#txtToken").val();
+            console.log('token val: ' + $token);
+            defaultAjax({
+                url: /*[[@{/profile/vinculateQr}]]*/null,
+                type: 'POST',
+                data: {
+                    token: '' + $token
+                },
+                success: function (data) {
+                    alert(data);
+                }
+            });
+        }
+        function clearCache() {
+            alert('asociado');
+        }
+        function newQr() {
+            //var urlRandom = 'http://lorempixel.com/200/200/';
+            var urlQr = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chld=M%7C0&chl=otpauth://totp/';
+            defaultAjax({
+                url: /*[[@{/profile/newQr}]]*/null,
+                type: 'POST',
+                data: {},
+                success: function (data) {
+                    var user = /*[[${username}]]*/null;
+                    var sec = data;
+                    urlQr = urlQr + user + '%3Fsecret%3D' + sec;
+                    console.log(urlQr);
+                    $('#qrImg').attr('src', urlQr);
+                }
+            });
+        }
+        $(document).ready(function() {
+            $(window).load(function() {
+                // this code will run after all other $(document).ready() scripts
+                // have completely finished, AND all page elements are fully loaded.
+                newQr();
+            });
+            $('.wHalfQR').css({width: widthQR / 2});
+            $('.wQR').css({width: widthQR});
+            $('input[type=file]').on('change', uploadFile);
+
+        });
+        /*$(document).ready(function () {
+            setTimeout(function(){
+
+             }, 3000);
+        });*/
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <!-- Home, Perfil.-->
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Perfil</span>
+                </li>
+            </ul>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div id="portletAdmin"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Información de usuario</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-6 col-sm-3 col-xs-5">
+                                        <img id="avatarProfileImg" alt="" class="img-circle fileinput fileinput-new avatar-principal" style="width: 180px;"
+                                             th:src="${@fileService.generateSysUserAvatarUrl('_SYSUSER_AVATAR_.jpg', #httpServletRequest, false)}" onclick="$('#image_file').click()" />
+                                        <span style="width: 180px; display: block; text-align: center"
+                                              class="username username-hide-mobile">
+                                            <span th:text="${active}"></span>
+                                        </span>
+                                        <form autocomplete="off" name="fileForm" method="POST" enctype="multipart/form-data" th:action="${@fileService.generateSysUserAvatarUrl('_SYSUSER_AVATAR_.jpg', #httpServletRequest, false)}">
+                                            <input style="display:none" type="file" name="image_file" id="image_file" autocomplete="off"/>
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-7 col-md-6 col-sm-9 col-xs-7">
+                                        <dl>
+                                            <dt>Nombre:</dt>
+                                            <dd>
+                                                <shiro:principal property="name"/>
+                                                <shiro:principal property="firstSurname"/>
+                                                <shiro:principal property="lastSurname"/>
+                                            </dd>
+                                            <dt>Roles:</dt>
+                                            <dd th:text="${roles}">
+                                            </dd>
+                                            <dt>Correo:</dt>
+                                            <dd th:text="${email}">
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 ">
+                        <div id="portletQR"
+                             th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Cambiar el QR para token</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-md-offset-1 col-md-4">
+                                        <a href="javascript:;" style="width: 200px; display: block;"
+                                           class="btn blue btn-outline wQR" onclick="newQr()">
+                                            <i class="fa fa-qrcode fa-lg"></i>
+                                            Generar
+                                            <i class="fa fa-qrcode fa-lg"></i><!--
+                                            <img style="width: 20px" th:src="@{/img/solven/qrIcon.svg}"/>-->
+                                        </a>
+                                        <img id="qrImg" class="wQR" style="width: 200px;" th:src="@{/img/solven/qrIcon.svg}"/>
+
+                                        <div class="input-group wQR" style="width: 200px">
+                                            <div>
+                                                <input id="txtToken" class="form-control wHalfQR" style="width: 100px"
+                                                       type="text" placeholder="Token"/>
+                                            </div>
+                                            <span class="input-group-btn" >
+                                                    <button id="genpassword" style="width: 100px" class="btn btn-success wHalfQR" type="button"
+                                                            onclick="vinculateQr()">
+                                                        Cambiar
+                                                    </button>
+                                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+
+</html>

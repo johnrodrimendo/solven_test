@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<!-- General Header -->
+<div class="process-header" th:fragment="generalHeader">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 column logol">
+                <div class="logo">
+                    <h1>
+                        <a th:href="@{/}" class="logo">
+                            <th:block th:switch="${@brandingService.isBranded(#httpServletRequest)}">
+                                <svg th:case="false" version="1.1" class="icon-solven" id="logoSolven" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                     viewBox="0 0 295 95" style="enable-background:new 0 0 295 95;width: 152px;fill: #F7323F;" xml:space="preserve">
+                                <g id="XMLID_1_">
+                                    <path id="XMLID_16_" class="st0" d="M4.099,89.699v-12.1c4,1.7,10.4,3.2,15.6,3.2c5.7,0,7.8-1.6,7.8-4.6c0-3.5-5-3.9-11.6-6.1c-6.9-2.2-12.3-6.7-12.3-16c0-11.7,8.8-16.7,21.7-16.7c5.3,0,11.1,1.1,14.2,2.1v12.2c-3.5-1.1-8-2.3-13.3-2.3c-5.1,0-7,1.3-7,3.7c0,2.7,2.3,3.4,9.4,5.3c7.5,2.2,14.8,6.2,14.8,17c0,11.3-8.6,17.3-21.4,17.3C13.899,92.799,8.199,91.599,4.099,89.699z"/>
+                                    <path id="XMLID_13_" class="st0" d="M46.599,65.099c0-14.4,8.7-27.7,26.8-27.7c18,0,26.6,12.1,26.6,27.7c0,14.4-8.7,27.7-26.7,27.7S46.599,80.699,46.599,65.099z M82.799,65.099c0-9.6-2.6-15.5-9.5-15.5c-6.8,0-9.4,5.9-9.4,15.5c0,9.7,2.6,15.4,9.5,15.4C80.199,80.399,82.799,74.799,82.799,65.099z"/>
+                                    <path id="XMLID_11_" class="st0" d="M128.299,3.199h16.1l-32.3,89.5h-16.1L128.299,3.199z"/>
+                                    <path id="XMLID_9_" class="st0" d="M135.199,38.199h17.6l7.6,28.7c0.9,3.3,1.7,8.4,2,9.2h0.2c0.2-0.9,1.2-6.1,2-9.2l7.5-28.7h17.1l-17.7,53.6h-18.9L135.199,38.199z"/>
+                                    <path id="XMLID_6_" class="st0" d="M188.199,65.099c0-14.8,8.7-27.7,26.1-27.7c18,0,23.8,12.1,23.8,25.4c0,1.7-0.1,3.6-0.3,5.5h-32.4c0.2,7.5,3.1,12.2,12.6,12.2c6.7,0,12.3-1.5,16.2-3.3v12.5c-4.8,1.9-10.8,3.1-17.4,3.1C196.399,92.799,188.199,81.299,188.199,65.099z M221.699,58.799v-0.7c0-4.5-2.3-8.8-7.4-8.8c-5.2,0-8.1,3.8-8.6,9.5H221.699z"/>
+                                    <path id="XMLID_4_" class="st0" d="M243.699,38.199h16.3v4.3c2.9-2.2,7.5-5.1,14.7-5.1c13.2,0,17.7,8.1,17.7,18.9v35.6h-16.6v-33.1c0-5.8-2-8.4-7.4-8.4c-3.1,0-5.9,1.5-8,3.1v38.5h-16.7V38.199z"/>
+                                    <path id="XMLID_2_" class="st0" d="M121.999,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C126.199,92.799,121.999,88.299,121.999,83.099z"/>
+                                </g>
+                            </svg>
+                                <img th:case="true" th:src="${@brandingService.isBranded(#httpServletRequest) ? @brandingService.getEntityBrandingLogoUrl(#httpServletRequest, '') : ''}" alt="" id="logoSolven" style="width: auto; height: 45px;"/>
+                            </th:block>
+                        </a>
+                    </h1>
+                </div>
+            </div>
+            <div th:if="${showHelp == null || showHelp}" class="col-lg-8 col-md-8 col-sm-8 column-2">
+                <div class="help text-right">
+                    <a href="#" id="helpSign" class="circle" title="Ayuda">
+                        <i class="icon icon-help"><span></span></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Process Header -->
+<div class="process-header" th:classappend="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} ? 'process-header-banbif' : ''" th:fragment="processHeader">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-4 column logol">
+                <div class="logo">
+                    <h1>
+                        <a th:href="@{/}" class="logo logoLinkUrl">
+                            <th:block th:switch="${@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+                                <th:block th:case="true">
+                                    <img class="icon-solven icon-efectivo-al-toque" id="logoSolven" th:src="@{/img/icon-al-toque.png}" style="width: 170px;"/>
+                                    <span>Efectivo al Toque</span>
+                                </th:block>
+                                <th:block th:case="false">
+                                    <svg version="1.1" class="icon-solven" id="logoSolven"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         x="0px" y="0px"
+                                         viewBox="0 0 295 95"
+                                         style="enable-background:new 0 0 295 95;width: 126px;fill: #F7323F;"
+                                         xml:space="preserve">
+                                        <g id="XMLID_1_">
+                                            <path id="XMLID_16_" class="st0" d="M4.099,89.699v-12.1c4,1.7,10.4,3.2,15.6,3.2c5.7,0,7.8-1.6,7.8-4.6c0-3.5-5-3.9-11.6-6.1c-6.9-2.2-12.3-6.7-12.3-16c0-11.7,8.8-16.7,21.7-16.7c5.3,0,11.1,1.1,14.2,2.1v12.2c-3.5-1.1-8-2.3-13.3-2.3c-5.1,0-7,1.3-7,3.7c0,2.7,2.3,3.4,9.4,5.3c7.5,2.2,14.8,6.2,14.8,17c0,11.3-8.6,17.3-21.4,17.3C13.899,92.799,8.199,91.599,4.099,89.699z"/>
+                                            <path id="XMLID_13_" class="st0" d="M46.599,65.099c0-14.4,8.7-27.7,26.8-27.7c18,0,26.6,12.1,26.6,27.7c0,14.4-8.7,27.7-26.7,27.7S46.599,80.699,46.599,65.099z M82.799,65.099c0-9.6-2.6-15.5-9.5-15.5c-6.8,0-9.4,5.9-9.4,15.5c0,9.7,2.6,15.4,9.5,15.4C80.199,80.399,82.799,74.799,82.799,65.099z"/>
+                                            <path id="XMLID_11_" class="st0" d="M128.299,3.199h16.1l-32.3,89.5h-16.1L128.299,3.199z"/>
+                                            <path id="XMLID_9_" class="st0" d="M135.199,38.199h17.6l7.6,28.7c0.9,3.3,1.7,8.4,2,9.2h0.2c0.2-0.9,1.2-6.1,2-9.2l7.5-28.7h17.1l-17.7,53.6h-18.9L135.199,38.199z"/>
+                                            <path id="XMLID_6_" class="st0" d="M188.199,65.099c0-14.8,8.7-27.7,26.1-27.7c18,0,23.8,12.1,23.8,25.4c0,1.7-0.1,3.6-0.3,5.5h-32.4c0.2,7.5,3.1,12.2,12.6,12.2c6.7,0,12.3-1.5,16.2-3.3v12.5c-4.8,1.9-10.8,3.1-17.4,3.1C196.399,92.799,188.199,81.299,188.199,65.099z M221.699,58.799v-0.7c0-4.5-2.3-8.8-7.4-8.8c-5.2,0-8.1,3.8-8.6,9.5H221.699z"/>
+                                            <path id="XMLID_4_" class="st0" d="M243.699,38.199h16.3v4.3c2.9-2.2,7.5-5.1,14.7-5.1c13.2,0,17.7,8.1,17.7,18.9v35.6h-16.6v-33.1c0-5.8-2-8.4-7.4-8.4c-3.1,0-5.9,1.5-8,3.1v38.5h-16.7V38.199z"/>
+                                            <path id="XMLID_2_" class="st0" d="M121.999,83.099c0-5.2,4.1-9.5,9.9-9.5c5.8,0,9.9,4.3,9.9,9.5s-4.1,9.7-9.9,9.7C126.199,92.799,121.999,88.299,121.999,83.099z"/>
+                                        </g>
+                                    </svg>
+                                    <span>Solven</span>
+                                </th:block>
+                            </th:block>
+
+                        </a>
+                        <a th:href="@{/}" class="logoLinkUrl">
+                            <img th:src="${@brandingService.isBranded(#httpServletRequest) ? @brandingService.getEntityBrandingLogoUrl(#httpServletRequest, '') : ''}" alt=""/>
+                        </a>
+                    </h1>
+                </div>
+            </div>
+            <div  id="processHeaderAmount" class="col-lg-5 col-md-4 col-sm-6 col-xs-8 column text-center">
+                <th:block th:replace="this :: processHeaderAmount">
+                </th:block>
+            </div>
+           <!--<div class="col-lg-4 col-md-4 col-sm-2 column-2 qh">
+                <div class="help text-right" th:if="${!@utilService.isEfectivoAlToqueBrand(#httpServletRequest)}">
+                    <a href="#" id="helpSign" class="helpSign circle" title="Ayuda">
+                        <i class="icon icon-help  brand-txt-colorweb"><span></span></i>
+                    </a>
+                </div>
+            </div>-->
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function getUrlBase(urlPathBase){
+            let urlBase = urlPathBase.origin;
+            if(urlBase[urlBase.length -1] == '/') urlBase = urlBase.substring(0, urlBase.length - 1);
+            let urlPathName =  urlPathBase.pathname || "";
+            if(urlPathName.length && urlPathName[0] == "/") urlPathName = urlPathName.substring(1,urlPathName.length-1);
+            if(urlPathName.indexOf("/") != -1) urlPathName = urlPathName.substring(0,urlPathName.indexOf("/"));
+            switch (urlPathName){
+                case 'pagos':
+                case 'pago-de-cuota':
+                case 'cuenta':
+                case 'identidad':
+                case 'consejero':
+                    if(urlPathName == 'pagos') urlPathName = 'pago-de-cuota';
+                    let urlToReturn = urlBase + '/' + urlPathName;
+                    document.querySelectorAll("a.logoLinkUrl").forEach(function(logoLinkUrl) {
+                        logoLinkUrl.setAttribute("href", urlToReturn)
+                    });
+                    break;
+            }
+        }
+
+        var componentSelector = document.querySelector("div.logo");
+        if(componentSelector != null){
+            getUrlBase(new URL(window.location.href));
+        }
+        /*]]>*/
+    </script>
+
+</div>
+
+
+<th:block th:fragment="processHeaderAmount">
+    <div class="edit-amount-box display-none" th:if="${loanApplication?.productCategory != null and
+        loanApplication?.productCategory?.id != loanApplication?.productCategory?.VEHICULO and
+        !@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+        <div class="wrap bg-gray">
+            <span class="currency text-bold" th:text="${loanApplication?.currency?.symbol}"></span>
+
+            <span id="loanAmount" class="amount text-bold text-black" th:text="${@utilService.integerOnlyMoney(loanApplication?.amount,loanApplication?.currency)}"></span>
+            <span class="text-small">(<span id="loanInstallments" th:text="${loanApplication?.installments}"></span> meses)</span>
+        </div>
+        <div class="icon-box text-center bg-gray">
+            <a href="#" id="edit-loan" class="icon icon-edit text-red" data-toggle="tooltip" data-placement="bottom" title="Editar Monto"></a>
+        </div>
+    </div>
+    <th:block th:if="${loanApplication?.productCategory != null and loanApplication?.productCategory?.id == loanApplication?.productCategory?.VEHICULO}">
+        <th:block th:if="${loanApplication?.status?.id == loanApplication?.status?.EVAL_APPROVED}">
+            <div class="edit-amount-box display-none">
+                <div class="wrap bg-gray">
+                    <div class="edit-auto-header wrap-valid-downPayment">
+                        <small>Cuota Inicial</small>
+                        <span id="downPayment" class="currency text-bold" th:text="${@utilService.integerMoneyFormat(loanApplication?.downPayment != null ? loanApplication?.downPayment : 0.0, T(com.affirm.common.model.catalog.Currency).USD_CURRENCY)}"></span>
+                    </div>
+                </div>
+                <div class="icon-box text-center bg-gray">
+                    <a href="#" id="edit-loan" class="icon icon-edit text-red"></a>
+                </div>
+            </div>
+            <span class="currency bg-gray car-model" th:text="${loanApplication?.vehicle?.brand?.brand + ' ' + loanApplication?.vehicle?.model + ' ' + loanApplication?.vehicle?.version}"></span>
+        </th:block>
+
+        <th:block th:if="${loanApplication?.status?.id != loanApplication?.status?.EVAL_APPROVED}">
+            <div class="edit-amount-box display-none">
+                <div class="wrap bg-gray">
+                    <div class="edit-auto-header">
+                        <span class="currency text-bold" th:text="${@utilService.integerMoneyFormat(loanApplication?.vehicle?.price, loanApplication?.vehicle?.currency)}"></span>
+                    </div>
+                </div>
+                <div class="icon-box text-center bg-gray">
+                    <a href="#" id="edit-loan" class="icon icon-edit text-red"></a>
+                </div>
+            </div>
+            <span class="currency bg-gray car-model" th:text="${loanApplication?.vehicle?.brand?.brand + ' ' + loanApplication?.vehicle?.model + ' ' + loanApplication?.vehicle?.version}"></span>
+        </th:block>
+    </th:block>
+
+    <script>
+        /*<![CDATA[*/
+
+        $('#edit-loan').on('click', function(){
+
+            setTimeout(function () {
+                $('#amount').focus();
+            }, 300);
+        });
+
+        /*]]>*/
+    </script>
+
+</th:block>
+
+<!-- Process Header -->
+<div class="pdf-header" th:fragment="pdfHeader">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3 column">
+                <div class="logo">
+                    <h1>
+                        <a th:href="@{/}">
+                            <i class="icon icon-solven"></i>
+                            <i class="icon icon-solven-iso"></i>
+                            <span class="hide">Solven</span>
+                            <img class="brand-logo" th:src="${@brandingService.isBranded(#httpServletRequest) ? @brandingService.getEntityBrandingLogoUrl(#httpServletRequest, '') : ''}" alt=""/>
+                        </a>
+                    </h1>
+                </div>
+            </div>
+
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9 column-2">
+                <div class="help text-right">
+                    <a href="#" id="helpSign" class="circle" title="Ayuda">
+                        <i class="icon icon-help"><span></span></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Header with subheader -->
+<header th:fragment="loanPdfViewerHeader" class="loanPdfViewerHeader" th:classappend="${is_fixed != null and is_fixed ? '' : 'no-fixed'}">
+    <div class="container">
+        <div class="logo">
+            <h1>
+                <a th:href="@{/}" class="desktop-logo" title="Solven">
+                    <i class="icon solven-logo-icon"></i>
+                </a>
+                <a th:href="@{/}" class="mobile-logo" title="Solven">
+            <span class="circle-iso">
+                <i class="icon solven-iso-icon"></i>
+            </span>
+                </a>
+            </h1>
+        </div>
+
+        <div class="help">
+            <a href="#" id="helpSign" class="circle" title="Ayuda">
+                <i class="icon icon-help"><span></span></i>
+            </a>
+        </div>
+    </div>
+    <div class="subHeader" th:if="${is_fixed}">
+        <div class="container">
+            <div class="download-section" th:if="${entityParams.signatureType == T(com.affirm.common.model.catalog.EntityProductParams).CONTRACT_TYPE_MANUAL}">
+                <h3 th:text="${signatureLoaded ? 'Completa la informaci&oacute;n de tu cuenta bancaria.' : 'Para continuar descarga y firma tu contrato'}"></h3>
+                <a th:if="${!signatureLoaded}" th:href="@{/__${productUrl}__/__${loanAplicationToken}__/contract}" class="button red-button" id="downloadContract" download="Contrato" target="_blank"><span>Descargar contrato</span></a>
+            </div>
+            <h3 th:if="${entityParams.signatureType == T(com.affirm.common.model.catalog.EntityProductParams).CONTRACT_TYPE_DIGITAL}">Firma tu contrato</h3>
+        </div>
+    </div>
+</header>
+
+
+<!-- Client Extranet Header -->
+<!-- BEGIN HEADER -->
+<div th:fragment="dashboardHeader" class="page-header navbar navbar-fixed-top">
+    <!-- BEGIN HEADER INNER -->
+    <div class="page-header-inner ">
+        <!-- BEGIN LOGO -->
+        <div class="page-logo">
+            <a th:href="@{/client/login}" class="text-red">
+                <img class="custom-logo-img-header" src="" alt="" style="display: none"/>
+              <i class="icon icon-solven logo-default extranet-logo" style="font-size: 2.5em;"></i>
+            </a>
+            <div class="menu-toggler sidebar-toggler">
+                <!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+            </div>
+        </div>
+        <!-- END LOGO -->
+        <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+        <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse"> </a>
+        <!-- END RESPONSIVE MENU TOGGLER -->
+        <!-- BEGIN PAGE TOP -->
+        <div class="page-top">
+            <!-- BEGIN HEADER SEARCH BOX -->
+            <!-- DOC: Apply "search-form-expanded" right after the "search-form" class to have half expanded search box -->
+           <!-- <form class="search-form" action="page_general_search_2.html" method="GET">
+                <div class="input-group">
+                    <input type="text" class="form-control input-sm" placeholder="Search..." name="query"/>
+                    <span class="input-group-btn">
+                        <a href="javascript:;" class="btn submit">
+                            <i class="icon-magnifier"></i>
+                        </a>
+                    </span>
+                </div>
+            </form>-->
+            <!-- END HEADER SEARCH BOX -->
+            <div class="timeout" style="display: inline-block;margin-top: 1.75em;vertical-align: top;">
+                <i class="icon-hourglass" style="color: #737a99;display: inline-block;margin-top: .20em;vertical-align: top;"></i>
+                <div id="countdown" style="color: #737a99;display: inline-block;vertical-align: top;">5:00</div>
+            </div>
+            <!-- BEGIN TOP NAVIGATION MENU -->
+            <div class="top-menu">
+                <ul class="nav navbar-nav pull-right">
+                    <!--<li class="separator hide"> </li>-->
+                    <!-- BEGIN NOTIFICATION DROPDOWN -->
+                    <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                    <!-- DOC: Apply "dropdown-hoverable" class after "dropdown" and remove data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to enable hover dropdown mode -->
+                    <!-- DOC: Remove "dropdown-hoverable" and add data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to the below A element with dropdown-toggle class -->
+                    <li class="dropdown dropdown-extended dropdown-notification dropdown-dark" id="header_notification_bar"
+                        th:with="lastInteractions=${@extranetService.getLastInteractions(#locale)}">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <i class="icon-bell"></i>
+                            <th:block th:if="${#lists.size(lastInteractions) > 0}">
+                                <span class="badge badge-success" th:text="${#lists.size(lastInteractions)}"></span>
+                            </th:block>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="external">
+                                <h3>Notificaciones
+                                    <span class="bold" th:text="${#lists.size(lastInteractions) > 0 ? #lists.size(lastInteractions) + ' pendientes' : 0 + ' pendientes'}"></span></h3>
+                                <a th:href="@{/client/notificaciones}">Ver todos</a>
+                            </li>
+                            <li>
+                                <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
+                                    <li th:each="lastInteraction : ${lastInteractions}">
+                                        <a th:href="@{/client/notificaciones}">
+                                            <span class="time" th:text="${@utilService.dateUntilNowFormat(lastInteraction.registerDate)}"></span>
+
+                                            <div class="details" style="overflow:visible;" th:if="${lastInteraction.interactionType.id == 1}">
+                                                <span class="label label-sm label-icon label-success">
+                                                    <i class="fa fa-bell-o"></i>
+                                                </span>
+                                                <span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;margin-top.5em;max-width: 70%;vertical-align:top;white-space: nowrap;" th:text="${lastInteraction.subject}"></span>
+                                            </div>
+                                            <div class="details" style="overflow:visible;" th:if="${lastInteraction.interactionType.id == 2}">
+                                                <span class="label label-sm label-icon label-info">
+                                                    <i class="icon-envelope-open"></i>
+                                                </span>
+                                                <span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;margin-top.5em;max-width: 70%;vertical-align:top;white-space: nowrap;" th:text="${lastInteraction.body}"></span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown dropdown-user dropdown-dark">
+                        <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <span class="username username-hide-on-mobile" th:text="${@userClService.getLoggedUserFirstName()}"></span>
+                            <!-- DOC: Do not remove below empty space(&nbsp;) as its purposely used -->
+                            <img alt="" class="img-circle" th:src="${avatarUrl != null ? avatarUrl : pictureUrl != null ?  pictureUrl : '/img/avatar-default.png'}" /> </a>
+                        <ul class="dropdown-menu dropdown-menu-default">
+                            <li>
+                                <a th:href="@{/client/perfil}">
+                                    <i class="icon-user"></i> Perfil </a>
+                            </li>
+                            <li class="divider"> </li>
+                            <li>
+                                <a href="#" id="signoutButton">
+                                    <i class="icon-key"></i> Salir </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END USER LOGIN DROPDOWN -->
+                </ul>
+            </div>
+            <!-- END TOP NAVIGATION MENU -->
+        </div>
+        <!-- END PAGE TOP -->
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#signoutButton').click(function () {
+            defaultAjax({
+                url: /*[[@{/client/logout}]]*/null,
+                type: 'POST'
+            });
+        });
+        /*]]>*/
+    </script>
+</div>
+
+
+<!-- Company Extranet Header -->
+<div th:fragment="companyDashboardHeader" class="page-header navbar navbar-fixed-top">
+    <!-- BEGIN HEADER INNER -->
+    <div class="page-header-inner ">
+        <!-- BEGIN LOGO -->
+        <div class="page-logo">
+            <a th:href="@{/login}" class="text-red">
+                <img class="custom-logo-img-header" src="" alt="" style="display: none"/>
+                <i class="icon icon-solven logo-default extranet-logo" style="font-size: 2.5em;"></i>
+            </a>
+            <div class="menu-toggler sidebar-toggler">
+                <!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+            </div>
+        </div>
+        <!-- END LOGO -->
+        <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+        <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse"> </a>
+        <!-- END RESPONSIVE MENU TOGGLER -->
+        <!-- BEGIN PAGE TOP -->
+        <div class="page-top">
+            <!--
+            <div class="tutorial" style="display: inline-block; margin-top: 1.75em; vertical-align: top;">
+                <ul class="social-icons social-icons-color">
+                    <a href="https://youtu.be/PxMtbKG_9AE" target="_blank">
+                        <i class="fa fa-youtube-play" aria-hidden="true" style="color: red;font-size: 24px;margin-right: 5px;line-height: 1;"></i>
+                        <span style="font-size: 14px;margin-right: 20px;display: inline-block;vertical-align: top;line-height: 1.7;color: #aeb2c4;">Tutorial</span>
+                    </a>
+                </ul>
+            </div>
+            -->
+            <div class="timeout" style="display: inline-block;margin-top: 1.75em;vertical-align: top;">
+                <i class="icon-hourglass" style="color: #737a99;display: inline-block;margin-top: .20em;vertical-align: top;"></i>
+                <div id="countdown" style="color: #737a99;display: inline-block;vertical-align: top;">5:00</div>
+            </div>
+            <!-- BEGIN TOP NAVIGATION MENU -->
+            <div class="top-menu">
+                <ul class="nav navbar-nav pull-right">
+                    <li class="dropdown dropdown-extended dropdown-notification dropdown-dark" id="header_notification_bar">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" th:if="false">
+                            <i class="icon-bell"></i>
+                                <span class="badge badge-success">1</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="external">
+                                <h3>Notificaciones
+                                    <span class="bold">1 Pendientes</span></h3>
+                                <a th:href="@{/client/notificaciones}">Ver todos</a>
+                            </li>
+                            <li>
+                                <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
+                                    <li>
+                                        <a th:href="@{/client/notificaciones}">
+                                            <span class="time">2d</span>
+
+                                            <div class="details" style="overflow:visible;">
+                                                <span class="label label-sm label-icon label-success">
+                                                    <i class="fa fa-bell-o"></i>
+                                                </span>
+                                                <span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;margin-top.5em;max-width: 70%;vertical-align:top;white-space: nowrap;">Hello world</span>
+                                            </div>
+                                            <div class="details" style="overflow:visible;">
+                                                <span class="label label-sm label-icon label-info">
+                                                    <i class="icon-envelope-open"></i>
+                                                </span>
+                                                <span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;margin-top.5em;max-width: 70%;vertical-align:top;white-space: nowrap;">SMS</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END NOTIFICATION DROPDOWN -->
+                    <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                    <li class="dropdown dropdown-user dropdown-dark">
+                        <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <span class="username username-hide-on-mobile" th:text="${@userClService.getLoggedUserFirstName()}"></span>
+                            <img alt="" class="img-circle" th:if="${@userClService.getLoggedUser().avatar != null}" th:src="@{/file/avatar(thumbnail=true)}"/>
+                            <img alt="" class="img-circle" th:if="${@userClService.getLoggedUser().avatar == null}" th:src="@{/img/avatar-default.png}"/>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-default">
+                            <li>
+                                <a th:href="@{/perfil}">
+                                    <i class="icon-user"></i> Perfil </a>
+                            </li>
+                            <li class="divider"> </li>
+                            <li>
+                                <a href="#" id="signoutButton">
+                                    <i class="icon-key"></i> Salir </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#signoutButton').click(function () {
+            defaultAjax({
+                url: /*[[@{/logout}]]*/null,
+                type: 'POST'
+            });
+        });
+        /*]]>*/
+    </script>
+</div>
+
+<!-- Entity Extranet Header -->
+<div th:fragment="entityDashboardHeader" class="page-header navbar navbar-fixed-top">
+    <!-- BEGIN HEADER INNER -->
+    <div class="page-header-inner ">
+        <!-- BEGIN LOGO -->
+        <div class="page-logo">
+
+            <a th:href="@{/}" class="text-red">
+                <img class="logo_bancosol"
+                    th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}"
+                    src="https://solven-public.s3.amazonaws.com/img/bancodelsol/bancodelsol_logo-white.png"
+                    Atl="Banco de Sol" Title="Banco de Sol" />
+                <i th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}" class="icon icon-solven logo-default extranet-logo" style="font-size: 2.5em;"></i>
+                <img class="custom-logo-img-header" th:src="${@brandingService.getExtranetBrandingImageHeader(#httpServletRequest)} != null ? ${@brandingService.getExtranetBrandingImageHeader(#httpServletRequest)} : ''" alt="" style="display: none"/>
+            </a>
+            <div class="menu-toggler sidebar-toggler">
+                <!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+            </div>
+        </div>
+        <!-- END LOGO -->
+        <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+        <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse"> </a>
+        <div class="page-top">
+            <!--
+            <div class="tutorial" style="display: inline-block; margin-top: 1.75em; vertical-align: top;">
+                <ul class="social-icons social-icons-color">
+                    <a href="https://youtu.be/Ij79ZsRIk7w" target="_blank">
+                        <i class="fa fa-youtube-play" aria-hidden="true" style="color: red;font-size: 24px;margin-right: 5px;line-height: 1;"></i>
+                        <span style="font-size: 14px;margin-right: 20px;display: inline-block;vertical-align: top;line-height: 1.7;color: #aeb2c4;">Tutorial</span>
+                    </a>
+                </ul>
+            </div>
+            -->
+            <div class="timeout" style="display: inline-block;margin-top: 1.75em;vertical-align: top;">
+                <i class="icon-hourglass" style="color: #737a99;display: inline-block;margin-top: .20em;vertical-align: top;"></i>
+                <div id="countdown" style="color: #737a99;display: inline-block;vertical-align: top;" data-extranet-type="entity" th:text="${@configuration.getEntityExtranetTimeoutMinutes()+':00'}"></div>
+            </div>
+            <!-- BEGIN TOP NAVIGATION MENU -->
+            <div class="top-menu">
+                <ul class="nav navbar-nav pull-right">
+                    <!--<li class="separator hide"> </li>-->
+                    <!-- BEGIN NOTIFICATION DROPDOWN -->
+                    <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                    <!-- DOC: Apply "dropdown-hoverable" class after "dropdown" and remove data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to enable hover dropdown mode -->
+                    <!-- DOC: Remove "dropdown-hoverable" and add data-toggle="dropdown" data-hover="dropdown" data-close-others="true" attributes to the below A element with dropdown-toggle class -->
+                    <li class="dropdown dropdown-extended dropdown-notification dropdown-dark" id="header_notification_bar">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" th:if="false">
+                            <i class="icon-bell"></i>
+                                <span class="badge badge-success">1</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="external">
+                                <h3>Notificaciones
+                                    <span class="bold">1 Pendientes</span></h3>
+                                <a th:href="@{/client/notificaciones}">Ver todos</a>
+                            </li>
+                            <li>
+                                <ul class="dropdown-menu-list scroller" style="height: 250px;" data-handle-color="#637283">
+                                    <li>
+                                        <a th:href="@{/client/notificaciones}">
+                                            <span class="time">2d</span>
+
+                                            <div class="details" style="overflow:visible;">
+                                                <span class="label label-sm label-icon label-success">
+                                                    <i class="fa fa-bell-o"></i>
+                                                </span>
+                                                <span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;margin-top.5em;max-width: 70%;vertical-align:top;white-space: nowrap;">Hello world</span>
+                                            </div>
+                                            <div class="details" style="overflow:visible;">
+                                                <span class="label label-sm label-icon label-info">
+                                                    <i class="icon-envelope-open"></i>
+                                                </span>
+                                                <span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;margin-top.5em;max-width: 70%;vertical-align:top;white-space: nowrap;">SMS</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END NOTIFICATION DROPDOWN -->
+                    <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                    <li class="dropdown dropdown-user dropdown-dark">
+                        <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                            <!-- DOC: Do not remove below empty space(&nbsp;) as its purposely used -->
+                            <img alt="" class="img-circle" th:src="@{/img/avatar-default.png}"/>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-default">
+                            <li>
+                                <a href="#" id="signoutButton">
+                                    <i class="icon-key"></i> Salir </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END USER LOGIN DROPDOWN -->
+                </ul>
+            </div>
+            <!-- END TOP NAVIGATION MENU -->
+        </div>
+        <!-- END PAGE TOP -->
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#signoutButton').click(function () {
+            console.log($(this));
+            $.ajax({
+                url: /*[[@{/logout}]]*/null,
+                method: 'POST',
+                cache: false,
+                headers: {
+                    'x-request-sender-type': 'ajax',
+                    'x-csrf-token': getCookie('fibonacci13')
+                },
+                statusCode: {
+                    308: function (data) {
+                        window.location.replace(data.responseText);
+                    },
+                    302: function (data, textStatus, jqXHR) {
+                        console.log('redirect to');
+                        console.log(jqXHR);
+                    },
+                    200: function (data, textStatus, jqXHR) {
+                        // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                        console.log('ok');
+                        console.log(jqXHR);
+                        window.location.replace('/');
+                    }
+                },
+                beforeSend: function () {
+                    App.blockUI({
+                        boxed: true,
+                        zIndex: 999999
+                    });
+                },
+                error: function (err) {
+                    console.error(err);
+                },
+                complete: function () {
+                    App.unblockUI();
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+    <!-- END HEADER INNER -->
+</div>
+<!-- END HEADER -->
+
+<div th:fragment="entityContentHeaderWithFilters">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+<!--                    <div class="actions" id="actions-filter" style="display: none">-->
+<!--                        <a href="javascript:;" id="cancel-filter" class="btn btn-circle btn-default filter-button-apply"> Cancelar <i class="fa fa-times"></i></a>-->
+<!--                        <a href="javascript:;" id="apply-filter" class="btn btn-circle btn-default filter-button-apply" style="margin-left: 10px"> Aplicar Filtros <i class="fa fa-check"></i></a>-->
+<!--                    </div>-->
+                </th:block>
+                <th:block>
+                    <div class="actions">
+
+                        <a  id="leadsToDeliverReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/leadsToDeliver/download/' + ${filterType}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <a  id="trayBanbifReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/bandeja/download/' + ${bandeja}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <th:block shiro:hasPermission="report:tray:execute">
+                            <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        </th:block>
+
+
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+
+                    <div class="row d-flex">
+                        <div class="col-div-4">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt style="margin-bottom: 0.5rem !important;">Fecha solicitud</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-div-2 ml-auto">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <div class="">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                console.log($(this));
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+<div th:fragment="entityContentHeaderWithFiltersRejectedPage">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+                    <!--                    <div class="actions" id="actions-filter" style="display: none">-->
+                    <!--                        <a href="javascript:;" id="cancel-filter" class="btn btn-circle btn-default filter-button-apply"> Cancelar <i class="fa fa-times"></i></a>-->
+                    <!--                        <a href="javascript:;" id="apply-filter" class="btn btn-circle btn-default filter-button-apply" style="margin-left: 10px"> Aplicar Filtros <i class="fa fa-check"></i></a>-->
+                    <!--                    </div>-->
+                </th:block>
+                <th:block>
+                    <div class="actions">
+
+                        <a  id="leadsToDeliverReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/leadsToDeliver/download/' + ${filterType}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <a  id="trayBanbifReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/bandeja/download/' + ${bandeja}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <th:block shiro:hasPermission="report:tray:execute">
+                            <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        </th:block>
+
+
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown exclude-custom-dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <input type="hidden" name="page" th:value="${page}"/>
+                    <div class="row d-flex">
+                        <div class="col-div-4">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt style="margin-bottom: 0.5rem !important;">Fecha solicitud</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div style="margin-left: 20px;" class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br />Producto</label>
+                                <select data-none-selected-text="Seleccionar producto" class="form-control input-sm form-control-sm selectpicker" multiple="true" id="product-selector" name="producto">
+                                    <th:block th:if="${not #lists.isEmpty(products)}" th:each="product : ${products}">
+                                        <option th:value="${product.id}" th:text="${product.name}" th:selected="${product.id == productSelected ? true : false}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>Motivo de rechazo</label>
+                                <select data-none-selected-text="Seleccionar analista" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="rejectedReason" name="rejectedReason">
+                                    <option value="-1">Sin asignar</option>
+                                    <th:block th:each="hardFielter, iterO : ${entityAllRejectionReasons.getHardFilters()}">
+                                        <option th:value="${'hf_'+hardFielter.id}" th:text="${hardFielter.hardFilterMessage}"></option>
+                                    </th:block>
+                                    <th:block th:each="creditRejectionReason, iterO : ${entityAllRejectionReasons.getCreditRejectionReasons()}">
+                                        <option th:if="${creditRejectionReason != null}" th:value="${'cr_'+creditRejectionReason.id}" th:text="${creditRejectionReason.reason}"></option>
+                                    </th:block>
+                                    <th:block th:each="offerRejectionReason, iterO : ${entityAllRejectionReasons.getOfferRejectionReasons()}">
+                                        <option th:if="${offerRejectionReason != null}" th:value="${'or_'+offerRejectionReason.id}" th:text="${offerRejectionReason.reason}"></option>
+                                    </th:block>
+                                    <th:block th:each="policy, iterO : ${entityAllRejectionReasons.getPolicys()}">
+                                        <option th:if="${policy != null}" th:value="${'po_'+policy.policyId}" th:text="${policy.policy}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-div-2 ml-auto">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <div class="">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                console.log($(this));
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+<div th:fragment="entityContentHeaderWithFiltersPaymentCommitment">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+                </th:block>
+                <th:block>
+                    <div class="actions">
+
+                        <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown exclude-custom-dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <input type="hidden" name="page" th:value="${page}"/>
+                    <div class="row">
+                        <div class="" style="display: flex;">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt>Fec. generaci&oacute;n</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+                            <dl class="dl-horizontal dl-user-data" style="width: 180px; min-width: 180px; max-width: 180px;">
+                                <dt>&nbsp;Producto </dt>
+                                <select data-none-selected-text="Seleccionar producto" class="form-control input-sm form-control-sm selectpicker" multiple="true" id="product-selector" name="entityProductParam">
+                                    <th:block th:if="${not #lists.isEmpty(products)}" th:each="product : ${products}">
+                                        <option th:value="${product.id}" th:text="${product.entityProduct}"></option>
+                                    </th:block>
+                                </select>
+                            </dl>
+                            <dl class="dl-horizontal dl-user-data" style="margin-left: 4px;width: 180px; min-width: 180px; max-width: 180px;">
+                                <dt>&nbsp;Estado </dt>
+                                <select data-none-selected-text="Seleccionar Estado" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="status" name="status">
+                                    <th:block>
+                                        <option value="1">Registro</option>
+                                        <option value="2">Oferta Aceptada</option>
+                                        <option value="3">Pendiente de Pago</option>
+                                        <option value="4">Pagado</option>
+                                        <option value="5">Pendiente de confirmación</option>
+                                        <option value="6">Pago informado</option>
+                                    </th:block>
+                                </select>
+                            </dl>
+                            <dl class="dl-horizontal dl-user-data ml-auto">
+                                <dt>&nbsp;</dt>
+                                <dd style="width: 100%;">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button" style="margin-left: 25px">Limpiar</button>
+                                    &nbsp;
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+<div th:fragment="entityContentHeaderWithFiltersProduct">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+                </th:block>
+                <th:block>
+                    <div class="actions">
+                        <a  id="leadsToDeliverReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/leadsToDeliver/download/' + ${filterType}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        <a  id="trayBanbifReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/bandeja/download/' + ${bandeja}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        <th:block shiro:hasPermission="report:tray:execute">
+                            <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        </th:block>
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown exclude-custom-dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu exclude-custom-dropdown dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <input type="hidden" name="page" th:value="${page}"/>
+                    <div class="row d-flex">
+                        <div class="col-div-4">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt style="margin-bottom: 0.5rem !important;">Fecha solicitud</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div style="margin-left: 20px;" class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br />Producto</label>
+                                <select data-none-selected-text="Seleccionar producto" class="form-control input-sm form-control-sm selectpicker" multiple="true" id="product-selector" name="product">
+                                    <th:block th:if="${not #lists.isEmpty(products)}" th:each="product : ${products}">
+                                        <option th:value="${product.id}" th:text="${product.name}" th:selected="${product.id == productSelected ? true : false}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                                    <label class="control-label"><b></b><br />Desembolso</label>
+                                    <select data-none-selected-text="Seleccionar desembolso" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="disbursementType" name="disbursementType">
+                                        <th:block th:each="disbursementType, iterO : ${disbursementTypes}">
+                                            <option th:value="${disbursementType.disbursementTypeId}" th:text="${disbursementType?.disbursementType}"></option>
+                                        </th:block>
+                                    </select>
+                                </th:block>
+<!--                                <th:block th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">-->
+<!--                                    <label class="control-label"><b></b><br />Producto</label>-->
+<!--                                    <select data-none-selected-text="Seleccionar producto" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="entityProductParam" name="entityProductParam">-->
+<!--                                        <th:block th:each="entityProductParam, iterO : ${entityProductParams}">-->
+<!--                                            <option th:value="${entityProductParam.id}" th:text="${entityProductParam.entityProduct}"></option>-->
+<!--                                        </th:block>-->
+<!--                                    </select>-->
+<!--                                </th:block>-->
+                            </div>
+                        </div>
+                        <div class="col-div-2 ml-auto">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <div class="">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+<div th:fragment="entityContentHeaderWithFiltersProductDefault">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+                </th:block>
+                <th:block>
+                    <div class="actions">
+                        <a  id="leadsToDeliverReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/leadsToDeliver/download/' + ${filterType}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        <a  id="trayBanbifReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/bandeja/download/' + ${bandeja}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        <th:block shiro:hasPermission="report:tray:execute">
+                            <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        </th:block>
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown exclude-custom-dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu exclude-custom-dropdown dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <input type="hidden" name="page" th:value="${page}"/>
+                    <div class="row d-flex">
+                        <div class="col-div-4">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt style="margin-bottom: 0.5rem !important;">Fecha solicitud</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div style="margin-left: 20px;" class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br />Producto</label>
+                                <select data-none-selected-text="Seleccionar producto" class="form-control input-sm form-control-sm selectpicker" multiple="true" id="product-selector" name="product">
+                                    <th:block th:if="${not #lists.isEmpty(products)}" th:each="product : ${products}">
+                                        <option th:value="${product.id}" th:text="${product.name}" th:selected="${product.id == productSelected ? true : false}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <th:block th:if="${showProgressSelector}">
+                            <div class="col-div-4">
+                                <dl class="dl-horizontal dl-user-data" style="margin-left: 2px;">
+                                    <dt>Progreso</dt>
+                                    <dd style="width: 100%;">
+                                        Mínimo
+                                        <input id="minProgress" name="minProgress" type="text"
+                                               style="display: inline"
+                                               class="form-control input-sm input-small"/>
+                                        Máximo
+                                        <input id="maxProgress" name="maxProgress" type="text"
+                                               style="display: inline"
+                                               class="form-control input-sm input-small"/>
+                                    </dd>
+                                </dl>
+                            </div>
+
+                            <script th:inline="javascript">
+                                /*<![CDATA[*/
+                                $('input[name="minProgress"], input[name="maxProgress"]').change(function() {
+                                    if(!(/^[0-9]*$/.test($(this).val()))){
+                                        $(this).val(null);
+                                        $(this).blur();
+                                    }
+                                })
+                                /*]]>*/
+                            </script>
+                        </th:block>
+                        <div class="col-div-2 ml-auto">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <div class="">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+<div th:fragment="entityContentHeaderWithFiltersEvaluation">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+<!--                    <div class="actions" id="actions-filter" style="display: none">-->
+<!--                        <a href="javascript:;" id="cancel-filter" class="btn btn-circle btn-default filter-button-apply"> Cancelar <i class="fa fa-times"></i></a>-->
+<!--                        <a href="javascript:;" id="apply-filter" class="btn btn-circle btn-default filter-button-apply" style="margin-left: 10px"> Aplicar Filtros <i class="fa fa-check"></i></a>-->
+<!--                    </div>-->
+                </th:block>
+                <th:block>
+                    <div class="actions">
+                        <a  id="leadsToDeliverReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/leadsToDeliver/download/' + ${filterType}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/></a>
+
+                        <a  id="trayBanbifReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/bandeja/download/' + ${bandeja}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <th:block shiro:hasPermission="report:tray:execute">
+                            <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        </th:block>
+
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown exclude-custom-dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <input type="hidden" name="page" value="evaluation"/>
+                    <div class="row d-flex">
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>Fecha registro</label>
+                                <input class="form-control input-sm" type="text" name="registerDate" />
+                            </div>
+                        </div>
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>Oferta</label>
+                                <input class="form-control input-sm" type="text" name="offer"/>
+                            </div>
+                        </div>
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>Analista</label>
+                                <select data-none-selected-text="Seleccionar analista" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="analyst" name="analyst">
+                                    <option value="-1">Sin asignar</option>
+                                    <th:block th:each="user, iterO : ${users}">
+                                        <option th:value="${user.userId}" th:text="${user.userName}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-left: 20px;" class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br />Producto</label>
+                                <select data-none-selected-text="Seleccionar producto" class="form-control input-sm form-control-sm selectpicker" multiple="true" id="product-selector" name="product">
+                                    <th:block th:if="${not #lists.isEmpty(products)}" th:each="product : ${products}">
+                                        <option th:value="${product?.id}" th:text="${product?.name}" th:selected="${product.id == productSelected ? true : false}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>Desembolso</label>
+                                <select data-none-selected-text="Seleccionar desembolso" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="disbursementType" name="disbursementType">
+                                    <th:block th:each="disbursementType, iterO : ${disbursementTypes}">
+                                        <option th:value="${disbursementType.disbursementTypeId}" th:text="${disbursementType?.disbursementType}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-div-2">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>Progreso</label>
+                                <select data-none-selected-text="Seleccionar progreso" multiple="true" class="form-control input-sm form-control-sm selectpicker" id="progress" name="progress">
+                                    <th:block th:each="progress, iterO : ${progresses}">
+                                        <option th:value="${progress.id}" th:text="${progress.name}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-div-2 ml-auto">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <div class="">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                console.log($(this));
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+
+            $('input[name="registerDate"]').daterangepicker({
+                endDate: moment(),
+                maxDate: new Date(),
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+            $('input[name="offer"]').daterangepicker({
+                endDate: moment(),
+                maxDate: new Date(),
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+
+            $('input[name="registerDate"]').on('apply.daterangepicker', function(ev, picker) {      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));  });
+            $('input[name="registerDate"]').on('cancel.daterangepicker', function(ev, picker) {      $(this).val('');  });
+
+            $('input[name="offer"]').on('apply.daterangepicker', function(ev, picker) {      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));  });
+            $('input[name="offer"]').on('cancel.daterangepicker', function(ev, picker) {      $(this).val('');  });
+
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+<div th:fragment="entityContentHeader">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <div class="top-menu">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown exclude-custom-dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+<!--                                <img alt="" class="img-circle" th:src="@{/img/avatar-default.png}"/>-->
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<div th:fragment="entityContentHeaderCommunication">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <div class="actions">
+                    <a id="sendSMSOption" class="btn btn-circle btn-default principal-button-action" href="javascript:;">Enviar SMSs </a>
+                </div>
+                <div class="top-menu">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <!--                                <img alt="" class="img-circle" th:src="@{/img/avatar-default.png}"/>-->
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<div th:fragment="entityContentHeaderWithFiltersBDS">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+                </th:block>
+                <th:block>
+                    <div class="actions">
+
+                        <a  id="leadsToDeliverReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/leadsToDeliver/download/' + ${filterType}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <a  id="trayBanbifReport" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" th:href="@{'/bandeja/download/' + ${bandeja}}" style="float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+
+                        <th:block shiro:hasPermission="report:tray:execute">
+                            <a id="downloadTrayReport" th:if="${@entityExtranetService.canShowDownloadTrayReport(tray,#httpServletRequest,#locale)} != null" class="btn btn-circle btn-default tablefilter-action-button download-action-button principal-button-action" href="javascript:;" style="float: right;float: right;display: none"> Descargar <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/> </a>
+                        </th:block>
+
+
+                    </div>
+                </th:block>
+                <div class="input-icons" style="margin-left: auto;">
+                    <input id="searchValueFilter" name="searchValue" type="text"
+                           style="display: inline; min-width: 250px"
+                           placeholder="Buscar"
+                           class="form-control input-sm input-small"/>
+                    <i class="fa fa-search search" style="cursor: pointer"></i>
+                </div>
+                <div class="top-menu" style="margin-left: 10px;">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity().name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <div class="row">
+                        <div class="col-md-6" style="display: flex;">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt>Fec. generaci&oacute;n</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+<!--                            <dl class="dl-horizontal dl-user-data" style="margin-left: 10px;">-->
+<!--                                <dt>Buscar:</dt>-->
+<!--                                <dd style="width: 100%;">-->
+<!--                                    <input id="searchValueFilter" name="searchValue" type="text"-->
+<!--                                           style="display: inline; min-width: 250px"-->
+<!--                                           class="form-control input-sm input-small"/>-->
+<!--                                </dd>-->
+<!--                            </dl>-->
+                            <dl class="dl-horizontal dl-user-data ml-auto">
+                                <dt>&nbsp;</dt>
+                                <dd style="width: 100%;">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button" style="margin-left: 25px">Filtrar</button>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                console.log($(this));
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+
+<div th:fragment="entityContentHeaderMarketingCampaign">
+    <div class="col-xs-12">
+        <div class="filter-card">
+            <div class="filter-title-container">
+                <span class="caption-subject bold" th:text="${title}"></span>
+                <div class="actions">
+                    <a id="createCampaign" class="btn btn-circle btn-default principal-button-action" href="javascript:;">Crear nueva campa&ntilde;a <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/icon-nueva-campana.svg" alt="" class="custom-icono-svg"/> </a>
+                    <a id="campaignConfiguration" class="btn btn-circle btn-default principal-button-action" href="javascript:;">Configuración <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/icon-configuraciones.svg" alt="" class="custom-icono-svg"/> </a>
+                </div>
+                <div class="top-menu">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown dropdown-user dropdown-dark">
+                            <a href="javascript:;" class="dropdown-toggle dropdown-avatar" id="dropdown-avatar" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                                <span class="username username-hide-on-mobile" th:text="${@entityExtranetService.getLoggedUserEntity()?.name}"></span>
+                                <svg id="avatar_icon" class="img-circle" data-name="avatar icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+                                    <circle id="Elipse_212" data-name="Elipse 212" cx="13" cy="13" r="13" transform="translate(2.276 2)" fill="#b7bec1"/>
+                                    <path id="Icon_awesome-user-circle" data-name="Icon awesome-user-circle" d="M15,.563a15,15,0,1,0,15,15A15,15,0,0,0,15,.563Zm0,5.806a5.323,5.323,0,1,1-5.323,5.323A5.323,5.323,0,0,1,15,6.369Zm0,20.806A11.59,11.59,0,0,1,6.139,23.05,6.744,6.744,0,0,1,12.1,19.433a1.48,1.48,0,0,1,.429.067A8.008,8.008,0,0,0,15,19.917a7.978,7.978,0,0,0,2.474-.417,1.48,1.48,0,0,1,.429-.067,6.744,6.744,0,0,1,5.958,3.617A11.59,11.59,0,0,1,15,27.175Z" transform="translate(0 -0.563)" fill="#f2f2f2"/>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-default">
+                                <li>
+                                    <a href="#" id="signoutButton">
+                                        <i class="icon-key"></i> Salir </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#signoutButton').click(function () {
+                $.ajax({
+                    url: /*[[@{/logout}]]*/null,
+                    method: 'POST',
+                    cache: false,
+                    headers: {
+                        'x-request-sender-type': 'ajax',
+                        'x-csrf-token': getCookie('fibonacci13')
+                    },
+                    statusCode: {
+                        308: function (data) {
+                            window.location.replace(data.responseText);
+                        },
+                        302: function (data, textStatus, jqXHR) {
+                            console.log('redirect to');
+                            console.log(jqXHR);
+                        },
+                        200: function (data, textStatus, jqXHR) {
+                            // CASO ESPECIAL. CUANDO SE TIENE MAS DE 2 TABS ABIERTAS Y SE INTENTA CERRAR SESION MAS DE 2 VECES (DIFERENTES TABS) YA NO RESPONDE EL AJAX
+                            console.log('ok');
+                            console.log(jqXHR);
+                            window.location.replace('/');
+                        }
+                    },
+                    beforeSend: function () {
+                        App.blockUI({
+                            boxed: true,
+                            zIndex: 999999
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    },
+                    complete: function () {
+                        App.unblockUI();
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+</div>
+
+<div th:fragment="entityErrorsWithFilters">
+    <div class="col-xs-12" style="padding-left: 0;">
+        <div class="filter-card" style="padding-left: 0;">
+            <div class="filter-title-container">
+                <span class="caption-subject font-green bold" th:text="${title}"></span>
+                <th:block>
+                    <div class="actions" id="actions-show-filter">
+                        <a class="btn btn-circle btn-default tablefilter-action-button actions-show-filter principal-button-action" href="javascript:;">Filtros <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/filtro.svg" alt="" class="custom-icono-svg"/> </a>
+                    </div>
+                </th:block>
+            </div>
+            <div class="portlet-title tablefilter-filters" style="display: none">
+                <form id="form-termitated-list">
+                    <input type="hidden" name="page" th:value="${page}"/>
+                    <div class="row d-flex">
+
+                        <div class="col-div-4">
+                            <dl class="dl-horizontal dl-user-data">
+                                <dt style="margin-bottom: 0.5rem !important;">&nbsp;</dt>
+                                <dd style="width: 100%;">
+                                    Desde
+                                    <input id="creationFromFilter" name="creationFrom" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    Hasta
+                                    <input id="creationToFilter" name="creationTo" type="text"
+                                           style="display: inline"
+                                           class="form-control input-sm input-small"/>
+                                    <script>
+                                        $('#creationFromFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationToFilter').datepicker({
+                                            autoclose: true,
+                                            format: "dd/mm/yyyy",
+                                            focusOnShow: true,
+                                            endDate: "today"
+                                        });
+                                        $('#creationFromFilter').on('change', function () {
+                                            $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                                        });
+                                    </script>
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-div-2" style="margin-left: 20px;margin-bottom: 5px;">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <input class="form-control input-sm" type="text" placeholder="Buscar" name="search" />
+                            </div>
+                        </div>
+
+                        <div class="col-div-2 ml-auto" style="width: 18%">
+                            <div class="form-group pl-0 pb-0 pt-0">
+                                <label class="control-label"><b></b><br/>&nbsp;</label>
+                                <div class="">
+                                    <button class="btn btn-default button-filter secondary-button w-45" id="cancel-filter" type="button">Limpiar</button>
+                                    <button class="btn btn-default button-filter principal-button w-45" id="apply-filter" type="button">Filtrar</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+
+            /*]]>*/
+        </script>
+    </div>
+    <script>
+        replaceImgSvgToSvgElement();
+    </script>
+</div>
+
+</body>
+</html>

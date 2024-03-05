@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      layout:decorator="templates/defaultTemplate">
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Para gestionar</title>
+    <script>
+        window.datetimepickerFilters = true;
+    </script>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <style>
+        table.dataTable tbody td.select-checkbox::before, table.dataTable tbody td.select-checkbox::after {
+            top: 50%;
+        }
+        table.dataTable tbody > tr.selected {
+            background-color: #0275d8 !important;
+        }
+    </style>
+    <link rel="stylesheet"
+          th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker/bootstrap-datetimepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+          rel="stylesheet"/>
+    <script th:src="@{/js/QuestionFrameworkBO.js}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.filters = [];
+        var allowedTablesWithActions = [];
+
+        allowedTablesWithActions.push(/*[[${@managementController.TAB_WITH_OFFER}]]*/);
+        allowedTablesWithActions.push(/*[[${@managementController.TAB_BEFORE_OFFER}]]*/);
+
+        var isCheckedAll = false;
+
+        var questionsBeforeOffer = /*[[${questionsBeforeOffer}]]*/;
+        var questionsAfterOffer = /*[[${questionsAfterOffer}]]*/;
+
+        $(document).ready(function () {
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var managementList = $(e.target).data("management");
+
+                if (allowedTablesWithActions.includes(managementList)) {
+                    $('.actions .btn-actions').show();
+                } else {
+                    $('.actions .btn-actions').hide();
+                }
+
+                if(managementList === /*[[${@managementController.TAB_WITH_OFFER}]]*/) {
+                    $('#sendBulkInteractionsModal .btn-export').show();
+                } else {
+                    $('#sendBulkInteractionsModal .btn-export').hide();
+                }
+
+                var base = /*[[ @{/loanApplication/managementv2/} ]]*/null;
+                var list = managementList + '/list';
+                var baseUrl = base + list;
+                var params = {
+                    tab: managementList
+                };
+
+                $('form[role="form"]').attr('action', baseUrl);
+                $('.tablefilter').data('tablefilter').closeFilters();
+                $('.tablefilter').data('tablefilter').removeFilters();
+
+                $("#table").defaultLoad(baseUrl, null, function (data) {
+                    $('.tablefilter').data('tablefilter').refreshInfo();
+                }, 'POST', params);
+            });
+
+            // Carga el primer tab visible
+            $('#management-tab li:first-child a').click();
+
+            $('#management-tab li a').click(function () {
+                $('.question').remove();
+                var tab = $(this).attr('data-management');
+                fillQuestions(tab);
+            });
+
+            function fillQuestions(tab) {
+                var questions;
+
+                if ('pin' === tab || 'before_offer' === tab) {
+                    questions = questionsBeforeOffer;
+                } else {
+                    questions = questionsAfterOffer;
+                }
+
+                for (var i = 0; i < questions.length; i++) {
+                    var question = questions[i];
+                    $('#selQuestion').append(
+                        '<option value="' + question.id + '" class="question">' + question.question + '</option>'
+                    );
+                }
+            }
+
+            fillQuestions('pin');
+        });
+
+        $(document).on('change', '.check-all', function () {
+            if ($(this).is(":checked")) {
+                $(this).closest('table').DataTable().rows().select();
+                isCheckedAll = true;
+            } else {
+                $(this).closest('table').DataTable().rows().deselect();
+                isCheckedAll = false;
+            }
+        });
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Solicitudes</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Para gestionar</span>
+                </li>
+            </ul>
+
+            <div id="missingDocsModal" class="modal fade">
+                <div class="modal-dialog" style="max-width: 860px !important;">
+                    <div class="modal-content">
+                        <div class="content">
+                            <div class="modal-body">
+                                <!--DYNAMICALLY LOADED-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script th:inline="javascript">
+                    function validateAllUserFiles(loanApplicationId) {
+                        var baseUrl = /*[[@{/file/userFile/all/validate}]]*/null;
+                        defaultAjax({
+                            url: baseUrl,
+                            type: 'POST',
+                            data: {
+                                userId: userId,
+                                loanApplicationId: loanApplicationId
+                            },
+                            success: function (data) {
+                                refreshMissingDocsModal(loanApplicationId)
+                            }
+                        })
+                    }
+
+                    function validateUserFile(userFileId, validated) {
+                        var baseUrl = /*[[@{/file/userFile/}]]*/null;
+                        defaultAjax({
+                            url: baseUrl + userFileId + '/validate',
+                            type: 'POST',
+                            data: {
+                                validated: validated
+                            },
+                            success: function (data) {
+                                var fileUserContainer = $('#file_' + userFileId);
+                                if (validated) {
+                                    // Add style to image
+                                    fileUserContainer.find('img').css('border-color', '#26C281');
+                                    fileUserContainer.find('a[title="Validar archivo"]').remove();
+                                } else {
+                                    // Move container to deletedFiles
+                                    fileUserContainer.find('.buttons-wrap').children('.btn').remove();
+                                    fileUserContainer.find('li').remove();
+                                    var parentContainer = fileUserContainer.parent();
+                                    if (parentContainer.find('.fileContent').length == 1) {
+                                        parentContainer.html('No se ha subido ningÃºn archivo.');
+                                    }
+                                    $('#deletedFiles').append(fileUserContainer);
+                                    fileUserContainer.find('img').css('border-color', '#ed6b75');
+                                    fileUserContainer.find('.fileHoverDiv').hide();
+                                }
+                            }
+                        })
+                    }
+
+                    function requestMissingDocumentation(loanApplicationId) {
+                        var baseUrl = /*[[@{/file/userFile/requestMissingDocumentation}]]*/null;
+                        defaultAjax({
+                            url: baseUrl,
+                            type: 'POST',
+                            data: {
+                                userId: userId,
+                                loanApplicationId: loanApplicationId
+                            },
+                            success: function (data) {
+                                refreshMissingDocsModal(loanApplicationId)
+                            }
+                        })
+                    }
+
+                    function invalidateUserFile(userFileId, validated, loanApplicationId) {
+                        if (!validated) {
+                            //action for dismiss documentation appear //style="display:none;"
+                            console.log('Invalidando documento');
+                            $('#markDocumentMissingAction').attr('style', 'display:true');
+                            markDocumentsMissing(loanApplicationId, false);
+                        }
+                        validateUserFile(userFileId, validated);
+                    }
+
+                    function updateUserFileType(userFileId, userFileTypeId) {
+                        var baseUrl = /*[[@{/file/userFile/}]]*/null;
+                        defaultAjax({
+                            url: baseUrl + userFileId + '/updateUserFileType',
+                            type: 'POST',
+                            data: {
+                                userFileTypeId: userFileTypeId
+                            },
+                            success: function (data) {
+                                closeUserFileUploadModal();
+                            }
+                        })
+                    }
+
+                    function markDocumentsMissing(loanApplicationId, refreshTab) {
+                        defaultAjax({
+                            url: /*[[@{/person/assign/documentsMissingFlag}]]*/null,
+                            type: 'POST',
+                            data: {
+                                loanApplicationId: loanApplicationId
+                            },
+                            success: function (data) {
+                                // Refresh the applications tab
+                                if (refreshTab) {
+                                    refreshMissingDocsModal(loanApplicationId);
+                                }
+                            }
+                        });
+                    }
+
+                    function refreshMissingDocsModal(loanApplicationId) {
+                        $('#missingDocsModal').modal('hide');
+                        openMissingDocsModal(loanApplicationId);
+                    }
+                </script>
+            </div>
+
+            <div id="answerWhoCallModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="control-label">Â¿Contest&oacute; el titular?</label>
+                                            <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                                <input id="personAnswerCall" type="checkbox" checked="checked"/>
+                                                Contest&oacute;
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8" id="contactRelationshipModalDiv">
+                                        <div class="form-group">
+                                            <label>Parentesco</label>
+                                            <select name="relationshipId" class="form-control form-control-sm">
+                                                <option value="" disabled="disabled" selected="selected">----------
+                                                </option>
+                                                <option th:each="relationship : ${@catalogService.getRelationships(#locale)}"
+                                                        th:value="${relationship.id}"
+                                                        th:text="${relationship.relationship}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                <button id="answerWhoCallModalSaveButton" type="button" class="btn btn-info">Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="contactResultModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6" id="contactResultModalDateDiv">
+                                        <div class="form-group">
+                                            <label class="control-label" for="contactResultModalDate">Seleccione la
+                                                fecha de nuevo contacto</label>
+                                            <input type="text" id="contactResultModalDate" class="form-control"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                <button id="contactResultModalSaveButton" type="button" class="btn btn-info">Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="contactDetailsModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label" for="details">Selecciona el motivo</label>
+                                            <select id="details" class="form-control"></select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label" for="detailsRejection">Comentarios</label>
+                                            <textarea class="form-control" name="detailsRejection" id="detailsRejection" maxlength="200"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                <button id="contactDetailsModalSaveButton" type="button" class="btn btn-info">Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sendBulkInteractionsModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label" for="interaction-templates">Selecciona la interacción</label>
+                                            <select id="interaction-templates" class="form-control"></select>
+                                        </div>
+                                        <div>
+                                            <p class="template-preview"></p>
+                                        </div>
+                                        <hr/>
+                                        <p>Se enviarán <strong class="total-interactions"></strong> interacciones.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                <a class="btn-export btn btn-default" th:onclick="'exportSelectedLoans()'">Exportar base</a>
+                                <button id="sendBulkInteractionsModalSaveButton" type="button" class="btn btn-info">Enviar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Solicitudes para Gestionar</span>
+                                </div>
+
+                                <ul class="nav nav-tabs pull-left" id="management-tab">
+                                    <li shiro:hasPermission="menu:loanapplication:management:pin">
+                                        <a href="#" th:attr="data-management=${@managementController.TAB_PIN}" data-toggle="tab">PIN</a>
+                                    </li>
+                                    <li shiro:hasPermission="menu:loanapplication:management:before_offer">
+                                        <a href="#" th:attr="data-management=${@managementController.TAB_BEFORE_OFFER}" data-toggle="tab" >Antes de oferta</a>
+                                    </li>
+                                    <li shiro:hasPermission="menu:loanapplication:management:offer">
+                                        <a href="#" th:attr="data-management=${@managementController.TAB_WITH_OFFER}" data-toggle="tab">Con oferta</a>
+                                    </li>
+                                    <li shiro:hasPermission="menu:loanapplication:management:pending_disbursement">
+                                        <a href="#" th:attr="data-management=${@managementController.TAB_PENDING_DISBURSEMENT}" data-toggle="tab" >Pendientes de desembolso</a>
+                                    </li>
+                                </ul>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}+' tablefilter-action-button'"
+                                       href="javascript:;">
+                                        <i class="fa fa-filter"></i> Filtros
+                                    </a>
+                                    <div class="btn-group btn-actions" style="display: none;width: initial !important;">
+                                        <a th:class="${@frontEndService.defaultActionButtonClass}"
+                                           href="javascript:;"
+                                           data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                                           aria-expanded="false">
+                                            Acciones <i class="fa fa-angle-down"></i>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li style="width: 100%">
+                                                <a href="javascript:;" tabindex="-1" shiro:hasPermission="loanapplication:sendBulkInteractions"
+                                                   class="font-grey-gallery sbold" th:onclick="'openSendBulkInteractionsModal()'">Envio Whatsapp</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="table-paginator-info"
+                                         style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-title tablefilter-filters" style="display: none">
+                                <form role="form" method="post" th:action="@{/loanApplication/managementv2/list}">
+                                    <div class="form-row">
+                                        <!-- Fecha de registro -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Fecha registro</b><br/>Desde</label>
+                                                <input id="creationFromFilter" name="creationFrom" type="text"
+                                                       class="form-control form-control-sm" placeholder="Desde"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationToFilter" name="creationTo" type="text"
+                                                       class="form-control form-control-sm" placeholder="Hasta"/>
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var creationFromFilter = $('#creationFromFilter');
+                                                var creationToFilter = $('#creationToFilter');
+                                                datepicker(creationFromFilter);
+                                                datepicker(creationToFilter);
+
+                                                function datepicker(obj) {
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+
+                                                creationFromFilter.on('change', function () {
+                                                    creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <!-- Monto solicitado -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b>Monto solicitado</b><br/>Desde</label>
+                                                <input id="amountFromFilter" name="amountFrom" type="text"
+                                                       class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="amountToFilter" name="amountTo" type="text"
+                                                       class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                        <!-- DNI -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>DNI</label>
+                                                <input name="document_number" type="text"
+                                                       class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+                                            <!-- Analista -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Analista</label>
+                                                <input name="analyst" type="text" class="form-control form-control-sm" />
+                                            </div>
+                                        </div>
+                                        <!-- Financiador -->
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Financiador</label>
+                                                <select name="entity" class="form-control form-control-sm">
+                                                    <option value="" hidden="">Selecciona financiador</option>
+                                                    <option th:each="entity : ${@catalogService.getEntities()}"
+                                                            th:value="${entity.id}" th:text="${entity.shortName}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- Proximo contacto -->
+                                        <div class="col-md-2 col-sm-3">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Pr&oacute;ximo contacto</label>
+                                                <select name="hoursNextContact" class="form-control form-control-sm">
+                                                    <option value="" hidden="hidden">Selecciona en cuánto tiempo</option>
+                                                    <option value="1">En 1 hora</option>
+                                                    <option value="2">En 2 horas</option>
+                                                    <option value="4">En 4 horas</option>
+                                                    <option value="8">En 8 horas</option>
+                                                    <option value="12">En 12 horas</option>
+                                                    <option value="24">En 24 horas</option>
+                                                    <option value="0">Todos los anteriores a hoy</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- Pregunta -->
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label"><b></b><br/>Pregunta donde está la solicitud</label>
+                                                <select name="question" class="form-control form-control-sm" id="selQuestion">
+                                                    <option value="" hidden="">Selecciona pregunta</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="tablefilter-table">
+                                    <div class="table-responsive" id="table">
+                                        <th:block th:switch="${tab}">
+                                            <th:block th:case="${@managementController.TAB_PIN}">
+                                                <th:block th:replace="this :: pin(wrapper=${wrapper})"></th:block>
+                                            </th:block>
+                                            <th:block th:case="${@managementController.TAB_BEFORE_OFFER}">
+                                                <th:block th:replace="this :: before_offer(wrapper=${wrapper})"></th:block>
+                                            </th:block>
+                                            <th:block th:case="${@managementController.TAB_WITH_OFFER}">
+                                                <th:block th:replace="this :: list(wrapper=${wrapper})"></th:block>
+                                            </th:block>
+                                            <th:block th:case="${@managementController.TAB_PENDING_DISBURSEMENT}">
+                                                <th:block th:replace="this :: pending_disbursement(wrapper=${wrapper})"></th:block>
+                                            </th:block>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        <!--TODO GENERALIZAR FUNCTION-->
+        function reloadLoanApplicationRow(loanApplicationId) {
+            var rowindex = $('tr[data-loan-aplication=' + loanApplicationId + ']').find('td:first-child').text()
+            var baseUrl = /*[[@{/loanApplication/managementv2/}]]*/;
+            var tab = $('#tableResults').data('tab');
+            defaultAjax({
+                url: baseUrl + tab + "/row",
+                type: 'GET',
+                data: {
+                    loanApplicationId: loanApplicationId
+                },
+                success: function (data) {
+                    $('#tableResults').DataTable().destroy();
+                    $('tr[data-loan-aplication=' + loanApplicationId + ']').replaceWith(data);
+                    $('tr[data-loan-aplication=' + loanApplicationId + ']').find('td:first-child').html(rowindex);
+                    getDatatable($('#tableResults'), true);
+                }
+            });
+        }
+
+        function saveContactResult(contactResultId, loanId) {
+            var contactResultCatalog = JSON.parse(/*[[${@utilService.toJson(@catalogService.getTrackingActions())}]]*/);
+            var interested = /*[[${T(com.affirm.common.model.catalog.TrackingAction).INTERESTED}]]*/null;
+            var busy = /*[[${T(com.affirm.common.model.catalog.TrackingAction).BUSY}]]*/null;
+            var noSeEncuentra = /*[[${T(com.affirm.common.model.catalog.TrackingAction).NO_SE_ENCUENTRA}]]*/null;
+            for (i = 0; i < contactResultCatalog.length; i++) {
+                if (contactResultCatalog[i].trackingActionId == contactResultId) {
+                    if (contactResultId === interested || contactResultId === busy || contactResultId === noSeEncuentra) {
+                        openWhoAnswerCallModal(loanId, contactResultId);
+                    } else if (contactResultCatalog[i].dateRequired) {
+                        openContactResultModal(loanId, contactResultId);
+                    } else if (contactResultCatalog[i].trackingDetails != null && contactResultCatalog[i].trackingDetails.length > 0) {
+                        openContactDetailsModal(loanId, contactResultId);
+                    } else {
+                        registerContactResult(loanId, contactResultId);
+                    }
+                    return;
+                }
+            }
+        }
+
+        function liftComment(loanId) {
+            defaultAjax({
+                url: /*[[@{/loanApplication/liftComment}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationId: loanId
+                },
+                success: function (data) {
+                    // swal({
+                    //     title: "",
+                    //     text: "Se levantÃ³ el comentario",
+                    //     type: "info",
+                    //     timer: 2000
+                    // });
+                    reloadLoanApplicationRow(loanId);
+                }
+            });
+        }
+
+        function returnProcess(loanId) {
+            defaultAjax({
+                url: /*[[@{/loanApplication/returnAssistedProcess}]]*/null,
+                type: 'POST',
+                data: {
+                    loanApplicationId: loanId,
+                    assistedProcess: window.assistedProcess
+                },
+                success: function (data) {
+                    swal({
+                        title: "",
+                        text: "Se ha enviado un correo al usuario para que continue el proceso.",
+                        type: "info"
+                    }, function (data) {
+                        window.location.href = window.location.href;
+                    });
+                }
+            });
+        }
+
+        function openWhoAnswerCallModal(loanId, contactResultId) {
+            // Open
+            $('#contactRelationshipModalDiv').hide();
+            $('#answerWhoCallModal').modal();
+            $('#answerWhoCallModal #personAnswerCall').prop('checked', true);
+            $('#answerWhoCallModal #personAnswerCall').click(function () {
+                if (!$(this).is(':checked')) {
+                    $('#answerWhoCallModal select[name=relationshipId]').val('');
+                    $('#contactRelationshipModalDiv').show();
+                } else {
+                    $('#contactRelationshipModalDiv').hide();
+                }
+            });
+            $('#answerWhoCallModalSaveButton').off("click");
+            $('#answerWhoCallModalSaveButton').click(function () {
+                if (!$('#answerWhoCallModal #personAnswerCall').is(':checked') && ($('#answerWhoCallModal select[name=relationshipId]').val() == '' || $('#answerWhoCallModal select[name=relationshipId]').val() == null)) {
+                    swal({
+                        title: "",
+                        text: "Debes seleccionar el parentesco de la persona que contestÃ³",
+                        type: "error"
+                    });
+                } else {
+                    registerContactResult(loanId, contactResultId, $('#answerWhoCallModal #personAnswerCall').is(':checked'), $('#answerWhoCallModal select[name=relationshipId]').val());
+                }
+            });
+        }
+
+        function openMissingDocsModal(loanId) {
+            var baseUrl = /*[[@{/loanApplication/managementv2/}]]*/null;
+            defaultAjax({
+                url: baseUrl + loanId + "/getMissingDocs/",
+                type: 'GET',
+                success: function (html) {
+                    $('#missingDocsModal').modal();
+                    $('#missingDocsModal .modal-body').html(html);
+                    $('#missingDocsModal .request-docs-to-user').hide();
+                    // variables globales unicamente usados para este modal
+                    userId = $('#missingDocsModal #tabData').data('userid');
+                    $('#missingDocsModal #tabData .tools a').click();// open accordion
+                    // function overwrite
+                    closeUserFileUploadModal = function () {
+                        $('#missingDocsModal').modal('hide');
+                        openMissingDocsModal(loanId);
+                    }
+                }, error: function (err) {
+                    console.error(err);
+                }
+            });
+        }
+
+        function openContactDetailsModal(loanId, contactResultId) {
+
+            var baseUrl = /*[[@{/loanApplication/}]]*/null;
+            defaultAjax({
+                url: baseUrl + loanId + "/getTrackingDetails/",
+                type: 'POST',
+                data: {
+                    contactResultId: contactResultId
+                },
+                success: function (data) {
+                    var arr = JSON.parse(data);
+
+                    var html = '<option value="" hidden="hidden"></option>';
+                    var len = arr.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + arr[i].trackingReasonId + '">' + arr[i].trackingReason + '</option>';
+                    }
+
+                    $('#details').html(html);
+
+                    // Open
+                    $('#contactDetailsModal').modal();
+                    $('#contactDetailsModalSaveButton').off("click");
+                    $('#contactDetailsModalSaveButton').click(function () {
+                        if ($('#details').val() == '' || $('#details').val() == null) {
+                            swal({
+                                title: "",
+                                text: "Debes ingresar un motivo",
+                                type: "error"
+                            });
+                        } else {
+                            registerContactResult(loanId, contactResultId, null, null, null, $('#details').val(), $('#detailsRejection').val());
+                        }
+                    });
+                }
+            })
+        }
+
+        function openContactResultModal(loanId, contactResultId) {
+            // Clean values
+            $('#contactResultModalDate').val("")
+
+            // Init Datetimepicker
+            $('#contactResultModalDate').datetimepicker({
+                viewMode: 'days',
+                format: 'DD/MM/YYYY HH:mm'
+            });
+
+            // Open
+            $('#contactResultModal').modal();
+            $('#contactResultModalSaveButton').off("click");
+            $('#contactResultModalSaveButton').click(function () {
+                registerContactResult(loanId, contactResultId, null, null, $('#contactResultModalDate').val(), null);
+            });
+        }
+
+        function registerContactResult(loanId, contactResultId, personAnswerCall, contactRelationship, date, detailReason, detailReasonComment) {
+            var baseUrl = /*[[@{/loanApplication/}]]*/null;
+            defaultAjax({
+                url: baseUrl + loanId + "/registerContactResult/",
+                type: 'POST',
+                data: {
+                    contactResultId: contactResultId,
+                    date: date,
+                    detailReason: detailReason,
+                    assistedProcess: window.assistedProcess,
+                    personAnswerCall: personAnswerCall,
+                    contactRelationship: contactRelationship,
+                    detailReasonComment: detailReasonComment
+                },
+                success: function (data) {
+                    toastr.success("Se registrÃ³ la acciÃ³n");
+                    $('#contactResultModal').modal('hide');
+                    $('#contactDetailsModal').modal('hide');
+                    $('#answerWhoCallModal').modal('hide');
+                    reloadLoanApplicationRow(loanId);
+                    $('#answerWhoCallModal #personAnswerCall').prop('checked', 'checked');
+                    $('#detailsRejection').val(null);
+                }
+            })
+        }
+
+        function exportSelectedLoans() {
+            var selectedRows = $('#tableResults').find('tr.selected');
+            var loanIdsArray = selectedRows.map(function () {
+                return Number($(this).data('loan-aplication'));
+            }).get();
+
+            if (selectedRows.length === 0) {
+                swal({
+                    title: '',
+                    text: 'Debes seleccionar uno o más solicitudes',
+                    type: "warning"
+                });
+                return;
+            }
+
+            exportTableAsExcel('tableResults', [23, 18, 2, 1, 0]);// COLUMNS TO DISCARD FROM RIGTH TO LEFT
+        }
+
+        // https://bl.ocks.org/Flyer53/1de5a78de9c89850999c
+        function exportTableAsExcel(table = 'tableResults', columnsToDiscard = [], sheetName = document.title.replace(/ /g, '_')) {
+            var uri = 'data:application/vnd.ms-excel;base64,'
+                , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+
+            if (!table.nodeType) table = document.getElementById(table);
+
+            // REMOVE UNNECESSARY ROWS / COLUMNS
+            const tableCopy = table.cloneNode(true);
+
+            for (let i = tableCopy.rows.length - 1; i >= 0; i--) {
+                if (i !== 0 && tableCopy.rows[i].classList.length > 0 && !tableCopy.rows[i].classList.contains('selected')) {
+                    tableCopy.deleteRow(i);
+                }
+            }
+
+            if (columnsToDiscard === null) {
+                columnsToDiscard = [];
+            }
+
+            for (let i = 0; i < tableCopy.rows.length; i++) {
+                for (let column of columnsToDiscard) {
+                    tableCopy.rows[i].deleteCell(column);
+                }
+            }
+
+            var tableInnerHtml = tableCopy.innerHTML;
+            tableInnerHtml = tableInnerHtml.replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
+            tableInnerHtml = tableInnerHtml.replace(/<a /g, '<span ').replace(/\/a>/g, '/span>');
+            // REMOVE UNNECESSARY ROWS / COLUMNS
+
+            var ctx = {worksheet: sheetName || 'Worksheet', table: tableInnerHtml};
+            window.location.href = uri + base64(format(template, ctx));
+        }
+
+        function openSendBulkInteractionsModal() {
+            var selectedRows = $('#tableResults').find('tr.selected');
+            var selectedTableTab = $('#tableResults').data('tab');
+            var loanIdsArray = selectedRows.map(function () {
+                return Number($(this).data('loan-aplication'));
+            }).get();
+
+            if (selectedRows.length === 0) {
+                swal({
+                    title: '',
+                    text: 'Debes seleccionar uno o más solicitudes',
+                    type: "warning"
+                });
+                return;
+            }
+
+            // var CHAT_TYPE = /*[[${T(com.affirm.common.model.catalog.InteractionType).CHAT}]]*/null;
+            var FOLLOWUP_BEFORE_OFFER = /*[[${T(com.affirm.common.model.catalog.InteractionContent).CHAT_FOLLOWUP_BEFORE_OFFER}]]*/null;
+            var FOLLOWUP_WITH_OFFER = /*[[${T(com.affirm.common.model.catalog.InteractionContent).CHAT_FOLLOWUP_WITH_OFFER}]]*/null;
+            // var countryActive = /*[[${@backofficeService.getCountryActiveSysuser()}]]*/null;
+            // var countries = $.parseJSON(countryActive);// TODO
+
+            var baseUrl = /*[[@{/catalog}]]*/null;
+            defaultAjax({
+                url: baseUrl + "/interactionsContent/json",
+                type: 'GET',
+                data: {
+                    countryId: 51// TODO
+                },
+                success: function (data) {
+                    var arr = JSON.parse(data);
+                    // TODO FOR THIS CASE I ONLY NEED 1 INTERACTION
+                    if (arr !== null) {
+                        arr = arr
+                        // .filter(function (i) { return i.type.id === CHAT_TYPE })
+                            .filter(function (i) {
+                                var withOfferTab = (selectedTableTab === /*[[${@managementController.TAB_WITH_OFFER}]]*/);
+                                var isWithOfferTab = withOfferTab && i.id === FOLLOWUP_WITH_OFFER;
+                                var beforeOfferTab = (selectedTableTab === /*[[${@managementController.TAB_BEFORE_OFFER}]]*/);
+                                var isBeforeOfferTab = beforeOfferTab && i.id === FOLLOWUP_BEFORE_OFFER;
+
+                                return isWithOfferTab || isBeforeOfferTab;
+                            });
+
+                        var html = '<option value="" hidden="hidden"></option>';
+                        var len = arr.length;
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + arr[i].id + '" data-template="' + arr[i].body + '">' + arr[i].content + '</option>';
+                        }
+
+                        $('#interaction-templates').html(html);
+                        $('#interaction-templates').change(function () {
+                            $('.template-preview').text($('#interaction-templates').children('option:selected').data('template'));
+                        });
+                    } else {
+                        swal({
+                            title: '',
+                            text: 'No se encontraron interacciones',
+                            type: "warning"
+                        });
+                        return;
+                    }
+
+                    $('.total-interactions').text(isCheckedAll ? 'hasta un max. de 500' : selectedRows.length);
+                    $('.template-preview').html('');
+
+                    $('#sendBulkInteractionsModal').modal();
+                    $('#sendBulkInteractionsModalSaveButton').off("click");
+                    $('#sendBulkInteractionsModalSaveButton').click(function () {
+                        if ($('#interaction-templates').val() == '' || $('#interaction-templates').val() == null || $('#tableResults').find('tr.selected').length === 0) {
+                            swal({
+                                title: "",
+                                text: $('#tableResults').find('tr.selected').length === 0 ? "No haz seleccionado solicitudes" : "Debes seleccionar la interacción a enviar",
+                                type: "error"
+                            });
+                        } else {
+                            sendBulkInteractions($('#interaction-templates').val(), Array.from(new Set(loanIdsArray)));
+                        }
+                    });
+                }
+            })
+        }
+
+        function sendBulkInteractions(interactionId, loanApplicationIds) {
+            var tab = $('#tableResults').data('tab');
+            var filtersJson = $('#tableResults').data('filters');
+            var baseUrl = /*[[ @{/loanApplication/managementv2} ]]*/null;
+
+            defaultAjax({
+                url: baseUrl + '/sendBulkInteractions',
+                type: 'POST',
+                data: $.extend(filtersJson, {
+                    tab,
+                    interactionId,
+                    loanApplicationIds,
+                    isCheckedAll,
+                    filters: JSON.stringify(filtersJson)
+                }), success: function () {
+                    $('#sendBulkInteractionsModal').modal('hide');
+
+                    swal({
+                        title: "",
+                        text: "Se enviaron las interacciones",
+                        type: "info",
+                        timer: 1000
+                    });
+
+                    $("tr.selected").map(function () {
+                        $(this).find('.select-checkbox').trigger('click')
+                    });
+                    isCheckedAll = false;
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+
+    <th:block th:replace="fragments/questionProcessFragments :: questionsModalShell"></th:block>
+
+</th:block>
+
+<!---->
+<!--TAB PIN-->
+<!---->
+<th:block th:fragment="pin">
+    <th:block th:switch="${#lists.isEmpty(wrapper?.results)}">
+        <div th:case="true">
+            <p>No hay resultados</p>
+        </div>
+        <div th:case="false">
+                <table id="tableResults" class="table table-bordered multiselect" th:attr="data-tab=${tab}, data-filters=${appliedFilters}">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th><input type="checkbox" class="check-all"/></th>
+                    <th>Pa&iacute;s</th>
+                    <th>Fecha de registro</th>
+                    <th>Fecha de &uacute;ltima acci&oacute;n</th>
+                    <th>C&oacute;digo de solicitud</th>
+                    <th>Estado</th>
+                    <th>Tipo / Nro Doc</th>
+                    <th>Nombre</th>
+                    <th>Producto</th>
+                    <th>Monto solicitado</th>
+                    <th>Analista</th>
+                    <th>Marketplace / Brandeada</th>
+                    <th>Tel&eacute;fono</th>
+                    <th>Cantidad de reintentos</th>
+                    <th>Fecha de &uacute;ltima llamada</th>
+                    <th></th>
+                    <th class="all">Acciones</th>
+                </tr>
+                </thead>
+                <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+                <th:block th:each="loan : ${wrapper?.results}">
+                    <th:block th:replace="this :: row_pin"></th:block>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="row_pin">
+    <tr th:if="${loan == null}"></tr>
+    <tr th:if="${loan != null}" th:style="'background-color:'+${loan?.lineColor}"
+        th:attr="data-loan-aplication=${loan?.id}">
+        <td th:text="${loan?.rowNumber}"></td>
+        <td></td>
+        <td>
+            <div class="choose-country">
+                <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+            </div>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.laRegisterDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.laRegisterDate)}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.lastClientActionDate, loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.lastClientActionDate)}"></td>
+        <td>
+            <a th:if="${loan?.credit == null}" th:href="@{/person(personId=${loan?.personId}, tab='applications', applicationId=${loan?.id})}"
+               th:text="${loan?.code}"></a>
+            <a th:if="${loan?.credit != null}" th:href="@{/person(personId=${loan?.personId}, tab='credits', creditId=${loan?.credit?.id})}"
+               th:text="${loan?.credit?.code}"></a>
+        </td>
+        <td>
+            <span th:if="${loan?.assistedProcess}" class="label label-xs label-info"
+                  th:text="${@utilService.datetimeShortFormat(loan?.assistedProcessScheduledCallingDate)}"></span><br/>
+            <span th:text="${loan?.status?.status}"></span><br/>
+            <span th:if="${loan?.creditSubStatus != null}" class="label label-xs label-primary"
+                  th:text="${loan?.creditSubStatus?.subStatus}"></span>
+            <span th:if="${loan?.status?.id ==  T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL and loan?.filesUploaded==false}"
+                  class="label label-xs label-primary">Faltan documentos</span>
+            <span th:if="${loan?.returningReasons != null and !loan?.returningReasons.isEmpty()}"
+                  class="label label-xs label-primary" style="cursor:pointer;"
+                  th:title="${loan.getTooltipForReturningReasons()}">Razones de retorno</span>
+        </td>
+        <td th:text="${loan?.documentType?.name + ' / ' + loan?.documentNumber}"></td>
+        <td th:text="${loan.getFullName()}"></td>
+        <td th:utext="${loan?.productCategory?.category}"></td>
+        <td class="numeric"
+            th:text="${loan?.getLoanApplicationAmmounts(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+        <td th:id="'analyst' + ${loan?.id}" th:text="${loan?.managementAnalyst}"></td>
+        <td th:text="${loan.isBranded()}"></td>
+        <td th:text="${loan?.phoneNumber}"></td>
+        <td th:text="${loan?.countInteractions}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.maxTrackingActionDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.maxTrackingActionDate)}"></td>
+        <td><a target="_blank"
+               th:href="@{/loanApplication/viewasclient(loanApplicationId=${loan?.id},userId=${loan?.userId},personId=${loan?.personId})}">Ver
+            como cliente</a>
+        </td>
+        <td th:id="'action' + ${loan?.id}" align="center">
+            <div class="aactions">
+                <div class="btn-group">
+                    <a th:class="${@frontEndService.defaultDropdownActionButtonClass}"
+                       href="javascript:;"
+                       data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                       aria-expanded="false">
+                        Acciones <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">No Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('No Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+
+<!---->
+<!--TAB CON OFERTA-->
+<!---->
+<th:block th:fragment="list">
+    <th:block th:switch="${#lists.isEmpty(wrapper?.results)}">
+        <div th:case="true">
+            <p>No hay resultados</p>
+        </div>
+        <div th:case="false">
+            <table id="tableResults" class="table table-bordered multiselect" th:attr="data-tab=${tab}, data-filters=${appliedFilters}">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th><input type="checkbox" class="check-all"/></th>
+                    <th>Pa&iacute;s</th>
+                    <th>Fecha de registro</th>
+                    <th>Fecha de &uacute;ltima acci&oacute;n</th>
+                    <th>Codigo de Solicitud</th>
+                    <th>Estado</th>
+                    <th>Tipo / Nro Doc</th>
+                    <th>Nombre</th>
+                    <th>Tel&eacute;fono</th>
+                    <th>Correo</th>
+                    <th>Financiador</th>
+                    <th>Producto</th>
+                    <th>Monto Solicitado</th>
+                    <th>Oferta</th>
+                    <th>Pregunta</th>
+                    <th>Origen</th>
+                    <th>Analista</th>
+                    <th></th>
+                    <th>Pr&oacute;ximo Contacto</th>
+                    <th>Comentario</th>
+                    <th># No contacto</th>
+                    <th># Acciones interesado</th>
+                    <th class="all">Acciones</th>
+                </tr>
+                </thead>
+                <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+                <th:block th:each="loan : ${wrapper?.results}">
+                    <th:block th:replace="this :: row_list"></th:block>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="row_list">
+    <tr th:if="${loan == null}"></tr>
+    <tr th:if="${loan != null}" th:style="'background-color:'+${loan?.lineColor}"
+        th:attr="data-loan-aplication=${loan?.id}">
+        <td th:text="${loan?.rowNumber}"></td>
+        <td></td>
+        <td>
+            <div class="choose-country">
+                <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+            </div>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.laRegisterDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.laRegisterDate)}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.lastClientActionDate, loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.lastClientActionDate)}"></td>
+        <td>
+            <a th:if="${loan?.credit == null}" th:href="@{/person(personId=${loan?.personId}, tab='applications', applicationId=${loan?.id})}"
+               th:text="${loan?.code}"></a>
+            <a th:if="${loan?.credit != null}" th:href="@{/person(personId=${loan?.personId}, tab='credits', creditId=${loan?.credit?.id})}"
+               th:text="${loan?.credit?.code}"></a>
+        </td>
+        <td>
+            <span th:if="${loan?.assistedProcess}" class="label label-xs label-info"
+                  th:text="${@utilService.datetimeShortFormat(loan?.assistedProcessScheduledCallingDate)}"></span><br/>
+            <span th:text="${loan?.status?.status}"></span><br/>
+            <span th:if="${loan?.creditSubStatus != null}" class="label label-xs label-primary"
+                  th:text="${loan?.creditSubStatus?.subStatus}"></span>
+            <span th:if="${loan?.status?.id ==  T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL and loan?.filesUploaded==false}"
+                  class="label label-xs label-primary">Faltan documentos</span>
+            <span th:if="${loan?.returningReasons != null and !loan?.returningReasons.isEmpty()}"
+                  class="label label-xs label-primary" style="cursor:pointer;"
+                  th:title="${loan.getTooltipForReturningReasons()}">Razones de retorno</span>
+        </td>
+        <td th:text="${loan?.documentType?.name + ' / ' + loan?.documentNumber}"></td>
+        <td th:text="${loan.getFullName()}"></td>
+        <td th:text="${loan?.phoneNumber}"></td>
+        <td th:text="${loan?.email}"></td>
+        <td th:text="${loan?.entity?.getFullName()}"></td>
+        <td th:text="${loan?.entityProductParams?.entityProduct}"></td>
+        <td class="numeric"
+            th:text="${loan?.getLoanApplicationAmmounts(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+        <td>
+            <block th:if="${loan?.offers != null}">
+                <div th:each="offer : ${loan.offers}">
+                    <div class="nowrap"
+                         th:style="${offer.selected} ? 'font-weight: bold'"
+                         th:text="${offer?.getLoanOfferDescription(@utilService, loan?.country?.id)}"></div>
+                </div>
+            </block>
+        </td>
+        <td th:switch="${loan?.currentProcessQuestion?.id}">
+            <a th:case="${T(com.affirm.common.model.catalog.ProcessQuestion.Question).VERIFICATION_DOCUMENTATION.id}"
+               href="javascript:;" th:onclick="'openMissingDocsModal('+${loan?.id}+')'"
+               th:text="'Falta documentaciÃ³n'"></a>
+            <span th:case="*" th:text="${loan?.currentQuestionDescription}"></span>
+        </td>
+        <td th:text="${loan.isBranded()}"></td>
+        <td th:id="'analyst' + ${loan?.id}" th:text="${loan?.managementAnalyst}"></td>
+        <td><a target="_blank"
+               th:href="@{/loanApplication/viewasclient(loanApplicationId=${loan?.id},userId=${loan?.userId},personId=${loan?.personId})}">Ver
+            como cliente</a>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormat(loan?.scheduledDate)}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.scheduledDate)}"></td>
+        <td>
+            <span th:if="${loan?.observed}" th:title="${loan?.observedComment}" style="cursor: pointer" class="label label-sm label-info">Reasignado</span><br/>
+        </td>
+        <td th:text="${loan?.noContactCount}"></td>
+        <td th:text="${loan?.actionsCount}"></td>
+        <td th:id="'action' + ${loan?.id}" align="center">
+            <div class="aactions">
+                <div class="btn-group">
+                    <a th:class="${@frontEndService.defaultDropdownActionButtonClass}"
+                       href="javascript:;"
+                       data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                       aria-expanded="false">
+                        Acciones <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">No Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('No Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" th:onclick="'liftComment(' + ${loan?.id} + ')'">Levantar observaci&oacute;n</a>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" th:onclick="'returnProcess(' + ${loan?.id} + ')'">Retornar proceso al
+                                usuario</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+
+<!---->
+<!--TAB ANTES DE OFERTA-->
+<!---->
+<th:block th:fragment="before_offer">
+    <th:block th:switch="${#lists.isEmpty(wrapper?.results)}">
+        <div th:case="true">
+            <p>No hay resultados</p>
+        </div>
+        <div th:case="false">
+            <table id="tableResults" class="table table-bordered multiselect" th:attr="data-tab=${tab}, data-filters=${appliedFilters}">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th><input type="checkbox" class="check-all"/></th>
+                    <th>Pa&iacute;s</th>
+                    <th>Fecha de registro</th>
+                    <th>Fecha de &uacute;ltima acci&oacute;n</th>
+                    <th>Código de solicitud</th>
+                    <th>Estado</th>
+                    <th>Tipo / Nro Doc</th>
+                    <th>Nombre</th>
+                    <th>Producto</th>
+                    <th>Monto solicitado</th>
+                    <th>Analista</th>
+                    <th>Pregunta</th>
+                    <th>Marketplace / Brandeada</th>
+                    <th>Teléfono</th>
+                    <th>Cantidad de reintentos</th>
+                    <th>Fecha de última llamada</th>
+                    <th></th>
+                    <th class="all">Acciones</th>
+                </tr>
+                </thead>
+                <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+                <th:block th:each="loan : ${wrapper?.results}">
+                    <th:block th:replace="this :: row_beforeOffer"></th:block>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="row_beforeOffer">
+    <tr th:if="${loan == null}"></tr>
+    <tr th:if="${loan != null}" th:attr="data-loan-aplication=${loan?.id}">
+        <td th:text="${loan?.rowNumber}"></td>
+        <td></td>
+        <td>
+            <div class="choose-country">
+                <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+            </div>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.laRegisterDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.laRegisterDate)}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.lastClientActionDate, loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.lastClientActionDate)}"></td>
+        <td>
+            <a th:if="${loan?.credit == null}" th:href="@{/person(personId=${loan?.personId}, tab='applications', applicationId=${loan?.id})}"
+               th:text="${loan?.code}"></a>
+            <a th:if="${loan?.credit != null}" th:href="@{/person(personId=${loan?.personId}, tab='credits', creditId=${loan?.credit?.id})}"
+               th:text="${loan?.credit?.code}"></a>
+        </td>
+        <td>
+            <span th:if="${loan?.assistedProcess}" class="label label-xs label-info"
+                  th:text="${@utilService.datetimeShortFormat(loan?.assistedProcessScheduledCallingDate)}"></span><br/>
+            <span th:text="${loan?.status?.status}"></span><br/>
+            <span th:if="${loan?.creditSubStatus != null}" class="label label-xs label-primary"
+                  th:text="${loan?.creditSubStatus?.subStatus}"></span>
+            <span th:if="${loan?.status?.id ==  T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL and loan?.filesUploaded==false}"
+                  class="label label-xs label-primary">Faltan documentos</span>
+            <span th:if="${loan?.returningReasons != null and !loan?.returningReasons.isEmpty()}"
+                  class="label label-xs label-primary" style="cursor:pointer;"
+                  th:title="${loan.getTooltipForReturningReasons()}">Razones de retorno</span>
+        </td>
+        <td th:text="${loan?.documentType?.name + ' / ' + loan?.documentNumber}"></td>
+        <td th:text="${loan.getFullName()}"></td>
+        <td th:utext="${loan?.productCategory?.category}"></td>
+        <td class="numeric"
+            th:text="${loan?.getLoanApplicationAmmounts(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+        <td th:id="'analyst' + ${loan?.id}" th:text="${loan?.managementAnalyst}"></td>
+        <td th:switch="${loan?.currentProcessQuestion?.id}">
+            <a th:case="${T(com.affirm.common.model.catalog.ProcessQuestion.Question).VERIFICATION_DOCUMENTATION.id}"
+               href="javascript:;" th:onclick="'openMissingDocsModal('+${loan?.id}+')'"
+               th:text="'Falta documentaciÃ³n'"></a>
+            <span th:case="*" th:text="${loan?.currentQuestionDescription}"></span>
+        </td>
+        <td th:text="${loan.isBranded()}"></td>
+        <td th:text="${loan?.phoneNumber}"></td>
+        <td th:text="${loan?.countInteractions}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.maxTrackingActionDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.maxTrackingActionDate)}"></td>
+        <td><a target="_blank"
+               th:href="@{/loanApplication/viewasclient(loanApplicationId=${loan?.id},userId=${loan?.userId},personId=${loan?.personId})}">Ver
+            como cliente</a>
+        </td>
+        <td th:id="'action' + ${loan?.id}" align="center">
+            <div class="aactions">
+                <div class="btn-group">
+                    <a th:class="${@frontEndService.defaultDropdownActionButtonClass}"
+                       href="javascript:;"
+                       data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                       aria-expanded="false">
+                        Acciones <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">No Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('No Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" th:onclick="'liftComment(' + ${loan?.id} + ')'">Levantar observaci&oacute;n</a>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" th:onclick="'returnProcess(' + ${loan?.id} + ')'">Retornar proceso al
+                                usuario</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+
+<!---->
+<!--TAB PENDIENTE DE DESEMBOLSO-->
+<!---->
+<th:block th:fragment="pending_disbursement">
+    <th:block th:switch="${#lists.isEmpty(wrapper?.results)}">
+        <div th:case="true">
+            <p>No hay resultados</p>
+        </div>
+        <div th:case="false">
+            <table id="tableResults" class="table table-bordered multiselect" th:attr="data-tab=${tab}, data-filters=${appliedFilters}">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th><input type="checkbox" class="check-all"/></th>
+                    <th>Pa&iacute;s</th>
+                    <th>Fecha de registro</th>
+                    <th>Fecha de &uacute;ltima acci&oacute;n</th>
+                    <th>C&oacute;digo de Cr&eacute;dito</th>
+                    <th>Estado</th>
+                    <th>Tipo / Nro Doc</th>
+                    <th>Nombre</th>
+                    <th>Tel&eacute;fono</th>
+                    <th>Correo</th>
+                    <th>Financiador</th>
+                    <th>Producto</th>
+                    <th>Monto Solicitado</th>
+                    <th>Oferta</th>
+                    <th>Marketplace / Brandeada</th>
+                    <th>Analista</th>
+                    <th></th>
+                    <th>Pr&oacute;ximo Contacto</th>
+                    <th class="all">Acciones</th>
+                </tr>
+                </thead>
+                <tbody th:attr="data-table-paginator-total=${wrapper?.meta?.total}">
+                <th:block th:each="loan : ${wrapper?.results}">
+                    <th:block th:replace="this :: row_pending_disbursement"></th:block>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="row_pending_disbursement">
+    <tr th:if="${loan == null}"></tr>
+    <tr th:if="${loan != null}" th:style="'background-color:'+${loan?.lineColor}"
+        th:attr="data-loan-aplication=${loan?.id}">
+        <td th:text="${loan?.rowNumber}"></td>
+        <td></td>
+        <td>
+            <div class="choose-country">
+                <span th:class="'c-language c' + ${loan?.country?.id}"></span>
+            </div>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.laRegisterDate,loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.laRegisterDate)}"></td>
+        <td th:text="${@utilService.datetimeShortFormatByCountry(loan?.lastClientActionDate, loan?.country?.id.intValue())}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.lastClientActionDate)}"></td>
+        <td>
+            <a th:if="${loan?.credit != null}" th:href="@{/person(personId=${loan?.personId}, tab='credits', creditId=${loan?.credit?.id})}"
+               th:text="${loan?.credit?.code}"></a>
+        </td>
+        <td>
+            <span th:if="${loan?.assistedProcess}" class="label label-xs label-info"
+                  th:text="${@utilService.datetimeShortFormat(loan?.assistedProcessScheduledCallingDate)}"></span><br/>
+            <span th:text="${loan?.status?.status}"></span><br/>
+            <span th:if="${loan?.creditSubStatus != null}" class="label label-xs label-primary"
+                  th:text="${loan?.creditSubStatus?.subStatus}"></span>
+            <span th:if="${loan?.status?.id ==  T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL and loan?.filesUploaded==false}"
+                  class="label label-xs label-primary">Faltan documentos</span>
+            <span th:if="${loan?.returningReasons != null and !loan?.returningReasons.isEmpty()}"
+                  class="label label-xs label-primary" style="cursor:pointer;"
+                  th:title="${loan.getTooltipForReturningReasons()}">Razones de retorno</span>
+        </td>
+        <td th:text="${loan?.documentType?.name + ' / ' + loan?.documentNumber}"></td>
+        <td th:text="${loan.getFullName()}"></td>
+        <td th:text="${loan?.phoneNumber}"></td>
+        <td th:text="${loan?.email}"></td>
+        <td th:text="${loan?.entity?.getFullName()}"></td>
+        <td th:text="${loan?.entityProductParams?.entityProduct}"></td>
+        <td class="numeric"
+            th:text="${loan?.getLoanApplicationAmmounts(@utilService,  loan?.country?.currency?.symbol, loan?.country?.separator)}"></td>
+        <td>
+            <block th:if="${loan?.offers != null}">
+                <div th:each="offer : ${loan.offers}">
+                    <div class="nowrap"
+                         th:style="${offer.selected} ? 'font-weight: bold'"
+                         th:text="${offer?.getLoanOfferDescription(@utilService, loan?.country?.id)}"></div>
+                </div>
+            </block>
+        </td>
+        <td th:text="${loan.isBranded()}"></td>
+        <td th:id="'analyst' + ${loan?.id}" th:text="${loan?.managementAnalyst}"></td>
+        <td><a target="_blank"
+               th:href="@{/loanApplication/viewasclient(loanApplicationId=${loan?.id},userId=${loan?.userId},personId=${loan?.personId})}">Ver
+            como cliente</a>
+        </td>
+        <td th:text="${@utilService.datetimeShortFormat(loan?.scheduledDate)}"
+            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loan?.scheduledDate)}"></td>
+        <td th:id="'action' + ${loan?.id}" align="center">
+            <div class="aactions">
+                <div class="btn-group">
+                    <a th:class="${@frontEndService.defaultDropdownActionButtonClass}"
+                       href="javascript:;"
+                       data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                       aria-expanded="false">
+                        Acciones <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu" style="width: 100%">
+                            <a href="javascript:;" tabindex="-1"
+                               class="font-grey-gallery sbold">No Contacto</a>
+                            <ul class="dropdown-menu">
+                                <li th:each="trackingAction : ${@catalogService.getTrackingActionsByTypeAndScreen('No Contacto', loan?.trackingType, tab)}">
+                                    <a href="javascript:;"
+                                       th:onclick="'saveContactResult('+${trackingAction.trackingActionId}+','+${loan?.id}+')'"
+                                       th:text="${trackingAction.trackingAction}"></a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        UtilModule.reindexOnReload();
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>

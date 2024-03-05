@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Reporte de Solicitudes Light</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <script th:src="@{/js/bo_tablepaginator.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/css/bootstrap-multiselect.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/js/bootstrap-multiselect.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var entities = /*[[${entities}]]*/
+
+        function exportToExcel() {
+            var filters = $('.form-control.form-control-sm');
+            var jsonParams = {};
+            for (var i = 0; i < filters.length; i++) {
+                if (jsonParams[filters[i].name] == undefined) {
+                    jsonParams[filters[i].name] = [];
+                }
+                jsonParams[filters[i].name][jsonParams[filters[i].name].length] = $(filters[i]).val();
+            }
+            defaultAjax({
+                url: /*[[@{/reporting/loansLight/export}]]*/null,
+                type: 'POST',
+                data: jsonParams,
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        }
+        function reloadResults(){
+            defaultAjax({
+                url: /*[[@{/reporting/loansLight/list}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#resultTable').html(data);
+                }
+            });
+            setTimeout(reloadResults, 5000);
+        }
+        setTimeout(reloadResults, 5000);
+
+        function fillEntitiesDropdown() {
+            selectedCountries = $('#countryFilter option:selected');
+
+            var filteredEntities = new Array();
+            for (var i = 0; i < selectedCountries.length; i++) {
+                var selectedCountryId = selectedCountries[i].value;
+
+                for (var j = 0; j < entities.length; j ++) {
+                    var entity = entities[j];
+                    if (entity.countryId == selectedCountryId) {
+                        filteredEntities.push(entity);
+                    }
+                }
+            }
+
+            var dropdownEntities = new Array();
+
+            for (var i = 0; i < filteredEntities.length; i++) {
+                dropdownEntities.push({
+                    'label': filteredEntities[i].shortName,
+                    'value': filteredEntities[i].id
+                });
+            }
+
+            dropdownEntities.sort(compare);
+
+            jQuery('#entityFilter').multiselect('dataprovider', dropdownEntities);
+        }
+
+        function compare( a, b ) {
+            if ( a.label < b.label ){
+                return -1;
+            }
+            if ( a.label > b.label ){
+                return 1;
+            }
+            return 0;
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li><span>Reporte de Solicitudes Light</span></li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Reporte de Solicitudes Light</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}" href="javascript:exportToExcel()">
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div id="filter">
+                                <form role="form" method="post">
+                                    <div class="form-group">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-2">
+                                                <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                <input id="creationFromFilter" name="creationFrom" type="text" class="form-control input-sm form-control-sm" placeholder="Desde" />
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationToFilter" name="creationTo" type="text" class="form-control input-sm form-control-sm" placeholder="Hasta" />
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var creationFromFilter = $('#creationFromFilter');
+                                                var creationToFilter = $('#creationToFilter');
+                                                datepicker(creationFromFilter);
+                                                datepicker(creationToFilter);
+                                                function datepicker( obj ){
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+                                                creationFromFilter.on('change', function () {
+                                                    creationToFilter.datepicker('setStartDate', creationFromFilter.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                            <div class="form-group col-md-2">
+                                                <label class="control-label"><b></b><br/>País</label>
+                                                <select id="countryFilter"
+                                                        name="countries[]" multiple="multiple"
+                                                        class="form-control form-control-sm">
+                                                    <option th:each="country : ${@catalogService.getCountryParams()}"
+                                                            th:value="${country.id}"
+                                                            th:text="${country.name}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label class="control-label"><b></b><br/>Financiador</label>
+                                                <select id="entityFilter"
+                                                        name="entities[]" multiple="multiple"
+                                                        class="form-control form-control-sm">
+                                                </select>
+                                            </div>
+
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var countryFilter = $('#countryFilter');
+                                                var entityFilter = $('#entityFilter');
+                                                multiselectCountry(countryFilter);
+                                                multiselect(entityFilter);
+
+                                                function multiselect(obj) {
+                                                    obj.multiselect({
+                                                        buttonWidth: '200px',
+                                                        nonSelectedText: 'Todos',
+                                                        numberDisplayed: 1,
+                                                        nSelectedText: ' Seleccionados',
+                                                        allSelectedText: 'Todos seleccionados'
+                                                    });
+                                                }
+
+                                                function multiselectCountry(obj) {
+                                                    obj.multiselect({
+                                                        buttonWidth: '200px',
+                                                        nonSelectedText: 'Todos',
+                                                        numberDisplayed: 1,
+                                                        nSelectedText: ' Seleccionados',
+                                                        allSelectedText: 'Todos seleccionados',
+                                                        onDropdownHidden: function(event) {
+                                                            fillEntitiesDropdown();
+                                                        }
+                                                    });
+                                                }
+
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet-title tabbable-line">
+                                                <div class="caption font-red-sharp">
+                                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Historico de Reportes</span>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="resultTable">
+                                                    <th:block th:replace="this :: results"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="results">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Fec. Registro</th>
+            <th>Fec. Procesamiento</th>
+            <th>Estatus</th>
+            <th>Filtro Fecha Inicio</th>
+            <th>Filtro Fecha Fin</th>
+            <!--<th>Pa&iacute;s</th>
+            <th>Financiador</th>-->
+            <th>Url</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="report : ${historicReports}">
+            <tr>
+                <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                <th:block th:switch="${report.status}">
+                    <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                    <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                </th:block>
+                <td th:text="${report.params != null ? report.params.get('startDate').toString() : ''}"></td>
+                <td th:text="${report.params != null ? report.params.get('endDate').toString() : ''}"></td>
+                <!--<td th:text="${report.params != null and report.params.get('countries') != null ? report.params.get('countries').toString() : ''}"></td>
+                <td th:text="${report.params != null and report.params.get('entities') != null ? report.params.get('entities').toString() : ''}"></td>-->
+                <td>
+                    <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</th:block>
+
+</body>
+
+</html>

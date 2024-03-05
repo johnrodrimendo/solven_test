@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+
+        <div class="form q62" th:classappend="${showScheduledCallingForm?'q62-paso1':'q62-paso2'}">
+
+            <th:block th:unless="${verifyStatus}">
+                <th:block th:if="${showScheduledCallingForm}">
+
+                    <p th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).COMPARTAMOS)}"
+                       th:text="#{questions.block.awaiting.compartamos}"></p>
+                    <p th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).COMPARTAMOS)}"
+                       th:text="#{questions.62.schedule.tittle(${personName})}"></p>
+                    <p th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CAJASULLANA)}">
+                        Mientras tanto, si quieres revisar los documentos contractuales, puedes encontrarlos <a
+                            href="http://www.cajasullana.pe/creditos/credito-personal-2/" target="_blank"
+                            class="text-lightblue">aquí</a>.
+                    </p>
+
+
+
+                    <p class="subtitle" th:text="#{questions.62.schedule.question}"></p>
+                    <div style="overflow:hidden;">
+
+                        <div class="form q62">
+                            <div style="overflow:hidden;">
+                                <div class="form-group">
+                                    <div class="w">
+                                        <div class="w-select2">
+                                            <select id="hour" data-width="170" data-placeholder="Horario">
+                                                <option value="" hidden="hidden">Horario</option>
+                                                <option th:each="schedule: ${@utilService.getAssistedProcessScheduleHours()}" th:value="${schedule.key}" th:text="${schedule.value}"></option>
+                                            </select>
+                                        </div>
+                                        <th:block th:unless="${showAgencies}">
+                                            <button id="scheduleBtn" class="button bg-red">Continuar</button>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--                    <th:block th:if="${showAgencies}">-->
+                        <!--                        <p class="subtitle">También tenemos nuestras agencias cerca tuyo, puedes acercarte a una de ellas para finalizar la solicitud:</p>-->
+                        <!--                        <div style="overflow:hidden;">-->
+                        <!--                            <div class="form-group">-->
+                        <!--                                <div class="w">-->
+                        <!--                                    <div class="w-select2">-->
+                        <!--                                        <select id="agency" data-width="400" data-placeholder="Agencia">-->
+                        <!--                                            <option value="" hidden="hidden">Agencia</option>-->
+                        <!--                                            <option th:each="agency: ${agencies}" th:value="${agency.codAgency}" th:text="${agency.district + ' - ' + agency.agency}"></option>-->
+                        <!--                                        </select>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+
+                        <!--                        <button id="scheduleBtn" class="button bg-red">Continuar</button>-->
+                        <!--                    </th:block>-->
+
+                    </div>
+                </th:block>
+
+                <th:block th:if="${!showScheduledCallingForm}">
+                    <th:block th:if="${finalMessage != null}">
+                        <p style="white-space: pre-line;" th:utext="${finalMessage}"></p>
+                    </th:block>
+                    <th:block th:if="${finalMessage == null}">
+                        <th:block th:if="${@brandingService.isBranded(#httpServletRequest)}">
+                            <th:block th:if="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA}">
+                                <p style="white-space: pre-line;"
+                                   th:if="${emailVerified}"
+                                   th:utext="#{questions.62.thanks.tittle.verifiedSavingAccount(${name})}"></p>
+                                <p style="white-space: pre-line;"
+                                   th:if="${!emailVerified}"
+                                   th:utext="#{questions.62.thanks.tittleSavingAccount(${name})}"></p>
+                            </th:block>
+                            <th:block th:unless="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA}">
+                                <p style="white-space: pre-line;"
+                                   th:if="${emailVerified}"
+                                   th:utext="#{questions.62.thanks.tittle.verified(${name})}"></p>
+                                <p style="white-space: pre-line;"
+                                   th:if="${!emailVerified}"
+                                   th:utext="#{questions.62.thanks.tittle(${name})}"></p>
+                            </th:block>
+                        </th:block>
+
+                        <th:block th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                            <p style="color:#999999;white-space: pre-line;"
+                               th:if="${emailVerified}"
+                               th:utext="#{questions.62.thanks.tittle.verified('Solven')}"></p>
+                            <p style="color:#999999;white-space: pre-line;"
+                               th:if="${!emailVerified}"
+                               th:utext="#{questions.62.thanks.tittle('Solven')}"></p>
+                        </th:block>
+                    </th:block>
+                </th:block>
+            </th:block>
+            <!--div class="note" th:unless="${@brandingService.isBranded(#httpServletRequest)}">
+                ¿Quieres aprender m&aacute;s de finanzas? <br/>
+                Visita nuestro blog <a th:href="@{/blog}" class="text-lightblue">aquí</a>.
+            </div-->
+
+            <div th:if="${verifyStatus}" class="process-loading-container circle-progress-question" style="height: auto !important; position: relative !important;">
+                <div class="loading-content">
+                    <div class="sk-circle">
+                        <div class="sk-circle1 sk-child"></div>
+                        <div class="sk-circle2 sk-child"></div>
+                        <div class="sk-circle3 sk-child"></div>
+                        <div class="sk-circle4 sk-child"></div>
+                        <div class="sk-circle5 sk-child"></div>
+                        <div class="sk-circle6 sk-child"></div>
+                        <div class="sk-circle7 sk-child"></div>
+                        <div class="sk-circle8 sk-child"></div>
+                    </div>
+                    <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:if="${showScheduledCallingForm}" th:inline="javascript">
+        /*<![CDATA[*/
+
+        var q50 = $('.q62');
+        q50.closest('.loan-process').find('.adviser-section').addClass('show-img').removeAttr('style');
+
+        let generatingCreditProcess = /*[[${generatingCreditProcess}]]*/null;
+        let verifyStatusProcess = /*[[${verifyStatus}]]*/null;
+
+        $(function () {
+            var hour = $('#hour');
+            var agency = $('#agency');
+
+            $('#scheduleBtn').click(function(){
+                var hourSelected = hour.val();
+                var agencySelected = agency.val();
+                if (hourSelected != "") {
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        button: $('#scheduleBtn'),
+                        data: {
+                            time: hourSelected,
+                            agency : agencySelected || null
+                        },
+                        success: function (data) {
+                            //location.reload();
+                            questionFw.refreshQuestion();
+                        }
+                    }, "registerAssistedProcessSchedule");
+                } else {
+                    swal({
+                        title: "",
+                        text: "Seleccione el horario y la fecha, por favor.",
+                        confirmButtonColor: "#F7323F",
+                        type: "info"
+                    });
+                }
+            });
+
+            $('input[name=assistedProcess]:radio').change(function () {
+                if ($(this).val() == "web") {
+                    questionFw.ajaxToCurrentQuestionController({
+                        type: "POST",
+                        data: {assistedProcess: false}
+                    }, "");
+                } else {
+                    $('#formContainer').hide();
+                    $('#calendarContainer').show();
+                }
+            });
+        });
+
+        $(document).ready(function(){
+            if(verifyStatusProcess && generatingCreditProcess != "S") verifyStatus();
+        })
+
+        function verifyStatus(){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "GET",
+                data: {},
+                success: function (data) {
+                    if(generatingCreditProcess == data) {
+                        setTimeout(()=>{
+                            verifyStatus();
+                        },10000);
+                    }
+                    else {
+                        switch (data){
+                            case "F":
+                                showErrorModalWithRechargeButton("Ha ocurrido un inconveniente con tu solicitud. Por favor, intente nuevamente.");
+                                break;
+                            default:
+                                location.reload();
+                        }
+                    }
+                }
+            }, "verifyStatus");
+        }
+
+        /*]]>*/
+
+    </script>
+
+    <script th:if="${verifyStatus}" th:inline="javascript">
+        /*<![CDATA[*/
+
+        let generatingCreditProcess = /*[[${generatingCreditProcess}]]*/null;
+        let verifyStatusProcess = /*[[${verifyStatus}]]*/null;
+
+        $(document).ready(function(){
+            if(verifyStatusProcess && generatingCreditProcess != "S") verifyStatus();
+        })
+
+        function verifyStatus(){
+            questionFw.ajaxToCurrentQuestionController({
+                type: "GET",
+                data: {},
+                success: function (data) {
+                    if(generatingCreditProcess == data) {
+                        setTimeout(()=>{
+                            verifyStatus();
+                        },10000);
+                    }
+                    else {
+                        switch (data){
+                            case "F":
+                                showErrorModalWithRechargeButton("Ha ocurrido un inconveniente con tu solicitud. Por favor, intente nuevamente.");
+                                break;
+                            default:
+                                location.reload();
+                        }
+                    }
+                }
+            }, "verifyStatus");
+        }
+
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

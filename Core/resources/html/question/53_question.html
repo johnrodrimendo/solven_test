@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:if="${isSelfEvaluation}" th:text="#{questions.block.yourPhoneNumber.selfEvaluation}"></p>
+            <p th:if="${isEvaluation}" th:text="#{questions.block.yourPhoneNumber}"></p>
+
+            <div class="form-group phoneCodeGroup" th:if="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                <small>Cod. Area (Ej:11)</small>
+                <input type="text" class="form-control" th:field="*{areaCode}" />
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group col-md-12">
+                <small>"#{questions.53.phonenumber}"</small>
+                <input type="text" class="form-control" th:field="*{phoneNumber}"/>
+                <div class="errorContainer"></div>
+            </div>
+
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+        })();
+        /*]]>*/
+    </script>
+    <script th:inline="javascript" th:if="${countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+        /*<![CDATA[*/
+        var staticPhoneNumberMaxlength = $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength;
+        $('body').on('keyup','#phoneCode', function(){
+            $('#questionForm').data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').data('validatorJson').rules.phoneNumber.minlength = staticPhoneNumberMaxlength - $(this).val().length;
+            $('#questionForm').validateForm($('#questionForm').data('validatorJson'));
+            $('#questionForm').data('validator').resetForm();
+        });
+
+        $('#phoneNumber').mask('000-#');
+        $('body').on('keyup','#areaCode', function(){
+            var actualCodeLength = $(this).val().length;
+            if(actualCodeLength == 2){
+                $('#phoneNumber').mask('0000-#');
+            }else if(actualCodeLength > 2){
+                $('#phoneNumber').mask('000-#');
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q25">
+            <form th:object="${form}" id="questionForm" autocomplete="off">
+                <p th:utext="#{questions.block.customProfession}"></p>
+                <div class="field inline">
+                    <select th:field="*{customProfession}" data-width="245" data-placeholder="Ocupaciones">
+                        <th:block th:each="profession : ${customProfessions}">
+                            <option value="" disabled="disabled" selected="selected"></option>
+                            <option th:value="${profession.id}" th:text="${profession.custom_profession}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+        var customProfession = $('#customProfession');
+
+        customProfession.on('select2:select', function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($('#questionForm').serializeObject(), {})
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

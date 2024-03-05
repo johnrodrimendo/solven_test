@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+    <th:block th:replace="loanApplication/formQuestions/formQuestions :: question_config"></th:block>
+
+    <script th:inline="javascript">
+        function questionValidationAndPreSave(questionId, questionJson, getDataFunction) {
+            var innerQuestionElement = $('.inner-question[data-question=' + questionId + ']');
+            var innerQuestionFormElement = innerQuestionElement.find('.inner-question-form');
+
+            questionFw.validateForm(innerQuestionFormElement, JSON.parse(questionJson));
+            innerQuestionFormElement.data('getData', getDataFunction != null ? getDataFunction : function () {
+                return innerQuestionFormElement.serializeObject();
+            });
+        }
+    </script>
+
+    <div id="q130" class="questions-section animated fadeInRight">
+        <div class="ds-fl fl-column algn-center sub-q130">
+            <div class ="grid">
+                <div class="grid-container">
+                    <div class="grid-item q_21">
+                            <th:block th:with="attr=${questionAttrs.get(21)}">
+                                    <div class="inner-question" data-question="21">
+                                        <p>¿Cual es tu estado civil?</p>
+                                        <form class="inner-question-form">
+                                            <div class="field inline">
+                                                <select data-width="245" name="maritalStatus">
+                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                    <option th:each="maritalStatus : ${@catalogService.getMaritalStatus(#locale)}"
+                                                            th:value="${maritalStatus?.id}" th:text="${maritalStatus?.status}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="errorContainer"></div>
+                                        </form>
+                                        <script th:inline="javascript">
+                                            /*<![CDATA[*/
+                                            (questionValidationAndPreSave)(21, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+            
+                                            var question21 = $('.inner-question[data-question=21]');
+                                            setTimeout(function () {
+                                                question21.find('#preevaluaton-success').addClass('block-hidden');
+                                                //question21.find('#marital-status-block').removeClass('block-hidden').addClass('fadeIn');
+                                                question21.find('#arentYou').removeClass('block-hidden').addClass('fadeIn');
+                                            }, 1000);
+                                            /*]]>*/
+                                        </script>
+                                    </div>
+                            </th:block>
+                    </div>   
+                    <div class="grid-item q_108">
+                        <th:block th:with="attr=${questionAttrs.get(108)}">
+                                <div class="inner-question" data-question="108">
+                                    <div class="questions-section animated fadeInRight">
+                                        <div class="forms" id="document-block">
+                                            <form th:object="${attr.form}" class="form inner-question-form">
+                                                <div id="idForm" class="w">
+                                                    <div class="grid-container">
+                                                        <div class="grid-item">
+                                                            <div class="field inline"
+                                                                th:if="${attr.loanApplication.countryId != T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                                                                <select id="partnerDocType" name="partnerDocType" data-width="80">
+                                                                    <option th:each="type : ${@catalogService.getIdentityDocumentTypeByCountry(attr.loanApplication.countryId, false)}"
+                                                                            th:value="${type.id}" th:text="${type.name}"></option>
+                                                                </select>
+                                                            </div>
+                                                        </div>    
+                                                        <div class="grid-item">
+                                                            <div class="field inline field-cuit">
+                                                                <input type="text" class="input-outline document-input" id="partnerDocNumber" name="partnerDocNumber" placeholder="Nº Doc. de Conviviente"/>
+                                                            </div>    
+                                                        </div>
+                                                    </div>    
+                                                </div>
+                                                <div id="noIdForm" class="w">
+                                                    <small class="input-help">Ingresa datos de tu esposo(a) o conviviente</small>
+                                                    <div class ="grid-container">   
+                                                        <div class="grid-item">
+                                                            <div class="field inline">
+                                                                <input type="text" class="input-outline" id="partnerName" name="partnerName" placeholder="Nombre"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-item">  
+                                                            <div class="field inline">
+                                                                <input type="text" class="input-outline" id="partnerFirstSurname" name="partnerFirstSurname" placeholder="Apellido Paterno"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid-item">
+                                                            <div class="field inline">
+                                                                <input type="text" class="input-outline" id="partnerLastSurname" name="partnerLastSurname" placeholder="Apellido Materno"/>
+                                                            </div>
+                                                        </div>    
+                                                    
+                                                        <style>
+                                                            .gender .select2 .selection .select2-selection {
+                                                                min-width: 229px;
+                                                            }
+                                                        </style>
+                                                        <div class="grid-item">
+                                                            <div class="field inline gender">
+                                                                <select name="gender" data-placeholder="Género">
+                                                                    <option value="" disabled="disabled" selected="selected"></option>
+                                                                    <option th:value="'M'" th:text="Hombre"></option>
+                                                                    <option th:value="'F'" th:text="Mujer"></option>
+                                                                </select>
+                                                            </div>
+                                                        </div> 
+                                                        <div class="grid-item">   
+                                                            <div class="field field-birthdate inline">
+                                                                <small class="input-help">Dia y Mes de Nacimiento</small>
+                                                                <div class="wrap-field">
+                                                                    
+                                                                    <div class="box-icon tiny-input"><i class="icon icon-cake"></i></div>
+                                                                    <input type="text" id="partnerDay" name="partnerDay" class="input-outline tiny-input"
+                                                                        placeholder="dd"
+                                                                        pattern="[0-9]*"/>
+                                                                    <input type="text" id="partnerMonth" name="partnerMonth" class="input-outline tiny-input"
+                                                                        placeholder="mm"
+                                                                        pattern="[0-9]*"/>
+                                                                </div>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <th:block
+                                                        th:unless="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                                                   <div class="display-block ck-box">
+                                                        <span class="w-list">
+                                                            <label for="noIdcheckedBox" class="custom-check">
+                                                                <span class="check-inner"><i class="icon icon-check"></i></span>
+                                                                <span class="check-label"> No lo recuerdo</span>
+                                                                <input type="checkbox" class="real-check" id="noIdcheckedBox" name="noIdcheckedBox"/>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                   
+                                                </th:block>
+    
+                                                <div class="display-block">
+                                                    <div class="errorContainer"></div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+    
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        (function() {
+                                            (questionValidationAndPreSave)(108, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+    
+                                            var question108 = $('.inner-question[data-question=108]');
+                                            var question108Form = question108.find('.inner-question-form');
+    
+                                            function dynamicFieldValidator(ischecked) {
+                                                var validator = question108Form.data('validatorJson');
+    
+                                                validator.rules.partnerDocNumber.required = !ischecked;
+                                                validator.rules.partnerDocType.required = !ischecked;
+    
+                                                validator.rules.partnerName.required = ischecked;
+                                                validator.rules.partnerFirstSurname.required = ischecked;
+                                                validator.rules.partnerLastSurname.required = ischecked;
+                                                validator.rules.partnerDay.required = ischecked;
+                                                validator.rules.partnerMonth.required = ischecked;
+                                                validator.rules.gender.required = ischecked;
+                                                question108Form.validateForm(validator);
+                                                question108.find('#partnerDay').keyup(function (event) {
+                                                    if ($(this).val().length === 2)
+                                                        question108.find('#partnerMonth').focus();
+                                                });
+                                                question108Form.data('validator').resetForm();
+                                            }
+    
+                                            var partnerIdMessage = "&iquest;Cu&aacute;l es el n&uacute;mero de documento de tu esposo(a) o conviviente?";
+                                            var partnerNoIdMessage = "Ingresa los datos de tu esposo(a) o conviviente";
+    
+                                            var partnerDocNumber = question108.find('input[name=partnerDocNumber]');
+                                            var docType = question108.find('select[name=partnerDocType]');
+                                            var noIdcheckedBox = question108.find('#noIdcheckedBox');
+                                            var checked = false;
+    
+                                            question108.find('#noIdForm').hide();
+                                            question108.find('#message').html(partnerIdMessage);
+                                            question108.find('#partnerDay').forceIntegerOnly(true, 1, 31);
+                                            question108.find('#partnerMonth').forceIntegerOnly(true, 1, 12);
+    
+                                            question108.find('#partnerDay').keyup(function (event) {
+                                                if ($(this).val().length === 2) {
+                                                    question108.find('#partnerMonth').focus();
+                                                }
+                                            });
+    
+                                            noIdcheckedBox.on('change', function () {
+                                                if (this.checked) {
+                                                    question108.find('#message').html(partnerNoIdMessage);
+                                                    checked = true;
+                                                    question108.find('#partnerDocNumber').val('');
+                                                    question108.find('#idForm').hide();
+                                                    question108.find('#noIdForm').show();
+    
+                                                } else {
+                                                    question108.find('#message').html(partnerIdMessage);
+                                                    checked = false;
+                                                    question108.find('#partnerDay').val('');
+                                                    question108.find('#partnerMonth').val('');
+                                                    question108.find('#partnerLastSurname').val('');
+                                                    question108.find('#partnerFirstSurname').val('');
+                                                    question108.find('#partnerName').val('');
+                                                    question108.find('#noIdForm').hide();
+                                                    question108.find('#idForm').show();
+    
+                                                }
+                                                dynamicFieldValidator(checked);
+    
+                                            });
+                                            docType.on('change', function () {
+                                                partnerDocNumber.val('');
+                                                question108Form.data('validatorJson').rules.partnerDocNumber.maxlength = $(this).val() == 2 ? 9 : 8;
+                                                question108Form.validateForm(question108Form.data('validatorJson'));
+                                                question108Form.data('validator').resetForm();
+                                            });
+    
+                                            dynamicFieldValidator(false);
+                                        })();
+                                        /*]]>*/
+                                    </script>
+                                </div>
+                        </th:block>
+                    </div>  
+                    <div class="grid-item q_80">     
+                        <th:block th:with="attr=${questionAttrs.get(80)}">
+                            <div class="inner-question" data-question="80">
+                                <p th:text="'¿Cuántas personas dependen de ti?'"></p>
+                                <form class="inner-question-form">
+                                    <div class="field inline">
+                                        <select data-width="245" name="dependents">
+                                            <option value="" disabled="disabled" selected="selected"></option>
+                                            <option value="0">Nadie</option>
+                                            <option value="1">1 persona</option>
+                                            <option value="2">2 persona</option>
+                                            <option value="3">3 persona</option>
+                                            <option value="4">Más de tres personas</option>
+                                        </select>
+                                    </div>
+                                    <div class="display-block">
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </form>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(80, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+                    <div class="grid-item q_23">     
+                        <th:block th:with="attr=${questionAttrs.get(23)}">
+                            <div class="inner-question" data-question="23">
+                                <p th:text="#{questions.block.propertyType}"></p>
+                                <form class="inner-question-form">
+                                    <div class="field inline">
+                                        <select data-width="245" name="housingType">
+                                            <option value="" disabled="disabled" selected="selected"></option>
+                                            <option th:each="type : ${@catalogService.getHousingTypes(#locale, true)}"
+                                                    th:value="${type.id}" th:text="${type.type}"></option>
+                                            <!--<small th:text="${type?.description}"></small>-->
+                                        </select>
+                                    </div>
+                                    <div class="errorContainer"></div>
+                                </form>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(23, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+                    <div class="grid-item q_24">     
+                        <th:block th:with="attr=${questionAttrs.get(24)}">
+                            <div class="inner-question" data-question="24">
+                                <p th:utext="#{questions.block.educationLevel}"></p>
+                                <form class="inner-question-form">
+                                    <div class="field inline">
+                                        <select data-width="245" name="studyLevel">
+                                            <option value="" disabled="disabled" selected="selected"></option>
+                                            <option th:each="level : ${@catalogService.getStudyLevels(#locale)}" th:value="${level.id}"
+                                                    th:text="${level.level}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="errorContainer"></div>
+                                </form>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(24, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>    
+                    <div class="grid-item q_25">     
+                        <th:block th:with="attr=${questionAttrs.get(25)}">
+                            <div class="inner-question" data-question="25">
+                                <p th:utext="#{questions.block.profession}"></p>
+                                <form class="inner-question-form">
+                                    <div class="field inline">
+                                        <select name="profession" data-width="245">
+                                            <th:block th:each="profession : ${@catalogService.getProfessionsActive(#locale)}">
+                                                <option value="" disabled="disabled" selected="selected"></option>
+                                                <option th:value="${profession.id}" th:text="${profession.profession}"></option>
+                                            </th:block>
+                                        </select>
+                                    </div>
+                                    <div class="errorContainer"></div>
+                                </form>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(25, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+
+                    </div>
+                    <div class="grid-item q_22">
+                        <th:block th:with="attr=${questionAttrs.get(22)}, q=22">
+                            <th:block th:replace="question/22_question :: question_client_grouped"/>
+                        </th:block>
+                    </div>    
+                    <div class="grid-item q_118" th:if="${questionAttrs.get(118) != null}">
+                        <th:block th:with="attr=${questionAttrs.get(118)}"
+                                th:if="${!@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                            <div class="inner-question" data-question="118">
+                                <p th:utext="#{questions.block.residenceTime}"></p>
+                                <form class="inner-question-form">
+                                    <div class="field field-amount inline">
+                                        <div class="wrap-field">
+                                            <input type="text" class="input-outline amount-input input-months" maxlength="3"
+                                                name="months" placeholder="Tiempo en meses"  />
+                                        </div>
+                                    </div>
+                                    <div class="errorContainer"></div>
+                                </form>
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    (questionValidationAndPreSave)(118, /*[[${attr.form.validator.toJson(#locale)}]]*/);
+                                    /*]]>*/
+                                </script>
+                            </div>
+                        </th:block>
+                    </div>  
+                    
+                
+                </div> 
+            </div>  
+            <div class="grid-button">   
+                    <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+            </div>    
+           
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('.inner-question[data-question=21] select[name=maritalStatus]').on('change', function () {
+                var marriedStatus = /*[[${T(com.affirm.common.model.catalog.MaritalStatus).MARRIED}]]*/;
+                var cohabitantStatus = /*[[${T(com.affirm.common.model.catalog.MaritalStatus).COHABITANT}]]*/;
+                if ($(this).val() == marriedStatus || $(this).val() == cohabitantStatus) {
+                    //$('.inner-question[data-question=108]').show();
+                    $('.inner-question[data-question=108]').closest('.grid-item').show();
+                    $('.inner-question[data-question=108]').removeClass('disabled');
+                } else {
+                    //$('.inner-question[data-question=108]').hide();
+                    $('.inner-question[data-question=108]').closest('.grid-item').hide();
+                    $('.inner-question[data-question=108]').addClass('disabled');
+                    $('.inner-question[data-question=108]').children('form').find('select').val(1).trigger('change');
+                }
+            });
+            $('.inner-question[data-question=21] select[name=maritalStatus]').change();
+
+            $('#sendButton').click(function () {
+                var isAllValid = true;
+                $('.inner-question').not('.disabled').each(function () {
+                    if (!$(this).find('.inner-question-form').valid()) {
+                        isAllValid = false;
+                    }
+                });
+
+                if (isAllValid) {
+                    var allFormsJson = [];
+                    $('.inner-question').not('.disabled').each(function () {
+                        var formJson = $(this).find('.inner-question-form').data('getData')();
+                        allFormsJson[allFormsJson.length] = {
+                            id: $(this).data('question'),
+                            data: formJson
+                        };
+                    });
+
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        data: {forms: JSON.stringify(allFormsJson)},
+                        error: function(xhr){
+                            unMask();
+                            if (xhr.status == 500 && isValidJson(xhr.responseText)){
+                                var jsonError = JSON.parse(xhr.responseText);
+                                if (jsonError.type == 'formValidation') {
+                                    if(jsonError.questionId != null){
+                                        var errorQuestionElemnt = $('.inner-question[data-question='+jsonError.questionId+']');
+                                        var errorQuestionForm = errorQuestionElemnt.find('.inner-question-form');
+                                        if(errorQuestionForm.length){
+                                            delete jsonError.questionId;
+                                            delete jsonError.type;
+                                            errorQuestionForm.data('validator').showErrors(jsonError);
+                                            errorQuestionForm.data('validatorJson').invalidHandler();
+                                            return false;
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }, "");
+                }
+            });
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p>Esa es la pregunta de toda la data personal, no se puede ver por BO :(</p>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+        })();
+        /*]]>*/
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <p th:utext="#{questions.block.bankProduct}"></p>
+
+        <div class="forms">
+            <div class="field inline">
+                <label class="h-input-radio">
+                    <input type="radio" name="bank" class="bank" value="Banco Falabella"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Banco Falabella</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline">
+                <label class="h-input-radio">
+                    <input type="radio" name="bank" class="bank" value="BCP"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Banco de la Naci&oacute;n</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline">
+                <label class="h-input-radio">
+                    <input type="radio" name="bank" class="bank" value="Interbank"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Interbank</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="field inline">
+                <label class="h-input-radio">
+                    <input type="radio" name="bank" class="bank" value="ninguno"/>
+                    <div class="option-wrapper">
+                        <div class="iconic-option-inner">
+                            <div class="radio inline"></div>
+                            <h5 class="inline">Ninguno</h5>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <form id="product-block" class="block-hidden" autocomplete="off">
+            <div class="display-block">
+                <div class="field inline">
+                    <label class="h-input-check">
+                        <input type="checkbox" class="checkbox" name="housingType"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Direcci&oacute;n 1</h5>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="h-input-check">
+                        <input type="checkbox" class="checkbox" name="housingType"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Direcci&oacute;n 2</h5>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="h-input-check">
+                        <input type="checkbox" class="checkbox" name="housingType"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Dinero</h5>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="h-input-check">
+                        <input type="checkbox" class="checkbox" name="housingType"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Direcci&oacute;n 3</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="actions text-center">
+                <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+            </div>
+        </form>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('.bank').on('change', function () {
+            if ($(this).val() != 'ninguno') {
+                $('#product-block').removeClass('block-hidden').addClass('fadeIn');
+            } else {
+                $('#product-block').addClass('block-hidden');
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST"
+                }, "");
+            }
+        });
+
+        $('#sendButton').click(function () {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#sendButton'),
+                type: "POST"
+            }, "");
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

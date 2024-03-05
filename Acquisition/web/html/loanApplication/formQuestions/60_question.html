@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div id="modal_msg_question60" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="offerModal">
+        <div class="modal-dialog" role="help">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <div class="title-wrap">
+                        <span class="circle"></span>
+                        <span class="text" id="modalTituloQuestion_60"></span>
+                    </div>
+                    <div class="corner-close">
+                        <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                </div>
+                <div class="modal-middle">
+                    <div class="block-content">
+                        <p id="modalMessageQuestion_60"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="questions-section animated fadeInRight q60">
+        <div id="documents_help" style="display: none">
+            <p id="documents_help_msg" class="documents-indicators-labels" style="margin-bottom: 15px;">Vamos a comenzar con tu validación de identidad. <br/> Recuerda tener tu DNI a mano.</p>
+
+            <img style="width: 469px" src="https://solven-public.s3.amazonaws.com/img/banbif/documents_help_v2.png" alt="" />
+            <br/>
+            <br/>
+            <br/>
+            <button id="initVerificationButton" class="button bg-red" type="button">Iniciar verificación</button>
+
+        </div>
+        <div id="documents_container">
+            <div id="documents" class="branding_credigob"></div>
+<!--            <div class="tk-small">-->
+<!--                <small>Los formatos de archivo permitidos son : jpg, jpeg, png, pdf y word</small>-->
+<!--                <br/>-->
+<!--                <small>El tamaño máximo de las imágenes es : 10Mb</small>-->
+<!--            </div>-->
+            <div class="actions main-buttons">
+                <a href="#" id="uploadButton" class="anchor-button bg-red tpAction" data-target="upload"
+                   th:utext="#{questions.block.uploadPhoto}"></a>
+                <a href="#" id="takeButton" class="anchor-button bg-red tpAction" data-target="take"
+                   th:utext="#{questions.block.takePhoto}"></a>
+
+                <button id="skipButton" class="button bg-red block-hidden bg-t" type="button" th:text="Omitir"></button>
+                <button id="newUpload" class="button bg-red-outline block-hidden" type="button" th:text="#{button.new.upload}"></button>
+                <button id="nextButton" class="button bg-red block-hidden" type="button" th:text="#{button.upload.file}"></button>
+                <button id="sendButton" class="button bg-red block-hidden" type="button" th:text="#{button.upload.file}"></button>
+
+                <th:block th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB)}">
+                    <p class="q60-paragraph">Te pediremos los siguientes documentos. Tenlos listos para iniciar el proceso.</p>
+                    <ul class="q60-files">
+                    </ul>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        /*]]>*/
+    </script>
+    <th:block th:if="${enableFaceApi == true}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $(document).ready(function () {
+                faceapi.nets.tinyFaceDetector.load('https://solven-public.s3.amazonaws.com/external/face-api/')
+            })
+            /*]]>*/
+        </script>
+    </th:block>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var files = JSON.parse(/*[[${jsonTakePictureConfig}]]*/);
+        var messages = JSON.parse(/*[[${jsonMessages}]]*/);
+        var automaticInitializer = /*[[${automaticInitializer}]]*/;
+        var tp = null;
+        var isBDS = /*[[${isBDS}]]*/;
+
+        $(document).ready(function () {
+            function initVerification(){
+                $("#documents_help").hide();
+                $("#documents_container").show();
+                tp = new Tp({
+                    container: '#documents',
+                    userFileConfig: files,
+                    messages: messages,
+                    showTakePhotoButton: (fileid) => {
+                        const shouldShowWhenCredigobAndSelfie = fileid === 23 && /*[[${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).CREDIGOB)}]]*/false;
+                        const isMarketplace = /*[[${!@brandingService.isBranded(#httpServletRequest)}]]*/true;
+
+                        return shouldShowWhenCredigobAndSelfie || isMarketplace;
+                    },
+                    presignedUrl : /*[[${presignedUrl}]]*/null,
+                    extraFilename : /*[[${recordingFilename}]]*/null
+                });
+                tp.init();
+                files.forEach((item, index) => { $('.q60-files').length ? $('.q60-files').append(`<li class="">
+            ${(index + 1)+")"} ${item.name}</li>`) : null; });
+            }
+
+            if(automaticInitializer) initVerification();
+            else{
+                $("#documents_help").show();
+                $("#documents_container").hide();
+            }
+
+            $("#initVerificationButton").click(function (){
+                initVerification();
+            })
+
+            $('#sendButton').click(function () {
+                $('#sendButton').loading('', 2);
+                tp.uploadPictures(function () {
+                    questionFw.ajaxToCurrentQuestionController({
+                        button: $('#sendButton'),
+                        type: "POST",
+                        error: function (xhr, errorJson) {
+                            $('#sendButton').unloading();
+                            if (errorJson != null && errorJson.constructor == {}
+                                .constructor && errorJson.type == "message") {
+                                let errorMessageText = "Tuvimos un incoveniente al validar tu documento. Por favor vuelve a intentarlo.";
+                                if(errorJson.message == 'retryUpload' || errorJson.message == 'invalidSizeImage' || errorJson.message == 'blurryTextImage' || errorJson.message == 'retryUploadRekognition' || errorJson.message == 'retryUploadLimitReached'){
+                                    if(errorJson.message == 'invalidSizeImage') errorMessageText = "La resolución mínima debe ser de 610x610. Te recomendamos utilizar la cámara de tu teléfono o una mejor imagen.";
+                                    else if(errorJson.message == 'blurryTextImage') errorMessageText = "La imagen se encuentra movida, por favor inténtalo nuevamente tomando otra fotografía.";
+                                    else if(errorJson.message == 'retryUploadRekognition') errorMessageText = "No hemos podido validar tus documentos, recuerda subir cada documento en orden y según las instrucciónes. Vuelva  a cargarlos.";
+                                    else if(errorJson.message == 'retryUploadLimitReached') errorMessageText = "Recuerda tomarte una foto de tu rostro sin anteojos, gorros, mascarillas u otros accesorios y tu documento de identidad completo y nítido";
+
+                                    swal({
+                                        title: "Oops...",
+                                        text: errorMessageText,
+                                        imageUrl: "/img/icon-modal-error.svg",
+                                        html: true,
+                                        confirmButtonColor: '#F7323F',
+                                        cancelButtonColor: '#3F3B3B',
+                                        imageSize: "66x66"
+                                    }, function (ok) {
+                                        location.reload();
+                                    });
+                                    return false;
+                                }
+                            }
+                        }
+                    }, "");
+                });
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+
+            var d = $('#documents');
+            d.closest('.loan-process').find('.adviser-section').addClass('show-img').removeAttr('style');
+
+            function triggerCallback(e, callback) {
+                if(!callback || typeof callback !== 'function') {
+                    return;
+                }
+                var files;
+                if(e.dataTransfer) {
+                    files = e.dataTransfer.files;
+                } else if(e.target) {
+                    files = e.target.files;
+                }
+                callback.call(null, files);
+            }
+
+            function makeDroppable(ele, callback) {
+                if (ele === null)
+                    return;
+
+                ele.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ele.classList.add('dragover');
+                });
+
+                ele.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ele.classList.remove('dragover');
+                });
+
+                ele.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ele.classList.remove('dragover');
+                    triggerCallback(e, callback);
+                });
+            }
+
+            function reloadDroppableFunction() {
+                setTimeout(function() {
+                    makeDroppable(window.document.querySelector('.upload-box'), function(files) {
+                        document.getElementById('upload').files = files;
+
+                        for (var i = 0; i < files.length; i++) {
+                            var fileName = files[i].name;
+                            var extension = fileName.substr(fileName.lastIndexOf('.')).toLowerCase();
+                            var allowedExtensions = document.getElementById('upload').accept.replace(/ /g, '').split(',');
+
+                            if ((extension !== '.jpg' && extension !== '.jpeg' && extension !== '.png') && !allowedExtensions.includes(extension)) {
+                                showErrorModal('No se permiten archivos de este formato');
+                                return;
+                            }
+                            if (files[i].size > 10485760) { // More than 10 MB
+                                showErrorModal('El tamaño máximo de las imágenes es de 10 MB');
+                                return;
+                            }
+                        }
+
+                        $('#upload').change();
+                    });
+                }, 500);
+            }
+
+            $('#uploadButton').click(function () {
+                reloadDroppableFunction();
+            });
+
+            (function() {
+                reloadDroppableFunction();
+            })(this);
+        })
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

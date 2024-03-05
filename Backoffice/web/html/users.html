@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Administracion de usuarios</title>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function activateUser(userId) {
+            var baseUrl = /*[[@{/user/activate}]]*/;
+            var domId="#btnActive"+userId;
+            defaultAjax({
+                url: baseUrl,
+                type: 'POST',
+                data: 'userId=' + userId,
+                success: function (data) {
+
+                    $(domId).fadeOut(400,function(){
+                        var $this = $(this);
+                        $this.attr("class","label label-sm label-default disabled");
+                        $this.css({'cursor': 'pointer', 'pointer-events' : 'none'})
+                        $this.removeAttr("href");
+                        $this.fadeIn(400);
+                        console.log("desactivando usuario");
+                    });
+
+                }
+            });
+        }
+
+        function resetUserPassword(userId,user,email) {
+            var baseUrl = /*[[@{/user/resetPassword}]]*/;
+            //alert(baseUrl);
+            var domId="#btnResetPassword"+userId;
+            defaultAjax({
+                url: baseUrl,
+                type: 'POST',
+                data: 'user=' + user+'&email='+email,
+                success: function (data) {
+                    var $this = $(this);
+                    $this.text("Enviado correo");
+                    $(domId).fadeOut(400,function(){
+                        var $this = $(this);
+                        $this.text("Reiniciar password");
+                        $this.fadeIn(400);
+                        console.log("reseteando password");
+                    });
+
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head">
+    </div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <a href="#">Administracion</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Usuarios del Backoffice</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}+' tablefilter'">
+                            <div class="portlet-title">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Listado de usuarios</span>
+                                </div>
+
+                                <div class="actions">
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div class="portlet-body" th:switch="${#lists.isEmpty(users)}">
+                                <div th:case="true">
+                                    <p>No hay usuarios</p>
+                                </div>
+                                <div th:case="false" class="table-responsive" id="table">
+                                    <th:block th:replace="this :: list"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="list">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Apellido paterno</th>
+            <th>Apellido materno</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Activo</th>
+            <th>Fecha de registro</th>
+            <th>Fecha de cese</th>
+            <th>--</th>
+            <th>--</th>
+        </tr>
+        </thead>
+        <tbody th:attr="data-table-paginator-total=${#wrapper?.meta?.total}">
+        <tr th:each="user, iterUser : ${users}">
+            <td th:text="${iterUser?.count}"></td>
+            <td th:text="${user?.name}"></td>
+            <td th:text="${user?.firstSurname}"></td>
+            <td th:text="${user?.lastSurname}"></td>
+            <td th:text="${user?.userName}"></td>
+            <td th:text="${user?.email}"></td>
+            <td th:if="${user?.active}" th:text="'Si'"></td>
+            <td th:unless="${user?.active}" th:text="'No'"></td>
+            <td th:text="${@utilService.datetimeShortFormat(user?.regiterDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(user?.regiterDate)}"></td>
+            <td th:text="${@utilService.datetimeShortFormat(user?.cessationDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(user?.cessationDate)}"></td>
+            <td th:if="${user?.active}" ><p class="label label-sm label-default disabled" th:href="goongle.com">Desbloquear</p></td>
+            <td th:unless="${user?.active}" ><a th:id="'btnActive' + ${user?.id}" class="label  label-success" th:onclick="'activateUser(' + ${user?.id} + ')'" href="javascript:;">Desbloquear</a></td>
+            <td ><a th:id="'btnResetPassword' + ${user?.id}" class="label label-sm label-danger" th:onclick="'resetUserPassword(\''+ ${user?.id} + '\',\''+ ${user?.userName} + '\',\'' + ${user?.email} + '\')'" href="javascript:;" >Reiniciar password</a></td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+
+
+
+</body>
+
+</html>

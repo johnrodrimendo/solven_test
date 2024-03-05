@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <title th:text="#{static.title.credito.consumo}"></title>
+    <meta name="description" th:attr="content=#{static.description.credito.consumo}" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/credito-de-consumo" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/credito-de-consumo" hreflang="x-default" />
+    <th:block layout:fragment="css">
+        <style>
+        </style>
+        <link rel="preload" as="style" th:href="@{/css/landingProducts.css}" />
+        <link rel="stylesheet" th:href="@{/css/landingProducts.css}" />
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function calcHeight() {
+                var chv = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                document.getElementById("main").setAttribute("style", "height:" + chv + "px;");
+            }
+            /*window.onload=function(){
+                var e = new XMLHttpRequest;e.open("GET","https://fonts.googleapis.com/css?family=Lato:300,400,700,900",!0),e.onreadystatechange=function(){if(4==e.readyState&&200==e.status){var t=document.createElement("style");t.innerHTML=e.responseText,document.head.appendChild(t)}},e.send();
+            };
+            */
+            window.onresize = function (event) {
+                calcHeight();
+            };
+            /*]]>*/
+        </script>
+        <script defer="true" type="text/javascript" th:src="@{/js/landingProducts.js}"></script>
+    </th:block>
+
+</head>
+
+<body
+    th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe credito-consumo main-arg rm' : 'main-pe credito-consumo rm'}">
+   <th:block layout:fragment="header">
+        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeaderArgentina"></th:block>
+        </th:block>
+        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeader"></th:block>
+        </th:block>
+    </th:block>
+    <th:block layout:fragment="content">
+        <main id="main" class="main-banner main-banner-product toload  main-adelanto-sueldo main-credito-consumo">
+            <article class="flex">
+                <div>
+                    <h1 th:utext="#{static.rmk.title}"></h1>
+                    <p>Completa la informaci&oacute;n para solicitarlo.</p>
+                </div>
+
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <div class="form-container cbo-saca-credito">
+                        <form id="frmRemarketing" class="block white form form-producto" autocomplete="off">
+                            <!-- <h2 th:utext="#{static.rmk.form.title}"></h2> -->
+                            <div class="wrap">
+                                <div class="w-date">
+                                    <div class="w-doc">
+                                        <div class="field">
+                                            <div class="flex">
+                                                <select name="docType" id="docType" class="select2">
+                                                    <option value="1">DNI</option>
+                                                    <option value="2">CE</option>
+                                                </select>
+                                                <input type="text" class="input-landing document-input-landing"
+                                                    id="documentNumber" name="documentNumber"
+                                                    placeholder="N&uacute;mero" />
+                                            </div>
+
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                        <script>
+                                            //$('.errorContainer').show()
+                                        </script>
+                                    </div>
+                                    <div class="w-email">
+                                        <div class="field inline">
+                                            <input type="text" id="email" name="email" class="input-landing"
+                                                placeholder="Correo electr&oacute;nico" autocorrect="off"
+                                                autocapitalize="none" />
+                                            <div class="errorContainer"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-date">
+                                    <div class="w-phonenumber">
+                                        <div class="field inline">
+                                            <input type="text" id="phone" name="phone" class="input-landing"
+                                                placeholder="Teléfono" autocorrect="off" autocapitalize="none" />
+                                            <div class="errorContainer"></div>
+
+                                        </div>
+                                    </div>
+                                    <div class="w-btn field">
+                                        <button id="btnRemarketing" type="button" class="button bg-red button-landing"
+                                            data-target="#frmRemarketing">Ingresar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="w-date">
+                                    <div class="field c-full f f-ww">
+                                        <input type="checkbox" id="acceptAgreement" name="acceptAgreement"
+                                            aria-required="true" />
+                                        <label for="acceptAgreement" class="icon-checkbox acceptAgreement">
+                                            <span class="check-label">He leído, comprendo y acepto los <a
+                                                    target="_blank" href="/terminos-y-condiciones">Términos y
+                                                    Condiciones</a> y <a target="_blank"
+                                                    href="/politica-de-privacidad">Política de Privacidad</a></span>
+                                        </label>
+                                        <div class="errorContainer"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <div class="form-container">
+                        <form class="block form" id="frmRemarketing" autocomplete="off">
+                            <div class="wrap">
+                                <div class="w-doc">
+                                    <div class="field inline" style=" margin-bottom: 5px;margin-right: 8px;">
+                                        <input type="text" class="input-landing document-input-landing"
+                                            id="documentNumber" name="documentNumber"
+                                            placeholder="Número de CUIT / CUIL / CDI" style=" width: 220px;margin-left:0"/>
+                                    </div>
+                                </div>
+                                <div class="w-email">
+                                    <div class="field inline">
+                                        <input type="text" id="email" name="email" class="input-landing"
+                                            placeholder="Correo electr&oacute;nico" autocorrect="off"
+                                            autocapitalize="none" />
+                                    </div>
+                                </div>
+                                <div class="w-phonenumber">
+                                    <div class="field inline">
+                                        <input type="text" id="code" name="code" class="input-landing"
+                                            placeholder="Código" autocorrect="off" autocapitalize="none" size="4"
+                                            style="width: 220px;"/>
+                                    </div>
+                                    <div class="field inline">
+                                        <input type="text" id="phone" name="phone" class="input-landing"
+                                            placeholder="Teléfono" autocorrect="off" autocapitalize="none" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="errorContainer">
+                            </div>
+                            <div class="field inline w-btn">
+                                <button id="btnRemarketing" type="button" class="button bg-red button-landing"
+                                    data-target="#frmRemarketing">Ingresar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </th:block>
+            </article>
+
+            <ul class="list-benefits">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <img id="bannerPrincipal"
+                src="https://s3.amazonaws.com/solven-public/img/solven/remarketing/bg-remarketing.jpg" alt=""
+                class="lazy" />
+        </main>
+        <div class="modal" id="confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="helpModal">
+            <div class="modal-dialog" role="confirmation">
+                <div class="modal-content">
+                    <div class="modal-top">
+                        <div class="title-wrap">
+                            <h4 class="title-modal" th:text="#{modal.confirmationCode.title}"></h4>
+                        </div>
+                        <div class="corner-close">
+                            <button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-middle">
+                        <div class="block-content">
+                            <p th:text="#{modal.confirmationCode.subTitle}"></p>
+                            <form action="">
+                                <div class="field inline">
+                                    <small class="input-help">C&oacute;digo de confirmaci&oacute;n</small>
+                                    <input type="text" class="input-outline" id="cofirmCodePromo" />
+                                </div>
+                                <div class="field inline">
+                                    <small class="input-help">&nbsp;</small>
+                                    <button type="button" class="button bg-red" th:text="#{button.confirm}"></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-overlay"></div>
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="js">
+        <script th:inline="javascript" async="async">
+            /*<![CDATA[*/
+            var ajaxValidator = /*[[${contactForm.validator.toJson(#locale)}]]*/ null;
+            var ajaxContact = /*[[@{/contact}]]*/ ;
+            var ajaxLoanApplication = /*[[@{/loanapplication}]]*/ ;
+            var ajaxSalaryAdvanceApplication = /*[[@{/salaryadvanceloanapplication}]]*/ null;
+            var ajaxCellPhone = /*[[@{adelanto-de-sueldo/cellphone}]]*/ null;
+            var ajaxCellPhoneValidate=/*[[@{adelanto-de-sueldo/cellphone/validate}]]*/ null;
+            var ajaxSubcribe = /*[[@{/subscribe}]]*/null;
+            var loanApplicationToken;
+            var GA_LOCAL_STORAGE_KEY = 'ga:clientId';
+
+            window.addEventListener('load', function () {
+                var validator = /*[[${form.validator.toJson(#locale)}]]*/ null;
+                if (validator != null) {
+                    var jsonValidator = JSON.parse(validator);
+                    $('#frmRemarketing').validateForm(createFormValidationJson(jsonValidator, $(
+                        '#frmRemarketing')));
+                }
+                var
+                countryIsArgentina = /*[[ ${@countryContextService.isCountryContextInArgentina(#httpServletRequest)} ]]*/ ;
+                console.log(countryIsArgentina);
+                if (countryIsArgentina) {
+                    $('#phone').mask('000-#');
+
+                    var staticPhoneNumberMaxlength = $('#frmRemarketing').data('validatorJson').rules.phone
+                        .maxlength;
+                    $('body').on('keyup', '#code', function () {
+                        $('#frmRemarketing').data('validatorJson').rules.phone.maxlength =
+                            staticPhoneNumberMaxlength - $(this).val().length;
+                        $('#frmRemarketing').data('validatorJson').rules.phone.minlength =
+                            staticPhoneNumberMaxlength - $(this).val().length;
+                        $('#frmRemarketing').validateForm($('#frmRemarketing').data('validatorJson'));
+                        $('#frmRemarketing').data('validator').resetForm();
+                    });
+
+                    $('body').on('keyup', '#code', function () {
+                        var actualCodeLength = $(this).val().length;
+                        if (actualCodeLength == 2) {
+                            $('#phone').mask('0000-#');
+                        } else if (actualCodeLength > 2) {
+                            $('#phone').mask('000-#');
+                        }
+                    });
+                }
+                (function () {
+                    var validator = /*[[${contactForm.validator.toJson(#locale)}]]*/ null;
+                    if (validator != null) {
+                        var jsonValidator = JSON.parse(validator);
+                        $('#contactForm').validateForm(createFormValidationJson(jsonValidator, $(
+                            '#contactForm')));
+                    }
+
+                }());
+
+            });
+
+
+            /*]]>*/
+        </script>
+    </th:block>
+
+</body>
+
+</html>

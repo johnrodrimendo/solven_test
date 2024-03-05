@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      layout:decorator="templates/extranetTemplate(sidebarClosed=true)">
+<head>
+    <style>
+        #tableResults > tbody > tr > td,
+        #tableResults > thead > tr > th {
+            padding: 0px 10px;
+            height: 42px;
+        }
+        #tableResults > tbody > tr > td > div.btn-group > a {
+            margin-bottom: 0px;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="header">
+<!--    <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+    <div class="clearfix"></div>
+</th:block>
+
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='users')"></th:block>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+
+                <th:block th:replace="fragments/headers :: entityContentHeader(title='Administracion de usuarios')"></th:block>
+
+                <div class="col-lg-12">
+                    <div class="portlet light bordered">
+<!--                        <div class="portlet-title">-->
+<!--                            <div class="caption">-->
+<!--                                <span class="caption-subject font-green bold uppercase">Administracion de usuarios</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                        <div id="portlet-body" class="portlet-body">
+                            <div class="actions">
+                                <div class="btn-group">
+                                    <a class="btn green btn-circle principal-button-action" href="javascript:;" data-toggle="dropdown"
+                                       aria-expanded="true">
+                                        <i class="fa fa-cog"></i> Acciones
+                                        <i class="fa fa-angle-down"></i>
+                                    </a>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li shiro:hasPermission="user:management:create">
+                                            <a th:href="@{/users/create}">
+                                                <i class="fa fa-user-plus"></i> Crear nuevo usuario
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row table-responsive" style="overflow:auto;">
+                                <table id="tableResults" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Nombre y apellido</th>
+                                        <th>Rol</th>
+                                        <th>Id en la entidad</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="user: ${users}">
+                                        <td th:text="${user.email}"></td>
+                                        <td th:text="${user.getFullName()}"></td>
+                                        <td th:text="${user.entityUserType?.entityUserType}"></td>
+                                        <td th:text="${user.entityUserIdFromEntity}"></td>
+                                        <td>
+                                            <h5>
+                                                <label id="classEstado" class="label" th:classappend="${user?.active ? 'label-success' : 'label-default'}">
+                                                    <span id="textEstado" th:text="${user?.active ? 'Activo' : 'Inactivo'}"></span>
+                                                </label>
+                                            </h5>
+                                        </td>
+                                        <td class="th-actions-row">
+                                            <div class="btn-group">
+                                                <a class="btn green btn-circle principal-button-action" href="javascript:;"
+                                                   data-toggle="dropdown"
+                                                   aria-expanded="true">
+                                                    <i class="fa fa-cog"></i>
+                                                    <i class="fa fa-angle-down"></i>
+                                                </a>
+                                                <ul class="dropdown-menu pull-right">
+                                                    <li th:if="${user.active}"
+                                                        shiro:hasPermission="user:management:resendPassword">
+                                                        <a href="#" class="resetPassword"
+                                                           th:attr="data-email=${user.email}">
+                                                            <i class="fa fa-lock"></i> Establecer contraseña
+                                                        </a>
+                                                    </li>
+                                                    <li th:if="${user.active}"
+                                                        shiro:hasPermission="user:management:edit">
+                                                        <a th:href="@{/users/__${user.id}__}">
+                                                            <i class="fa fa-pencil"></i> Editar
+                                                        </a>
+                                                    </li>
+                                                    <li shiro:hasPermission="user:management:activate">
+                                                        <a href="#" class="toggleStatus"
+                                                           th:attr="data-email=${user.email}, data-id=${user.id}, data-active=${user?.active},
+                                                                data-full-name=${user.getFullName()}, data-rol=${user.entityUserType?.entityUserType},
+                                                                data-entity-user-id-from-entity=${user.entityUserIdFromEntity}">
+                                                            <i class="fa"
+                                                               th:classappend="${user.active ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
+                                                            <span th:text="${user.active ? 'Desactivar' : 'Activar'}"></span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        dataTable($('#tableResults'), true, false, true, true);
+
+        // C/P FROM extranetUserManagement
+        $('.toggleStatus').click(function () {
+            var active = $(this).data('active');
+            var btnSelected = $(this);
+            var userEmail = $(this).data('email');
+            var userId = $(this).data('id');
+            var fullName = $(this).data('full-name');
+            var rol = $(this).data('rol');
+            var entityUserIdFromEntity = $(this).data('entity-user-id-from-entity');
+
+            swal({
+                title: '',
+                text:   '¿Estás seguro de querer <b>' + (active ? 'desactivar' : 'activar') + '</b> el siguiente usuario?<br/>' +
+                        'Ten en cuenta que si es un organizador o productor, sus productores o usuarios seguiran activos.' +
+                        '<table class="table table-bordered" style="text-align: left; margin-top: 15px;">' +
+                        '<tr>' +
+                            '<th>Nombre y apellido</th><td>' + fullName + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th>Email</th><td>' + userEmail + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th>Rol</th><td>' + rol + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th>ID en la entidad</th><td>' + entityUserIdFromEntity + '</td>' +
+                        '</tr>',
+                html: true,
+                showCancelButton: true,
+                confirmButtonText: "¡Sí, seguro!",
+                cancelButtonText: "Cancelar",
+                type: 'info',
+            }, function (agree) {
+                if (agree) {
+                    defaultAjax({
+                        url: /*[[@{/users/updateActiveUser}]]*/null,
+                        type: 'POST',
+                        data: {
+                            valueToUpdate: !active,
+                            entityUserId: userId
+                        },
+                        success: function (data) {
+                            if (active) {
+                                swal({title: "", text: "Desactivación satisfactoria", type: "success"},function() {
+                                    location.reload();
+                                });
+                                btnSelected.find('span').text("Activar");
+                            } else {
+                                swal({title: "", text: "Activación satisfactoria", type: "success"},function() {
+                                    location.reload();
+                                });
+                                btnSelected.find('span').text("Desactivar");
+                            }
+                        },
+                        error: function () {
+                            swal({title: "", text: "Ha ocurrido un error", type: "error"});
+                        }
+                    });
+                }
+            });
+        });
+
+        // C/P FROM extranetLogin.html
+        $('.resetPassword').click(function (e) {
+            e.preventDefault();
+            var userEmail = $(this).data('email');
+
+            swal({
+                title: '',
+                text: '¿Estás seguro de querer establecer la contraseña para ' + userEmail + '?',
+                showCancelButton: true,
+                confirmButtonText: "¡Sí, seguro!",
+                cancelButtonText: "Cancelar",
+                type: 'info',
+            }, function (agree) {
+                if (agree) {
+                    defaultAjax({
+                        url: /*[[@{/users/resendPassword}]]*/null,
+                        type: 'POST',
+                        data: {
+                            email: userEmail
+                        },
+                        success: function (data) {
+                            swal("", "Las instrucciones para establecer tu contraseña han sido enviadas a " + userEmail, "success");
+                        }
+                    });
+                }
+            });
+        });
+
+        /*]]>*/
+    </script>
+
+</th:block>
+
+</body>
+</html>

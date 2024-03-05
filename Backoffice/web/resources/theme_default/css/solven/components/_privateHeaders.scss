@@ -1,0 +1,137 @@
+/* Private Header Without Amount*/
+.private-header {
+  background: white;
+  @include box-shadow(0, 1px, 4px, rgba(0,0,0,.2));
+  max-height: 60px;
+  padding: .5em 0;
+  .container {
+    .logo {
+      h1 {
+        max-width: 130px;
+        a {
+          img {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+/* Private Header With Amount*/
+.header-loan {
+  background: white;
+  @include box-shadow(0, 1px, 4px, rgba(0,0,0,.2));
+  max-height: 60px;
+  padding: .5em 0;
+  .container {
+    .row {
+      .col-lg-4 {
+        h1 {
+          max-width: 130px;
+          a {
+            img {
+              width: 100%;
+            }
+          }
+        }
+        .square-amount {
+          background: #f9f9fb;
+          display: inline-block;
+          padding: .2em 2em;
+          @include border-radius(5px);
+
+          h3, span {
+            display: inline-block;
+            vertical-align: top;
+          }
+          h3 {
+            color: $black_color_main;
+            font-family: 'Proxima-Nova Bold', sans-serif;
+            font-size: 1.5em;
+            margin-top: .2em;
+          }
+          span {
+            font-family: 'Proxima-Nova', sans-serif;
+            margin: .4em .5em;
+          }
+          #editLoanAmmountLink {
+            display: inline-block;
+            margin-top: .3em;
+          }
+        }
+      }
+      .center {
+        text-align: center;
+        .square-amount {
+          margin-top: .1em;
+        }
+      }
+      .col-lg-4:last-child {
+        text-align: right;
+        .phone-section {
+          .callUs-icon {
+            display: inline-block;
+            position: relative;
+            vertical-align: top;
+            width: 30px;
+          }
+          .callUs-icon:before {
+            content: '\f10a';
+            color: $red_color_main;
+            font-size: 1.5em;
+            left: 0;
+            position: absolute;
+            top: 4px;
+          }
+          .call-us {
+            color: $black_color_main;
+            display: inline-block;
+            font-family: 'Proxima-Nova Bold', sans-serif;
+            font-size: 1em;
+            margin-top: .6em;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media only screen and(min-width: 481px) and(max-width: 768px) {
+
+  .header-loan {
+    .container {
+      .row {
+        .col-xs-8 {
+          text-align: right;
+        }
+        .col-lg-4 {
+          &:last-child {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+@media only screen and(max-width: 480px) {
+  .header-loan {
+    .container {
+      .row {
+        .col-xs-8 {
+          text-align: right;
+          .square-amount {
+            padding: .2em 1em;
+          }
+        }
+        .col-lg-4 {
+          &:last-child {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}

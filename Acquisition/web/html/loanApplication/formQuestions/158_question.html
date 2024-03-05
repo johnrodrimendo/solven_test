@@ -1,0 +1,423 @@
+    <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q158">
+            <form id="questionForm" class="title-margin" th:object="${form}">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div>
+                            <b th:text="'¡Felicitaciones, ' + ${personName} + '!'"></b>
+                        </div>
+                        <div style="margin-bottom: 30px;font-size: 15px;">
+                            <span>Tienes una Tarjeta de Crédito <th:block th:text="${cardType}"></th:block> aprobada con:</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-offset-2 col-lg-8">
+                        <div class="row q158-row">
+                            <div class="col-xs-12 col-md-6" style="padding-right: 0;padding-left: 0">
+                                <div style="display: flex;">
+                                    <div style="width: 45%">
+                                        <th:block th:switch="${cardType}">
+                                            <img th:case="'Visa Clasica'" src="/img/banbif/CLASSIC.jpg" class="img-card" style="max-width: 100%; max-height: 228px;" alt=""/>
+                                            <img th:case="'Visa Oro'" src="/img/banbif/GOLD.jpg" class="img-card" style="max-width: 100%; max-height: 228px;" alt=""/>
+                                            <img th:case="'Visa Infinite'" src="/img/banbif/INFINITE.jpg" class="img-card" style="max-width: 100%;max-height: 228px;" alt=""/>
+                                            <img th:case="'Visa Platinum'" src="/img/banbif/PLATINUM.jpg" class="img-card" style="max-width: 100%; max-height: 228px;" alt=""/>
+                                            <img th:case="'Visa Signature'" src="/img/banbif/SIGNATURE.jpg" class="img-card" style="max-width: 100%; max-height: 228px;" alt=""/>
+                                            <img th:case="'MasterCard Platinum'" src="/img/banbif/MASTERCARD.jpg" class="img-card" style="max-width: 100%;max-height: 228px;" alt=""/>
+                                        </th:block>
+                                    </div>
+                                    <div class="q158-option option-card-data-offer card-height-size" style="width:55%;color:white;border-radius: 6px; background-color: #20A6FF;border: 2px solid #20A6FF;">
+                                        <div style="margin-top: 35px;margin-bottom: 5px;">
+                                            <b>L&iacute;nea disponible</b>
+                                        </div>
+                                        <div>
+                                            <div style="display: inline-block;" class="amount-q158">
+                                                <b style="font-size: 28px">$<th:block th:text="${#numbers.formatDecimal(lineValue, 0, 'COMMA', 0, 'POINT')}"></th:block> </b>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 20px;">
+                                            <span style="font-size: 14px;">TCEA <th:block th:utext="${TCEA}"></th:block> <sup>(1)</sup> </span>
+                                        </div>
+                                        <div class="first-due-date" style="color: var(--branding-loading-color);">
+                                            <div>Fecha de facturación:</div>
+                                            <div>23 de cada mes</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-1 col-md-1 separator-q158">
+                                <div  class="q158-option card-height-size" style="display: flex;justify-content: center;align-items: center;">
+                                    <svg version="1.1" width="30" height="30" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                         viewBox="0 0 38.8 38.8" style="enable-background:new 0 0 38.8 38.8;margin-top: -15px;" xml:space="preserve">
+                                    <style type="text/css">.st0{fill:#20A6FF;}</style>
+                                            <g id="Grupo_259" transform="translate(-1499 -13963.625)">
+                                            <g id="Icon_ionic-ios-add-circle-outline" transform="translate(1495.625 13960.25)">
+                                                <path id="Trazado_145" class="st0" d="M31.2,21.3h-6.9v-6.9c0-0.8-0.7-1.5-1.5-1.5c-0.8,0-1.5,0.7-1.5,1.5v6.9h-6.9
+                                                    c-0.8,0-1.5,0.6-1.5,1.4c0,0,0,0.1,0,0.1c0,0.8,0.6,1.5,1.4,1.5c0,0,0.1,0,0.1,0h6.9v6.9c0,0.8,0.6,1.5,1.4,1.5c0,0,0.1,0,0.1,0
+                                                    c0.8,0,1.5-0.7,1.5-1.5c0,0,0,0,0,0v-6.9h6.9c0.8,0,1.5-0.7,1.5-1.5S32,21.3,31.2,21.3L31.2,21.3z"/>
+                                                <path id="Trazado_146" class="st0" d="M22.8,6c9.3,0,16.8,7.5,16.8,16.8c0,9.3-7.5,16.8-16.8,16.8C13.5,39.5,6,32,6,22.7
+                                                    c0-4.4,1.8-8.7,4.9-11.8C14,7.7,18.3,6,22.8,6 M22.8,3.4C12,3.4,3.4,12,3.4,22.8S12,42.1,22.8,42.1s19.4-8.7,19.4-19.4
+                                                    C42.1,12.1,33.5,3.4,22.8,3.4C22.8,3.4,22.8,3.4,22.8,3.4z"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-md-5 bonus-container-q158 card-height-size card-bonus-detail" style="display:grid;align-items: center;color: var(--branding-loading-color);">
+                                <div class="" style="border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 1px 4px 9px;padding-top: 10px;padding-bottom: 10px;">
+                                    <div>
+                                        <b>Bono de bienvenida <sup>(2)</sup></b>
+                                    </div>
+                                    <div>
+                                        <div style="display: inline-block;" class="amount-q158">
+                                            <b style="font-size: 24px" th:text="${#numbers.formatDecimal(welcomeBonus, 0, 'COMMA', 0, 'POINT')}"></b>
+                                            <b style="font-size: 24px; margin-bottom: 0;padding-bottom: 0">Ptos BanBif</b>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="" style="border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 1px 4px 9px;padding-top: 10px;padding-bottom: 10px; margin-top: 10px" th:if="${compraDeDeudaActiva}">
+                                    <div>
+                                        Tasa promocional para<br/>
+                                        <b>Compra de Deuda <sup>(3)</sup></b> <br/>
+                                        a 36 meses
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="display:none">
+                    <div class="col-lg-offset-2 col-lg-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="btnOnline" class="div-button">
+                                    <table>
+                                        <tr>
+                                            <td style="padding: 10px">
+                                                <label style="margin-bottom:0px"><input type="radio" name="loanApplicationType" class="div-button-radio" value="O" checked="checked"/><span class="div-button-radio-span"></span></label>
+                                            </td>
+                                            <td>
+                                                <div style="text-align: left;">
+                                                    <div style="font-size: 13px;">
+                                                        <b>Solicitud en l&iacute;nea</b>
+                                                    </div>
+                                                    <div style="font-size: 11px;">
+                                                        <span></span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="btnTelephoneBanking" class="div-button">
+                                    <table>
+                                        <tr>
+                                            <td style="padding: 10px">
+                                                <label style="margin-bottom:0px"><input type="radio" name="loanApplicationType" class="div-button-radio" value="T" /><span class="div-button-radio-span"></span></label>
+                                            </td>
+                                            <td>
+                                                <div style="text-align: left;">
+                                                    <div style="font-size: 13px;">
+                                                        <b>Solicitud por Banca Telef&oacute;nica</b>
+                                                    </div>
+                                                    <div style="font-size: 11px;">
+                                                        <span>Un ejecutivo se contactar&aacute; durante el siguiente d&iacute;a h&aacute;bil</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-offset-2 col-lg-8">
+                        <div class="row accept-reject-buttons">
+                            <div class="field inline field-button container-options-mobile" style="margin-top: 25px; margin-bottom: 20px;">
+                                <button id="sendButton" style="font-size: 16px;color:#ffffff;background-color: #20A6FF; min-width: 260px !important;"
+                                        type="button" class="button" th:text="'¡La quiero!'"></button>
+                                <a href="javascript:void(0);" class="remove-position-absolute-mobile rejectOffers" style="color: gray; text-decoration: underline; position: absolute;top: 50%;right: 20%;">No deseo</a>
+
+                            </div>
+                            <!--<div class="col-sm-6">
+                                <div class="w-rejectOffers" style="margin-bottom: 20px; height: 45px;display: flex;justify-content: center;align-items: center;">
+                                    <a href="javascript:void(0);" id="rejectOffers" style="color: gray; text-decoration: underline;">No la quiero</a>
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 text-center" style="color: gray;">
+                        <span style="margin-bottom: 5px">¿Prefiero una tarjeta que no me cobre membresía?</span>
+                        <br/>
+                        <span>TARJETA BANBIF CERO MEMBRESIA <a href="javascript:void(0);" id="zeroMembership" style="color: gray; text-decoration: underline;">aquí</a></span>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-lg-offset-2" style="margin-top: 10px">
+                        <img style="width: 100%" src="https://solven-public.s3.amazonaws.com/img/banbif/banner-bono_2022.png" alt=""/>
+                    </div>
+                </div>
+
+            </form>
+
+            <form id="questionFormZeroMembership" class="title-margin" th:object="${form}" style="display: none;">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div>
+                            <b th:text="'¡Felicitaciones, ' + ${personName} + '!'"></b>
+                        </div>
+                        <div style="margin-bottom: 30px;font-size: 15px;">
+                            <span>Tienes una Tarjeta de Crédito Banbif Cero Membresía aprobada con:</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="hidden" name="loanApplicationType" class="div-button-radio" value="O" />
+                    <div class="" th:classappend="${compraDeDeudaActiva} ? 'col-md-offset-1 col-md-10' : 'col-md-offset-1 col-md-10'">
+                        <div class="row q158-row">
+                            <div class="col-sm-3 cardDetailBanbif">
+                                <div>
+                                    <img src="/img/banbif/CLASSIC.jpg" class="img-card" style="max-width: 220px; margin-left: auto; max-height: 215px; visibility: hidden" alt=""/>
+                                </div>
+                                <div class="mt-card-button" >
+                                    <a href="javascript:void(0);" class="goToPrincipalOffers" style="color: gray; text-decoration: underline;">Ver la oferta anterior</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-lg-2 cardDetailBanbif">
+                                <div>
+                                    <img src="https://solven-public.s3.amazonaws.com/img/banbif/tarjeta-blanca.png" class="img-card" style="max-width: 220px; margin-left: auto; max-height: 215px;" alt=""/>
+                                </div>
+                                <div class="mt-card-button" >
+                                    <a href="javascript:void(0);" class="rejectOffers" style="color: gray; text-decoration: underline;">No deseo</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6"  th:classappend="${compraDeDeudaActiva} ? 'col-xs-6' : 'col-xs-12'">
+                                <div class="q158-option" style="width:100%; margin-left: auto; margin-right: auto; color:#888888;border-radius: 6px; height: 215px;background-color: #d9d9d9;border: 2px solid #d9d9d9;">
+                                    <div style="margin-top: 30px;margin-bottom: 5px;">
+                                        <b>L&iacute;nea disponible</b>
+                                    </div>
+                                    <div>
+                                        <div style="display: inline-block;" class="amount-q158">
+                                            <b style="font-size: 28px">$<th:block th:text="${#numbers.formatDecimal(lineValue, 0, 'COMMA', 0, 'POINT')}"></th:block> </b>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 20px;">
+                                        <span style="font-size: 14px;">TCEA <th:block th:utext="${TCEA_ZERO_MEMBERSHIP}"></th:block> <sup>(1)</sup> </span>
+                                    </div>
+                                    <div class="first-due-date" style="background-color: #ffffff">
+                                        <div>Fecha de facturación:</div>
+                                        <div>23 de cada mes</div>
+                                    </div>
+                                </div>
+                                <button id="sendButtonZeroMembership" style="width:100%;font-size: 16px;color:#ffffff;background-color: #20A6FF;min-width: 160px !important;"
+                                        type="button" class="button mt-card-button" th:text="'¡La quiero!'"></button>
+                            </div>
+                            <div class="col-xs-6 col-sm-3 bonus-container-q158 card-height-size-zero card-separator-margin" th:if="${compraDeDeudaActiva}" style="color: var(--branding-loading-color); display: grid;align-items: center;">
+                                <div class="compra-de-deuda-cero-membresia" style="border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 1px 4px 9px;padding-top: 10px;padding-bottom: 10px;">
+                                    <div>
+                                        Tasa promocional para<br/>
+                                        <b>Compra de Deuda <sup>(2)</sup></b> <br/>
+                                        a 36 meses
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6 cardDetailBanbifMobile mt-card-button" style="">
+                                <a href="javascript:void(0);" class="goToPrincipalOffers" style="color: gray; text-decoration: underline; margin-bottom: 5px;">Ver la oferta anterior</a>
+                            </div>
+
+                            <div class="col-xs-6 cardDetailBanbifMobile" th:classappend="${compraDeDeudaActiva} ? '' : 'mt-card-button'">
+                                <a href="javascript:void(0);" class="rejectOffers" style="color: gray; text-decoration: underline;">No deseo</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </form>
+
+            <div>
+
+            </div>
+            <div class="divider"></div>
+            <div class="footer-container-q158">
+                <div class="offer-container">
+                    <section class="section-footer-q158">
+                        <div class="description-example" style="margin-top: 12px">
+                            <p>
+                                Los Servicios adicionales asociados a la tarjeta de crédito nacen deshabilitados. Puedes habilitarlos o deshabilitarlos posteriormente, a tu solicitud.
+                            </p>
+                            <p>
+                                *Servicios adicionales asociados a tu tarjeta de crédito: (i) compras por internet, (ii) compras en el exterior, (iii) disposición de efectivo y sobregiro (previa evaluación). La solicitud la podrás realizar en línea a través de: Red de oficinas, Banca telefónica y Banca digital (web o app). Para mayor información sobre beneficios, riesgos y condiciones de estos servicios, ingresar en: www.banbif.com.pe/Personas / Nuestros productos/ Tarjetas /Tarjeta de Crédito Clásica (o cualquier otra tarjeta del portafolio) /Información de interés/ Información sobre tu tarjeta: Máxima Seguridad
+                            </p>
+                            <p>
+                                “Estimado cliente, informarle adicionalmente que usted puede ejercer su derecho de endosar un seguro de vida en reemplazo del seguro de desgravamen que le ofrece el banco. En tal caso, deberá realizar el endoso una vez que se emita la tarjeta de crédito y por el valor de la línea de crédito aprobada. El procedimiento para realizar el endoso se encuentra publicado en nuestra página web: https://www.banbif.com.pe/Personas/Fondos-Mutuos-y-Seguros/Seguros/Seguros-Asociados-a-la-Contratacion-de-un-Producto o en nuestras oficinas BanBif. <br/>
+                                Para que no aplique el cobro del seguro de desgravamen, deberá de haber cumplido con entregar la póliza de vida y el endoso a favor del banco, debiendo contarse con la aceptación del banco. Si usted desea evitar que se genere el cobro del seguro de desgravamen, le recomendamos realizar consumos luego de recibir la confirmación que el endoso de su póliza de vida ha sido aceptado por el banco.”
+
+                            </p>
+                        </div>
+                    </section>
+                    <br/>
+                </div>
+                <div class="offer-container">
+                    <section class="section-footer-q158">
+                        <div class="info-container">Conoce nuestras Tarjetas BanBif <a href="https://www.banbif.com.pe/Personas/Tarjeta-de-Credito" target="_blank" style="text-decoration: underline; color: white">aquí</a></div>
+                        <div class="description-example">
+                            <br/>
+                            <p>Le informamos que esta oferta estará vigente por un plazo de 24 horas. Si deseas alguna opción distinta a la ofrecida, puedes solicitar tu tarjeta en cualquiera de nuestras oficinas BanBif donde te atenderán y
+                                evaluarán.</p>
+                            <br/>
+                            <p>
+                                (1) TCEA: Su cálculo corresponde a un patrón estandarizadas de comparación de costos y se presenta a través de un ejemplo explicativo que considera los parámetros: plan revolvente, moneda de la línea, consumo de US$300 realizado 30 días antes de la fecha de facturación, cancelado en un plazo de 12 meses, considerando pagos mínimos con saldo capital aplicado por un factor revolvente de 24, intereses, comisiones por membresía anual en el mes 12 (no se cobra por envío electrónico de estado de cuenta); y gasto por seguro de desgravamen mensual. Umbral mínimo de amortización de capital del pago mínimo: US$10. No considera deuda anterior. (*)Tarifa en soles, expresada en dólares. Tipo de cambio referencial de S/ 3.50. TCEA (Tasa de Costo Efectivo Anual) y TEA (Tasa Efectiva Anual) calculadas a 360 días.
+                            </p>
+                            <br/>
+                            <p>
+                                Puedes verificar las condiciones de la TCEA en la hoja de resumen del producto tarjeta de crédito ingresando a www.banbif.com.pe/ Personas / Información de interés / Formularios Contractuales /Hoja de Resumen / Hoja Resumen Tarjeta de Crédito.
+                            </p>
+                            <br/>
+                            <p class="bono-bienvenida">
+                                (2) Bono de Bienvenida: Para recibirlo deberás realizar compras acumuladas dentro de los treinta (30) días calendario posteriores a la activación de la tarjeta de crédito, por montos iguales o superiores a la meta indicada en la Carta de Bienvenida que recibirás junto con tu tarjeta de crédito, donde además encontrarás información sobre las condiciones del bono. Ver condiciones del Programa de Puntos en www.banbif.com.pe/Nuestros productos/Otros servicios/Puntos BanBif .
+                            </p>
+                            <br class="bono-bienvenida"/>
+                            <p class="compra-deuda" th:if="${compraDeDeudaActiva}">
+                                (<span id="compraDeudaIndicador">3</span>) Compra de deuda: Beneficio exclusivo para Tarjetas de Crédito titulares Visa Cero Membresía, VISA Clásica, VISA Oro, VISA Platinum, Mastercard Platinum, VISA Signature y VISA Infinite. Para acceder a la Compra de Deuda deberás mantener tu tarjeta de crédito activa, sin mora, no mantener obligaciones vencidas con BanBif o con otras entidades financieras, mantener las condiciones financieras e historial crediticio que motivaron la aprobación, de acuerdo a las políticas de riesgo y prevención del BanBif. El monto total de la compra incluye la comisión por gestión de compra de deuda y está sujeto al límite de la línea de la tarjeta de crédito. Te otorgamos tu Compra de Deuda por un monto mínimo de S/ 1,000 y US$300. La compra de deuda no aplica a terceros, debe realizarse exclusivamente para comprar la deuda del mismo titular de la tarjeta de BanBif en tarjetas de crédito de otras entidades financieras. Se podrá comprar deuda sólo de tarjetas de crédito de las entidades financieras: Banco de Crédito del Perú, BBVA, Interbank, Scotiabank, GNB, Banco Falabella, Banco Ripley, Banco Pichincha y Diners Club. La comisión por gestión de compra de deuda es de S/10, en caso la compra de deuda sea de más de un banco, la comisión se aplica por cada monto que se pagara a los otros bancos. La cuota mensual se cargará en la Tarjeta de crédito BanBif y será incluida dentro del pago mínimo indicado en tu estado de cuenta. Dicha cuota disminuye el saldo disponible en la línea de crédito de tu tarjeta.
+                            </p>
+                            <br class="compra-deuda" th:if="${compraDeDeudaActiva}"/>
+                            <p>ITF de 0.005%, según D.S No150-2007-EF.</p>
+                            <p>
+                                Puedes endosar un seguro de desgravamen para tu tarjeta solicitándolo en cualquiera de nuestras oficinas BanBif o llamando a nuestra banca telefónica (agregar números Lima y Provincia). El procedimiento y las condiciones para endosar una póliza se encuentra en www.banbif.com.pe
+                                De no pagar por lo menos el Pago Mínimo dentro de la fecha límite de pago se cobrará el interés compensatorio más la tasa de interés moratoria, que es de 12.51% en soles y 9.90% en dólares.  Esta tasa de interés moratorio se calcula sobre la deuda en mora sin capitalizar intereses, después de verificar que no se ha cancelado por lo menos el pago mínimo hasta la fecha límite de pago y se encuentra dentro del límite máximo establecido por el BCRP, que actualmente es el 15% de la tasa máxima de interés convencional compensatorio publicada por el Banco Central de Reserva del Perú. Esta tasa de interés moratorio se cobra en forma adicional a la tasa de interés convencional compensatorio. La tasa máxima de interés moratorio podrá ser modificada por el Banco Central de Reserva del Perú conforme a lo dispuesto en el artículo 6 de la Ley 28587, el artículo 51 del Decreto Ley 26123 y la circular 0008-2021-BCRP. El Interés compensatorio será cobrado hasta la fecha de pago y las exoneraciones de cobro de intereses, así como las tasas preferenciales ofrecidas, solo aplicarán mientras el cliente se encuentre al día en el pago de sus obligaciones.
+                            </p>
+                            <br/>
+                            <p>Información sobre los costos de nuestro producto Tarjeta de Crédito disponible en las oficinas de atención al público a través del tarifario y en nuestra página web: www. BanBif. com. pe, a través de información de Interés, link “Tarifario General”.</p>
+
+                            <br/>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        let compraDeDeudaActiva = /*[[${compraDeDeudaActiva}]]*/false;
+
+        $('#btnOnline').click(function() {
+            $('input:radio[name="loanApplicationType"]').filter('[value="O"]').prop('checked', true);
+        });
+
+        // $('.loan-process').addClass("flex-container-loan-process");
+        // $('#container-evaluation-div').addClass("flew-grow-question-container");
+
+        $('#btnTelephoneBanking').click(function() {
+            $('input:radio[name="loanApplicationType"]').filter('[value="T"]').prop('checked', true);
+        });
+
+        $('#zeroMembership').click(function() {
+            $("#questionForm").hide();
+            $("#questionFormZeroMembership").show();
+            $(".bono-bienvenida").hide();
+            if(compraDeDeudaActiva) $("#compraDeudaIndicador").text(2);
+            mostrarDeudaActivaLegal();
+        });
+
+        $('.goToPrincipalOffers').click(function() {
+            $("#questionForm").show();
+            $("#questionFormZeroMembership").hide();
+            $(".bono-bienvenida").show();
+            $("#compraDeudaIndicador").text(3);
+            mostrarDeudaActivaLegal();
+        });
+
+        function setHeightDivider(){
+         let height = 0;
+
+         let acum = $("#questionForm").outerHeight(true) + $(".adviser-section").outerHeight(true) +  $(".process-header").outerHeight(true);
+         if(acum < window.innerHeight && window.innerWidth > 1023){
+             let heightFooter = $(".footer-container-q158 > div:nth-child(1)").outerHeight(true);
+             height = window.innerHeight - acum - heightFooter;
+             if(height > 0) {
+                 let percentageHeight = ((height)*100)/window.innerHeight;
+                 $(".divider").css("height",percentageHeight+"vh");
+             }
+
+         }
+
+        }
+
+        setHeightDivider();
+
+        function mostrarDeudaActivaLegal(){
+            if(compraDeDeudaActiva){
+                $(".compra-deuda").show();
+            }
+        }
+
+        $(".compra-deuda").hide();
+        if(compraDeDeudaActiva) mostrarDeudaActivaLegal();
+
+
+
+        questionFw.initializeFormInputs();
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').on('click', function(){
+            let principalOffer = /*[[${principalOffer}]]*/null;
+            sendForm(principalOffer?.id,'#questionForm','#sendButton');
+        });
+
+        $('#sendButtonZeroMembership').on('click', function(){
+            let zeroMembershipOffer = /*[[${zeroMembershipOffer}]]*/null;
+            sendForm(zeroMembershipOffer?.id,"#questionFormZeroMembership",'#sendButtonZeroMembership');
+        });
+
+
+        function sendForm(loanOfferId, formId, button){
+            if ($(formId).valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $(button),
+                    type: "POST",
+                    form: $(formId),
+                    data: $.extend($(formId).serializeObject(),
+                        {
+                            offerId: loanOfferId
+                        })
+                }, "");
+            }
+        }
+
+        $('.rejectOffers').on('click', function (event) {
+            event.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {
+                    loanApplicationType: 'R'
+                },
+                success: function () {
+                    questionFw.refreshQuestion();
+                }
+            }, "");
+        });
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_client_grouped">
+    <div class="inner-question" th:attr="data-question=${q}">
+        <div class="questions-section animated fadeInRight">
+            <form class="inner-question-form" autocomplete="off">
+                <p th:text="#{questions.block.independentRUC}"></p>
+                <div class="display-block w-input-ruc field">
+                    <input type="text" class="input-outline" name="ruc"/>
+                    <span class="w-list">
+                        <label th:attr="for='haventRUC_' + ${q}"    class="custom-check">
+                            <span class="check-inner"><i class="icon icon-check"></i></span>
+                            <span class="check-label"> No tengo</span>
+                            <input type="checkbox" class="real-check haventRUC" th:id="'haventRUC_' + ${q}"/>
+                        </label>
+                    </span>
+                </div>
+                <div class="errorContainer"></div>
+            </form>
+        </div>
+        <hr class="divisor-bottom"/>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/, function(){
+                    return $.extend(innerQuestionForm.serializeObject(), {
+                        haventRuc: haventRUC.prop('checked')
+                    });
+                });
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                var innerQuestionForm = innerQuestion.find('.inner-question-form');
+
+                var ruc = innerQuestion.find('input[name=ruc]');
+                var haventRUC = innerQuestion.find('.haventRUC');
+
+                var enabled = false;
+                haventRUC.click(function () {
+                    if (enabled === true) {
+                        ruc.prop('disabled', true).toggleClass('disabled');
+                    }
+                    else {
+                        ruc.prop('disabled', false).toggleClass('disabled');
+                    }
+                    enabled = true;
+
+                });
+
+                haventRUC.click(function () {
+                    if ($(this).is(':checked')) {
+                        ruc.val('');
+                        ruc.focus();
+                        ruc.prop('disabled', true);
+                        innerQuestionForm.data('validatorJson').rules.ruc.required = false;
+                        innerQuestionForm.data('validatorJson').rules.ruc.maxlength = 0;
+                        innerQuestionForm.data('validatorJson').rules.ruc.minlength = 0;
+                    } else {
+                        ruc.prop('disabled', false);
+                        ruc.val('');
+                        ruc.focus();
+                        innerQuestionForm.data('validatorJson').rules.ruc.required = true;
+                        innerQuestionForm.data('validatorJson').rules.ruc.maxlength = 11;
+                        innerQuestionForm.data('validatorJson').rules.ruc.minlength = 11;
+                    }
+                    innerQuestionForm.validateForm(innerQuestionForm.data('validatorJson'));
+                    innerQuestionForm.data('validator').resetForm();
+                });
+            })();
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+
+            <p th:utext="#{questions.block.independentRUC}"></p>
+            
+            <div class="form-group col-md-12">
+                <small>Ingreso variable</small>
+                <input class="form-control" type="text" th:field="*{ruc}"/>
+                <div class="errorContainer"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="mt-checkbox mt-checkbox-outline">
+                    <input type="checkbox" class="haventRUC"/> No tengo
+                    <span></span>
+                </label>
+            </div>
+
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return $.extend(questionFlow.getFormElement().serializeObject(), {
+                    haventRuc: questionFlow.find('.haventRUC').is(':checked')
+                });
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+
+            questionFlow.find(".haventRUC").click(function () {
+                if ($(this).is(':checked')) {
+                    questionFlow.find('input[name=ruc]').prop('disabled', true);
+                    questionFlow.find('input[name=ruc]').val('');
+                    questionFlow.getFormElement().data('validatorJson').rules.ruc.required = false;
+                } else {
+                    questionFlow.find('input[name=ruc]').prop('disabled', false);
+                    questionFlow.getFormElement().data('validatorJson').rules.ruc.required = true;
+                }
+                questionFlow.getFormElement().validateForm($Form.data('validatorJson'));
+                questionFlow.getFormElement().data('validator').resetForm();
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

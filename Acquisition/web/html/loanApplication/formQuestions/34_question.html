@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms">
+            <form th:object="${form}" autocomplete="off">
+                <p th:utext="#{questions.block.services}"></p>
+                <div class="field inline">
+                    <select data-width="245" th:field="*{serviceType}" th:attr="data-placeholder=#{question.map.service}">
+                        <th:block th:each="services : ${@catalogService.getServiceTypes(#locale)}">
+                            <option value="" disabled="disabled" selected="selected"></option>
+                            <option th:value="${services.id}" th:text="${services.serviceType}"></option>
+                        </th:block>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var serviceType = $('select');
+        serviceType.on('select2:select', function () {
+            sendForm();
+        });
+
+        function sendForm() {
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST",
+                data: {serviceType: $('#serviceType').val()}
+            }, "");
+        }
+
+        /*]]>*/
+
+    </script>
+
+
+</th:block>
+</html>

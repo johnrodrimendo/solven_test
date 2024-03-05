@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q37">
+            <p th:utext="#{questions.block.provableIncome}"></p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="centrado">
+                    <div>
+                        <div class="field field-amount inline">
+                            <div class="wrap-field">
+                                <div class="box-icon prefix-box tiny-input">
+                            <span class="prefix"
+                                  th:text="${@countryContextService.getCountryParamsByRequest(#httpServletRequest).currency.symbol}"></span>
+                                </div>
+                                <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <input type="text" class="input-outline amount-input" th:field="*{monthlyIncome}" style="display:none" th:attr="maxlength=${9 + (9 / 3 - 1) + 1 + 2 - 1}"/>
+                                </th:block>
+                                <th:block th:unless="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+                                    <input type="text" class="input-outline amount-input" th:field="*{monthlyIncome}"/>
+                                </th:block>
+                                <small class="input-help">Ingreso U6M</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="q-espacio">
+                        <div class="errorContainer"></div>
+                    </div>
+                </div>
+
+                <!--div class="field inline">
+                    <button type="button" id="sendButton" class="button bg-red" th:text="#{button.next}"></button>
+                </div-->
+                <div class="display-block">
+                    <label class="h-input-radio">
+                        <input type="radio" name="hopeGrow" value="despite"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Espero que disminuyan.</h5>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="h-input-radio">
+                        <input type="radio" name="hopeGrow" value="keeping"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Espero que se mantengan.</h5>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="h-input-radio">
+                        <input type="radio" name="hopeGrow" value="grow"/>
+                        <div class="option-wrapper">
+                            <div class="iconic-option-inner">
+                                <div class="radio inline"></div>
+                                <h5 class="inline">Espero crecer en m&aacute;s del 15%.</h5>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <th:block th:if="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            var $monthlyIncome = $('#monthlyIncome');
+            var $questionForm = $('#questionForm');
+            setTimeout(function () {
+                $monthlyIncome.focus();
+            }, 300);
+            $('input[name=monthlyIncome]').on("keyup", function (event) {
+                if (event.keyCode == 13) {
+                    sendForm();
+                    return false;
+                }
+            });
+
+            $('input[name=hopeGrow]').click(function () {
+                sendForm();
+            });
+            $('.amount-input').maskNumber({
+                thousands: '.',
+                integer: true
+            });
+            function sendForm() {
+                questionFw.ajaxToCurrentQuestionController({
+                    //button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $.extend($questionForm.serializeObject(), {
+                        monthlyIncome:$('.amount-input').val().replace(/(\.|\,)+\d{1,2}$/g, '').replace(/\.|\,/g, ''),
+                    })
+                }, "");
+            }
+
+            /*]]>*/
+
+        </script>
+    </th:block>
+    <th:block th:unless="${@countryContextService.isCountryContextInColombia(#httpServletRequest)}">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+            var $monthlyIncome = $('#monthlyIncome');
+            setTimeout(function () {
+                $monthlyIncome.focus();
+            }, 300);
+            $('input[name=monthlyIncome]').on("keyup", function (event) {
+                if (event.keyCode == 13) {
+                    sendForm();
+                    return false;
+                }
+            });
+
+            $('input[name=hopeGrow]').click(function () {
+                sendForm();
+            });
+
+            function sendForm() {
+                questionFw.ajaxToCurrentQuestionController({
+                    //button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+
+            /*]]>*/
+
+        </script>
+    </th:block>
+
+
+</th:block>
+</html>

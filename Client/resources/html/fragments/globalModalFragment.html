@@ -1,0 +1,36 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="globalModalContact" class="modal" id="contact-modal" tabindex="-1" role="dialog" aria-labelledby="contactModal"
+     th:with="contactForm=${T(com.affirm.client.model.form.ContactForm).newInstance()}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-top"><div class="title-wrap"><span class="title-modal" th:text="#{static.landing.modal.title}"></span></div><div class="corner-close"><button class="icon icon-close" data-dismiss="modal" aria-label="Close"></button></div></div>
+            <div class="modal-middle">
+                <div class="block-content">
+                    <div class="contact-form">
+                        <form id="contactForm">
+                            <div id="response-block"></div>
+                            <div class="field"><input type="text" name="contactFullName" id="contactFullName" class="input-outline" placeholder="Nombre completo"/><div class="errorContainer text-left"></div></div>
+                            <div class="field mobile-hidden"><input type="text" name="contactTelephone" id="contactTelephone" class="input-outline" placeholder="Tel&eacute;fono"/><div class="errorContainer text-left"></div></div>
+                            <div class="field"><input type="text" name="contactEmail" id="contactEmail" class="input-outline" placeholder="Correo electr&oacute;nico"/><div class="errorContainer text-left"></div></div>
+                            <div class="field"><input type="text" name="contactSubject" id="contactSubject" class="input-outline" placeholder="Asunto"/><div class="errorContainer text-left" ></div></div>
+                            <div class="field"><textarea name="contactMessage" id="contactMessage" class="input-outline" rows="5" placeholder="Mensaje..."></textarea><div class="errorContainer text-left"></div></div>
+                            <div class="g-recaptcha" th:attr="data-sitekey=${@configuration.invisibleCaptchaPublicKey()}" data-callback="submitGlobalModalContact" data-size="invisible"></div>
+                            <div class="field text-center"><button type="button" id="sendMessage" class="button bg-red">Enviar</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay"></div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var globalModalContact = {
+            ajaxValidator: /*[[${contactForm.validator.toJson(#locale)}]]*/null,
+            ajaxUrl: /*[[@{/contact}]]*/
+        };
+        /*]]>*/
+    </script>
+</div>
+</th:block>

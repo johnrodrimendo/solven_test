@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Solven | El cr&eacute;dito que mereces</title>
+    <meta name="description" th:content="${T(com.affirm.system.configuration.Configuration).APP_NAME}"/>
+    <meta name="keywords" th:content="${T(com.affirm.system.configuration.Configuration).APP_NAME}"/>
+    <meta name="Resource-type" content="Document"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+
+    <style th:inline="text">
+        @font-face {
+            font-family: "Solven Icons";
+            font-style: normal;
+            font-weight: normal;
+            src: url("[[@{/fonts/icomoon/icomoon.eot?#iefix}]]") format("embedded-opentype"), url("[[@{/fonts/icomoon/icomoon.woff}]]") format("woff"), url("[[@{/fonts/icomoon/icomoon.ttf}]]") format("truetype"), url("[[@{/fonts/icomoon/icomoon.svg#Solven Icons}]]") format("svg")
+        }
+    </style>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Variable globales
+        var system = {
+            contextPath : /*[[ ${#httpServletRequest.getContextPath()} ]]*/
+        };
+        /*]]>*/
+    </script>
+
+    <!-- Common scritps and css -->
+
+    <!-- Jquery -->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery/dist/jquery.min.js'}"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!-- Jquery UI -->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-ui/jquery-ui.min.js'}"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+    <!-- Bootstrap -->
+    <!--<link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/css/bootstrap.min.css'}"/>-->
+    <!--<script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/dist/js/bootstrap.min.js'}"></script>-->
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/css/bootstrap.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap/js/bootstrap.js'}"></script>
+    <!-- BootBox -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootbox/bootbox.min.js'}"></script>
+
+    <!--Jquery Numeric-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/numeric/jquery.numeric.min.js'}"></script>
+
+    <!-- Detect Mobile -->
+    <script th:src="@{/js/mobile-detect/mobile-detect.js}"></script>
+
+    <!-- Font Awesome-->
+    <!--<link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/font-awesome/css/font-awesome.min.css'}"/>-->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/css/font-awesome.min.css}"/>-->
+    <!-- Own -->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-client.css}"/> -->
+
+    <!-- link rel="stylesheet" type="text/css" th:href="@{/css/affirm-backup.css}"/-->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-forms.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-assets.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/affirm-responsive.css}"/> -->
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:src="@{/js/util.js}"></script>
+
+    <!--Sweet Alerts -->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.min.js'}"></script>
+    <link rel="stylesheet" type="text/css" th:href="${@urlService.externalUrl(#httpServletRequest) + '/sweetalert/sweetalert.css'}"/>
+
+    <!-- /Common scritps and css -->
+    <th:block layout:fragment="head"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/application.css}"/>
+</head>
+<body>
+    <!-- header -->
+    <div th:if="${header == null}">
+        <header th:replace="fragments/headers :: privatePagesHeader"></header>
+    </div>
+    <div th:if="${header eq 'loanOfferHeader'}">
+        <div th:replace="fragments/headers :: loanOfferHeader"></div>
+    </div>
+    <!-- /header -->
+
+    <!-- content -->
+    <div id="aff-template-pages-private">
+        <div layout:fragment="content"/>
+    </div>
+    <!-- /content -->
+
+    <!-- footer -->
+    <div th:replace="fragments/footers :: footerDefault"></div>
+    <!-- /footer -->
+
+</body>
+</html>

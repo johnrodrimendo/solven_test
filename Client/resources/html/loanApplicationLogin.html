@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+
+    <script th:inline="javascript" charset="ISO-8859-1">
+        /*<![CDATA[*/
+        $(function () {
+
+            var validatorCellphone = /*[[${loanApplicationLoginForm.validator.toJson(#locale)}]]*/null;
+            var validatorToken = /*[[${validateCellphoneForm.validator.toJson(#locale)}]]*/null;
+            $('#cellPhoneForm').validateForm(createFormValidationJson(JSON.parse(validatorCellphone), $('#cellPhoneForm')));
+            $('#cellPhoneTokenForm').validateForm(createFormValidationJson(JSON.parse(validatorToken), $('#cellPhoneTokenForm')));
+
+            // Submit
+            var buttonSendToken = $('#sendToken'),
+                    buttonResendToken = $('#resendToken'),
+                    buttonValidateToken = $('#validateToken'),
+                    sectionCellphone = $('#cellPhoneNumberBlock'),
+                    sectionToken = $('#cellPhonePIN');
+
+            $('#cellPhoneNumber').keypress(function (e) {
+                if (e.which == 13) {
+                    buttonSendToken.trigger('click');
+                    return false;    //<---- Add this line
+                }
+            });
+
+            buttonSendToken.on('click', function () {
+                buttonSendToken.loading();
+                defaultAjax({
+                    url: /*[[@{/loanapplicationlogin/__${loanApplicationToken}__}]]*/null,
+                    type: 'POST',
+                    form: $('#cellPhoneForm'),
+                    data: $('#cellPhoneForm').serializeObject(),
+                    success: function (data) {
+                        buttonSendToken.unloading();
+
+                        sectionCellphone.css({'display': 'none'});
+                        buttonSendToken.css({'display': 'none'});
+                        sectionToken.css({'display': 'block'});
+                        buttonValidateToken.css({'display': 'inline-block'});
+                    },
+                    error: function () {
+                        buttonSendToken.unloading();
+                    }
+                });
+            });
+
+            $('#authToken').keypress(function (e) {
+                if (e.which == 13) {
+                    buttonValidateToken.trigger('click');
+                    return false;    //<---- Add this line
+                }
+            });
+
+            buttonValidateToken.on('click', function () {
+                buttonValidateToken.loading();
+                var jsonParams = $('#cellPhoneTokenForm').serializeObject();
+                jsonParams.loanAplicationToken = /*[[${loanApplicationToken}]]*/null;
+                defaultAjax({
+                    url: /*[[@{/user/cellphone/validate}]]*/null,
+                    type: 'POST',
+                    form: $('#cellPhoneTokenForm'),
+                    data: jsonParams,
+                    success: function (data) {
+                        buttonValidateToken.unloading();
+                    },
+                    error: function () {
+                        buttonValidateToken.unloading();
+                    }
+                });
+            });
+
+            buttonResendToken.on('click', function () {
+
+                defaultAjax({
+                    url: /*[[@{/loanapplication/__${loanApplicationToken}__/resendSmsToken}]]*/,
+                    type: 'POST',
+                    success: function (data) {
+                        console.log(data);
+                    }
+                });
+
+            });
+
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: generalHeader "></th:block>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="main-content">
+        <div class="container">
+            <div class="wrap">
+                <div class="loginForm">
+                    <div class="formContainer">
+                        <form action="#" role="form" id="cellPhoneForm" th:object="${loanApplicationLoginForm}"
+                              autocomplete="off">
+                            <div class="block" id="cellPhoneNumberBlock">
+                                <p>Hola <b th:text="${name}"/>, necesitamos que ingreses tu n&uacute;mero de celular <b
+                                        th:if="${userPhone != null}" th:text="${userPhone}"></b> para validar que eres t&uacute;.
+                                </p>
+                                <div class="form-group label-floating medium-number-input">
+                                    <label for="cellPhoneNumber" class="control-label"
+                                           style="font-size: 14px;margin: 0;">Ingresa N&deg;
+                                        celular</label>
+                                    <input type="text" class="form-control align-center" th:field="*{cellPhoneNumber}"/>
+                                    <div class="errorContainer"></div>
+                                </div>
+                            </div>
+                        </form>
+                        <form action="#" role="form" id="cellPhoneTokenForm" th:object="${validateCellphoneForm}"
+                              autocomplete="off">
+                            <div class="block" id="cellPhonePIN">
+                                <p>Ingresa el PIN de verificaci&oacute;n</p>
+                                <div class="form-group label-floating tidy-input-number">
+                                    <label for="authToken" class="control-label" style="margin: 0;">PIN</label>
+                                    <input type="text" class="form-control align-center" th:field="*{authToken}"/>
+                                    <small><a href="#" id="resendToken">Reenviar</a></small>
+                                </div>
+                                <div class="errorContainer"></div>
+                            </div>
+                        </form>
+                        <div class="actions">
+                            <button class="button red-button" id="sendToken">Enviar</button>
+                            <button class="button red-button" id="validateToken">Validar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerDefault"></th:block>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="form q62">
+            <p th:text="#{questions.116.tittle(${name})}"></p>
+        </div>
+
+        <div class="display-block text-center">
+            <button type="button" id="icandoit" class="button bg-red">¡Prefiero hacerlo yo!</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $('#icandoit').on('click', function (e) {
+            e.preventDefault();
+            questionFw.ajaxToCurrentQuestionController({
+                type: "POST"
+            }, "icandoit");
+        });
+
+        /*]]>*/
+    </script>
+</th:block>
+</html>

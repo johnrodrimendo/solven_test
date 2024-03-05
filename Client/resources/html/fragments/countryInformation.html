@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<th:block th:fragment="metadata">
+    <script type="application/ld+json" th:inline="text" >
+        {
+            "@context":"http://schema.org","@type":"Blog",
+            "url":"[[ 'https://' + ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).domains[0]} ]]"
+        }
+    </script>
+    <script type="application/ld+json" th:inline="text">
+        {
+            "@context":"http://schema.org",
+            "@type":"Organization",
+            "url":"[[ 'https://' + ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).domains[0]} ]]",
+            "name":"Solven",
+            "description":"[[ ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).description} ]]",
+            "email":"[[ ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).email} ]]",
+            "telephone":"[[ ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).phone} ]]",
+            "sameAs":[
+                "https://www.facebook.com/SolvenLatam/",
+                "https://twitter.com/SolvenLatam/",
+                "https://www.instagram.com/SolvenLatam/",
+                "https://www.linkedin.com/company/solven/",
+                "https://www.youtube.com/channel/UCFcORm0YI8ewYGzo_yq5u9Q"
+            ],
+            "aggregateRating":{"@type":"AggregateRating",
+            "address":{
+                "@type":"PostalAddress",
+                "addressLocality":"[[ ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).addressLocality} ]]",
+                "postalCode":"[[ ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).postalCode} ]]",
+                "streetAddress":"[[ ${@countryContextService.getCountryParamsByRequest(#httpServletRequest).streetAddress} ]]"
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

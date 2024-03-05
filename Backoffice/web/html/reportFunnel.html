@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="templates/defaultTemplate">
+
+<head>
+    <meta charset="ISO-8859-1"/>
+    <title>Reporte de Funnel</title>
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/moment/min/moment.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/css/bootstrap-multiselect.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/js/bootstrap-multiselect.js'}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function exportToExcel(){
+            var filters = $('.form-control.input-sm.form-control-sm');
+            var jsonParams = {};
+            for (var i = 0; i < filters.length; i++) {
+                if (jsonParams[filters[i].name] == undefined) {
+                    jsonParams[filters[i].name] = [];
+                }
+                jsonParams[filters[i].name][jsonParams[filters[i].name].length] = $(filters[i]).val();
+            }
+            defaultAjax({
+                url: /*[[@{/reporting/funnelReport/export}]]*/null,
+                type: 'POST',
+                data: jsonParams,
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        }
+
+        function reloadResults(){
+            defaultAjax({
+                url: /*[[@{/reporting/funnelReport/list}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#resultTable').html(data);
+                }
+            });
+            setTimeout(reloadResults, 5000);
+        }
+        setTimeout(reloadResults, 5000);
+
+        $(function() {
+            $('#entityDiv').hide();
+            $('#originFilter').change(function(){
+                if($('#originFilter').val() == '1') {
+                    $('#entityDiv').show();
+                } else {
+                    $('#entityDiv').hide();
+                    $('#entityFilter').multiselect('deselectAll', false);
+                    $('#entityFilter').multiselect('updateButtonText');
+                }
+            });
+        });
+
+        $(function() {
+            $('#sourceFilter').change(function () {
+                $('#mediumFilter').val('');
+                $('#campaignFilter').val('');
+                defaultAjax({
+                    url: /*[[@{/reporting/funnelReport/getMediums}]]*/null,
+                    type: 'POST',
+                    data: {
+                        source: $('#sourceFilter').val(),
+                    },
+                    success: function (data) {
+                        var json = JSON.parse(data);
+                        $('#mediumFilter').html('');
+                        $('#campaignFilter').html('');
+                        var options = "<option value=''></option>";
+                        for (i = 0 ; i < json.length; i++) {
+                            options += "<option value='"+json[i]+"'>" + json[i] + "</option>";
+                        }
+                        $('#mediumFilter').html(options);
+                    }
+                });
+            });
+        });
+
+
+        $(function() {
+            $('#mediumFilter').change(function () {
+                $('#campaignFilter').val('');
+                defaultAjax({
+                    url: /*[[@{/reporting/funnelReport/getCampaings}]]*/null,
+                    type: 'POST',
+                    data: {
+                        source: $('#sourceFilter').val(),
+                        medium: $('#mediumFilter').val(),
+                    },
+                    success: function (data) {
+                        var json = JSON.parse(data);
+                        $('#campaignFilter').html('');
+                        var options = "<option value=''></option>";
+                        for (i = 0 ; i < json.length; i++) {
+                            options += "<option value='"+json[i]+"'>" + json[i] + "</option>";
+                        }
+                        $('#campaignFilter').html(options);
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="page-head"></div>
+    <div class="page-content">
+        <div class="container">
+            <ul class="page-breadcrumb breadcrumb">
+                <li>
+                    <a th:href="@{/}">Home</a>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Reportes</span>
+                    <i class="fa fa-circle"></i>
+                </li>
+                <li>
+                    <span>Originaciones por entidad</span>
+                </li>
+            </ul>
+            <div class="page-content-inner">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div th:class="${@frontEndService.getDefaultPortletClass()}">
+                            <div class="portlet-title tabbable-line">
+                                <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                    <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Reporte de Funnel</span>
+                                </div>
+                                <div class="actions">
+                                    <a th:class="${@frontEndService.defaultActionButtonClass}" href="javascript:exportToExcel()">
+                                        <i class="fa fa-table"></i> Exportar a Excel</a>
+                                    <div class="table-paginator-info" style="display: inline-block;vertical-align: top;margin-top: .5em;margin-right: 1em;"></div>
+                                </div>
+                            </div>
+                            <div id="filter">
+                                <form role="form" method="post">
+
+                                    <div class="form-row">
+                                        <!-- Fecha de Período 1 -->
+                                        <div id="periodDiv" class="form-row col-md-4">
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b>Fecha</b><br />Desde</label>
+                                                <input id="creationFrom" name="creationFrom" type="text" class="form-control input-sm form-control-sm" placeholder="Desde" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="control-label"><b></b><br/>Hasta</label>
+                                                <input id="creationTo" name="creationTo" type="text" class="form-control input-sm form-control-sm" placeholder="Hasta" />
+                                            </div>
+                                            <script th:inline="javascript">
+                                                /*<![CDATA[*/
+                                                var creationFrom = $('#creationFrom');
+                                                var creationTo = $('#creationTo');
+                                                datepicker(creationFrom);
+                                                datepicker(creationTo);
+                                                function datepicker( obj ){
+                                                    obj.datepicker({
+                                                        autoclose: true,
+                                                        format: "dd/mm/yyyy",
+                                                        focusOnShow: true,
+                                                        endDate: "today"
+                                                    });
+                                                }
+                                                creationFrom.on('change', function () {
+                                                    creationTo.datepicker('setStartDate', creationFrom.val());
+                                                });
+                                                /*]]>*/
+                                            </script>
+                                        </div>
+                                        <!-- Visualización de estados -->
+                                        <div id="statusDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Visualización de estados</label>
+                                            <select name="status[]" class="form-control input-sm form-control-sm">
+                                                <option value="1" th:text="${@reportsService.FUNNEL_REPORT_DATETYPE_1}"></option>
+                                                <option value="2" th:text="${@reportsService.FUNNEL_REPORT_DATETYPE_2}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <!-- Source -->
+                                        <div  id="sourceDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Source</label>
+                                            <select id="sourceFilter" name="source" class="form-control input-sm form-control-sm">
+                                                <option value="" hidden="hidden">Source</option>
+                                                <option th:each="source : ${sources}" th:value="${source}" th:text="${source}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!--  Medium  -->
+                                        <div id="mediumDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Medium</label>
+                                            <select id="mediumFilter" name="medium" class="form-control input-sm form-control-sm">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Campaign -->
+                                        <div id="campaignDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Campaign</label>
+                                            <select id="campaignFilter" name="campaign" class="form-control input-sm form-control-sm">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <!-- Marketplace/brandeados -->
+                                        <div id="originDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Marketplace/brandeados</label>
+                                            <select id="originFilter" name="origin[]" class="form-control input-sm form-control-sm">
+                                                <option value="0">Marketplace</option>
+                                                <option value="1">Brandeados</option>
+                                            </select>
+                                        </div>
+                                        <!-- Brandeados -->
+                                        <div id="entityDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Brandeados</label>
+                                            <select id="entityFilter" name="entities[]" class="form-control input-sm form-control-sm" multiple="multiple">
+                                                <option class="entityOption" th:each="branded : ${@catalogService.getBrandedEntities()}" th:value="${branded.entity.id}" th:text="${branded.entity.shortName}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <!-- Productos -->
+                                        <div id="productDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Productos</label>
+                                            <select id="productFilter" name="product[]" class="form-control input-sm form-control-sm" multiple="multiple">
+                                                <option value="0">Sin producto</option>
+                                                <option th:each="product : ${@catalogService.getActiveProducts()}" th:value="${product.id}" th:text="${product.name}"></option>
+                                            </select>
+                                            <script>
+                                                $('#productFilter').multiselect({
+                                                    buttonWidth: '200px',
+                                                    nonSelectedText: 'Ninguno',
+                                                    numberDisplayed: 1,
+                                                    nSelectedText: ' Seleccionados',
+                                                    includeSelectAllOption: true,
+                                                    selectAllText: ' Seleccionar todos',
+                                                    allSelectedText: 'Todos seleccionados',
+                                                });
+                                            </script>
+                                        </div>
+                                        <!-- Paises -->
+                                        <div id="productDiv" class="form-group col-md-2">
+                                            <label class="control-label"><b></b><br/>Paises</label>
+                                            <select id="countryFilter" name="country[]" class="form-control input-sm form-control-sm" multiple="multiple">
+                                                <option th:each="country : ${@catalogService.getCountryParams()}" th:value="${country.id}" th:text="${country.name}"></option>
+                                            </select>
+                                            <script>
+                                                $('#countryFilter').multiselect({
+                                                    buttonWidth: '200px',
+                                                    nonSelectedText: 'Ninguno',
+                                                    numberDisplayed: 1,
+                                                    nSelectedText: ' Seleccionados',
+                                                    includeSelectAllOption: true,
+                                                    selectAllText: ' Seleccionar todos',
+                                                    allSelectedText: 'Todos seleccionados'
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet transparent">
+                                                <div class="portlet-title">
+                                                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Historico de Reportes</span>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="table-responsive" id="resultTable">
+                                                        <th:block th:replace="this :: results"></th:block>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="results">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Fec. Registro</th>
+            <th>Fec. Procesamiento</th>
+            <th>Estatus</th>
+            <th>Fecha de corte</th>
+            <th>Visualización de estados</th>
+            <th>Brandeados</th>
+            <th>Source</th>
+            <th>Medium</th>
+            <th>Campaign</th>
+            <th>Productos</th>
+            <th>Url</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="report : ${historicReports}">
+            <tr>
+                <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                <th:block th:switch="${report.status}">
+                    <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                    <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                    <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                </th:block>
+                <td th:text="${report.params != null ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : '' }"></td>
+                <td th:text="${report.params != null and !report.params.isNull('dateType') ? @utilService.getDateTypeFunnel(report.params.get('dateType')) : '' }"></td>
+                <td th:text="${report.params != null and !report.params.isNull('entities') ? @utilService.getEntitiesFunnelByIds(report.params.get('entities')) : ''}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('source') ? report.params.get('source').toString() : ''}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('medium') ? report.params.get('medium').toString() : ''}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('campaign') ? report.params.get('campaign').toString() : ''}"></td>
+                <td th:text="${report.params != null and !report.params.isNull('products') ? @utilService.getProductsFunnelByIds(report.params.get('products')) : ''}"></td>
+                <td>
+                    <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</th:block>
+
+</body>
+
+</html>

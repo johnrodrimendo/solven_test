@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight q9">
+        <div id="load-first" class="forms animated fadeInRight">
+
+            <th:block th:switch="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">
+                <th:block th:case="true">
+                    <p id="text-q9" th:utext="${message}"></p>
+                </th:block>
+                <th:block th:case="false">
+                    <th:block th:if="${loanApplication?.entityUserId != null}">
+                        <p id="text-q9" th:utext="${message}"></p>
+                    </th:block>
+
+                    <th:block th:if="${loanApplication?.entityUserId == null}">
+                        <th:block th:unless="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and (loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA)}">
+                            <p th:if="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}" id="text-q9-calculating" th:utext="#{questions.block.calculatingIdentidad}"></p>
+                            <p th:unless="${loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}" id="text-q9-calculating" th:utext="#{questions.block.calculating}"></p>
+                        </th:block>
+                    </th:block>
+                </th:block>
+            </th:block>
+
+            <th:block th:switch="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF) or (@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and (loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA)) or (@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and (loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD))}">
+                <div th:case="true" class="process-loading-container circle-progress-question" style="height: auto !important; position: relative !important;">
+                    <div class="loading-content">
+                        <div class="sk-circle">
+                            <div class="sk-circle1 sk-child"></div>
+                            <div class="sk-circle2 sk-child"></div>
+                            <div class="sk-circle3 sk-child"></div>
+                            <div class="sk-circle4 sk-child"></div>
+                            <div class="sk-circle5 sk-child"></div>
+                            <div class="sk-circle6 sk-child"></div>
+                            <div class="sk-circle7 sk-child"></div>
+                            <div class="sk-circle8 sk-child"></div>
+                        </div>
+                        <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                </div>
+                <th:block th:case="false">
+                    <div class="calculation-response">
+                        <h4 class="block-hidden" id="finish-text">
+                            <i class="icon icon-check text-lightblue"></i>
+                            Análisis completo
+                        </h4>
+                        <div th:if="${isSelfEvaluation}" id="msg_loaded" class="msg-loaded">
+                            <span>
+                                Puede demorar hasta 45 segundos.
+                                <div class="sk-circle">
+                                    <div class="sk-circle1 sk-child"></div>
+                                    <div class="sk-circle2 sk-child"></div>
+                                    <div class="sk-circle3 sk-child"></div>
+                                    <div class="sk-circle4 sk-child"></div>
+                                    <div class="sk-circle5 sk-child"></div>
+                                    <div class="sk-circle6 sk-child"></div>
+                                    <div class="sk-circle7 sk-child"></div>
+                                    <div class="sk-circle8 sk-child"></div>
+                                </div>
+                                <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                            </span>
+                        </div>
+                        <ul class="list-progressbar">
+                            <li id="step-1 fade-in">
+                                <p th:text="#{question.9.step1}"></p>
+                                <div class="rating">
+                                    <div class="progressBar">
+                                        <div class="track">
+                                            <div class="bar" id="bar-1"></div>
+                                            <div class="bar" id="bar-2"></div>
+                                            <div class="bar" id="bar-3"></div>
+                                            <div class="bar" id="bar-4"></div>
+                                            <div class="bar" id="bar-5"></div>
+                                            <div class="bar" id="bar-6"></div>
+                                            <div class="bar" id="bar-7"></div>
+                                            <div class="bar" id="bar-8"></div>
+                                            <div class="bar" id="bar-9"></div>
+                                            <div class="bar" id="bar-10"></div>
+                                            <div class="bar" id="bar-11"></div>
+                                            <div class="bar" id="bar-12"></div>
+                                            <div class="bar" id="bar-13"></div>
+                                            <div class="bar" id="bar-14"></div>
+                                            <div class="bar" id="bar-15"></div>
+                                            <div class="bar" id="bar-16"></div>
+                                            <div class="bar" id="bar-17"></div>
+                                            <div class="bar" id="bar-18"></div>
+                                            <div class="bar" id="bar-19"></div>
+                                            <div class="bar" id="bar-20"></div>
+                                            <div class="bar" id="bar-21"></div>
+                                            <div class="bar" id="bar-22"></div>
+                                            <div class="bar" id="bar-23"></div>
+                                            <div class="bar" id="bar-24"></div>
+                                            <div class="bar" id="bar-25"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li id="step-2" class="block-hidden">
+                                <p th:text="#{question.9.step2}"></p>
+                                <div class="rating">
+                                    <div class="progressBar">
+                                        <div class="track">
+                                            <div class="bar" id="bar-1"></div>
+                                            <div class="bar" id="bar-2"></div>
+                                            <div class="bar" id="bar-3"></div>
+                                            <div class="bar" id="bar-4"></div>
+                                            <div class="bar" id="bar-5"></div>
+                                            <div class="bar" id="bar-6"></div>
+                                            <div class="bar" id="bar-7"></div>
+                                            <div class="bar" id="bar-8"></div>
+                                            <div class="bar" id="bar-9"></div>
+                                            <div class="bar" id="bar-10"></div>
+                                            <div class="bar" id="bar-11"></div>
+                                            <div class="bar" id="bar-12"></div>
+                                            <div class="bar" id="bar-13"></div>
+                                            <div class="bar" id="bar-14"></div>
+                                            <div class="bar" id="bar-15"></div>
+                                            <div class="bar" id="bar-16"></div>
+                                            <div class="bar" id="bar-17"></div>
+                                            <div class="bar" id="bar-18"></div>
+                                            <div class="bar" id="bar-19"></div>
+                                            <div class="bar" id="bar-20"></div>
+                                            <div class="bar" id="bar-21"></div>
+                                            <div class="bar" id="bar-22"></div>
+                                            <div class="bar" id="bar-23"></div>
+                                            <div class="bar" id="bar-24"></div>
+                                            <div class="bar" id="bar-25"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li id="step-3" class="block-hidden">
+                                <p th:text="#{question.9.step3}"></p>
+                                <div class="rating">
+                                    <div class="progressBar">
+                                        <div class="track">
+                                            <div class="bar" id="bar-1"></div>
+                                            <div class="bar" id="bar-2"></div>
+                                            <div class="bar" id="bar-3"></div>
+                                            <div class="bar" id="bar-4"></div>
+                                            <div class="bar" id="bar-5"></div>
+                                            <div class="bar" id="bar-6"></div>
+                                            <div class="bar" id="bar-7"></div>
+                                            <div class="bar" id="bar-8"></div>
+                                            <div class="bar" id="bar-9"></div>
+                                            <div class="bar" id="bar-10"></div>
+                                            <div class="bar" id="bar-11"></div>
+                                            <div class="bar" id="bar-12"></div>
+                                            <div class="bar" id="bar-13"></div>
+                                            <div class="bar" id="bar-14"></div>
+                                            <div class="bar" id="bar-15"></div>
+                                            <div class="bar" id="bar-16"></div>
+                                            <div class="bar" id="bar-17"></div>
+                                            <div class="bar" id="bar-18"></div>
+                                            <div class="bar" id="bar-19"></div>
+                                            <div class="bar" id="bar-20"></div>
+                                            <div class="bar" id="bar-21"></div>
+                                            <div class="bar" id="bar-22"></div>
+                                            <div class="bar" id="bar-23"></div>
+                                            <div class="bar" id="bar-24"></div>
+                                            <div class="bar" id="bar-25"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li id="step-4" class="block-hidden">
+                                <p th:text="#{question.9.step4}"></p>
+                                <div class="rating">
+                                    <div class="progressBar">
+                                        <div class="track">
+                                            <div class="bar" id="bar-1"></div>
+                                            <div class="bar" id="bar-2"></div>
+                                            <div class="bar" id="bar-3"></div>
+                                            <div class="bar" id="bar-4"></div>
+                                            <div class="bar" id="bar-5"></div>
+                                            <div class="bar" id="bar-6"></div>
+                                            <div class="bar" id="bar-7"></div>
+                                            <div class="bar" id="bar-8"></div>
+                                            <div class="bar" id="bar-9"></div>
+                                            <div class="bar" id="bar-10"></div>
+                                            <div class="bar" id="bar-11"></div>
+                                            <div class="bar" id="bar-12"></div>
+                                            <div class="bar" id="bar-13"></div>
+                                            <div class="bar" id="bar-14"></div>
+                                            <div class="bar" id="bar-15"></div>
+                                            <div class="bar" id="bar-16"></div>
+                                            <div class="bar" id="bar-17"></div>
+                                            <div class="bar" id="bar-18"></div>
+                                            <div class="bar" id="bar-19"></div>
+                                            <div class="bar" id="bar-20"></div>
+                                            <div class="bar" id="bar-21"></div>
+                                            <div class="bar" id="bar-22"></div>
+                                            <div class="bar" id="bar-23"></div>
+                                            <div class="bar" id="bar-24"></div>
+                                            <div class="bar" id="bar-25"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                </th:block>
+            </th:block>
+
+        </div>
+        <section id="carousel_entities" class="sec-workus toload block-hidden">
+
+            <p class="carrusel-text">Est&aacute;s siendo evaluado por todos los bancos afiliados a Solven... </p>
+
+            <div class="gwr">
+                <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                    <section class="sec-workus toload">
+                        <div class="gwr">
+                            <section class="regular slider worker-us-ar worker-us">
+                                <div><img class="lazy bg-opacity"
+                                          data-src="https://solven-public.s3.amazonaws.com/img/transatlantica/transatlantica_solven_gray.png"
+                                          alt="" /></div>
+                                <div class="banco-del-sol-gray"><img class="lazy bg-opacity"
+                                                                     data-src="https://solven-public.s3.amazonaws.com/img/bancodelsol/banco-sol-gray-3.png"
+                                                                     alt="" style="transform:scale(1.1)" />
+                                </div>
+                                <div><img class="lazy bg-opacity"
+                                          data-src="https://solven-public.s3.amazonaws.com/img/efectivosi/efectivo-si-gray.png"
+                                          alt="" style="transform:scale(1.3)" />
+                                </div>
+                                <div><img class="lazy bg-opacity"
+                                          data-src="https://solven-public.s3.amazonaws.com/img/vivusar/vivus-ar-gray.png"
+                                          alt=""
+                                          style="transform:scale(1.2)" />
+                                </div>
+                                <div><img class="lazy bg-opacity"
+                                          data-src="https://solven-public.s3.amazonaws.com/img/transatlantica/transatlantica_solven_gray.png"
+                                          alt="" /></div>
+                                <div class="banco-del-sol-gray"><img class="lazy bg-opacity"
+                                                                     data-src="https://solven-public.s3.amazonaws.com/img/bancodelsol/banco-sol-gray-3.png"
+                                                                     alt="" style="transform:scale(1.1)" />
+                                </div>
+                                <div><img class="lazy bg-opacity"
+                                          data-src="https://solven-public.s3.amazonaws.com/img/efectivosi/efectivo-si-gray.png"
+                                          alt="" style="transform:scale(1.3)" />
+                                </div>
+                                <div><img class="lazy bg-opacity"
+                                          data-src="https://solven-public.s3.amazonaws.com/img/vivusar/vivus-ar-gray.png"
+                                          alt="" style="transform:scale(1.2)" />
+                                </div>
+                                <!--
+                                    <div>
+                                        <img class="lazy bg-opacity"
+                                            data-src="https://s3.amazonaws.com/solven-public/img/bancos/transatlantica_solven.png" alt="" />
+                                    </div>
+                                    <div>
+                                        <img class="lazy bg-opacity"
+                                            data-src="https://solven-public.s3.amazonaws.com/img/bancodelsol/bancodelsol-white2.png" alt=""
+                                            style="transform:scale(1.2)" />
+                                    </div>
+                                    <div>
+                                        <img class="lazy bg-opacity"
+                                            data-src="https://solven-public.s3.amazonaws.com/img/efectivosi/efectivosi.png" alt=""
+                                            style="transform:scale(1.3)" />
+                                    </div>
+                                    <div>
+                                        <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/vivusar/vivus-ar.png"
+                                            alt="" style="transform:scale(1.3)" />
+                                    </div>
+                                -->
+                            </section>
+                        </div>
+                    </section>
+                </th:block>
+                <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+                    <section class="regular slider worker-us worker-us-pe">
+                        <div class="abaco_logo">
+                            <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/abaco/abaco_solven_gray.png" alt="Abaco" />
+                        </div>
+                        <div class="acceso_logo">
+                            <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/acceso/branding/acceso_solven_gray.png" alt="Acceso" />
+                        </div>
+                        <div class="compartamos_logo">
+                            <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/compartamos/compartamos_financiera_solven_gray.png" alt="Compartamos Financiera" />
+                        </div>
+                        <div class="banbif_logo">
+                            <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/banbif/banbif_solven_gray.png" alt="Banbif" />
+                        </div>
+                        <div class="qapac_logo">
+                            <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/qapaq/qapaq_solven_gray.png" alt="Qapac" />
+                        </div>
+                        <div class="financiera-efectiva_logo">
+                            <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/efectiva/financiera_efectiva_solven_gray.png" alt="Financiera Efectiva" />
+                        </div>
+                        <!--
+                            <div class="abaco_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/abaco_solven.png" alt="Abaco"/>
+                            </div>
+                            <div class="acceso_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/acceso_solven.png" alt="Acceso"/>
+                            </div>
+                            <div class="compartamos_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/compartamos_financiera_solven.png" alt="Compartamos Financiera"/>
+                            </div>
+                            <div class="banfif_logo">
+                                <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/bancos/banbif_solven.png" alt="Banbif"/>
+                            </div>
+                            <div class="qapac_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/qapac_solven.png" alt="Qapac"/>
+                            </div>
+                            <div class="banco-ripley_logo">
+                                <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/bancos/banco_ripley_solven.png" alt="Banco Ripley"/>
+                            </div>
+                            <div class="caja-sullana_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/caja_sullana_solven.png" alt="Caja Sullana + Solven"/>
+                            </div>
+                            <div class="financiera-efectiva_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/financiera_efectiva_solven.png" alt="Financiera Efectiva"/>
+                            </div>
+                            <div class="efl_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/efl_solven.png" alt="EFL"/>
+                            </div>
+                            <div class="transatlantica_logo">
+                                <img class="lazy bg-opacity" data-src="https://s3.amazonaws.com/solven-public/img/bancos/transatlantica_solven.png" alt="Transatlantica"/>
+                            </div>
+                            <div class="credigob_logo">
+                                <img class="lazy bg-opacity" data-src="https://solven-public.s3.amazonaws.com/img/bancos/credigob_solven.png" alt="Credigob"/>
+                            </div>
+                        -->
+                    </section>
+                </th:block>
+            </div>
+        </section>
+        <div id="load-more" class="wrap-note block-hidden animated fadeInRight " style="display:none">
+            <div class="wsi">
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                     x="0px" y="0px" width="60px" height="60px" viewBox="0 0 25.951 25.951" style="enable-background:new 0 0 25.951 25.951;" xml:space="preserve" fill="#7a7f8c">
+                    <g>
+                        <path style="fill:#7a7f8c;" d="M3,0.225h18c1.656,0,3,1.344,3,3v10c0,0.313-0.062,0.609-0.15,0.893l-2.056-1.832
+                            c-0.451-0.457-1.358-0.662-2.078-0.369l-3.692-3.779L23,2.7L12,8.632L1,2.7l6.977,5.438l-5.77,5.906l7.037-5.025L12,10.813
+                            l2.758-1.795l4.467,3.191c-0.451,0.366-0.725,0.922-0.725,1.531v1.043c-1.135,0.168-2.473,0.565-3.703,1.441H3
+                            c-1.656,0-3-1.344-3-3V3.225C0,1.569,1.344,0.225,3,0.225z"/>
+                        <g>
+                            <path style="fill:#7a7f8c;" d="M20,13.741v2.434c-3.227,0-7.5,1.564-7.5,9.551c1.412-5.096,3.314-5.488,7.5-5.488v2.473
+                                c0,0.191,0.105,0.363,0.281,0.437c0.059,0.024,0.121,0.036,0.182,0.036c0.123,0,0.244-0.048,0.334-0.139l5.016-4.504
+                                c0.184-0.184,0.184-0.484,0-0.668l-5.016-4.465c-0.135-0.135-0.34-0.176-0.516-0.103S20,13.549,20,13.741z"/>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <p th:utext="#{questions.block.foundYourOffer}" style="display:none"></p>
+            <th:block th:if="${@brandingService.getEntityBranding(#httpServletRequest) != null}">
+                <p th:utext="#{questions.block.waitingBrandingMessage}"></p>
+            </th:block>
+            <th:block th:unless="${@brandingService.getEntityBranding(#httpServletRequest) != null}">
+                <p th:utext="#{questions.block.waitingMessage}"></p>
+            </th:block>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        setTimeout(function () {
+            $('#step-1').removeClass('fade-in');
+            setTimeout(function () {
+                $('#step-2').removeClass('block-hidden');
+                setTimeout(function () {
+                    $('#step-2').removeClass('fade-in');
+                    $('#step-3').removeClass('block-hidden');
+
+                    setTimeout(function () {
+                        $('#step-3').removeClass('fade-in');
+                        $('#step-4').removeClass('block-hidden');
+
+                        setTimeout(function () {
+                            $('#step-4').removeClass('fade-in');
+
+                            setTimeout(function () {
+                                // sendPost();
+                                var showCarousel = /*[[${showCarousel}]]*/;
+                                if(showCarousel){
+                                    $('#load-first').addClass('block-hidden');
+                                    $("#carousel_entities").removeClass('block-hidden');
+                                    $('#carousel_entities').addClass('fadeIn');
+                                    $(window).trigger('resize');
+                                }
+                            }, 2000);
+                        }, 1200)
+                    }, 3450);
+                }, 3450);
+            }, 3450);
+        }, 3450);
+
+        function sendPost() {
+            questionFw.ajaxToCurrentQuestionController({
+                showLoadingBar: false,
+                type: "POST",
+                success: function (data) {
+                    // if (data == 'delayed') {
+                    //     $("#load-first").addClass('block-hidden');
+                    //     $("#load-more").removeClass('block-hidden');
+                    //     $("#load-more").removeAttr('style');
+                    // }
+
+                    if (data == null || data == '' || data == 'delayed') {
+                        // var showCarousel = /*[[${showCarousel}]]*/;
+                        // if(showCarousel){
+                        //     $('#load-first').addClass('block-hidden');
+                        //     $("#carousel_entities").removeClass('block-hidden');
+                        //     $('#carousel_entities').addClass('fadeIn');
+                        //     $(window).trigger('resize');
+                        // }
+
+                        setTimeout(function () {
+                            sendPost();
+                        }, data != null && data == 'delayed' ? 60000 : 1000);
+                    } else {
+                        $('#finish-text').removeClass('block-hidden').addClass('fadeIn');
+                    }
+                }
+            }, "");
+        }
+
+        sendPost();
+
+        if ($('body').hasClass('w-autoevaluacion')) {
+            $('#texto_legal').css('margin-bottom', '0px');
+        }
+
+        var $animation_elements = $('.toload');
+        check_if_in_view();
+        lazy();
+
+        function lazy() {
+            setTimeout(function () {
+                $('.lazy').unveil(0, function () {
+                    $(this).addClass('loaded');
+                });
+            }, 5000);
+        }
+
+        function check_if_in_view() {
+            var window_height = $(window).height(),
+                window_top_position = $(window).scrollTop(),
+                window_bottom_position = (window_top_position + window_height) - 50;
+
+            $.each($animation_elements, function () {
+                var element = $(this),
+                    element_height = element.outerHeight(),
+                    element_top_position = element.offset().top,
+                    element_bottom_position = (element_top_position + element_height);
+                if ((element_bottom_position >= window_top_position) && (element_top_position < window_bottom_position)) {
+                    element.addClass('loaded').removeClass('toload').find('.lazy').lazy();
+                } else {
+                    //element.removeClass('loaded');
+                }
+            });
+        }
+
+        $('.worker-us-pe').slick({
+            dots: false,
+            autoplay: true,
+            autoplaySpeed: 1000,
+            slidesToScroll: 1,
+            slidesToShow: 5,
+            responsive: [{
+                breakpoint: 885,
+                settings: {
+                    autoplay: true,
+                    slidesToScroll: 1,
+                    slidesToShow: 4,
+                }
+            },
+                {
+                    breakpoint: 720,
+                    settings: {
+                        autoplay: true,
+                        slidesToScroll: 1,
+                        slidesToShow: 3,
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        autoplay: true,
+                        slidesToScroll: 1,
+                        slidesToShow: 2,
+                    }
+                }
+
+                // You can unslick at a given breakpoint now by adding:
+                // settings: "unslick"
+                // instead of a settings object
+            ]
+
+        });
+
+        $('.worker-us-ar').slick({
+            dots: false,
+            autoplay: true,
+            autoplaySpeed: 1000,
+            slidesToScroll: 1,
+            slidesToShow: 4,
+            infinite: true,
+            responsive: [{
+                breakpoint: 720,
+                settings: {
+                    autoplay: true,
+                    slidesToScroll: 1,
+                    slidesToShow: 3,
+                }
+            },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        autoplay: true,
+                        slidesToScroll: 1,
+                        slidesToShow: 2,
+                    }
+                }
+
+                // You can unslick at a given breakpoint now by adding:
+                // settings: "unslick"
+                // instead of a settings object
+            ]
+
+        });
+        /*]]>*/
+    </script>
+
+    <script th:if="${isSelfEvaluation}" th:inline="javascript">
+        /*<![CDATA[*/
+        setTimeout(function () {
+            $('#msg_loaded').addClass('active');
+        }, 16000);
+        /*]]>*/
+
+    </script>
+</th:block>
+</html>

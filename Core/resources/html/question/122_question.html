@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            <p><th:block th:text="${personFirstName}"/>, revisamos tus antecedentes y en este momento solo calificas para un crédito de consumo garantizado.</p>
+            <p>Si tienes un auto a tu nombre y tiene las siguientes <a href="#">características</a>, podrás acceder a un crédito de hasta <th:block th:text="${@utilService.integerMoneyFormat(maxMinParameter?.maxAmount, loanApplication?.currency)}"/>, a tan solo <th:block th:text="${@utilService.percentFormat(maxMinParameter?.maxTea)}"/> y hasta 60 meses de plazo.</p>
+            <!--<button type="button" class="btn default btn-xs interested">No me interesa</button>-->
+            <!--<button type="button" class="btn default btn-xs interested">Me interesa</button>-->
+        </div>
+    </form>
+    <!--<script th:inline="javascript">-->
+        <!--/*<![CDATA[*/-->
+        <!--(function() {-->
+            <!--var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);-->
+            <!--questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);-->
+            <!--questionFlow.getFormValuesJson = function(){-->
+                <!--return questionFlow.getFormElement().serializeObject();-->
+            <!--};-->
+
+            <!--questionFlow.find('.interested').on('click', function () {-->
+                <!--questionFlow.loadNextQuestions();-->
+            <!--});-->
+
+        <!--})();-->
+        <!--/*]]>*/-->
+    <!--</script>-->
+</th:block>
+</html>

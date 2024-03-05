@@ -1,0 +1,9 @@
+FROM public.ecr.aws/x1q7o9g5/openjdk:8
+FROM public.ecr.aws/x1q7o9g5/tomcat:8.5
+
+COPY . /app
+USER root
+RUN chmod 755 /app/Scripts
+RUN chmod 755 /app/EntityExt/target
+WORKDIR /app
+CMD java -Dhttp.agent=default_java_agent $JAVA_OPTS -jar EntityExt/target/dependency/webapp-runner.jar --port $PORT --path /funcionarios --enable-compression --compressable-mime-types text/html,text/xml,text/plain,text/css,text/javascript,text/json,image/png,image/jpeg,font/woff,font/woff2,application/x-javascript,application/javascript,application/json $TOMCAT_AUTH EntityExt/target/*.war

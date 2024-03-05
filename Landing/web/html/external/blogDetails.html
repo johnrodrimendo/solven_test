@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/mainTemplate">
+<head>
+    <title th:utext="${post.title.rendered}"></title>
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+</head>
+<body>
+<!-- Header -->
+<th:block layout:fragment="header">
+    <th:block th:replace="fragments/headers :: landingHome"></th:block>
+</th:block>
+<!-- Header ends -->
+<th:block layout:fragment="content">
+    <section class="landing-wfs blog" th:style="'background: url(' + ${post.featuredImageUrl} + ') center;background-size: cover;'">
+        <div class="hero-content">
+            <div class="container">
+                <div class="wrap">
+                    <div class="hero-text">
+                        <h2 class="landing-title" th:utext="${post.title.rendered}"></h2>
+                    </div>
+                    <div class="divisor-bar"></div>
+                    <div class="tags">
+                        <ul>
+                            <li th:each="cat : ${post.categories}">
+                                <span class="tag bg-gray-soft" th:text="${cat}">Lorem ipsum</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="author-block">
+            <div class="container">
+                <div class="avatar-wrap">
+                    <div class="avatar-medium" th:style="'background: url(' + ${post.author[1]} + ');background-size: 100%;'"></div>
+                    <h3 class="text-white" th:text="${post.author[0]}"></h3>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="blog-details">
+        <div class="wrap">
+            <div class="content-post" th:utext="${post.content.rendered}"></div>
+        </div>
+    </section>
+</th:block>
+
+<th:block layout:fragment="footer">
+    <th:block th:replace="fragments/footers :: footerLandings(itemSelected='blog')"></th:block>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<th:block th:fragment="contract" class="accordion-container" data-accordion-group="true">
+    <!-- Contract -->
+    <div th:utext="${@creditService.renderContract(person.id, offer.entityId, T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE, #locale, false, person.getFirstName() + ' ' + person.getFirstSurname() + ' ' + person.getLastSurname())}"></div>
+    <!-- /Contract -->
+    <br/><br/>
+    <div class="pdfWrapper">
+        <div th:replace="fragments/modalScheduleFragment :: summarySheet"></div>
+    </div>
+    <div class="pdfWrapper">
+        <div th:replace="fragments/modalScheduleFragment :: offerSchedule"></div>
+    </div>
+</th:block>
+
+</body>
+</html>

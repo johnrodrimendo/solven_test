@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="headerRejected">
+    <th>#</th>
+    <th class="text-left">Fecha<br/>Registro</th>
+    <th class="text-left">Código</th>
+    <th class="text-left">Producto</th>
+    <th class="text-left">Documento/<br/>Número</th>
+    <th class="text-left">Nombre Completo</th>
+    <th class="text-left">Email</th>
+    <th class="text-left">Teléfono</th>
+    <th class="text-left">Motivo de rechazo</th>
+    <th class="text-left">Descargar</th>
+    <th th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.rejectedPageConfiguration?.detailConfiguration != null}">Detalle</th>
+</th:block>
+
+<th:block th:fragment="bodyRejected">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:id="'loan_'+${credit.loanApplicationId}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td class="text-left" th:text="${iterCredit.count}"></td>
+            <td class="text-left">
+                <th:block th:text="${@utilService.dateFormat(credit?.generationDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></th:block>
+                <br/>
+                <th:block th:text="${@utilService.hourFormat(data?.registerDate)}" th:attr="data-order=${@utilService.hourFormat(data?.registerDate)}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.code}"></td>
+            <td class="text-left" >
+                <th:block th:if="${credit?.product}" th:text="${credit?.product?.name}"></th:block>
+                <th:block th:unless="${credit?.product}" th:text="${credit?.productCategory?.category}"></th:block>
+
+            </td>
+            <td class="text-left">
+                <th:block th:text="${credit?.personDocumentType?.name}"></th:block>
+                <br/>
+                <th:block th:text="${credit?.personDocumentNumber}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.fullName}"></td>
+            <td class="text-left" th:text="${credit?.email}"></td>
+            <td class="text-left" th:text="${credit?.phone}"></td>
+            <td>
+                <th:block th:if="${credit?.creditId == null}">
+                    <th:block th:if="${credit?.applicationRejectionReason == null}">
+                        <th:block th:if="${credit?.getHardFilterOrPolicyMessageToShow() != null}" >
+                            <th:block th:text="${credit?.getHardFilterOrPolicyMessageToShow()}"></th:block>
+                        </th:block>
+                        <th:block th:unless="${credit?.getHardFilterOrPolicyMessageToShow() != null}" >
+                            <th:block th:text="${credit?.applicationRejectionReason?.reason}"></th:block>
+                        </th:block>
+                    </th:block>
+                    <th:block th:unless="${credit?.applicationRejectionReason == null}">
+                        <th:block th:text="${credit?.applicationRejectionReason?.reason}"></th:block>
+                    </th:block>
+                </th:block>
+                <th:block th:unless="${credit?.creditId == null}">
+                    <th:block th:text="${credit?.rejectionReason?.reason}"></th:block>
+                </th:block>
+            </td>
+            <td>
+                <a target="_blank" th:if="${credit?.hasFiles and credit?.id != null}"
+                   th:href="${@entityExtranetService.generateUserFilesLink(credit?.id)}" class="link_files">
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/>
+                </a>
+            </td>
+            <td th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.rejectedPageConfiguration?.detailConfiguration != null}">
+                <button th:onclick="'getLoanDetail('+${credit?.loanApplicationId}+')'" class="btn btn-circle collapse-table">+</button>
+            </td>
+        </tr>
+        <script>
+            replaceImgSvgToSvgElement();
+        </script>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="headerGenerated">
+    <th>#</th>
+    <th class="text-left">Fecha <br/>originado</th>
+    <th class="text-left">Producto</th>
+    <th class="text-left">Código</th>
+    <th class="text-left">Documento/ <br/> Número</th>
+    <th class="text-left">Nombre completo</th>
+    <th class="text-left" style="width: ;">Email</th>
+    <th class="text-left">Teléfono</th>
+    <th class="text-left" style="width: 90px;">Monto</th>
+    <th class="text-left">Cuotas</th>
+    <th class="text-left" style="width: 65px;">Tasa</th>
+    <th class="text-left">Desembolso</th>
+    <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+        <th class="text-left">Agencia</th>
+    </th:block>
+    <th class="text-left">Expediente</th>
+    <th class="text-left">Acción</th>
+    <th class="text-left" th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disburseCreditPageConfiguration?.detailConfiguration != null}">Detalle</th>
+</th:block>
+
+<th:block th:fragment="headerTerminated">
+    <th>#</th>
+    <th class="text-left">Fecha <br/>originado</th>
+    <th class="text-left">Producto</th>
+    <th class="text-left">Código</th>
+    <th class="text-left">Documento/ <br/> Número</th>
+    <th class="text-left">Nombre completo</th>
+    <th class="text-left" style="width: ;">Email</th>
+    <th class="text-left">Teléfono</th>
+    <th class="text-left" style="width: 90px;">Monto</th>
+    <th class="text-left">Cuotas</th>
+    <th class="text-left" style="width: 65px;">Tasa</th>
+    <th class="text-left">Desembolso</th>
+    <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+        <th class="text-left">Agencia</th>
+    </th:block>
+    <th class="text-left">Expediente</th>
+    <th class="text-left" th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disbursedCreditPageConfiguration?.detailConfiguration != null}">Detalle</th>
+</th:block>
+
+<th:block th:fragment="headerCallCenter">
+    <th>#</th>
+    <th>Registro</th>
+    <th>Tipo</th>
+    <th>Número</th>
+    <th>Nombres</th>
+    <th>Apellido<br/>Paterno</th>
+    <th>Apellido<br/>Materno</th>
+    <th>Email</th>
+    <th>Teléfono</th>
+    <th>Monto</th>
+    <th>Cuotas</th>
+    <th>Tasa</th>
+</th:block>
+
+<th:block th:fragment="headerGeneratedTc">
+    <tr>
+        <th>#</th>
+        <th>Fecha<br/>Generación</th>
+        <th>Tarjeta de Crédito</th>
+        <th>Producto</th>
+        <th>Tipo Doc.</th>
+        <th>Número Doc.</th>
+        <th>Nombres</th>
+        <th>Apellido<br/>Paterno</th>
+        <th>Apellido<br/>Materno</th>
+        <th>Linea</th>
+        <th>Tipo de tarjeta</th>
+        <th>Bono de bienvenida</th>
+    </tr>
+</th:block>
+
+<th:block th:fragment="headerTerminatedTc">
+    <tr>
+        <th>#</th>
+        <th>Fecha<br/>Generación</th>
+        <th>Tarjeta de Crédito</th>
+        <th>Producto</th>
+        <th>Tipo Doc.</th>
+        <th>Número Doc.</th>
+        <th>Nombres</th>
+        <th>Apellido<br/>Paterno</th>
+        <th>Apellido<br/>Materno</th>
+        <th>Linea</th>
+        <th>Tipo de tarjeta</th>
+        <th>Bono de bienvenida</th>
+    </tr>
+</th:block>
+
+<th:block th:fragment="headerPending">
+    <tr>
+        <th>#</th>
+        <th>Fecha<br/>Generación</th>
+        <th>Crédito</th>
+        <th>Producto</th>
+        <th>Tipo Doc.</th>
+        <th>Número Doc.</th>
+        <th>Nombres</th>
+        <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+            <th>Apellidos</th>
+        </th:block>
+        <th:block th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+            <th>Apellido<br/>Paterno</th>
+            <th>Apellido<br/>Materno</th>
+        </th:block>
+        <th>Monto</th>
+        <th>Cuotas</th>
+        <th>Tasa</th>
+        <th>Expediente</th>
+
+        <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).ABACO)}">
+            <th>Empleador</th>
+        </th:block>
+
+        <th:block th:if="${page != 'terminated'} and ${page != 'callcenter'}">
+            <th:block th:switch="${page}">
+                <th shiro:hasPermission="credit:pending:validate" th:case="pending">Acciones</th>
+            </th:block>
+            <th:block th:switch="${page}">
+                <th shiro:hasPermission="credit:toUpload:upload" th:case="toUpload">Acciones</th>
+            </th:block>
+        </th:block>
+        <th></th><!--BOTON EXPIRAR-->
+    </tr>
+</th:block>
+
+<th:block th:fragment="headerToUpload">
+    <tr>
+        <th>#</th>
+        <th>Fecha<br/>Generación</th>
+        <th>Crédito</th>
+        <th>Producto</th>
+        <th>Tipo Doc.</th>
+        <th>Número Doc.</th>
+        <th>Nombres</th>
+        <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+            <th>Apellidos</th>
+        </th:block>
+        <th:block th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+            <th>Apellido<br/>Paterno</th>
+            <th>Apellido<br/>Materno</th>
+        </th:block>
+        <th>Monto</th>
+        <th>Cuotas</th>
+        <th>Tasa</th>
+        <th>Expediente</th>
+
+        <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).ABACO)}">
+            <th>Empleador</th>
+        </th:block>
+
+        <th:block th:if="${page != 'terminated'} and ${page != 'callcenter'}">
+            <th:block th:switch="${page}">
+                <th shiro:hasPermission="credit:pending:validate" th:case="pending">Acciones</th>
+            </th:block>
+            <th:block th:switch="${page}">
+                <th shiro:hasPermission="credit:toUpload:upload" th:case="toUpload">Acciones</th>
+            </th:block>
+            <th:block th:switch="${page}">
+                <th shiro:hasPermission="credit:generated:disbursement" th:case="generated">Acciones</th>
+                <th shiro:hasPermission="credit:generated:disbursement" th:case="callcenter">Acciones</th>
+            </th:block>
+        </th:block>
+        <th></th><!--BOTON EXPIRAR-->
+    </tr>
+</th:block>
+
+<th:block th:fragment="bodyGenerated">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="20">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:id="'loan_'+${credit.loanApplicationId}"
+            th:styleappend="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td class="text-left" th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td class="text-left">
+                <th:block th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></th:block>
+                <br/>
+                <th:block th:text="${@utilService.hourFormat(data?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.hourFormat(data?.inactiveWOScheduleDate)}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.product?.name}"></td>
+            <td class="text-left" >
+                <th:block th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disburseCreditPageConfiguration?.detailConfiguration != null}"><span th:text="${credit?.code}"></span></th:block>
+                <th:block th:unless="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disburseCreditPageConfiguration?.detailConfiguration != null}"><a th:href="@{/credit/__${credit?.id}__}" th:text="${credit?.code}" target="_blank"></a></th:block>
+            </td>
+            <td class="text-left">
+                <th:block th:text="${credit?.personDocumentType?.name}"></th:block>
+                <br/>
+                <th:block th:text="${credit?.personDocumentNumber}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.fullName}"></td>
+            <td class="text-left" th:text="${credit?.email}"></td>
+            <td class="text-left" th:text="${credit?.phoneNumber}"></td>
+            <td class="text-left" th:text="${@utilService.doubleMoneyFormat(credit?.loanCapital, credit?.currency)}"></td>
+            <td class="text-left" th:text="${credit?.installments}"></td>
+            <td class="text-left" th:if="${credit?.country?.id}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate, credit?.currency)}"></td>
+            <td class="text-left" th:unless="${credit?.country?.id}"></td>
+            <td class="text-left">
+                <span th:if="${credit?.showDisbursementTypeColumn()}" th:text="${credit?.entityProductParams?.disbursementTypeObject?.disbursementType}"></span>
+            </td>
+            <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <td class="text-left" th:text="${credit?.getAgencyNameWithoutText()}"></td>
+            </th:block>
+            <td>
+                <a target="_blank" th:if="${showButton == true} and ${credit.hasFiles == true}"
+                   th:href="${@entityExtranetService.generateUserFilesLink(credit?.id)}" class="link_files">
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/>
+                </a>
+            </td>
+            <td class="extranet-table-actions" th:if="${credit.showAeluInternalDisbursementButton or credit.showAeluUploadFinalDocumentationButton or credit.showAccesoUploadFinalDocumentationButton or credit.showGeneratedDisbursementButton or credit.showGeneratedRejectButton or credit.showUploadRipleyFinalSchedule or credit.showRemoveRipleyFinalSchedule}">
+                <button data-toggle="tooltip" title="Rechazar" th:if="${credit.showGeneratedRejectButton and showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn red btn-sm openRejectCreditModal" th:onclick="'showRegisterDisbursementCreditRejectionModal('+${credit?.id}+')'">
+                    <i class="fa fa-ban"></i>
+                </button>
+                <th:block th:if="${credit?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_CUENTA_AHORRO}">
+                    <button data-toggle="tooltip" title="Confirmar" th:if="${credit.showGeneratedDisbursementButton and showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn blue btn-sm disbursmentCredit" th:onclick="'approveBankAccountSaving('+${credit?.id}+')'">
+                        <i class="fa fa-check"></i>
+                    </button>
+                </th:block>
+                <th:block th:unless="${credit?.entityProductParameterId == T(com.affirm.common.model.catalog.EntityProductParams).ENT_PROD_PARAM_AZTECA_CUENTA_AHORRO}">
+                    <button data-toggle="tooltip" title="Confirmar" th:if="${credit.showGeneratedDisbursementButton and showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn blue btn-sm disbursmentCredit" th:onclick="'showRegisterGeneratedCreditDisbursementModal('+${credit?.id}+','+${credit?.amount}+','+${credit?.installments}+','+${credit?.effectiveAnnualRate}+')'">
+                        <i class="fa fa-check"></i>
+                    </button>
+                </th:block>
+            </td>
+            <td class="text-left" th:unless="${credit.showAeluInternalDisbursementButton or credit.showAeluUploadFinalDocumentationButton or credit.showAccesoUploadFinalDocumentationButton or credit.showGeneratedDisbursementButton or credit.showGeneratedRejectButton or credit.showUploadRipleyFinalSchedule or credit.showRemoveRipleyFinalSchedule}"></td>
+            <td class="text-left" th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disburseCreditPageConfiguration?.detailConfiguration != null}">
+                <button th:onclick="'getLoanDetail('+${credit?.loanApplicationId}+')'" class="btn btn-circle collapse-table">+</button>
+            </td>
+        </tr>
+        <script>
+            replaceImgSvgToSvgElement();
+        </script>
+    </th:block>
+
+</th:block>
+
+<th:block th:fragment="bodyTerminated">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="20">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:id="'loan_'+${credit.loanApplicationId}" th:onclick="'getLoanDetail('+${credit?.loanApplicationId}+')'" style="cursor: pointer"
+            th:styleappend="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td class="text-left" th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td class="text-left">
+                <th:block th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></th:block>
+                <br/>
+                <th:block th:text="${@utilService.hourFormat(data?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.hourFormat(data?.inactiveWOScheduleDate)}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.product?.name}"></td>
+            <td class="text-left" >
+                <th:block th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disburseCreditPageConfiguration?.detailConfiguration != null}"><span th:text="${credit?.code}"></span></th:block>
+                <th:block th:unless="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disburseCreditPageConfiguration?.detailConfiguration != null}"><a th:href="@{/credit/__${credit?.id}__}" th:text="${credit?.code}" target="_blank"></a></th:block>
+            </td>
+            <td class="text-left">
+                <th:block th:text="${credit?.personDocumentType?.name}"></th:block>
+                <br/>
+                <th:block th:text="${credit?.personDocumentNumber}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.fullName}"></td>
+            <td class="text-left" th:text="${credit?.email}"></td>
+            <td class="text-left" th:text="${credit?.phoneNumber}"></td>
+            <td class="text-left" th:text="${@utilService.doubleMoneyFormat(credit?.loanCapital, credit?.currency)}"></td>
+            <td class="text-left" th:text="${credit?.installments}"></td>
+            <td class="text-left" th:if="${credit?.country?.id}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate, credit?.currency)}"></td>
+            <td class="text-left" th:unless="${credit?.country?.id}"></td>
+            <td class="text-left">
+                <span th:if="${credit?.showDisbursementTypeColumn()}" th:text="${credit?.entityProductParams?.disbursementTypeObject?.disbursementType}"></span>
+            </td>
+            <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <td class="text-left" th:text="${credit?.getAgencyNameWithoutText()}"></td>
+            </th:block>
+            <td>
+                <a target="_blank" th:if="${showButton == true} and ${credit.hasFiles == true}"
+                   th:href="${@entityExtranetService.generateUserFilesLink(credit?.id)}" class="link_files">
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/>
+                </a>
+            </td>
+            <td class="text-left" th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.disbursedCreditPageConfiguration?.detailConfiguration != null}">
+                <button class="btn btn-circle collapse-table">+</button>
+            </td>
+        </tr>
+        <script>
+            replaceImgSvgToSvgElement();
+        </script>
+    </th:block>
+
+</th:block>
+
+<th:block th:fragment="bodyCallCenter">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></td>
+            <td th:text="${credit?.personDocumentType?.name}"></td>
+            <td th:text="${credit?.personDocumentNumber}"></td>
+            <td th:text="${credit?.personName}"></td>
+            <td th:text="${credit?.personFirstSurname}"></td>
+            <td th:text="${credit?.personLastSurname}"></td>
+            <td th:text="${credit?.email}"></td>
+            <td th:text="${credit?.phoneNumber}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.loanCapital, credit?.currency)}"></td>
+            <td th:text="${credit?.installments}"></td>
+            <td th:if="${credit?.country?.id}" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate, credit?.currency)}"></td>
+            <td th:unless="${credit?.country?.id}"></td>
+        </tr>
+    </th:block>
+
+</th:block>
+
+<th:block th:fragment="bodyGeneratedTc">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></td>
+            <td th:text="${credit?.code}"></td>
+            <td th:text="${credit?.entityProductParams?.entityProduct}"></td>
+            <td th:text="${credit?.personDocumentType?.name}"></td>
+            <td th:text="${credit?.personDocumentNumber}"></td>
+            <td th:text="${credit?.personName}"></td>
+            <td th:text="${credit?.personFirstSurname}"></td>
+            <td th:text="${credit?.personLastSurname}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.getBanbifBaseDataAsInteger('linea'),'$')}"></td>
+            <td th:text="${credit?.getBanbifBaseDataAsString('plastico')}"></td>
+            <td th:text="${credit?.getBanbifBaseDataWelcomeBonusAsString()}"></td>
+        </tr>
+    </th:block>
+
+</th:block>
+
+<th:block th:fragment="bodyTerminatedTc">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></td>
+            <td th:text="${credit?.code}"></td>
+            <td th:text="${credit?.entityProductParams?.entityProduct}"></td>
+            <td th:text="${credit?.personDocumentType?.name}"></td>
+            <td th:text="${credit?.personDocumentNumber}"></td>
+            <td th:text="${credit?.personName}"></td>
+            <td th:text="${credit?.personFirstSurname}"></td>
+            <td th:text="${credit?.personLastSurname}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.getBanbifBaseDataAsInteger('linea'),'$')}"></td>
+            <td th:text="${credit?.getBanbifBaseDataAsString('plastico')}"></td>
+            <td th:text="${credit?.getBanbifBaseDataWelcomeBonusAsString()}"></td>
+        </tr>
+    </th:block>
+
+</th:block>
+
+<th:block th:fragment="bodyPending">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></td>
+            <td><a th:href="@{/credit/__${credit?.id}__}" th:text="${credit?.code}" target="_blank"></a></td>
+            <td th:text="${credit?.entityProductParams?.entityProduct}"></td>
+            <th:block th:if="${!((page == 'generated' or page == 'callcenter') and @entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL))}">
+                <td th:text="${credit?.personDocumentType?.name}"></td>
+            </th:block>
+            <td th:text="${credit?.personDocumentNumber}"></td>
+            <td th:text="${credit?.personName}"></td>
+            <td th:text="${credit?.personFirstSurname}"></td>
+            <td th:text="${credit?.personLastSurname}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.loanCapital, credit?.currency)}"></td>
+            <td th:text="${credit?.installments}"></td>
+
+            <th:block th:switch="${credit?.country?.id}">
+                <td th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}" th:text="${@utilService.percentFormat(credit?.nominalAnualRate, credit?.currency)}"></td>
+                <td th:case="*" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate, credit?.currency)}"></td>
+            </th:block>
+
+            <td>
+                <a target="_blank" th:if="${showButton == true} and ${credit.hasFiles == true}"
+                   th:href="${@entityExtranetService.generateUserFilesLink(credit?.id)}" class="link_files">
+                    <!--                    Descargar-->
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/>
+                </a>
+            </td>
+
+            <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).ABACO)}">
+                <td th:text="${credit?.employer?.name}"/>
+            </th:block>
+
+            <!--        ACCIONES-->
+            <th:block th:if="${page == 'pending'}">
+                <td>
+                    <button th:if="${credit.showPendingToValidateButton  and showButton == true}" id="validateCredit" type="button"
+                            class="btn blue btn-sm" style="width:100px;"
+                            th:onclick="'validateCredit('+${credit?.id}+', this)'">
+                        <i class="fa fa-check"></i> Verificado
+                    </button>
+                    <button th:if="${credit.showPendingObservations  and showButton == true}" id="creditObservations"
+                            th:disabled="${credit?.observationReason?.id != null}" type="button" class="btn grey btn-sm"
+                            style="width:100px;" th:onclick="'showCreditObservationsModal('+${credit?.id}+')'">
+                        <i class="fa fa-search"></i> Observado
+                    </button>
+                    <button th:if="${credit.showPendingRejectButton  and showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn red btn-sm openRejectCreditModal" th:onclick="'showRegisterCreditRejectionModal('+${credit?.id}+')'">
+                        <i class="fa fa-ban"></i> Rechazado
+                    </button>
+                    <button th:if="${credit.showAccesoScheduleAppointmentButton  and showButton == true}" id="scheduleAppointment" type="button" class="btn blue btn-sm scheduleAppointmentModal" th:onclick="'showScheduleAppointmentModal('+${credit?.id}+')'">
+                        <i class="fa fa-check"></i> Agendar cita
+                    </button>
+                    <button th:if="${credit.showAccesoReScheduleAppointmentButton  and showButton == true}" id="rescheduleAppointment" type="button" class="btn blue btn-sm scheduleAppointmentModal" th:onclick="'showScheduleAppointmentModal('+${credit?.id}+')'">
+                        <i class="fa fa-check"></i> Reagendar cita
+                    </button>
+                </td>
+            </th:block>
+
+            <!--        ACCIONES-->
+            <th:block th:if="${credit?.subStatus?.id == T(com.affirm.common.model.catalog.CreditSubStatus).PENDING_ENTIY_LOAD} and ${page != 'callcenter'}">
+                <th:block th:if="${@catalogService.getEntityProductParam(credit?.entity?.id, credit?.product?.id)?.showDisbursement == true}">
+
+                    <td shiro:hasPermission="credit:toUpload:upload">
+                        <button shiro:hasPermission="credit:toUpload:upload" th:if="${showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn blue btn-sm loadCredit" th:onclick="'showRegisterGeneratedCreditUploadModal('+${credit?.id}+')'">
+                            <i class="fa fa-check"></i> Cargado
+                        </button>
+                        <button shiro:hasPermission="credit:toUpload:reject"  th:if="${showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn red btn-sm openRejectCreditModal"
+                                th:onclick="'showRegisterGeneratedCreditRejectionModal('+${credit?.id}+')'">
+                            <i class="fa fa-ban"></i> Rechazado
+                        </button>
+                    </td>
+                </th:block>
+                <th:block th:unless="${@catalogService.getEntityProductParam(credit?.entity?.id, credit?.product?.id)?.showDisbursement == true}">
+                    <td></td>
+                </th:block>
+            </th:block>
+
+            <th:block>
+                <td th:if="${page != 'terminated' and page != 'callcenter' and (credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_WO_SCHEDULE or credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_W_SCHEDULE)}">
+                    <button th:if="${showButton == true}" shiro:hasPermission="loan:expire" type="button" class="btn red btn-sm expire-loan" th:onclick="'expireLoanApplication(this,' + ${credit?.loanApplicationId} + ')'">
+                        Expirar solicitud
+                    </button>
+                </td>
+                <th:block th:unless="${page != 'terminated' and page != 'callcenter' and (credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_WO_SCHEDULE or credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_W_SCHEDULE)}">
+                    <td th:if="${page != 'callcenter'}"></td>
+                </th:block>
+
+            </th:block>
+        </tr>
+    </th:block>
+</th:block>
+
+<th:block th:fragment="bodyToUpload">
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td th:text="${iterCredit.count + (offset != null ? offset : 0)}"></td>
+            <td th:text="${@utilService.dateFormat(credit?.inactiveWOScheduleDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></td>
+            <td><a th:href="@{/credit/__${credit?.id}__}" th:text="${credit?.code}" target="_blank"></a></td>
+            <td th:text="${credit?.entityProductParams?.entityProduct}"></td>
+            <th:block th:if="${!((page == 'generated' or page == 'callcenter') and @entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL))}">
+                <td th:text="${credit?.personDocumentType?.name}"></td>
+            </th:block>
+            <td th:text="${credit?.personDocumentNumber}"></td>
+            <td th:text="${credit?.personName}"></td>
+            <td th:text="${credit?.personFirstSurname}"></td>
+            <td th:text="${credit?.personLastSurname}"></td>
+            <td th:text="${@utilService.doubleMoneyFormat(credit?.loanCapital, credit?.currency)}"></td>
+            <td th:text="${credit?.installments}"></td>
+
+            <th:block th:switch="${credit?.country?.id}">
+                <td th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}" th:text="${@utilService.percentFormat(credit?.nominalAnualRate, credit?.currency)}"></td>
+                <td th:case="*" th:text="${@utilService.percentFormat(credit?.effectiveAnnualRate, credit?.currency)}"></td>
+            </th:block>
+
+            <td>
+                <a target="_blank" th:if="${showButton == true} and ${credit.hasFiles == true}"
+                   th:href="${@entityExtranetService.generateUserFilesLink(credit?.id)}" class="link_files">
+                    <!--                    Descargar-->
+                    <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/descargar.svg" alt="" class="custom-icono-svg"/>
+                </a>
+            </td>
+
+            <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).ABACO)}">
+                <td th:text="${credit?.employer?.name}"/>
+            </th:block>
+
+            <!--        ACCIONES-->
+            <th:block th:if="${credit?.subStatus?.id == T(com.affirm.common.model.catalog.CreditSubStatus).PENDING_ENTIY_LOAD} and ${page != 'callcenter'}">
+                <th:block th:if="${@catalogService.getEntityProductParam(credit?.entity?.id, credit?.product?.id)?.showDisbursement == true}">
+
+                    <td shiro:hasPermission="credit:toUpload:upload">
+                        <button shiro:hasPermission="credit:toUpload:upload" th:if="${showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn blue btn-sm loadCredit" th:onclick="'showRegisterGeneratedCreditUploadModal('+${credit?.id}+')'">
+                            <i class="fa fa-check"></i> Cargado
+                        </button>
+                        <button shiro:hasPermission="credit:toUpload:reject"  th:if="${showButton == true}" th:attr="data-id=${credit?.id}" type="button" class="btn red btn-sm openRejectCreditModal"
+                                th:onclick="'showRegisterGeneratedCreditRejectionModal('+${credit?.id}+')'">
+                            <i class="fa fa-ban"></i> Rechazado
+                        </button>
+                    </td>
+                </th:block>
+                <th:block th:unless="${@catalogService.getEntityProductParam(credit?.entity?.id, credit?.product?.id)?.showDisbursement == true}">
+                    <td></td>
+                </th:block>
+            </th:block>
+
+            <th:block>
+                <td th:if="${page != 'terminated' and page != 'callcenter' and (credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_WO_SCHEDULE or credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_W_SCHEDULE)}">
+                    <button th:if="${showButton == true}" shiro:hasPermission="loan:expire" type="button" class="btn red btn-sm expire-loan" th:onclick="'expireLoanApplication(this,' + ${credit?.loanApplicationId} + ')'">
+                        Expirar solicitud
+                    </button>
+                </td>
+                <th:block th:unless="${page != 'terminated' and page != 'callcenter' and (credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_WO_SCHEDULE or credit?.status?.id == T(com.affirm.common.model.catalog.CreditStatus).INACTIVE_W_SCHEDULE)}">
+                    <td th:if="${page != 'callcenter'}"></td>
+                </th:block>
+
+            </th:block>
+        </tr>
+    </th:block>
+
+</th:block>
+
+<th:block th:fragment="headerBeingProcessed">
+    <th class="text-left">#</th>
+    <th class="text-left">Fecha<br/>Registro</th>
+    <th class="text-left">Código</th>
+    <th class="text-left">Producto</th>
+    <th class="text-left">Documento/<br/>Número</th>
+    <th class="text-left">Nombre Completo</th>
+    <th class="text-left">Email</th>
+    <th class="text-left">Teléfono</th>
+    <th class="text-left">Oferta</th>
+    <th class="text-left" style="width: 90px;max-width: 90px;">Avance</th>
+    <th th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.rejectedPageConfiguration?.detailConfiguration != null}">Detalle</th>
+</th:block>
+
+<th:block th:fragment="bodyBeingProcessed">
+
+    <th:block th:if="${#lists.isEmpty(credits)}">
+        <tr>
+            <td colspan="10">No hay resultados</td>
+        </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(credits)}">
+        <tr th:each="credit, iterCredit : ${credits}"
+            th:id="'loan_'+${credit.loanApplicationId}"
+            th:style="${credit?.observationReason?.id != null }? 'background-color:#FFFFCC'">
+            <td class="text-left" th:text="${iterCredit.count}"></td>
+            <td class="text-left">
+                <th:block th:text="${@utilService.dateFormat(credit?.generationDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(credit?.inactiveWOScheduleDate)}"></th:block>
+                <br/>
+                <th:block th:text="${@utilService.hourFormat(data?.registerDate)}" th:attr="data-order=${@utilService.hourFormat(data?.registerDate)}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.code}"></td>
+            <td class="text-left" >
+                <th:block th:if="${credit?.product}" th:text="${credit?.product?.name}"></th:block>
+                <th:block th:unless="${credit?.product}" th:text="${credit?.getFirstPreliminaryEvaluation()?.product?.name}"></th:block>
+            </td>
+            <td class="text-left">
+                <th:block th:text="${credit?.personDocumentType?.name}"></th:block>
+                <br/>
+                <th:block th:text="${credit?.personDocumentNumber}"></th:block>
+            </td>
+            <td class="text-left" th:text="${credit?.personName + ' ' + credit?.personFullSurnames}"></td>
+            <td class="text-left" th:text="${credit?.email}"></td>
+            <td class="text-left" th:text="${credit?.phone}"></td>
+            <td class="text-left">
+                <th:block th:unless="${#lists.isEmpty(credit?.offers)}">
+                    <th:block th:each="offer, iterO : ${credit.offers}">
+                        <span th:if="${offer.selected}" th:classappend="${offer.selected} ? 'selected-offer' : ''">
+                            <th:block th:text="${offer?.getLoanOfferDescription(@utilService, credit?.personDocumentType?.countryId)}" ></th:block>
+                        </span>
+                    </th:block>
+                </th:block>
+            </td>
+            <td class="text-left">
+                <th:block th:if="${credit?.questionId}" th:text="#{process.question.id.+${credit?.questionId}}"></th:block>
+<!--                <span class="tooltip-on" data-toggle="tooltip" data-placement="bottom" th:id="'progress-'+${iterCredit.count}" th:title="${@utilService.doubleToIntegerFormat(credit?.percentageProgress)}">-->
+<!--                    <svg class="radial-progress" th:attr="data-percentage=${@utilService.doubleToIntegerFormat(credit?.percentageProgress)}" viewBox="0 0 80 80">-->
+<!--                    <circle class="incomplete" cx="40" cy="40" r="35"></circle>-->
+<!--                    <circle class="complete" cx="40" cy="40" r="35" style="stroke-dashoffset: 39.58406743523136;"></circle>-->
+<!--                    <text class="percentage" x="50%" y="57%" transform="matrix(0, 1, -1, 0, 80, 0)"><th:block th:text="${@utilService.doubleToIntegerFormat(credit?.percentageProgress)}"></th:block>%</text>-->
+<!--                    </svg>-->
+<!--                </span>-->
+            </td>
+            <td th:if="${@brandingService.getExtranetBrandingAsJson(#httpServletRequest)?.inProcessCreditPageConfiguration?.detailConfiguration != null}">
+                <button th:onclick="'getLoanDetail('+${credit?.loanApplicationId}+')'" class="btn btn-circle collapse-table">+</button>
+            </td>
+        </tr>
+        <script>
+            replaceImgSvgToSvgElement();
+        </script>
+    </th:block>
+
+</th:block>
+
+</html>

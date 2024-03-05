@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/templateLandingMaster">
+
+<head>
+    <title th:text="#{static.title.nosotros}"></title>
+    <link rel="alternate" href="https://www.solven.pe/nosotros" hreflang="es" />
+    <link rel="alternate" href="https://www.solven.pe/nosotros" hreflang="es-pe" />
+    <link rel="alternate" href="https://www.solven.com.ar/nosotros" hreflang="es-ar" />
+    <link rel="alternate" href="https://www.solven.pe/nosotros" hreflang="x-default" />
+    <th:block layout:fragment="css">
+        <style>
+        </style>
+        <link rel="preload" as="style" th:href="@{/css/landingNosotros.css}" />
+        <link rel="stylesheet" th:href="@{/css/landingNosotros.css}" />
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            function calcHeight() {
+                var chv = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                document.getElementById("main").setAttribute("style", "height:" + chv + "px;");
+            }
+            /*window.onload=function(){
+                var e = new XMLHttpRequest;e.open("GET","https://fonts.googleapis.com/css?family=Lato:300,400,700,900",!0),e.onreadystatechange=function(){if(4==e.readyState&&200==e.status){var t=document.createElement("style");t.innerHTML=e.responseText,document.head.appendChild(t)}},e.send();
+            };
+            */
+            window.onresize = function (event) {
+                calcHeight();
+            };
+            /*]]>*/
+        </script>
+        <script defer="true" type="text/javascript" th:src="@{/js/landingNosotros.js}"></script>
+    </th:block>
+    <style>
+
+        .main-banner article h1::after {
+            content: "";
+            display: block;
+        }
+
+        .main-banner article p {
+             margin: 0;
+        }
+        @media only screen and (max-width: 840px){
+            .wrap-about ul li {
+                width: 50%!important;
+            }
+        }
+    </style>
+</head>
+
+<body
+
+    th:class="${@countryContextService.isCountryContextInArgentina(#httpServletRequest) ? 'main-pe main-arg' : 'main-pe'}">
+    <th:block layout:fragment="header">
+<!--        <th:block th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">-->
+<!--            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeaderArgentina"></th:block>-->
+<!--        </th:block>-->
+<!--        <th:block th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">-->
+            <th:block th:replace="fragments/fragmentLandingHeader :: landingHeader"></th:block>
+<!--        </th:block>-->
+    </th:block>
+    <th:block layout:fragment="content">
+
+        <section id="banner" class="main-banner bgbanner-inner">
+            <article>
+                <h1 th:text="#{static.landing.conocenos.title}"></h1>
+                <p th:text="'En Solven conectamos a las personas que necesitan crédito con las instituciones financieras y los fondos de inversión más innovadores del mercado. Hacemos posible que los créditos se emitan tan solo en 5 minutos; sin fricción en el proceso, 100% en línea y con las mejores condiciones.'"></p>
+            </article>
+            <img id="bannerPrincipal" th:attr="data-src=@{/img/bgnosotros.jpg}" alt="" class="lazy" />
+            <img id="bannerResponsive" th:attr="data-src=@{/img/bgperu_responsive.jpg}" alt="" />
+        </section>
+        <section id="sec_about" class="gwr wrap-about tabs">
+            <ul style="justify-content: center">
+                <li style="order: 1">
+                    <article class="w-item h1">
+                        <div class="title">
+                            <div class="container-title">
+                                <h2>Facundo Turconi<a class="text-lightblue" rel="noopener noreferrer"
+                                        href="https://www.linkedin.com/in/facundoturconi/" target="_blank">&nbsp;<i
+                                            class="icon icon-linkedin"></i></a></h2><span>Fundador &amp; CEO</span>
+                            </div><button>+</button>
+                        </div>
+                        <figure><img class="lazy loaded"
+                                data-src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Facundo.jpg"
+                                alt="Facundo Turconi"
+                                src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Facundo.jpg"/></figure>
+                    </article>
+                </li>
+                <li style="order: 2">
+                    <article class="w-item h2">
+                        <div class="title">
+                            <div class="container-title">
+                                <h2> Mat&iacute;as Fernandez<a class="text-lightblue" rel="noopener noreferrer"
+                                        href="https://www.linkedin.com/in/matias-fernandez-manero/"
+                                        target="_blank">&nbsp;<i class="icon icon-linkedin"></i></a></h2><span>Project
+                                    Manager</span>
+                            </div><button>+</button>
+                        </div>
+                        <figure><img class="lazy loaded"
+                                data-src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Matias.jpg"
+                                alt="Matías Fernandez"
+                                src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Matias.jpg"/></figure>
+                    </article>
+                </li>
+                <li style="order: 3">
+                    <article class="w-item h3">
+                        <div class="title">
+                            <div class="container-title">
+                                <h2>John Rodriguez<a class="text-lightblue" rel="noopener noreferrer"
+                                        href="https://www.linkedin.com/in/john-mc-kevin-rodriguez-mendoza-6abb37a4/"
+                                        target="_blank">&nbsp;<i class="icon icon-linkedin"></i></a></h2><span>Lead
+                                    Software Developer</span>
+                            </div><button>+</button>
+                        </div>
+                        <figure><img class="lazy loaded"
+                                data-src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-John.jpg"
+                                alt="John Rodriguez"
+                                src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-John.jpg"/></figure>
+                    </article>
+                </li>
+                <li style="display: none">
+                    <article class="w-item h4">
+                        <div class="title">
+                            <div class="container-title">
+                                <h2>Annel Alfaro<a class="text-lightblue" rel="noopener noreferrer"
+                                        href="https://www.linkedin.com/in/annelalfaro/" target="_blank">&nbsp;<i
+                                            class="icon icon-linkedin"></i></a></h2><span>Head of Acquisition</span>
+                            </div><button>+</button>
+                        </div>
+                        <figure><img class="lazy loaded"
+                                data-src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Annel.jpg"
+                                alt="Annel Alfaro"
+                                src="https://s3.amazonaws.com/solven-public/img/solven/equipo/FT-Annel.jpg"/></figure>
+                    </article>
+                </li>
+                <li>
+                    <article class="parragraph p1">
+                        <p><b>Facundo </b>dirige la estrategia de la compa&ntilde;&iacute;a trayendo toda su experiencia
+                            en el sector
+                            financiero durante m&aacute;s de 15 de a&ntilde;os a lo largo de Latinoam&eacute;rica. Fue
+                            Country Manager de
+                            Afluenta, Gerente de Negocios en Acceso Crediticio, Gerente de Riesgos en Banco Financiero,
+                            Interbank, trabaj&oacute; en BBVA Banco Franc&eacute;s (Argentina) y fue Gerente de Proyectos en
+                            Experian,
+                            implementando Motores de Decisi&oacute;n, CRM, Cobranzas y Modelos Anal&iacute;ticos en toda
+                            la regi&oacute;n.
+                        </p>
+                    </article>
+                </li>
+                <li>
+                    <article class="parragraph p2">
+                        <p><b>Mat&iacute;as </b>gestiona los proyectos y los productos que ofrecemos en Solven. Tiene
+                            amplia
+                            experiencia trabajando con metodolog&iacute;as &aacute;giles, procesos y tecnolog&iacute;a
+                            para el crecimiento
+                            exitoso de marcas como Sally Beauty y Chevron.</p>
+                    </article>
+                </li>
+                <li>
+                    <article class="parragraph p3">
+                        <p><b>John </b>lidera la programaci&oacute;n del BackEnd de la plataforma, tiene experiencia en
+                            an&aacute;lisis
+                            y desarrollo, utilizando tecnolog&iacute;as JAVA. Viene de trabajar en Acceso Crediticio,
+                            empresa
+                            l&iacute;der de financiación para autos en Per&uacute;.</p>
+                    </article>
+                </li>
+            </ul>
+        </section>
+
+    </th:block>
+
+</body
+        >
+
+</html>

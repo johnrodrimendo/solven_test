@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question_client">
+
+</th:block>
+
+<th:block th:fragment="question_client_grouped">
+    <div class="inner-question" th:attr="data-question=${q}">
+        <div class="questions-section animated fadeInRight">
+            <div id="formPhone" class="forms arg q28">
+                <form class="inner-question-form" autocomplete="off">
+                    <p th:utext="#{questions.block.companyPhone}"></p>
+                    <div class="wrap-phones">
+                        <div class="field inline cbofield">
+                            <select id="select_28" data-placeholder="Tipo" data-width="100"
+                                    name="typePhone">
+                                <option value="" disabled="disabled" selected="selected"></option>
+                                <option th:value="${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}">
+                                    Fijo
+                                </option> 
+                                <option th:value="${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}">
+                                    Celular
+                                </option>
+                            </select>
+                        </div>
+                        <div class="field inline phoneCodeField">
+                            <input type="text" maxlength="4" class="input-outline small-input codeInput"
+                                   name="phoneCode" placeholder="Área"/>
+                        </div>
+                        <div class="field inline arg-field">
+                            <input th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}"
+                                   type="text" class="input-outline phoneInput" placeholder="Teléfono"
+                                   name="phoneNumber"/>
+                            <input th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}"
+                                   type="text"
+                                   class="input-outline cellphone-input" name="phoneNumber"
+                                   placeholder="Número"/>
+                            <small class="input-help"
+                                   th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+                                Nro.
+                                Fijo/ Celular (Ej: 1234 5678)
+                            </small>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </form>
+            </div>
+        </div>
+        <hr class="divisor-bottom"/>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (questionValidationAndPreSave)([[${q}]], /*[[${attr.form.validator.toJson(#locale)}]]*/);
+            /*]]>*/
+        </script>
+
+        <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInPeru(#httpServletRequest)}">
+            /*<![CDATA[*/
+            (function() {
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                var innerQuestionForm = innerQuestion.find('.inner-question-form');
+                var $phoneNumber = innerQuestion.find('input[name=phoneNumber]');
+                var $typePhone = innerQuestion.find('select[name=typePhone]');
+                var $phoneCode = innerQuestion.find('input[name=phoneCode]');
+
+                $phoneNumber.mask('000-#');
+                var staticPhoneNumberMaxlength = innerQuestionForm.data('validatorJson').rules.phoneNumber.maxlength;
+                var status = false;
+                $typePhone.on('change select2:select', function () {
+                    if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}]]*/) {
+                        innerQuestionForm.data('validatorJson').rules.phoneCode.required = true;
+                        innerQuestionForm.validateForm(innerQuestionForm.data('validatorJson'));
+                        innerQuestionForm.data('validator').resetForm();
+                        $phoneCode.val('');
+                        innerQuestionForm.data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $phoneCode.val().length;
+                        $phoneCode.keyup();
+                        innerQuestion.find('.phoneCodeField').show();
+                        setTimeout(function () {
+                            $phoneCode.focus();
+                        }, 300);
+                        $(this).closest('.wrap-phones').removeClass("wrap-mobil");
+                        status = false;
+
+                    } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}]]*/) {
+                        innerQuestionForm.data('validatorJson').rules.phoneCode.required = false;
+                        innerQuestionForm.validateForm(innerQuestionForm.data('validatorJson'));
+                        innerQuestionForm.data('validator').resetForm();
+                        $phoneCode.val('');
+                        innerQuestionForm.data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $phoneCode.val().length;
+                        innerQuestion.find('.phoneCodeField').hide();
+                        $phoneNumber.mask('0000-#');
+                        $phoneCode.keyup();
+                        setTimeout(function () {
+                            $phoneNumber.focus();
+                        }, 300);
+                        $(this).closest('.wrap-phones').addClass("wrap-mobil");
+                        status = true;
+                    }
+
+                });
+                $typePhone.change();
+
+
+                $('body').on('keyup', '.inner-question[data-question=' + [[${q}]] + '] input[name=phoneCode]', function (event) {
+                    innerQuestionForm.data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+                    innerQuestionForm.validateForm(innerQuestionForm.data('validatorJson'));
+                    innerQuestionForm.data('validator').resetForm();
+
+                    if (status == false) {
+                        if (event.keyCode == 13) {
+                            $(this).closest('.questions-section').find('.button').click();
+                            event.preventDefault();
+                            return false;
+                        }
+                    }
+                });
+
+
+                $('body').on('keyup', '.inner-question[data-question=' + [[${q}]] + '] input[name=phoneNumber]', function (event) {
+                    if (status != false) {
+                        if (event.keyCode == 13) {
+                            $(this).closest('.questions-section').find('.button').click();
+                            event.preventDefault();
+                            return false;
+                        }
+                    }
+                });
+
+            })();
+            /*]]>*/
+
+        </script>
+
+        <script th:inline="javascript" th:if="${@countryContextService.isCountryContextInArgentina(#httpServletRequest)}">
+            /*<![CDATA[*/
+            (function() {
+
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                var innerQuestionForm = innerQuestion.find('.inner-question-form');
+                var $phoneNumber = innerQuestion.find('input[name=phoneNumber]');
+                var $typePhone = innerQuestion.find('select[name=typePhone]');
+                var $phoneCode = innerQuestion.find('input[name=phoneCode]');
+
+
+                $phoneNumber.mask('000-#');
+                var staticPhoneNumberMaxlength = innerQuestionForm.data('validatorJson').rules.phoneNumber.maxlength;
+                $('body').on('keyup', '.inner-question[data-question=' + [[${q}]] + '] input[name=phoneCode]', function () {
+                    var actualCodeLength = $(this).val().length;
+                    if (actualCodeLength == 2) {
+                        $phoneNumber.mask('0000-#');
+                    } else if (actualCodeLength > 2) {
+                        $phoneNumber.mask('000-#');
+                    }
+
+                    innerQuestionForm.data('validatorJson').rules.phoneNumber.maxlength = staticPhoneNumberMaxlength - $(this).val().length;
+                    innerQuestionForm.data('validatorJson').rules.phoneNumber.minlength = staticPhoneNumberMaxlength - $(this).val().length;
+                    innerQuestionForm.validateForm(innerQuestionForm.data('validatorJson'));
+                    innerQuestionForm.data('validator').resetForm();
+                });
+
+
+                $('body').on('keyup', '.inner-question[data-question=' + [[${q}]] + '] input[name=phoneNumber]', function () {
+                    if (event.keyCode == 13) {
+                        $(this).closest('.questions-section').find('.button').click();
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+                var change = function () {
+                    $phoneCode.focus();
+                };
+
+
+                $phoneCode.on("keydown", function (e) {
+                    var code = e.which;
+                    if (code == 13 || code == 9) {
+                        e.preventDefault();
+                        $phoneNumber.focus();
+                    }
+                });
+
+
+                $typePhone.on('select2:select change', change);
+
+            })();
+            /*]]>*/
+        </script>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                var innerQuestion = $('.inner-question[data-question=' + [[${q}]] + ']');
+                var innerQuestionForm = innerQuestion.find('.inner-question-form');
+                var $phoneNumber = innerQuestion.find('input[name=phoneNumber]');
+                var $phoneCode = innerQuestion.find('input[name=phoneCode]');
+
+                var phoneCodeVal = /*[[${phonePrefix}]]*/ null;
+                if (phoneCodeVal != null && phoneCodeVal != '') {
+                    $phoneCode.val(phoneCodeVal);
+                    setTimeout(function () {
+                        $phoneNumber.focus();
+                    }, 400);
+                    $phoneCode.keyup();
+                } else {
+                    setTimeout(function () {
+                        $phoneCode.focus();
+                    }, 400);
+                }
+            })();
+            /*]]>*/
+        </script>
+    </div>
+</th:block>
+
+<th:block th:fragment="question_backoffice">
+    <form class="question-form" th:object="${form}" th:attr="data-random-id=${randomId}">
+        <div class="row">
+            
+            <th:block th:switch="${ocupation?.activityType?.id}">
+                <p th:case="${T(com.affirm.common.model.catalog.ActivityType).MONOTRIBUTISTA}" th:text="#{questions.block.independentWorkphone}"></p>
+                <p th:case="${T(com.affirm.common.model.catalog.ActivityType).INDEPENDENT}" th:text="#{questions.block.independentWorkphone}"></p>
+                <p th:case="*" th:utext="#{questions.block.companyPhone}"></p>
+                <small class="input-help subtitle"
+                       th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                       th:utext="#{questions.message.cellphone.phone}"></small>
+            </th:block>
+            
+            <div class="form-group col-md-6 nopadding">
+                <small>Tipo</small>
+                <select th:field="*{typePhone}" class="form-control">
+                    <option value="" hidden="hidden" selected="selected"></option>
+                    <option th:value="${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}">Fijo</option>
+                    <option th:value="${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}">Celular</option>
+                </select>
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group col-md-6 nopadding phoneCodeGroup">
+                <small>Cod. Area</small>
+                <input type="text" class="form-control" th:classappend="'phoneCode_'+${randomId}+' codeInput_'+${randomId}" th:field="*{phoneCode}" />
+                <div class="errorContainer"></div>
+            </div>
+            <div class="form-group col-md-12">
+                <small>Número</small>
+                <input type="text" class="form-control" th:field="*{phoneNumber}"/>
+                <div class="errorContainer"></div>
+            </div>
+            
+            <button type="button" class="btn default btn-xs send-button" th:text="#{button.next}"></button>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            var questionFlow = new QuestionFlow([[${questionId}]], [[${randomId}]]);
+            questionFlow.initializeFormValidation(/*[[${form.validator.toJson(#locale)}]]*/);
+            questionFlow.getFormValuesJson = function(){
+                return questionFlow.getFormElement().serializeObject();
+            };
+
+            questionFlow.find('.send-button').on('click', function () {
+                questionFlow.loadNextQuestions();
+            });
+        })();
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+        /*<![CDATA[*/
+        (function() {
+            var $Form = getQuestionFlowByRandomId([[${randomId}]]);
+            $Form.getFormElement().data('staticPhoneNumberMaxlength', $Form.getFormElement().data('validatorJson').rules.phoneNumber.maxlength);
+            $('body').on('keyup','.phoneCode_'+[[${randomId}]], function(){
+                $Form.getFormElement().data('validatorJson').rules.phoneNumber.maxlength = $Form.getFormElement().data('staticPhoneNumberMaxlength') - $(this).val().length;
+                $Form.getFormElement().validateForm($Form.getFormElement().data('validatorJson'));
+                $Form.getFormElement().data('validator').resetForm();
+            });
+
+            $Form.find('input[name=phoneNumber]').mask('000-#');
+            $Form.find('select[name=typePhone]').on('change', function () {
+                if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).LANDLINE}]]*/) {
+                    $Form.getFormElement().data('validatorJson').rules.phoneCode.required = true;
+                    $Form.find('input[name=phoneCode]').val('');
+                    $Form.find('input[name=phoneCode]').keyup();
+                    $Form.find('.phoneCodeGroup').show();
+                } else if ($(this).val() == /*[[${T(com.affirm.common.model.catalog.PhoneType).CELLPHONE}]]*/) {
+                    $Form.getFormElement().data('validatorJson').rules.phoneCode.required = false;
+                    $Form.find('input[name=phoneCode]').val('');
+                    $Form.find('input[name=phoneCode]').keyup();
+                    $Form.find('.phoneCodeGroup').hide();
+                }
+                $Form.getFormElement().validateForm($Form.getFormElement().data('validatorJson'));
+                $Form.getFormElement().data('validator').resetForm();
+            });
+            $Form.find('select[name=typePhone]').change();
+        })();
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${loanApplication.countryId == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+        /*<![CDATA[*/
+        (function() {
+            var $Form = getQuestionFlowByRandomId([[${randomId}]]);
+            $Form.getFormElement().data('staticPhoneNumberMaxlength', $Form.getFormElement().data('validatorJson').rules.phoneNumber.maxlength);
+            $('body').on('keyup','.phoneCode_'+[[${randomId}]], function(){
+                $Form.getFormElement().data('validatorJson').rules.phoneNumber.maxlength = $Form.getFormElement().data('staticPhoneNumberMaxlength') - $(this).val().length;
+                $Form.getFormElement().data('validatorJson').rules.phoneNumber.minlength = $Form.getFormElement().data('staticPhoneNumberMaxlength') - $(this).val().length;
+                $Form.getFormElement().validateForm($Form.getFormElement().data('validatorJson'));
+                $Form.getFormElement().data('validator').resetForm();
+            });
+
+            $Form.find('input[name=phoneNumber]').mask('000-#');
+            $('body').on('keyup','.codeInput_'+[[${randomId}]], function(){
+                var actualCodeLength = $(this).val().length;
+                if(actualCodeLength == 2){
+                    $Form.find('input[name=phoneNumber]').mask('0000-#');
+                }else if(actualCodeLength > 2){
+                    $Form.find('input[name=phoneNumber]').mask('000-#');
+                }
+            });
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+</html>

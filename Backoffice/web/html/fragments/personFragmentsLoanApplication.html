@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<div th:fragment="loan-application" th:class="${@frontEndService.getDefaultPortletClass()}"
+     th:id="${loanApplication?.code != null ? loanApplication?.code : ''}" th:remove="tag">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $("#jquery_jplayer_1").jPlayer({
+                ready: function () {
+                    $(this).jPlayer("setMedia", {
+                        wav: /*[[${loanApplication?.tokyCall}]]*/null
+                    });
+                },
+                swfPath: '/js',
+                solution: 'html, flash',
+                supplied: "mp3, oga, wav",
+                preload: 'metadata',
+                volume: 0.8,
+                muted: false,
+                backgroundColor: '#000000',
+                cssSelectorAncestor: '#jp_container_1',
+                cssSelector: {
+                    videoPlay: '.jp-video-play',
+                    play: '.jp-play',
+                    pause: '.jp-pause',
+                    stop: '.jp-stop',
+                    seekBar: '.jp-seek-bar',
+                    playBar: '.jp-play-bar',
+                    mute: '.jp-mute',
+                    unmute: '.jp-unmute',
+                    volumeBar: '.jp-volume-bar',
+                    volumeBarValue: '.jp-volume-bar-value',
+                    volumeMax: '.jp-volume-max',
+                    playbackRateBar: '.jp-playback-rate-bar',
+                    playbackRateBarValue: '.jp-playback-rate-bar-value',
+                    currentTime: '.jp-current-time',
+                    duration: '.jp-duration',
+                    title: '.jp-title',
+                    fullScreen: '.jp-full-screen',
+                    restoreScreen: '.jp-restore-screen',
+                    repeat: '.jp-repeat',
+                    repeatOff: '.jp-repeat-off',
+                    gui: '.jp-gui',
+                    noSolution: '.jp-no-solution'
+                },
+                errorAlerts: false,
+                warningAlerts: false
+            });
+
+            $('#tokyCallUploader').on('change', function (event) {
+                event.preventDefault();
+                if ($(this).val().replace(/C:\\fakepath\\/i, '') != '') {
+                    var data = new FormData();
+                    data.append("tokyCall", $('#tokyCallUploader')[0].files[0]);
+                    data.append("loanApplicationId", /*[[${loanApplication?.id}]]*/null);
+
+                    console.log(data);
+                    defaultAjax({
+                        url: /*[[ @{/loanApplication/uploadTokyCall} ]]*/,
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            system.unloadAlert = false;
+                            location.reload();
+                        },
+                        error: function () {
+
+                        }
+                    });
+                }
+
+            });
+        });
+    </script>
+
+    <th:block
+            th:if="${loanApplication?.status?.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED || loanApplication?.status?.id == T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED_AUTOMATIC}">
+        <div class="list-group-item list-group-item-danger"
+             style="border-radius: 5px;display:inline-block;margin-bottom:1.5em;">
+            <span th:text="${(loanApplication?.rejectionReason?.reason != null ? 'Rechazado por: ' + #strings.toLowerCase(loanApplication?.rejectionReason?.reason) : loanApplication?.rejectionHardFilter != null ? loanApplication?.rejectionHardFilter : loanApplication?.rejectionPolicy != null ? loanApplication?.rejectionPolicy : 'no especificado') + '. ' + #strings.toLowerCase(loanApplication?.rejectionComment != null ?loanApplication?.rejectionComment : '') }"></span>
+        </div>
+    </th:block>
+    <div th:each="reason : ${loanApplication?.auditRejectionReasons}" class="custom-alerts alert alert-danger">
+        <div th:text="'La auditoria ' + ${reason?.auditType} + ', fue rechazado por ' + ${reason?.loanApplicationAuditRejectionReason} + '. ' + ${#strings.toLowerCase(reason?.loanApplicationAuditRejectionComment != null ? reason?.loanApplicationAuditRejectionComment : '')}"></div>
+    </div>
+    <div th:if="${loanApplication?.fraudFlagId != 1 and loanApplication?.fraudFlagId != null }"
+         class="custom-alerts alert alert-danger">
+        <div th:text="'La solicitud ha sido marcada con flag de fraude : ' + ${@catalogService.getFraudFlag(loanApplication?.fraudFlagId).flag}"></div>
+    </div>
+    <div class="custom-alerts alert alert-danger" style="font-size: 13px;">
+        <div th:text="'La solictud tiene ' + ${loanApplication?.needToReview} +  ${ loanApplication?.needToReview == 1 ?  'alerta que no necesita supervisión' :  ' alertas que no necesitan supervisión'} + ' , y '+ ${loanApplication?.notNeedToReview} + ${ loanApplication?.notNeedToReview == 1 ?  'que necesita supervisión.' :  ' que necesitan supervisión.'} "></div>
+    </div>
+
+    <!--ACCIONES-->
+    <div class="actions f" style="justify-content: flex-end; margin-bottom: 1rem;" th:if="${!loanApplication?.credit}">
+        <div class="btn-group" style="width: inherit !important;">
+            <a th:class="${@frontEndService.defaultDropdownActionButtonClass}"
+               href="javascript:;"
+               data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+               aria-expanded="false">
+                Acciones <i class="fa fa-angle-down"></i>
+            </a>
+            <ul id="lstLoanActions" class="dropdown-menu pull-right" style="font-size: 14px;">
+                <th:block th:if="${loanApplication.isWaitingForApproval()}">
+                    <li>
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId == null}"
+                           th:onclick="'assignAnalyst(' + ${loanApplication?.id} + ')'">Asignar
+                            analista
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId != null}"
+                           th:onclick="'approveLoanApplication(' + ${loanApplication?.id} + ')'">Aprobar
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId != null}"
+                           th:onclick="'showRegisterApplicationRejectionModal(' + ${loanApplication?.id} + ')'">Rechazar
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId != null}"
+                           th:onclick="'showCreateLoanOffer(' + ${loanApplication?.id} + ')'">Crear
+                            oferta
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:onclick="'showModalLoanApplicationFraudAlertLoan('+${loanApplication?.id}+')'">
+                            Asignar Flag de Fraude
+                        </a>
+                    </li>
+                    <li id="markDocumentMissingAction">
+                        <a href="javascript:;"
+                           th:onclick="'markDocumentsMissing('+${loanApplication?.id}+', true)'">
+                            Falta documentación
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:onclick="'openWhoAnswerCallModal('+${loanApplication?.id}+','+${T(com.affirm.common.model.catalog.TrackingAction).INTERESTED}+')'">
+                            Registrar contacto - Interesado
+                        </a>
+                    </li>
+                    <li shiro:hasPermission="loanApplication:analyst:unassign">
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId != null}"
+                           th:onclick="'unassignAnalyst('+${loanApplication?.id}+', true)'">Desasignar Analista</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId != null}"
+                           th:onclick="'runFraudAlerts(' + ${loanApplication?.id} + ')'">Correr alertas de fraude
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"
+                           th:if="${loanApplication.creditAnalystSysUserId != null}"
+                           th:onclick="'sendVerificationEmail(' + ${loanApplication?.id} + ')'">Enviar email de verificación
+                        </a>
+                    </li>
+                </th:block>
+                <li th:if="${T(com.affirm.common.model.catalog.LoanApplicationStatus).EXPIRED != loanApplication?.status?.id
+                                and !loanApplication?.credit and !loanApplication?.expirationDate.before(#dates.createNow())}"
+                        shiro:hasPermission="loanApplication:expire">
+                    <a href="javascript:;"
+                       th:onclick="'expire(' + ${loanApplication?.id} + ')'">Expirar solicitud
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;"
+                       th:if="${loanApplication.isWaitingForApproval() and loanApplication.creditAnalystSysUserId != null}"
+                       th:onclick="'showChangeFirstDueDateModal(' + ${loanApplication?.id} + ')'">Cambiar fecha de 1er vencimiento
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;"
+                       shiro:hasPermission="loanApplication:returnToContract"
+                       th:if="${T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL == loanApplication.getStatus().getId()}"
+                       th:onclick="'returnToContract(' + ${loanApplication?.id} + ')'">Volver a contrato
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;"
+                       shiro:hasPermission="loanApplication:reevaluate"
+                       th:if="${T(com.affirm.common.model.catalog.LoanApplicationStatus).EVAL_APPROVED == loanApplication.getStatus().getId() or
+                                T(com.affirm.common.model.catalog.LoanApplicationStatus).WAITING_APPROVAL == loanApplication.getStatus().getId()}"
+                       th:onclick="'reevaluate(' + ${loanApplication?.id} + ')'">Reevaluar
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;"
+                       shiro:hasPermission="loanApplication:returnToEvaluationList"
+                       th:if="${T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED == loanApplication.getStatus().getId() and
+                                loanApplication.getWaitingapprovalDate() != null}"
+                       th:onclick="'returnToEvaluationList(' + ${loanApplication?.id} + ')'">Volver a Bandeja Evaluar
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;"
+                       shiro:hasPermission="loanApplication:returnToManagementList"
+                       th:if="${T(com.affirm.common.model.catalog.LoanApplicationStatus).REJECTED == loanApplication.getStatus().getId() and
+                                loanApplication.getWaitingapprovalDate() == null}"
+                       th:onclick="'returnToManagementList(' + ${loanApplication?.id} + ')'">Volver a Bandeja Gestionar
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <dl class="dl-horizontal dl-loan-application">
+                <dt>Monto solicitado</dt>
+                <th:block th:if="${exchangeRate == null}">
+                    <dd th:text="${@utilService.integerMoneyFormat(loanApplication?.amount, loanApplication?.country?.currency)}"></dd>
+                </th:block>
+                <th:block th:unless="${exchangeRate == null}">
+                    <dd th:text="${@utilService.integerMoneyFormat(@utilService.convertMoney(loanApplication?.getNetAmount(), exchangeRate), currency?.symbol)}"></dd>
+                </th:block>
+
+                <th:block
+                        th:if="${loanApplication?.product != null and loanApplication?.product?.id == loanApplication?.product.GUARANTEED}">
+                    <dt>Loan to Value</dt>
+                    <dd th:text="${@utilService.percentFormat(credit?.loanToValue)}"></dd>
+                </th:block>
+
+                <dt>Producto</dt>
+                <dd th:text="${loanApplication?.product?.productCategory?.category}"></dd>
+                <th:block
+                        th:if="${loanApplication?.product != null and loanApplication?.product?.id == loanApplication?.product.SALARY_ADVANCE}">
+                    <dt>Empresa</dt>
+                    <dd th:text="${loanApplication?.employer?.name}"></dd>
+                </th:block>
+                <th:block th:if="${loanApplication?.vehicle == null}">
+                    <dt>Plazo</dt>
+                    <dd th:text="${loanApplication?.installments}+ ' meses'"></dd>
+                </th:block>
+                <dt>Motivo</dt>
+                <dd th:text="${loanApplication?.reason?.reason}"></dd>
+                <th:block th:switch="${person?.documentType?.countryId}">
+                    <dt th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">Score</dt>
+                    <dt th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">Score Nosis</dt>
+                    <dt th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_COLOMBIA}">Score</dt>
+                </th:block>
+                <dd th:text="${loanApplication?.score}"></dd>
+                <dt>Score EFL</dt>
+                <th:block th:switch="${loanApplication?.resultEFL}">
+                    <dd th:case="${T(com.affirm.backoffice.model.LoanApplicationBoPainter).EFL_GREEN}"><span
+                            class="label label-xs label-success" th:text="${loanApplication?.resultEFL}"></span>
+                    </dd>
+                    <dd th:case="${T(com.affirm.backoffice.model.LoanApplicationBoPainter).EFL_RED}"><span
+                            class="label label-xs label-danger" th:text="${loanApplication?.resultEFL}"></span>
+                    </dd>
+                    <dd th:case="${T(com.affirm.backoffice.model.LoanApplicationBoPainter).EFL_YELLOW}"><span
+                            class="label label-xs label-warning" th:text="${loanApplication?.resultEFL}"></span>
+                    </dd>
+                    <dd th:case="*">No evaluado</dd>
+                </th:block>
+                <dt>Cluster</dt>
+                <dd th:text="${loanApplication?.clusterSubcluster}"></dd>
+                <dt>Motivo Rechazo</dt>
+                <dd>
+                    <div th:if="${loanApplication?.rejectionReasonLocal != null}"
+                         th:text="${loanApplication?.rejectionReasonLocal + '. '}" th:remove="tag"></div>
+                    <div th:if="${loanApplication?.rejectionHardFilterKey != null}"
+                         th:text="${@loanApplicationService.getLastPreliminaryEvaluation(loanApplication?.id, #locale, null)?.hardFilterMessage}"
+                         th:remove="tag"></div>
+                    <div th:if="${loanApplication?.rejectionPolicyKey != null}"
+                         th:text="${@loanApplicationService.getLastEvaluation(loanApplication?.id, loanApplication?.personId, #locale)?.policyMessage}"
+                         th:remove="tag"></div>
+                </dd>
+                <dt>Resultado Rekognition</dt>
+                <dd th:text="${loanApplication?.recognitionHighSimilarity}"></dd>
+                <dt>Asesor entidad</dt>
+                <dd th:text="${loanApplication?.entityUser?.getFullName()}"></dd>
+                <dt>Asesor Solven</dt>
+                <dd th:text="${@sysUserService.getSysUserById(loanApplication?.creditAnalystSysUserId)?.getFullName()}"></dd>
+                <dt th:if="${loanApplication?.resultEFL}">Resultado EFL</dt>
+                <dd th:if="${loanApplication?.resultEFL}" th:text="${loanApplication?.resultEFL}"></dd>
+
+                <th:block
+                        th:if="${loanApplication?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                    <dt>Ingreso Disponible</dt>
+                    <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.disposableIncome, loanApplication?.country?.currency)}"></dd>
+                </th:block>
+                <th:block
+                        th:if="${loanApplication?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                    <dt>Ingreso Estimado</dt>
+                    <dd th:text="${loanApplication?.getSelectedLoanOffer() != null ? @utilService.doubleMoneyFormat(loanApplication?.getSelectedLoanOffer().admissionTotalIncome, loanApplication?.country?.currency) : ''}"></dd>
+                </th:block>
+            </dl>
+        </div>
+
+        <div class="col-md-4">
+            <dl class="dl-horizontal dl-loan-application">
+                <dt>F. Registro</dt>
+                <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.registerDate)}"
+                    th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.registerDate)}"></dd>
+                <dt>F. Expiración</dt>
+                <dd th:text="${@utilService.dateFormat(loanApplication?.expirationDate)}"
+                    th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.expirationDate)}"></dd>
+                <dt>F. Primera Cuota</dt>
+                <dd>
+                    <a href="#" id="firstDueDate" data-trigger="focus"
+                       th:text="${@utilService.dateFormat(loanApplication?.firstDueDate)}"
+                       th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.firstDueDate)}"></a>
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        var v_start = /*[[ ${loanApplication?.getProductMaxMinParameter()?.minDaysFirstDueDate} ]]*/null;
+                        var v_end = /*[[ ${loanApplication?.getProductMaxMinParameter()?.maxDaysFirstDueDate} ]]*/null;
+                        var firstDueDateValue = /*[[ ${@utilService.dateFormat(loanApplication?.firstDueDate)} ]]*/null;
+
+                        $('#firstDueDate').datepicker({
+                            startDate: '+' + v_start + 'd',
+                            endDate: '+' + v_end + 'd',
+                            daysOfWeekDisabled: "0,6"
+                        }).on('changeDate', function (ev) {
+                            firstDueDateValue = moment(ev.date).format("DD/MM/YYYY");
+                            defaultAjax({
+                                url: /*[[ @{/loanApplication/__${loanApplication?.id}__/firstDueDate} ]]*/,
+                                type: 'POST',
+                                data: {
+                                    value: firstDueDateValue
+                                },
+                                success: function (data) {
+                                    $('#firstDueDate').datepicker('hide');
+                                    $('#firstDueDate').text(firstDueDateValue);
+                                    refreshTabAjax('applications');
+                                    refreshTabAjax('applications');
+                                }
+                            })
+                        });
+                        /*]]>*/
+                    </script>
+                </dd>
+                <dt>Geolicaci&oacute;n de Navegador</dt>
+                <dd th:if="${loanApplication.consentNavGeolocation == null}">No existe</dd>
+                <dd th:if="${loanApplication.consentNavGeolocation != null}">
+                    <span class="label label-xs label-success" th:if="${loanApplication.consentNavGeolocation}">Confirmado</span>
+                    <span class="label label-xs label-danger" th:if="${!loanApplication.consentNavGeolocation}">Rechazado</span>
+                </dd>
+                <dt>Ubicaciones</dt>
+                <dd><a href="javascript:;"
+                       th:onclick="'showLoanApplicationMapModal('+${loanApplication?.id}+')'">Ver mapa</a>
+                </dd>
+                <th:block th:if="${loanApplication.getGuaranteedVehicleDescription() != null}">
+                    <dt>Vehiculo Garantizado</dt>
+                    <dd th:text="${loanApplication.getGuaranteedVehicleDescription()}"></dd>
+                    <dt>kilometraje</dt>
+                    <dd th:text="${loanApplication.guaranteedVehicleMileage}"></dd>
+                    <dt>Loan to Value</dt>
+                    <dd th:text="${@utilService.percentFormat(loanApplication.loanToValue)}"></dd>
+                    <dt>Fec. cita garantizado</dt>
+                    <dd th:text="${loanApplication.guaranteedVehicleAppointmentDate}"></dd>
+                    <dt>Placa</dt>
+                    <dd th:text="${loanApplication.guaranteedVehiclePlate}"></dd>
+                </th:block>
+                <!--<dt>¿Es proceso asistido?</dt>-->
+                <!--<dd th:text="${loanApplication?.assistedProcess ? 'Si' : 'No'}"></dd>-->
+                <th:block th:if="${loanApplication?.assistedProcessScheduledCallingDate}">
+                    <dt>Horario de contacto</dt>
+                    <dd th:text="${@utilService.getAssistedProcessScheduleRange(loanApplication?.assistedProcessScheduledCallingDate)}"></dd>
+                </th:block>
+            </dl>
+        </div>
+        <div class="col-md-4">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Estados</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <dl class="dl-horizontal dl-loan-application">
+                        <dt>Nuevo</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.newLADate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.newLADate)}"></dd>
+                        <dt>Pre evaluación. aprobada</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.peapprovedDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.peapprovedDate)}"></dd>
+                        <dt>Evaluación aprobada</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.eapprovedDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.eapprovedDate)}"></dd>
+                        <dt>A la espera de aprobación</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.waitingapprovalDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.waitingapprovalDate)}"></dd>
+                        <dt>Aprobada</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.approvedDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.approvedDate)}"></dd>
+                        <dt>Aprobada y firmada</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.approvedsignedDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.approvedsignedDate)}"></dd>
+                        <dt>Rechazada</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.rejectedDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.rejectedDate)}"></dd>
+                        <dt>Rechazada auto.</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.rejectedautomaticallyDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.rejectedautomaticallyDate)}"></dd>
+                        <dt>Rechazada auto. evaluacion</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.rejectedAutomaticallyEvaluation)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.rejectedAutomaticallyEvaluation)}"></dd>
+                        <dt>Lead Referido</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.leadReferred)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.leadReferred)}"></dd>
+                        <dt>Expirado</dt>
+                        <dd th:text="${@utilService.datetimeShortFormat(loanApplication?.expired)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(loanApplication?.expired)}"></dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" th:if="${loanApplication.consolidableDebts != null}">
+        <div class="col-md-12">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Deudas Consolidables</span>
+                    </div>
+
+                </div>
+                <div class="portlet-body">
+                    <div class="table-responsive">
+                        <table th:if="${loanApplication?.consolidableDebts != null}"
+                               class="table table-bordered table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>Banco</th>
+                                <th>Nro Tarjeta/Nro de Préstamo</th>
+                                <th>Marca</th>
+                                <th>Ubigeo</th>
+                                <th>Monto (S/)</th>
+                                <th>Tasa</th>
+                                <th>Cuotas</th>
+                                <th>Seleccionado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="consolidableDebt : ${loanApplication?.consolidableDebts}">
+                                <script th:inline="javascript">
+                                    /*<![CDATA[*/
+                                    var loanApplicationId = new String(/*[[ ${consolidableDebt?.loanApplicationId} ]]*/);
+                                    var consolidationAccountType = new String(/*[[ ${consolidableDebt?.consolidationAccounttype} ]]*/);
+                                    var entityId = new String(/*[[ ${consolidableDebt?.entity?.code} ]]*/);
+                                    var consolidableDebtId = loanApplicationId.concat("_", consolidationAccountType, "_", entityId);
+                                    /*]]>*/
+                                </script>
+                                <td th:text="${consolidableDebt?.entity?.shortName}"></td>
+                                <td>
+                                    <a href="#"
+                                       th:id="'accountCard_' + ${consolidableDebt?.loanApplicationId} + '_' + ${consolidableDebt?.consolidationAccounttype} + '_' + ${consolidableDebt?.entity?.code}"
+                                       th:text="${consolidableDebt?.accountCardNumber}"></a>
+                                    <span class="label label-xs label-info"
+                                          th:text="' (' + ${consolidableDebt.getShortNameAccountType(consolidableDebt?.consolidationAccounttype)} + ')'"></span>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var editableJson = getDefaultXEditableJson();
+                                        editableJson.type = 'text';
+                                        editableJson.url = /*[[ @{/loanOffer/accountCardNumber} ]]*/;
+                                        editableJson.params.loanApplicationId = loanApplicationId;
+                                        editableJson.params.consolidationAccounttype = consolidationAccountType;
+                                        editableJson.params.entity = entityId;
+                                        editableJson.title = 'Nro Tarjeta';
+                                        editableJson.value = /*[[ ${consolidableDebt?.accountCardNumber} ]]*/;
+                                        $('#accountCard_' + consolidableDebtId).editable(editableJson);
+                                        /*]]>*/
+                                    </script>
+                                </td>
+
+                                <td>
+                                    <a href="#"
+                                       th:id="'creditCardBrand_' + ${consolidableDebt?.loanApplicationId} + '_' + ${consolidableDebt?.consolidationAccounttype} + '_' + ${consolidableDebt?.entity?.code}"
+                                       th:text="${consolidableDebt?.creditCardBrand?.name}"></a>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var editableJson = getDefaultXEditableJson();
+                                        editableJson.type = 'select';
+                                        editableJson.url = /*[[ @{/loanOffer/creditCard} ]]*/;
+                                        editableJson.params.loanApplicationId = loanApplicationId;
+                                        editableJson.params.consolidationAccounttype = consolidationAccountType;
+                                        editableJson.params.entity = entityId;
+                                        editableJson.title = 'Marca';
+                                        editableJson.value = /*[[ ${consolidableDebt?.creditCardBrand?.id} ]]*/;
+                                        editableJson.source = function () {
+                                            var crediCardBrands;
+                                            $.ajax({
+                                                url: /*[[@{/catalog/creditCardBrand/json}]]*/null,
+                                                type: 'GET',
+                                                async: false,
+                                                global: false,
+                                                success: function (data) {
+                                                    var result = JSON.parse(data);
+                                                    crediCardBrands = [];
+
+                                                    for (i = 0; i < result.length; i++) {
+                                                        crediCardBrands[i] = {
+                                                            value: result[i].id,
+                                                            text: result[i].name
+                                                        };
+                                                    }
+                                                }
+                                            })
+                                            return crediCardBrands;
+                                        };
+                                        $('#creditCardBrand_' + consolidableDebtId).editable(editableJson);
+                                        /*]]>*/
+                                    </script>
+                                </td>
+                                <td>
+                                    <a href="#"
+                                       th:id="'ubigeo_' + ${consolidableDebt?.loanApplicationId} + '_' + ${consolidableDebt?.consolidationAccounttype} + '_' + ${consolidableDebt?.entity?.code}"
+                                       th:text="${consolidableDebt?.department?.name}"></a>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var editableJson = getDefaultXEditableJson();
+                                        editableJson.type = 'select';
+                                        editableJson.url = /*[[ @{/loanOffer/ubigeo} ]]*/;
+                                        editableJson.params.loanApplicationId = loanApplicationId;
+                                        editableJson.params.consolidationAccounttype = consolidationAccountType;
+                                        editableJson.params.entity = entityId;
+                                        editableJson.title = 'Ubigeo';
+                                        editableJson.value = /*[[ ${consolidableDebt?.department?.id} ]]*/;
+                                        editableJson.source = function () {
+                                            var departments;
+                                            $.ajax({
+                                                url: /*[[@{/catalog/departments/json}]]*/null,
+                                                type: 'GET',
+                                                async: false,
+                                                global: false,
+                                                success: function (data) {
+                                                    var result = JSON.parse(data);
+                                                    departments = [];
+
+                                                    for (i = 0; i < result.length; i++) {
+                                                        departments[i] = {
+                                                            value: result[i].id,
+                                                            text: result[i].name
+                                                        };
+                                                    }
+                                                }
+                                            })
+                                            return departments;
+                                        };
+                                        $('#ubigeo_' + consolidableDebtId).editable(editableJson);
+                                        /*]]>*/
+                                    </script>
+                                </td>
+                                <td class="numeric">
+                                    <a href="#"
+                                       th:id="'balance_' + ${consolidableDebt?.loanApplicationId} + '_' + ${consolidableDebt?.consolidationAccounttype} + '_' + ${consolidableDebt?.entity?.code}"
+                                       th:text="${consolidableDebt?.balanceDouble}"></a>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var editableJson = getDefaultXEditableJson();
+                                        editableJson.type = 'text';
+                                        editableJson.url = /*[[ @{/loanOffer/balance} ]]*/;
+                                        editableJson.params.loanApplicationId = loanApplicationId;
+                                        editableJson.params.consolidationAccounttype = consolidationAccountType;
+                                        editableJson.params.entity = entityId;
+                                        editableJson.title = 'Monto (S/)';
+                                        editableJson.value = /*[[ ${consolidableDebt?.balanceDouble} ]]*/;
+                                        $('#balance_' + consolidableDebtId).editable(editableJson);
+                                        /*]]>*/
+                                    </script>
+                                </td>
+                                <td class="numeric">
+                                    <a href="#"
+                                       th:id="'rate_' + ${consolidableDebt?.loanApplicationId} + '_' + ${consolidableDebt?.consolidationAccounttype} + '_' + ${consolidableDebt?.entity?.code}"
+                                       th:text="${@utilService.percentFormat(consolidableDebt?.rate)}"></a>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var editableJson = getDefaultXEditableJson();
+                                        editableJson.type = 'text';
+                                        editableJson.url = /*[[ @{/loanOffer/rate} ]]*/;
+                                        editableJson.params.loanApplicationId = loanApplicationId;
+                                        editableJson.params.consolidationAccounttype = consolidationAccountType;
+                                        editableJson.params.entity = entityId;
+                                        editableJson.title = 'Tasa';
+                                        editableJson.value = /*[[ ${consolidableDebt?.rate} ]]*/;
+                                        $('#rate_' + consolidableDebtId).editable(editableJson);
+                                        /*]]>*/
+                                    </script>
+                                </td>
+                                <td class="numeric">
+                                    <a href="#"
+                                       th:id="'installments_' + ${consolidableDebt?.loanApplicationId} + '_' + ${consolidableDebt?.consolidationAccounttype} + '_' + ${consolidableDebt?.entity?.code}"
+                                       th:text="${consolidableDebt?.installments}"></a>
+                                    <script th:inline="javascript">
+                                        /*<![CDATA[*/
+                                        var editableJson = getDefaultXEditableJson();
+                                        editableJson.type = 'text';
+                                        editableJson.url = /*[[ @{/loanOffer/installments} ]]*/;
+                                        editableJson.params.loanApplicationId = loanApplicationId;
+                                        editableJson.params.consolidationAccounttype = consolidationAccountType;
+                                        editableJson.params.entity = entityId;
+                                        editableJson.title = 'Tasa';
+                                        editableJson.value = /*[[ ${consolidableDebt?.installments} ]]*/;
+                                        $('#installments_' + consolidableDebtId).editable(editableJson);
+                                        /*]]>*/
+                                    </script>
+                                </td>
+                                <td align="center">
+                                    <a th:if="${consolidableDebt?.selected != null and !consolidableDebt?.selected}"
+                                       href="javascript:;"
+                                       th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                       th:onclick="'selectConsolidableDebt('+${consolidableDebt?.loanApplicationId}+','+${loanApplication?.selectedEntityId}+','+${consolidableDebt?.consolidationAccounttype}+',\''+${consolidableDebt?.entity?.code}+'\','+${consolidableDebt?.balanceDouble}+','+${consolidableDebt?.installments}+','+${consolidableDebt?.rate}+',\''+${consolidableDebt?.accountCardNumber}+'\', true, '+${consolidableDebt?.brandId}+',\''+${consolidableDebt?.departmentUbigeo}+ '\')'">
+                                        <i class="fa fa-check"></i>Seleccionar</a>
+                                    <a th:if="${consolidableDebt?.selected != null and consolidableDebt?.selected}"
+                                       href="javascript:;"
+                                       th:class="${@frontEndService.getDefaultInsidePortletRejectButtonClass()}"
+                                       th:onclick="'selectConsolidableDebt('+${consolidableDebt?.loanApplicationId}+','+${loanApplication?.selectedEntityId}+','+${consolidableDebt?.consolidationAccounttype}+',\''+${consolidableDebt?.entity?.code}+'\','+${consolidableDebt?.balanceDouble}+','+${consolidableDebt?.installments}+','+${consolidableDebt?.rate}+',\''+${consolidableDebt?.accountCardNumber}+'\', false,'+${consolidableDebt?.brandId}+',\''+${consolidableDebt?.departmentUbigeo}+ '\')'">
+                                        <i class="fa fa-check"></i>Deseleccionar</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" th:if="${loanApplication.vehicle != null}">
+        <div class="col-md-12">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Datos del Vehículo</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <dl class="dl-horizontal dl-loan-application">
+                        <dt>Marca</dt>
+                        <dd th:text="${loanApplication?.vehicle?.brand?.brand}"></dd>
+                        <dt>Modelo</dt>
+                        <dd th:text="${loanApplication?.vehicle?.model}"></dd>
+                        <dt>Transmisión</dt>
+                        <th:block
+                                th:switch="${loanApplication?.vehicle?.transmission}">
+                            <dd th:case="${T(com.affirm.common.model.catalog.Vehicle).MECANICO}">
+                                Mecánico
+                            </dd>
+                            <dd th:case="${T(com.affirm.common.model.catalog.Vehicle).AUTOMATICO}">
+                                Automático
+                            </dd>
+                        </th:block>
+                        <dt>Precio Online</dt>
+                        <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.vehicle?.price, T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"></dd>
+                        <dt>Precio de Lista</dt>
+                        <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.vehicle?.listPrice, T(com.affirm.system.configuration.Configuration).DOLLAR_CURRENCY)}"></dd>
+                        <dt>Porcentaje de Ahorro</dt>
+                        <dd th:text="${@utilService.percentajeSave(loanApplication?.vehicle?.listPrice, loanApplication?.vehicle?.price)}"></dd>
+                        <dt>Versión</dt>
+                        <dd th:text="${loanApplication?.vehicle?.version}"></dd>
+                        <dt>Combustible</dt>
+                        <dd th:text="${loanApplication?.vehicle?.gasType?.type}"></dd>
+                        <dt>Año de Producción</dt>
+                        <dd th:text="${loanApplication?.vehicle?.yearOfProduction}"></dd>
+                        <dt>Color</dt>
+                        <dd th:text="${loanApplication?.vehicle?.vehicleDetails[0]?.color}"></dd>
+
+                        <dt>Consecionario</dt>
+                        <dd th:text="${loanApplication?.vehicle?.vehicleDealership?.name}"></dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row"
+         th:if="${loanApplication.getSelectedLoanOfferEntityProductParam() != null and loanApplication.getSelectedLoanOfferEntityProductParam().getRequiresContractCall()}">
+        <div class="col-md-12">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Llamada Toky</span>
+                    </div>
+                </div>
+                <div th:if="${loanApplication?.tokyCall == null}">
+                    <form action="#" enctype="multipart/form-data" id="tokyCallForm">
+                        <label href="javascript:;" class="btn btn-lg red" for="tokyCallUploader"> Subir Archivo
+                            <i class="fa fa-edit"></i>
+                            <input type="file" style="display: none" name="tokyCall" id="tokyCallUploader"/>
+                        </label>
+                    </form>
+                </div>
+                <div th:unless="${loanApplication?.tokyCall == null}">
+                    <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+                    <div id="jp_container_1" class="jp-audio" role="application" aria-label="media player">
+                        <div class="jp-type-single">
+                            <div class="jp-gui jp-interface">
+                                <div class="jp-controls">
+                                    <button class="jp-pause" role="button" tabindex="0">pause</button>
+                                    <button class="jp-play" role="button" tabindex="0">play</button>
+                                    <button class="jp-stop" role="button" tabindex="0">stop</button>
+                                </div>
+                                <div class="jp-progress">
+                                    <div class="jp-seek-bar">
+                                        <div class="jp-play-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="jp-volume-controls">
+                                    <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                    <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                                    <div class="jp-volume-bar">
+                                        <div class="jp-volume-bar-value"></div>
+                                    </div>
+                                </div>
+                                <div class="jp-time-holder">
+                                    <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                                    <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                                    <div class="jp-toggles">
+                                        <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="jp-details">
+                                <div class="jp-title" aria-label="title">
+                                    <div>
+                                        <a target="_blank" th:href="${loanApplication?.tokyCall}"> Descargar
+                                            llamada </a>
+                                    </div>
+
+                                    <div>
+                                        <a href="javascript:;"
+                                           th:onclick="'deleteTokyCall(' + ${loanApplication?.id} + ')'">
+                                            Eliminar </a>
+                                    </div>
+                                    <script th:inline="javascript">
+                                        function deleteTokyCall(loanApplicationId) {
+                                            var data = new FormData();
+                                            data.append("loanApplicationId", loanApplicationId);
+
+                                            swal({
+                                                    title: "",
+                                                    text: "<br/><br/>¿Deseas eliminar la llamada de Toky de todas maneras?",
+                                                    type: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "#DD6B55",
+                                                    confirmButtonText: "¡Sí, eliminar!",
+                                                    closeOnConfirm: false,
+                                                    html: true
+                                                },
+                                                function () {
+                                                    defaultAjax({
+                                                        url: /*[[ @{/loanApplication/deleteTokyCall} ]]*/,
+                                                        type: 'POST',
+                                                        data: data,
+                                                        cache: false,
+                                                        processData: false,
+                                                        contentType: false,
+                                                        success: function (data) {
+                                                            refreshTabAjax('applications');
+                                                            swal("Eliminada", "La llamada de Toky ha sido eliminada correctamente.", "success");
+                                                        }
+                                                    });
+                                                });
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="jp-no-solution">
+                                <span>Update Required</span>
+                                To play the media you will need to either update your browser to a recent
+                                version or update your <a href="http://get.adobe.com/flashplayer/"
+                                                          target="_blank">Flash plugin</a>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row" th:if="${loanApplication.offers != null}">
+        <div class="col-md-12">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Ofertas</span>
+                    </div>
+
+                </div>
+                <div class="portlet-body">
+                    <div th:if="${loanApplication?.loadingOffers}">
+                        Las ofertas están en proceso de creación. Vuelve a cargar en unos segundos.
+                    </div>
+                    <div class="table-responsive" th:if="${!loanApplication?.loadingOffers}">
+                        <table th:if="${loanApplication?.offers != null}"
+                               class="table table-bordered table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>Entidad</th>
+                                <th>Producto</th>
+                                <th>Fecha de generación</th>
+                                <th>Oferta</th>
+                                <th>Cuota Inicial (USD)</th>
+                                <th>Tipo de Cambio</th>
+                                <th><span
+                                        th:text="'Comisión Solven ' + ${loanApplication?.country?.currency?.symbol}"></span>
+                                </th>
+                                <th><span
+                                        th:text="'Cuota promedio mensual ' + ${loanApplication?.country?.currency?.symbol}"></span>
+                                </th>
+                                <th>RCI</th>
+                                <th>Seleccionado</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="offer : ${loanApplication?.offers}">
+                                <td th:text="${offer?.entityShortName}"></td>
+                                <td th:text="${offer?.entityProductParam?.entityProduct }"></td>
+                                <td th:text="${@utilService.datetimeShortFormat(offer?.registerDate)}"
+                                    th:attr="data-order=${@utilService.datetimeYearFirstFormat(offer?.registerDate)}"></td>
+                                <td class="numeric">
+                                            <span th:if="${offer?.selectedByClient}"
+                                                  class="label  label-warning label-mini"> Cliente </span>
+                                    <span th:if="${offer?.selectedByAnalyst}"
+                                          class="label label-xs label-success label-mini"> Analista </span>
+                                    <span th:if="${offer?.entityClusterId}!= null">&nbsp;&nbsp; </span>
+                                    <span th:if="${offer?.entityClusterId}!= null"
+                                          class="label label-xs label-default label-mini"
+                                          th:text="${offer?.entityClusterId}"></span>
+                                    <span th:text="'&nbsp;&nbsp;' + ${offer?.getLoanOfferDescription(@utilService, loanApplication?.country?.id)}">
+                                            </span>
+                                </td>
+                                <td class="numeric">
+                                    <span th:text="${offer?.downPayment}"></span>
+                                    <span th:if="${offer?.downPayment != null}"
+                                          title="Porcentaje del vehiculo que representa la cuota inicial"
+                                          th:text="${' (' + @utilService.percentFormat(offer?.getVehicleDownPaymentInPercentage(loanApplication?.vehicle?.price)) + ')'}"></span>
+                                </td>
+                                <td class="numeric" th:text="${offer?.exchangeRate}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offer?.loanCommission, offer?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offer?.installmentAmountAvg, offer?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.percentFormat(offer?.rci,offer?.currency)}"></td>
+                                <td align="center">
+                                            <span th:if="${offer?.selected}"
+                                                  class="label label-xs label-info label-mini"> Seleccionado </span>
+                                    <a th:if="${offer?.selected != null and !offer?.selected}"
+                                       href="javascript:;"
+                                       th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                       th:onclick="'selectLoanOffer('+${offer?.id}+','+${loanApplication?.id}+')'">
+                                        <i class="fa fa-check"></i>Seleccionar</a>
+
+                                    <a th:if="${offer?.selected}"
+                                       href="javascript:;"
+                                       th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                       th:onclick="'notifyOffer('+${offer?.id}+','+${loanApplication?.id}+')'"
+                                       style="margin-left:20px;">
+                                        <i class="fa fa-check"></i>Notificar
+                                    </a>
+                                </td>
+                                <th:block th:if="${offer?.commercialSpeech != null}">
+                                    <td align="center">
+                                        <span th:if="${offer?.selected != null and !offer?.selected}"></span>
+                                        <a th:if="${offer?.selected}"
+                                           href="javascript:;"
+                                           th:class="${@frontEndService.getDefaultInsidePortletButtonClass()}"
+                                           th:onclick="'showSpeechModal'+${offer?.id}+'()'"> Speech </a>
+                                    </td>
+                                    <script th:inline="javascript">
+                                        function showSpeechModal[[${offer?.id}]]()
+                                        {
+                                            var win = window.open("", "Speech", "toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=800, height=780");
+                                            win.document.body.innerHTML = /*[[${offer?.commercialSpeech}]]*/"";
+                                        }
+                                    </script>
+                                </th:block>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Pre evaluación - Motivos de Rechazo</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tab-content">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Entidad</th>
+                                    <th>Producto</th>
+                                    <th>Filtro Duro</th>
+                                    <th>Aprobada</th>
+                                    <th>Mensaje de Ayuda</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="preEvaluationRejection,iter : ${loanApplication?.preliminaryEvaluations}">
+                                    <td th:text="${preEvaluationRejection?.entity?.shortName}"></td>
+                                    <td th:text="${preEvaluationRejection?.product?.name}"></td>
+                                    <td th:text="${preEvaluationRejection?.hardFilter?.hardFilterMessage}"></td>
+                                    <td th:if="${preEvaluationRejection?.approved}">
+                                        <div class="fa fa-check alert-success"></div>
+                                    </td>
+                                    <td th:unless="${preEvaluationRejection?.approved}">
+                                        <div class="fa fa-close alert-danger"></div>
+                                    </td>
+                                    <td th:text="${preEvaluationRejection?.helpMessage}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">Evaluación - Motivos de Rechazo</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tab-content">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Entidad</th>
+                                    <th>Producto</th>
+                                    <th>Política</th>
+                                    <th>Aprobada</th>
+                                    <th>Mensaje de Ayuda</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="evaluationRejection,iter : ${loanApplication?.evaluations}">
+                                    <td th:text="${evaluationRejection?.entity?.shortName}"></td>
+                                    <td th:text="${evaluationRejection?.product?.name}"></td>
+                                    <td th:text="${evaluationRejection?.policy?.policy}"></td>
+                                    <td th:if="${evaluationRejection?.approved}">
+                                        <div class="fa fa-check alert-success"></div>
+                                    </td>
+                                    <td th:unless="${evaluationRejection?.approved}">
+                                        <div class="fa fa-close alert-danger"></div>
+                                    </td>
+                                    <td th:text="${evaluationRejection?.helpMessage}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                                <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"
+                                      th:switch="${loanApplication?.country?.id}">
+                                    <th:block
+                                            th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">RCI</th:block>
+                                    <th:block th:case="*">RCI Inicial</th:block>
+                                </span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <dl class="dl-horizontal dl-loan-application">
+                        <th:block th:switch="${person?.documentType?.countryId}">
+                            <th:block th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                <dt>Cuota SBS</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.sbsMonthlyInstallment, loanApplication?.country?.currency?.symbol, loanApplication?.country?.separator)}"></dd>
+                                <dt>Cuota SBS Hipotecario</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.sbsMonthlyInstallmentMortgage, loanApplication?.country?.currency?.symbol, loanApplication?.country?.separator)}"></dd>
+                                <dt>Ingreso Total Admisión</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.admissionTotalIncome, loanApplication?.country?.currency)}"></dd>
+                                <dt>RCI</dt>
+                                <dd th:text="${@utilService.percentFormat(loanApplication?.rci, loanApplication?.country?.currency)}"></dd>
+                            </th:block>
+                            <th:block th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                                      th:with="selectedOffer=${loanApplication?.getSelectedLoanOffer()}">
+                                <dt>Cuota</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.installmentAmountAvg, loanApplication?.country?.currency) : ''}"></dd>
+                                <dt>Ingreso Estimado</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.admissionTotalIncome, loanApplication?.country?.currency) : ''}"></dd>
+                                <dt>RCI</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.percentFormat(selectedOffer.rci, loanApplication?.country?.currency) : ''}"></dd>
+                                <dt>Deuda total BCRA</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.totalDebt, loanApplication?.country?.currency) : ''}"></dd>
+                            </th:block>
+                        </th:block>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" th:if="${loanApplication?.getSelectedLoanOffer() != null}">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}"
+                         th:switch="${loanApplication?.country?.id}">
+                        <th:block th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">DTI</span>
+                        </th:block>
+                        <th:block th:case="*">
+                            <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}">RCI Final</span>
+                            <span class="caption-helper">Oferta seleccionada</span>
+                        </th:block>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <dl class="dl-horizontal dl-loan-application">
+                        <th:block th:switch="${person?.documentType?.countryId}">
+                            <th:block th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_PERU}">
+                                <dt>Cuota Promedio</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.getSelectedLoanOffer().installmentAmountAvg, loanApplication?.country?.currency)}"></dd>
+                                <dt>Cuota SBS</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.getSelectedLoanOffer().sbsMonthlyInstallment, loanApplication?.country?.currency?.symbol, loanApplication?.country?.separator)}"></dd>
+                                <dt>Cuota SBS Hipotecario</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.getSelectedLoanOffer().sbsMonthlyInstallmentMotgage, loanApplication?.country?.currency?.symbol, loanApplication?.country?.separator)}"></dd>
+                                <dt>Ingreso Total Admisión</dt>
+                                <dd th:text="${@utilService.doubleMoneyFormat(loanApplication?.getSelectedLoanOffer().admissionTotalIncome, loanApplication?.country?.currency)}"></dd>
+                                <dt>RCI</dt>
+                                <dd th:text="${@utilService.percentFormat(loanApplication?.getSelectedLoanOffer().rci, loanApplication?.country?.currency)}"></dd>
+                                <dt>RCI Interno</dt>
+                                <dd th:text="${@utilService.percentFormat(loanApplication?.getSelectedLoanOffer()?.internalRci, loanApplication?.country?.currency)}"></dd>
+                            </th:block>
+                            <th:block th:case="${T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA}"
+                                      th:with="selectedOffer=${loanApplication?.getSelectedLoanOffer()}">
+                                <dt>Cuota</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.installmentAmountAvg, loanApplication?.country?.currency) : ''}"></dd>
+                                <dt>Compromiso Mensual</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.sbsMonthlyInstallmentEfx, loanApplication?.country?.currency) : ''}"></dd>
+                                <dt>Ingreso Estimado</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.admissionTotalIncome, loanApplication?.country?.currency) : ''}"></dd>
+                                <dt>DTI</dt>
+                                <dd th:text="${selectedOffer != null ? @utilService.doubleMoneyFormat(selectedOffer.dti, loanApplication?.country?.currency) : ''}"></dd>
+                            </th:block>
+                        </th:block>
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" th:if="${loanApplication?.getSelectedLoanOffer() != null}">
+            <div class="portlet transparent">
+                <div class="portlet-title">
+                    <div th:class="${@frontEndService.getDefaultCaptionClass()}">
+                        <span th:class="${@frontEndService.getDefaultCaptionSubjectClass()}"> Cronograma de la oferta</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-responsive" style="overflow-x: auto;">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>Cuota</th>
+                                <th>Vencimiento</th>
+                                <th>Remanente</th>
+                                <th>Capital</th>
+                                <th>Interés</th>
+                                <th>Interés
+                                    <th:block
+                                            th:text="${loanApplication?.country?.id == T(com.affirm.common.model.catalog.CountryParam).COUNTRY_ARGENTINA ? 'IVA' : 'IGV'}"/>
+                                </th>
+                                <th>Recaudo</th>
+                                <th>Recaudo IGV</th>
+                                <!--th th:if="${loanApplication.vehicle != null}">Seguro Vehicular</th-->
+                                <th>Desgravamen</th>
+                                <th>Cuota total</th>
+                            </tr>
+                            </thead>
+                            <tbody th:with="selectedLoanOffer=${loanApplication?.getSelectedLoanOffer()}">
+                            <tr th:each="offerSchedule : ${selectedLoanOffer.offerSchedule}">
+                                <td th:text="${offerSchedule?.installmentId}"></td>
+                                <td class="text-center"
+                                    th:text="${@utilService.dateFormat(offerSchedule?.getDueDate())}"
+                                    th:attr="data-order=${@utilService.datetimeYearFirstFormat(offerSchedule?.getDueDate())}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getRemainingCapital(), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentCapital(), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInterest(), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInterestTax(), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getCollectionCommission(), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getCollectionCommissionTax(), loanApplication?.country?.currency)}"></td>
+                                <!--th:block th:if="${loanApplication.vehicle != null}">
+                                    <td class="numeric" th:text="${@utilService.doubleMoneyFormat(offerSchedule?.carInsurance, loanApplication?.country?.currency?.symbol, loanApplication?.country?.separator)}"></td>
+                                </th:block-->
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInsurance(), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(offerSchedule?.getInstallmentAmount(), loanApplication?.country?.currency)}"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" align="right"><b>Totales:</b></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('installmentCapital'), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('interest'), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('interestTax'), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('collectionCommission'), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('collectionCommissionTax'), loanApplication?.country?.currency)}"></td>
+                                <td th:if="${loanApplication.vehicle != null}" class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('carInsurance'), loanApplication?.country?.currency?.symbol, loanApplication?.country?.separator)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('insurance'), loanApplication?.country?.currency)}"></td>
+                                <td class="numeric"
+                                    th:text="${@utilService.doubleMoneyFormat(selectedLoanOffer.getTotalScheduleField('installmentAmount'), loanApplication?.country?.currency)}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div th:if="${loanApplication.showFiles}"
+             th:with="userFilesObject = ${loanApplication.userFilesObjectList}, showMissingDocumentationButton=${loanApplication.showMissingDocumentationButton}"
+             th:remove="tag">
+            <div th:replace="fragments/personFragmentsDocumentation :: tab-documentation(loanApplication=${loanApplication})"/>
+        </div>
+    </div>
+    <div class="row">
+        <div th:if="${loanApplication.showRecognition}" th:with="result = ${loanApplication.recognition}"
+             th:remove="tag">
+            <div th:replace="fragments/personFragmentsRekognition :: tab-rekognition"/>
+        </div>
+
+        <div th:if="${loanApplication.showInteractions}" th:with="interaction = ${loanApplication.interactions}"
+             th:remove="tag">
+            <div th:replace="fragments/personFragmentsInteraction :: tab-interactions-know"/>
+        </div>
+    </div>
+    <div th:if="${loanApplication.showFraudAlerts}" class="row" th:with="loanApplication = ${loanApplication}, showActions=true, sectionName = 'Alerta de fraudes',  tableID='fraudAlerts'">
+        <div th:replace="fragments/personFragmentFraudAlert :: tab-fraud-alerts"></div>
+    </div>
+    <div th:if="${loanApplication.showFraudAlerts}" class="row" th:with="loanApplicationFraudAlerts = ${loanApplication.loanApplicationFraudAlertsLogs}, showActions=false, sectionName = 'Log Alerta de fraudes',tableID='fraudAlertsLog'">
+        <div th:replace="fragments/personFragmentFraudLogAlert :: tab-fraud-log-alerts"></div>
+    </div>
+    <div th:if="${loanApplication.showNotes}" class="row">
+        <div th:replace="fragments/personFragmentsNote :: tab-notes-log"></div>
+    </div>
+    <div th:if="${loanApplication.showPepOfac}" class="row"  th:with="loanApplication=${loanApplication} , disquilifiers=${@personService.getPersonDisqualifierMap(#httpServletRequest,loanApplication?.id)}">
+        <div th:replace="fragments/personFragmentDisqualifier :: tab-disqualifier"></div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            var uri = /*[[ @{/person} ]]*/null;
+            var personId = /*[[ ${loanApplication.personId} ]]*/null;
+            var loanApplicationId = /*[[ ${loanApplication.id} ]]*/null;
+            var baseURL = uri + '/' + personId + '/application/' + loanApplicationId;
+
+            var loanApplicationCode = /*[[ ${loanApplication.code} ]]*/null;
+            var accordions = $('#' + loanApplicationCode + ' #tabData');
+
+            // console.log(accordions);
+
+            accordions.each(function (accordion) {
+                var eachAccordion = $(this).data('accordion');
+                var oneTimeLoadAccordion = $(this).find('.tools a.expand');
+                // console.log(oneTimeLoadAccordion);
+                var reloadAccordion = $(this).find('.tools a.reload');
+                // console.log(reloadAccordion);
+
+                oneTimeLoadAccordion.one('click', function () {
+                    loadAccordionOnDemand(eachAccordion, false);
+                });
+                reloadAccordion.click(function () {
+                    loadAccordionOnDemand(eachAccordion, true);
+                });
+            });
+
+            function loadAccordionOnDemand(accordion, isReload) {
+                var url = baseURL + '/' + accordion;
+                var container = $('#' + loanApplicationCode + ' #tabData[data-accordion=' + accordion + '] .portlet-body');
+                // console.log(url);
+
+                if(accordion == null) {
+                    container.html('<ul class="fa-ul"><li>Acordeón no implementado correctamente</ul>');
+                    return;
+                }
+
+                if(isReload) {
+                    container.html('<ul class="fa-ul"><li><i class="fa-li fa fa-spinner fa-spin"></i>Cargando información ...</li></ul>');
+                }
+
+                defaultAjax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        // console.log(data);
+                        if(data !== null && data.trim() !== '') {
+                            // Sucede que al refrescar, el nuevo html ya no ejecuta el script que tiene internamente cuando se usa $.html().
+                            // Como workaround y hack de alguna libreria de $. Doy click al refresh -> renderiza una animacion de carga (son alrededor de 3 divs) -> tomo el primer div y uso $.replaceWith()
+                            // $.replaceWith() a diferencia $.html() si vuelve a cargar el JS
+                            container.children().first().replaceWith(data);
+                        }
+                        // else {
+                        //     container.html('No se obtuvieron resultados');
+                        // }
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    }
+                });
+            }
+        })();
+        /*]]>*/
+    </script>
+
+</div>
+</body>
+</html>

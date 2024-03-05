@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/extranetTemplate(sidebarClosed=true)"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}">
+    </script>
+    <script
+        th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}">
+    </script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+        rel="stylesheet" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.js'}">
+    </script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.css'}"
+        rel="stylesheet" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+        type="text/javascript"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet"
+        type="text/css" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}"
+        rel="stylesheet" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.resize.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.categories.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.pie.min.js'}"
+        type="text/javascript"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/css/bootstrap-datepicker3.min.css'}" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <style>
+        #noteFragment .dataTables_wrapper .dataTables_processing{
+            margin-left: 0px !important;
+            margin-top: 0px !important;
+        }
+
+        #tableNote{
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+
+        .dataTable th:first-child, .dataTable td:first-child{
+            text-align: center;
+        }
+        .dataTable th, .dataTable td{
+            height: 33px !important;
+        }
+        .modal-content .dropdown-toggle.btn-default {
+            margin-top: 0px;
+        }
+        .all-trapezoid-container{
+            width : 60%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .trapezoid-container{
+            display : flex;
+            flex-direction: row;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .right-trapezoid{
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 50px 1rem 0 0;
+        }
+
+        .left-trapezoid{
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 1rem 50px 0;
+        }
+
+        .center-trapezoid{
+            width: 90%;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .first-trapezoid{
+            width : 100%
+        }
+
+        .second-trapezoid{
+            width : calc(100% - 2.5rem)
+        }
+
+        .third-trapezoid{
+            width : calc(100% - 5rem)
+        }
+
+        .fourth-trapezoid{
+            width : calc(100% - 7.5rem)
+        }
+
+        .fifth-trapezoid{
+            width : calc(100% - 10rem)
+        }
+
+        .sixth-trapezoid{
+            width : calc(100% - 12.5rem)
+        }
+
+        .seventh-trapezoid{
+            width : calc(100% - 15rem)
+        }
+
+        .eighth-trapezoid{
+            width : calc(100% - 17.5rem)
+        }
+
+        .center-trapezoid > h4, .center-trapezoid > h5{
+            margin: 0px;
+            color: white;
+            text-align: center;
+        }
+
+
+        .inactive-trapezoid > .right-trapezoid{
+            border-color: #d9d8d8 transparent transparent transparent !important;
+        }
+
+        .inactive-trapezoid > .center-trapezoid{
+            background-color: #d9d8d8 !important;
+        }
+
+        .inactive-trapezoid > .left-trapezoid{
+            border-color: transparent #d9d8d8 transparent !important;
+        }
+
+        div.first-trapezoid > .right-trapezoid{
+            border-color: #094e9c transparent transparent transparent;
+        }
+
+        div.first-trapezoid > .left-trapezoid{
+            border-color: transparent #094e9c transparent
+        }
+
+        div.first-trapezoid > .center-trapezoid{
+            background-color: #094e9c;
+        }
+
+        div.second-trapezoid > .right-trapezoid{
+            border-color: #015dcc transparent transparent transparent;
+        }
+
+        div.second-trapezoid > .left-trapezoid{
+            border-color: transparent #015dcc transparent
+        }
+
+        div.second-trapezoid > .center-trapezoid{
+            background-color: #015dcc;
+        }
+
+        div.third-trapezoid > .right-trapezoid{
+            border-color: #3d7bd2 transparent transparent transparent;
+        }
+
+        div.third-trapezoid > .left-trapezoid{
+            border-color: transparent #3d7bd2 transparent
+        }
+
+        div.third-trapezoid > .center-trapezoid{
+            background-color: #3d7bd2;
+        }
+
+        div.fourth-trapezoid > .right-trapezoid{
+            border-color: #7fadeb transparent transparent transparent;
+        }
+
+        div.fourth-trapezoid > .left-trapezoid{
+            border-color: transparent #7fadeb transparent
+        }
+
+        div.fourth-trapezoid > .center-trapezoid{
+            background-color: #7fadeb;
+        }
+
+
+        div.fifth-trapezoid > .right-trapezoid{
+            border-color: #20a6ff transparent transparent transparent;
+        }
+
+        div.fifth-trapezoid > .left-trapezoid{
+            border-color: transparent #20a6ff transparent
+        }
+
+        div.fifth-trapezoid > .center-trapezoid{
+            background-color: #20a6ff;
+        }
+
+        div.sixth-trapezoid > .right-trapezoid{
+            border-color: #63c0fd transparent transparent transparent;
+        }
+
+        div.sixth-trapezoid > .left-trapezoid{
+            border-color: transparent #63c0fd transparent
+        }
+
+        div.sixth-trapezoid > .center-trapezoid{
+            background-color: #63c0fd;
+        }
+
+        div.seventh-trapezoid > .right-trapezoid{
+            border-color: #2ebff8 transparent transparent transparent;
+        }
+
+        div.seventh-trapezoid > .left-trapezoid{
+            border-color: transparent #2ebff8 transparent
+        }
+
+        div.seventh-trapezoid > .center-trapezoid{
+            background-color: #2ebff8;
+        }
+
+        div.eighth-trapezoid > .right-trapezoid{
+            border-color: #6fd6ff transparent transparent transparent;
+        }
+
+        div.eighth-trapezoid > .left-trapezoid{
+            border-color: transparent #6fd6ff transparent
+        }
+
+        div.eighth-trapezoid > .center-trapezoid{
+            background-color: #6fd6ff;
+        }
+
+        .row-filter-group  div.form-group {
+            padding: 0px;
+        }
+
+        .row-filter-group-button{
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .row-filter{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            padding: 1rem 1rem;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        .row-filter > div{
+            padding: 0rem 1rem;
+        }
+
+        .col-div-3{
+            width: 22%;
+        }
+
+        .col-div-2{
+            width: 18%;
+        }
+
+
+        .col-div-1-5{
+            width: 14%;
+        }
+
+        .col-div-1{
+            width: 10%;
+        }
+
+
+        .bootstrap-select button.dropdown-toggle{
+            height: 100%;
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 17px;
+            height: 17px;
+            vertical-align: text-bottom;
+            border: .25em solid white;
+            border-right-color: white;
+            border-right-color: transparent;
+            border-radius: 50%;
+            -webkit-animation: spinner-border .75s linear infinite;
+            animation: spinner-border .75s linear infinite;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        @-webkit-keyframes spinner-border {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spinner-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+    /*    Select2*/
+
+        .select2-container{
+            height: 40px !important;
+        }
+
+        .select2-selection--multiple{
+            position: relative;
+            height: 40px !important;
+            display: flex;
+            padding: 0px 5px !important;
+            border-radius: 6px !important;
+            border-color: #c2cad8 !important;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+        }
+
+        .select2-container .select2-dropdown .select2-results .select2-results__options .select2-results__option--highlighted{
+            color: black;
+        }
+
+        .select2-search--inline{
+            display: none;
+        }
+
+        .invalid-select2{
+            border: 1px solid #d54c4c !important;
+        }
+
+        .errorContainer{
+            position: absolute;
+            font-size: 9px;
+            color: red;
+            display: none;
+        }
+
+        button#filterBtn > div.loading-ajax-visible {
+            max-height: 17px;
+            max-width: 17px;
+            margin-left: 0rem;
+        }
+
+        #loader-container .circle-progress-question{
+            background-color: transparent;
+        }
+
+        #loader-container{
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var maxDays = [[${maxDays}]];
+        $(document).ready(function (){
+            $('#creationFromFilter').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true,
+                endDate: "today"
+            });
+            $('#creationToFilter').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true,
+                endDate: "today"
+            });
+            $('#creationFromFilterPeriod2').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true,
+                endDate: "today"
+            });
+            $('#creationToFilterPeriod2').datepicker({
+                autoclose: true,
+                format: "dd/mm/yyyy",
+                focusOnShow: true,
+                endDate: "today"
+            });
+
+            $('#analysis').on('change', function () {
+                if($(this).val() == "period"){
+                    $(".date-filter-period-2").show();
+                    $("#firstDateFilteLabel").text("Fecha 1");
+                }
+                else if($(this).val() == "champion"){
+                    $(".date-filter-period-2").hide();
+                    $("#firstDateFilteLabel").text("Fecha");
+                }
+            })
+
+            function convertDateToFormat(date, format){
+                if(!date || !format) return null;
+                let momentDate = moment(date);
+                if(momentDate.isValid()) return momentDate.format(format);
+                return date;
+            }
+
+            $('#creationFromFilter').on('change', function () {
+                let date = $('#creationFromFilter').datepicker('getDate');
+                date.setDate(date.getDate() + maxDays);
+                if(date > new Date()) date = new Date();
+                let dateToCompare = $('#creationToFilter').datepicker('getDate');
+                $('#creationToFilter').datepicker('setStartDate', $('#creationFromFilter').val());
+                $('#creationToFilter').datepicker('setEndDate', date);
+                $('#creationToFilter').datepicker('setMaxDate', date);
+                if(dateToCompare != null){
+                    if(dateToCompare > date) $('#creationToFilter').datepicker('setDate', convertDateToFormat(date, 'DD/MM/YYYY'));
+                }
+            });
+            $('#creationFromFilterPeriod2').on('change', function () {
+                let date = $('#creationFromFilterPeriod2').datepicker('getDate');
+                date.setDate(date.getDate() + maxDays);
+                if(date > new Date()) date = new Date();
+                let dateToCompare = $('#creationToFilterPeriod2').datepicker('getDate');
+                $('#creationToFilterPeriod2').datepicker('setStartDate', $('#creationFromFilterPeriod2').val());
+                $('#creationToFilterPeriod2').datepicker('setEndDate', date);
+                $('#creationToFilterPeriod2').datepicker('setMaxDate', date);
+                if(dateToCompare != null){
+                    if(dateToCompare > date) $('#creationToFilterPeriod2').datepicker('setDate', convertDateToFormat(date, 'DD/MM/YYYY'));
+                }
+            });
+
+            $(document.body).on("change","#product-selector",function(){
+                let requestData = $('#formContainer').serializeObject();
+                if(!requestData.producto){
+                    $(".errorContainer").css("display","block");
+                    // $(".select2-selection--multiple").addClass("invalid-select2");
+                    // $(".select2-selection--multiple")[0].style.setProperty('border', '1px solid #d54c4c', 'important');
+                }
+                else{
+                    $(".errorContainer").css("display","none");
+                    // $(".select2-selection--multiple")[0].style.setProperty('border', '');
+                }
+            });
+
+            $('#filterBtn').click(function(e){
+                e.preventDefault();
+                let requestData = $('#formContainer').serializeObject();
+                if(!requestData.producto){
+                    $(".errorContainer").css("display","block");
+                    $(".select2-selection--multiple").addClass("invalid");
+                    return;
+                }
+                $("#loader-container").show();
+                $("#reportDataContainer").hide();
+                var self = $(this);
+                // self.find(".spinner-border").show();
+                if(requestData.producto) {
+                    requestData.producto = requestData.producto.indexOf(",") != -1 ? requestData.producto.split(",") : [requestData.producto]
+                }
+                requestData.producto = JSON.stringify(requestData.producto);
+                defaultAjax({
+                    url: /*[[ @{/funnel/list} ]]*/,
+                    type: 'POST',
+                    data: requestData,
+                    success: function (data) {
+                        // self.find(".spinner-border").show();
+                        $("#loader-container").hide();
+                        $('#reportDataContainer').html(data);
+                        $("#reportDataContainer").show();
+                    },
+                    error: function(){
+                        // self.find(".spinner-border").hide();
+                        $("#loader-container").hide();
+                    }
+                });
+            });
+
+            $('#analysis').change();
+
+            let todayDate = new Date();
+            todayDate.setDate(todayDate.getDate() - maxDays);
+            $('#creationFromFilter').datepicker('setDate', todayDate);
+            $('#creationFromFilter').change();
+            $('#creationToFilter').datepicker('setDate', convertDateToFormat(new Date(), 'DD/MM/YYYY'));
+            $('#filterBtn').click();
+
+            $('#product-selector').selectpicker();
+            $('#analisis').selectpicker();
+            $('#edad').selectpicker();
+            $('#medio').selectpicker();
+            $('#tipoPlastico').selectpicker();
+            //
+            // $(".select2-selection--multiple").css("cssText", "height: 40px !important");
+            //
+            // $(".select2-selection__rendered").css("cssText", "overflow-y: auto !important;height: 35px !important");
+
+            $('select').on('select2:opening select2:closing', function( event ) {
+                var $searchfield = $(this).parent().find('.select2-search__field');
+                $searchfield.prop('disabled', true);
+                $searchfield.attr('inputmode','none')
+            });
+
+        });
+
+        function exportToExcel(){
+            /*var filters = $('.loans-light-report .form-control.input-sm.form-control-sm');
+
+            var jsonParams = {};
+            for (var i = 0; i < filters.length; i++) {
+                if (jsonParams[filters[i].name] == undefined) {
+                    jsonParams[filters[i].name] = [];
+                }
+                jsonParams[filters[i].name][jsonParams[filters[i].name].length] = $(filters[i]).val();
+            }*/
+
+            let requestData = $('#formContainer').serializeObject();
+            if(requestData.producto) {
+                requestData.producto = requestData.producto.indexOf(",") != -1 ? requestData.producto.split(",") : [requestData.producto]
+            }
+            requestData.producto = JSON.stringify(requestData.producto);
+
+            defaultAjax({
+                url: /*[[@{/funnel/loansLight/export}]]*/null,
+                type: 'POST',
+                data: requestData,
+                success: function (data) {
+                    swal({
+                        title: "¡Operación exitosa!",
+                        text: "Solicitud de generación de reporte",
+                        type: "success"
+                    });
+                }, error: function(data) {
+                    // btnGenerateReport.unloading();
+                }
+            });
+        }
+
+        function reloadResultsLoansLightList() {
+            defaultAjax({
+                url: /*[[@{/funnel/loansLight/list}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#loansLightResultTable').html(data);
+                },
+                error: function(data){
+                    return false;
+                }
+            });
+            setTimeout(reloadResultsLoansLightList, 5000);
+        }
+
+        setTimeout(reloadResultsLoansLightList, 5000);
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ @{/funnel/notes} ]]*/;
+        var totalCount = [[${totalCount}]];
+        var limitPaginator =  [[${limitPaginator}]];
+
+        $(document).on('ready', function () {
+            enableTableOptions($("#tableNote"), url+"/list", url+"/count", false, null);
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function (){
+            $("#createNote").click(function (e){
+                clearExtranetNoteForm();
+                $('#noteForm').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            })
+            setEventDetail();
+
+        });
+
+        function setEventDetail(){
+            $(".open-detail-note").click(function(e){
+                let data = JSON.parse($(e.delegateTarget).attr("data"));
+                renderDetail(data);
+            })
+        }
+        function createNewNote(note, type, id){
+            $("#createNoteSubmit").loading('',2);
+            defaultAjax({
+                url: /*[[@{/funnel/notes}]]*/null,
+                type: 'POST',
+                data: {note,type, id},
+                success: function (data) {
+                    resetCustomTable($("#tableNote"));
+                    $("#createNoteSubmit").unloading();
+                    $('#noteForm').modal('hide');
+                    setEventDetail();
+                    setTimeout(()=>{
+                        setEventDetail();
+                    },1000)
+                }, error: function(data) {
+                    $("#createNoteSubmit").unloading();
+                }
+            });
+        }
+
+        function renderDetail(data){
+            if(data.type == 'P') $("#typeNote").addClass('label-warning');
+            else if(data.type == 'D') $("#typeNote").addClass('label-success');
+            $("#typeNote").text(data.type_description);
+            $("#userNote").text(data.user);
+            $("#descriptionNote").text(data.note);
+            $("#dateNote").text(data.date);
+
+            fillExtranetNoteForm(data.note, data.type, data.id);
+
+            $('#noteForm').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+        /*]]>*/
+    </script>
+
+
+</head>
+
+<body>
+
+    <th:block layout:fragment="header">
+<!--        <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+        <div class="clearfix"></div>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='funnel')">
+        </th:block>
+        <div class="page-content-wrapper">
+            <div class="page-content">
+                <div class="row row-filter-group">
+                    <th:block th:replace="fragments/headers :: entityContentHeader(title='Funnel')"></th:block>
+                    <div class="col-xs-12 col-sm-12">
+                        <form class="row-filter" id="formContainer">
+                            <div class="col-div-2">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />Producto</label>
+                                    <select class="form-control input-sm form-control-sm selectpicker" id="product-selector" name="producto">
+                                        <option value="12">Tarjeta de crédito</option>
+                                        <option value="13">Leads</option>
+                                        <option value="12,13" selected="true">Tarjeta de crédito/Leads</option>
+                                    </select>
+                                    <div class="errorContainer">Campo es requerido</div>
+                                </div>
+                            </div>
+
+                            <div class="col-div-2">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />Análisis</label>
+                                    <select class="form-control input-sm form-control-sm selectpicker" id="analysis" name="analisis">
+                                        <option value="champion">Champion/ Challenger</option>
+                                        <option value="period">Por períodos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-div-1-5">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />Edad</label>
+                                    <select class="form-control input-sm form-control-sm selectpicker" id="edad" name="edad">
+                                        <option value="0">Todos</option>
+                                        <option value="1">Hasta 34</option>
+                                        <option value="2">35-44</option>
+                                        <option value="3">45-54</option>
+                                        <option value="4">Más de 55</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-div-1-5">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />Medio</label>
+                                    <select class="form-control input-sm form-control-sm selectpicker" id="medio" name="medio">
+                                        <option value="0">Todos</option>
+                                        <option value="1">Online</option>
+                                        <option value="2">Banca Telefónica</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-div-2">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />Tipos de Plástico</label>
+                                    <select class="form-control input-sm form-control-sm"  id="tipoPlastico" name="tipoPlastico">
+                                        <option value="0">Todos</option>
+                                        <option value="1">Visa Clásica</option>
+                                        <option value="2">Visa Oro</option>
+                                        <option value="3">Visa Platinum</option>
+                                        <option value="4">Visa Infinite</option>
+                                        <option value="5">MasterCard Platinum</option>
+                                        <option value="6">Visa Signature</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-div-1-5">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br /><span id="firstDateFilteLabel">Fec. Periodo 1</span></label>
+                                    <input id="creationFromFilter" name="fromDate1" type="text"
+                                           class="form-control input-sm form-control-sm"
+                                           placeholder="Desde" />
+                                </div>
+                            </div>
+                            <div class="col-div-1-5">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />&nbsp;</label>
+                                    <input id="creationToFilter" name="toDate1" type="text"
+                                           class="form-control input-sm form-control-sm"
+                                           placeholder="Hasta" />
+                                </div>
+                            </div>
+                            <div class="col-div-1-5 date-filter-period-2">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />Fecha 2</label>
+                                    <input id="creationFromFilterPeriod2" name="fromDate2" type="text"
+                                           class="form-control input-sm form-control-sm"
+                                           placeholder="Desde" />
+                                </div>
+                            </div>
+                            <div class="col-div-1-5 date-filter-period-2">
+                                <div class="form-group">
+                                    <label class="control-label"><b></b><br />&nbsp;</label>
+                                    <input id="creationToFilterPeriod2" name="toDate2" type="text"
+                                           class="form-control input-sm form-control-sm"
+                                           placeholder="Hasta" />
+                                </div>
+                            </div>
+                            <div class="col-div-3">
+                                <div class="" style="width: 100%;display:flex;">
+                                    <div class="form-group" style="width: 50%;"><button id="filterBtn" type="button" class="filter-btn principal-button" style="display: flex;padding: 1rem 0rem;width: 100%;justify-content: center;">
+<!--                                        <div class="spinner-border text-light" role="status" style="margin-right: 2px; display: none">-->
+<!--                                                <span class="sr-only"></span>
+                                        </div>-->
+                                    Filtrar</button>
+                                    </div>
+                                    <div class="form-group" style="width: 50%"><button id="downloadBtn" type="button" class="download-btn principal-button-modal" style="margin-left: 5px;padding: 1rem 0rem;width: 100%;" onclick="exportToExcel();">Descargar</button></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="loader-container" class="col-xs-12">
+                        <div class="process-loading-container circle-progress-question" style="height: auto !important; position: initial !important;">
+                            <div class="loading-content">
+                                <div class="sk-circle">
+                                    <div class="sk-circle1 sk-child"></div>
+                                    <div class="sk-circle2 sk-child"></div>
+                                    <div class="sk-circle3 sk-child"></div>
+                                    <div class="sk-circle4 sk-child"></div>
+                                    <div class="sk-circle5 sk-child"></div>
+                                    <div class="sk-circle6 sk-child"></div>
+                                    <div class="sk-circle7 sk-child"></div>
+                                    <div class="sk-circle8 sk-child"></div>
+                                </div>
+                                <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="reportDataContainer">
+                        <th:block th:replace="this :: reportData"></th:block>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title" style="display: flex;align-items: center;">
+                                <b>Notas</b>
+                                <button  id="createNote" type="button" style="margin-left: auto" class="btn btn-circle btn-default principal-button-action">Nueva nota</button>
+                            </div>
+                            <div class="portlet-body">
+                                <div id="creditsTable" class="tablefilter-table table-container">
+                                    <div class="table-responsive" id="noteFragment">
+                                        <th:block th:replace="entityExtranet/fragments/extranetNoteFragment :: noteFragment"></th:block>
+                                        <th:block th:replace="fragments/footers :: paginatorFooter "></th:block>
+                                    </div>
+                                </div>
+                                <th:block th:replace="entityExtranet/fragments/extranetNoteFragment :: noteFormFragment"></th:block>
+                                <th:block th:replace="entityExtranet/fragments/extranetNoteFragment :: noteFormDetailFragment"></th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <b>Reporte Consolidado de Solicitudes</b>
+                                <br/>
+                                <span>&Uacute;ltimos reportes descargados</span>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-responsive" id="loansLightResultTable">
+                                    <th:block th:replace="this :: results"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:fragment="loansLightResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>Fec. Solicitud</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loansLightHistoricReports)}" th:each="report : ${loansLightHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loansLightHistoricReports)}">
+                <tr>
+                    <td colspan="4">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="reportData">
+        <th:block th:if="${data}">
+            <div class="col-xs-12 col-sm-6">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <b th:text="${data.leftReport.name}"></b>
+                                <br/>
+                                <th:block th:text="${data.leftReport.getFromToDateFormatted()}"></th:block>
+                            </div>
+                            <div class="portlet-body">
+                                <th:block th:replace="this :: trapezoidContainer(report=${data.leftReport})"></th:block>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <b th:text="${data.leftReport.name}"></b>
+                                <br/>
+                                <th:block th:text="${data.leftReport.getFromToDateFormatted()}"></th:block>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-responsive" id="championFirstPeriod">
+                                    <th:block th:replace="this :: championTable(report=${data.leftReport})"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <b th:text="${data.rightReport.name}"></b>
+                                <br/>
+                                <th:block th:text="${data.rightReport.getFromToDateFormatted()}"></th:block>
+                            </div>
+                            <div class="portlet-body">
+                                <th:block th:replace="this :: trapezoidContainer(report=${data.rightReport})"></th:block>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <b th:text="${data.rightReport.name}"></b>
+                                <br/>
+                                <th:block th:text="${data.rightReport.getFromToDateFormatted()}"></th:block>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-responsive" id="championSecondPeriod">
+                                    <th:block th:replace="this :: championTable(report=${data.rightReport})"></th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </th:block>
+
+    <th:block th:fragment="championTable">
+        <th:block th:if="${data}">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>STEP</th>
+                    <th>USUARIOS</th>
+                    <th>STEP-BY-STEP</th>
+                    <th>ACUMULADO</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="step : ${report.steps}">
+                    <tr th:if="${step.active}">
+                        <th:block th:if="${step.number % 1 == 0}"> <!-- Show only integer steps -->
+                            <td th:text="${#numbers.formatInteger(step.number,1)}"></td>
+                            <td th:text="${step.step}"></td>
+                            <td th:text="${step.users}"></td>
+                            <td th:text="${@utilService.percentFormat(step.stepPerc)}"></td>
+                            <td th:text="${@utilService.percentFormat(step.accumulatedPerc)}"></td>
+                        </th:block>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </th:block>
+    </th:block>
+
+    <th:block th:fragment="trapezoidContainer">
+        <th:block th:if="${data}">
+            <div class="all-trapezoid-container">
+                <div class="trapezoid-container first-trapezoid" th:classappend="${!report.getStepStatus(1) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(1))}"></h4>
+                        <h5>Step 1 - Registro</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+                <div class="trapezoid-container second-trapezoid" th:classappend="${!report.getStepStatus(2) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(2))}"></h4>
+                        <h5>Step 2 - Con oferta</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+                <div class="trapezoid-container third-trapezoid" th:classappend="${!report.getStepStatus(3) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(3))}"></h4>
+                        <h5>Step 3 - Validaci&oacute;n aprobada</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+                <div class="trapezoid-container fourth-trapezoid" th:classappend="${!report.getStepStatus(4) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(4))}"></h4>
+                        <h5>Step 4 - Oferta aceptada</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+                <div class="trapezoid-container fifth-trapezoid" th:classappend="${!report.getStepStatus(5) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(5))}"></h4>
+                        <h5>Step 5 - Domicilio vivienda</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+                <div class="trapezoid-container sixth-trapezoid" th:classappend="${!report.getStepStatus(6) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(6))}"></h4>
+                        <h5>Step 6 - Solicitud completa</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+                <div class="trapezoid-container seventh-trapezoid" th:classappend="${!report.getStepStatus(7) ? 'inactive-trapezoid' : ''}">
+                    <div class="left-trapezoid"></div>
+                    <div class="center-trapezoid">
+                        <h4 th:text="${@utilService.percentFormat(report.getStepPercentage(7))}"></h4>
+                        <h5>Step 7 - Entregada</h5>
+                    </div>
+                    <div class="right-trapezoid"></div>
+                </div>
+            </div>
+        </th:block>
+    </th:block>
+
+
+</body>
+</html>

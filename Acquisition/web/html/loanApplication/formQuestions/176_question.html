@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+
+    <div class="questions-section animated fadeInRight">
+        <div class="forms q54">
+            <p th:text="#{questions.block.validatePINEmail}" th:if="${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)} and ${!@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA)}"></p>
+            <p th:utext="#{questions.block.validatePINEmailAzteca}" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and loanApplication?.productCategoryId != T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA and loanApplication?.productCategoryId != T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}"></p>
+            <p th:utext="#{questions.block.validatePINEmailAztecaAhorro}" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).CUENTA_BANCARIA}"></p>
+            <p th:utext="#{questions.block.validatePINEmailAztecaIdentidad}" th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).AZTECA) and loanApplication?.productCategoryId == T(com.affirm.common.model.catalog.ProductCategory).VALIDACION_IDENTIDAD}"></p>
+            <p th:if="${@brandingService.isBrandedByEntityId(#httpServletRequest, T(com.affirm.common.model.catalog.Entity).BANBIF)}">Ingresa el PIN que te enviamos por Correo electrónico</p>
+            <form id="questionForm" th:object="${form}" autocomplete="off">
+                <div class="centrado">
+                    <div>
+                        <div class="field inline">
+                            <input type="text" class="input-outline pin-input" placeholder="PIN" th:field="*{pin}"
+                                   pattern="[0-9]*"/>
+                        </div>
+                        <div class="field inline">
+                            <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                        </div>
+                    </div>
+                    <div class="errorContainer"></div>
+                </div>
+
+                <small th:class="input-help">
+                    <a href="#" class="text-lightblue fadeIn hidden"
+                       id="resendToken"><i class="icon icon-reload"></i>Reenviar</a>
+                </small>
+
+            </form>
+        </div>
+    </div>
+    <hr class="divisor-bottom"/>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        var url = /*[[@{/loanapplication}]]*/;
+        var loanApplicationToken;
+        var retryEmail = /*[[${retryEmail}]]*/;
+        var timeoutEmail = /*[[${timeoutEmail}]]*/;
+        var sentEmail = /*[[${sentEmail}]]*/;
+        var canRetry = /*[[${canRetry}]]*/;
+        var timeouts = [];
+
+        var $pininput = $('.pin-input');
+
+        if (retryEmail && canRetry) {
+            var smsTimeout = setTimeout(function () {
+                $("#resendToken").removeClass('hidden');
+                timeoutEmail = 0;
+            }, timeoutEmail);
+            timeouts.push(smsTimeout);
+        }
+
+        function killTimeouts() {
+            timeouts.forEach(function (timeout) {
+                clearTimeout(timeout);
+            });
+        }
+
+        $('#resendToken').on('click', function (e) {
+            e.preventDefault();
+            // if(retryEmail) {
+            questionFw.ajaxToCurrentQuestionController({
+                button: $('#resendToken'),
+                type: "POST",
+                form: $('#questionForm'),
+                success: function(){
+                    questionFw.refreshQuestion();
+                    killTimeouts();
+                }
+            }, "resend_token");
+        });
+        $('#sendButton').click(function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject(),
+                    complete: function(){
+                    }
+                }, "");
+            }
+        });
+        /*]]>*/
+
+    </script>
+
+</th:block>
+</html>

@@ -1,0 +1,96 @@
+.datepicker-inline {
+  margin: 0 auto;
+  @include border-radius(5px);
+  overflow: hidden;
+  width: 320px !important;
+  .datepicker-days {
+    table.table-condensed {
+      width: 100%;
+      thead {
+        background: $lightblue-1;
+        tr {
+          th {
+            color: white;
+            font-family: 'Lato Bold', 'Helvetica',sans-serif;
+            font-size: .75em;
+            font-weight: normal;
+            @include border-radius(0);
+            .icon:before {
+              font-size: 1.5em;
+            }
+            &:hover {
+              background: $lightblue-1;
+            }
+          }
+          th[style*="visibility: hidden"] {
+            visibility: visible !important;
+            cursor: default;
+            color: $lightblue-3;
+          }
+          .datepicker-switch {
+            background: $lightblue-1;
+            font-size: .85em;
+          }
+        }
+      }
+      tbody {
+        tr {
+          td {
+            color: $black_color_main;
+            font-family: 'Lato Bold', 'Helvetica', sans-serif;
+            font-weight: normal;
+            font-size: .85em;
+            padding: 1em;
+            @include transition(all .3s ease);
+            &:hover {
+              background: $lightblue-1;
+              color: white;
+            }
+          }
+          .active,
+          .day {
+            @include border-radius(50%);
+            height: 40px;
+            width: 40px;
+          }
+          .disabled{
+            background: transparent;
+            color: $black-3;
+            &:hover {
+              background: transparent;
+              color: $black-3;
+            }
+          }
+          .active {
+            background: $lightblue-1;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and(max-width: 1280px) {
+
+  .datepicker-inline {
+    width: 220px !important;
+    .datepicker-days {
+      table.table-condensed {
+        tbody {
+          tr {
+            td {
+              padding: .5em;
+            }
+            .active,
+            .day {
+              height: 30px;
+              width: 30px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+}

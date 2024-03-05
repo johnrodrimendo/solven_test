@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/extranetTemplate"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}" rel="stylesheet"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.css'}" rel="stylesheet"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/select2/css/select2.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/select2/css/select2-bootstrap.min.css'}" rel="stylesheet" type="text/css"/>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}" rel="stylesheet"/>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datetimepicker-4.17/bootstrap-datetimepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.resize.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.categories.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.pie.min.js'}" type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/select2/js/select2.full.min.js'}" type="text/javascript"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/css/bootstrap-datepicker3.min.css'}" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jPlayer/dist/jplayer/jquery.jplayer.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/jPlayer/dist/skin/blue.monday/css/jplayer.blue.monday.min.css'}" rel="stylesheet"/>
+
+    <script async="true" th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+    <script async="true" th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-masknumber/dist/jquery.masknumber.min.js'}"></script>
+
+    <script async="true" th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-mask/dist/jquery.mask.min.js'}"></script>
+    <script async="true" th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-masknumber/dist/jquery.masknumber.min.js'}"></script>
+
+
+    <!--    RANGEPICKER-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/rangepicker/daterangepicker.min.js'}" type="text/javascript"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/rangepicker/daterangepicker.css'}" rel="stylesheet"/>
+
+
+    <script defer="defer"
+            th:src="${'https://maps.googleapis.com/maps/api/js?libraries=geometry,places&amp;key=' + (T(com.affirm.system.configuration.Configuration).GOOGLE_API_KEY)}"></script>
+
+    <script th:src="@{/js/bo_tablefilter.js}"></script>
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <script>
+        function resetTimer() {
+            endTime = (+new Date) + 1000 * (60*defaultMin) + 500;
+        }
+    </script>
+
+    <th:block th:replace="/entityExtranet/fragments/extranetDetailFragments :: detailLoanResources" />
+
+    <style>
+        .dataTables_wrapper{
+            width: 97% !important;
+        }
+        .modal-backdrop, .modal-backdrop.fade.in{
+            background-color: #57575752 !important;
+        }
+        .col-div-3{
+            width: 22%;
+        }
+
+        .col-div-2{
+            width: 18%;
+        }
+
+
+        .col-div-1-5{
+            width: 14%;
+        }
+
+        .col-div-1{
+            width: 10%;
+        }
+
+        .media-player-container{
+            background-color: #f5f5f5;
+            min-height: 70px;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .media-player{
+            width: 70%;
+            min-height: 70px;
+        }
+
+        .media-player-options{
+            width: 30%;
+            border-left: 1px solid #f0f0f0;
+            min-height: 70px;
+        }
+
+    </style>
+
+    <script>
+        /*<![CDATA[*/
+
+        $(document).ready(function(){
+
+            $('tooltip-on').tooltip()
+
+            $('svg.radial-progress').each(function( index, value ) {
+                $(this).find($('circle.complete')).removeAttr( 'style' );
+            });
+
+            $(window).scroll(function(){
+                $('svg.radial-progress').each(function( index, value ) {
+                    // If svg.radial-progress is approximately 25% vertically into the window when scrolling from the top or the bottom
+                    if (
+                        $(window).scrollTop() > $(this).offset().top - ($(window).height() * 0.75) &&
+                        $(window).scrollTop() < $(this).offset().top + $(this).height() - ($(window).height() * 0.25)
+                    ) {
+                        // Get percentage of progress
+                        percent = $(value).data('percentage');
+                        // Get radius of the svg's circle.complete
+                        radius = $(this).find($('circle.complete')).attr('r');
+                        // Get circumference (2πr)
+                        circumference = 2 * Math.PI * radius;
+                        // Get stroke-dashoffset value based on the percentage of the circumference
+                        strokeDashOffset = circumference - ((percent * circumference) / 100);
+                        // Transition progress for 1.25 seconds
+                        $(this).find($('circle.complete')).animate({'stroke-dashoffset': strokeDashOffset}, 1250);
+                    }
+                });
+            }).trigger('scroll');
+
+        })
+        /*]]>*/
+    </script>
+
+    <th:block th:replace="components/tracking :: social" />
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var url = /*[[ @{/evaluation/} ]]*/;
+        var totalCount = [[${totalCount}]];
+        var limitPaginator =  [[${limitPaginator}]];
+        if(limitPaginator == null) limitPaginator = -1;
+
+        $(document).on('ready', function () {
+            enableTableOptions($("#tableResultEvaluation"), url+'list', url+"count", true, "#downloadTrayReport");
+        });
+        /*]]>*/
+    </script>
+
+
+
+</head>
+<body>
+<th:block layout:fragment="header">
+    <div class="clearfix"></div>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage=${page})"></th:block>
+
+    <div class="page-content-wrapper">
+        <div class="page-content entity-evaluation-page">
+            <div class="row w-creditos-procesados">
+                <th:block th:replace="fragments/headers :: entityContentHeaderWithFiltersEvaluation "></th:block>
+                <div class="col-xs-12">
+                    <div id="creditsTable" class="tablefilter-table table-container">
+                        <div class="table-responsive" style="overflow: auto; display: flex; justify-content: center; flex-direction: column">
+                            <table id="tableResultEvaluation" class=" table white-color order-column align-left">
+                                <thead>
+                                    <th:block th:replace="this :: headerEvaluationTable"></th:block>
+                                </thead>
+                                <tbody>
+                                    <th:block th:replace="this :: list"></th:block>
+                                </tbody>
+                            </table>
+                            <th:block th:replace="fragments/footers :: paginatorFooter "></th:block>
+                        </div>
+                    </div>
+                </div>
+
+
+        </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // var url = /*[[ @{/extranet-paginator/} ]]*/;
+        // var totalCount = [[${totalCount}]];
+        // var filterType =  [[${filterType}]];
+        // var limitPaginator =  [[${limitPaginator}]];
+        // if(limitPaginator == null) limitPaginator = -1;
+        // if(filterType == 1)  url+="leadsToDeliver";
+        // else if(filterType == 2)  url+="leadsDelivered";
+        //
+        // $(document).on('ready', function () {
+        //     enableTableOptions($("#tableResultEvaluation"), url, url+"/count", true, "#leadsToDeliverReport");
+        // });
+        /*]]>*/
+    </script>
+
+</th:block>
+
+<th:block th:fragment="headerEvaluationTable">
+    <tr>
+        <th style="max-width: 45px;width: 40px;">#</th>
+        <th style="max-width: 110px;width: 110px;">Fecha<br/>Registro</th>
+        <th style="max-width: 145px;width: 145px;">Código</th>
+        <th style="max-width: 145px;width: 145px;">Producto</th>
+        <th style="max-width: 110px;width: 110px;">Documento/<br/>Número</th>
+        <th style="max-width: 150px;width: 150px;">Nombre Completo</th>
+        <th style="max-width: 90px;width: 90px;">Teléfono</th>
+        <th style="max-width: 100px;width: 100px;" th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">Desembolso</th>
+        <th style="max-width: 150px;width: 150px;" th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">Producto</th>
+        <th style="max-width: 270px;width: 270px;">Oferta</th>
+        <th style="width: 170px;max-width: 170px;">Progreso</th>
+        <th style="width: 120px;max-width: 120px;">Analista</th>
+        <th></th>
+    </tr>
+</th:block>
+
+<th:block th:fragment="list">
+    <th:block th:if="${#lists.isEmpty(loans)}">
+            <tr>
+                <td colspan="11">No hay resultados</td>
+            </tr>
+    </th:block>
+    <th:block th:unless="${#lists.isEmpty(loans)}">
+        <tr th:each="data, iter : ${loans}" th:id="'loan_'+${data.loanApplicationId}" >
+            <td th:text="${iter.count + (offset != null ? offset : 0)}"></td>
+            <td>
+                <th:block th:text="${@utilService.dateFormat(data?.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(data?.registerDate)}"></th:block>
+                <th:block th:text="${@utilService.hourFormat(data?.registerDate)}" th:attr="data-order=${@utilService.hourFormat(data?.registerDate)}"></th:block>
+            </td>
+            <td th:text="${data?.code}"></td>
+            <td th:text="${data?.product?.name}"></td>
+            <td>
+                <th:block th:text="${data?.documentType?.name}"></th:block>
+                <th:block th:text="${data?.documentNumber}"></th:block>
+            </td>
+            <td th:text="${data?.getFullName()}"></td>
+            <td th:text="${data?.phoneNumber}"></td>
+            <td th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}">
+                <span th:if="${data?.showDisbursementTypeColumn()}" th:text="${data?.entityProductParam?.disbursementTypeObject?.disbursementType}"></span>
+            </td>
+            <td th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).AZTECA)}" th:text="${data?.entityProductParam?.entityProduct}"></td>
+            <td>
+                <th:block th:each="offer, iterO : ${data.offers}">
+                    <span th:if="${offer.selected}" th:classappend="${offer.selected} ? 'selected-offer' : ''">
+                        <th:block th:text="${offer?.getLoanOfferDescription(@utilService, data?.documentType?.countryId)}" ></th:block>
+                    </span>
+<!--                    <br/>-->
+                </th:block>
+            </td>
+            <td>
+<!--                <span class="tooltip-on" data-toggle="tooltip" data-placement="bottom" th:id="'progress-'+${iter.count}" th:title="${data?.lastApprovalValidation != null ? data?.lastApprovalValidation?.name : ''}">-->
+<!--                    <svg class="radial-progress" th:attr="data-percentage=${data.calculateProgressPercentage()}" viewBox="0 0 80 80">-->
+<!--                    <circle class="incomplete" cx="40" cy="40" r="35"></circle>-->
+<!--                    <circle class="complete" cx="40" cy="40" r="35" style="stroke-dashoffset: 39.58406743523136;"></circle>-->
+<!--                    <text class="percentage" x="50%" y="57%" transform="matrix(0, 1, -1, 0, 80, 0)"><th:block th:text="${data.calculateProgressPercentage()}"></th:block>%</text>-->
+<!--                    </svg>-->
+<!--                </span>-->
+                <th:block th:each="progress, iterO : ${data.getApprovalValidationsIds(@loanApplicationApprovalValidationService)}">
+                    <span>
+                        <th:block th:switch="${data.existsApprovalValidation(progress.id)}">
+                            <th:block th:case="true">
+                                <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/validar_todos.svg" alt="" class="custom-icono-svg custom_icono_success"/>
+                            </th:block>
+                            <th:block th:case="false">
+                                <img src="https://solven-public.s3.amazonaws.com/img/iconos_extranet/solicitar_documentacion.svg" alt="" class="custom-icono-svg custom_icono_alert"/>
+                            </th:block>
+                        </th:block>
+                        <th:block th:text="${progress.name}"></th:block>
+                    </span>
+                    <br/>
+                </th:block>
+            </td>
+            <td>
+                <select name="" th:id="'analyst_'+${data?.loanApplicationId}" data-width="125" class="custom-select-evaluation selectpicker change-analyst">
+                    <option th:value="${null}">Sin asignar</option>
+                    <th:block th:each="user, iterO : ${users}">
+                        <option th:value="${user.userId}" th:text="${user.userName}" th:selected="${data?.assignedEntityUserId != null and user.userId == data?.assignedEntityUserId} ? true : false"></option>
+                    </th:block>
+                </select>
+            </td>
+            <td> <button class="btn btn-circle collapse-table" th:onclick="'getLoanDetail('+${data?.loanApplicationId}+')'" style="cursor: pointer">+</button></td>
+        </tr>
+    </th:block>
+
+    <script>
+        replaceImgSvgToSvgElement();
+        enableSelect();
+    </script>
+</th:block>
+
+</body>
+</html>

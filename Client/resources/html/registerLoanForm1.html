@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="templates/loanApplicationWizardTemplate" th:with="step = 1">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+
+<th:block layout:fragment="head">
+    <!--Jquery Validation-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist//additional-methods.min.js'}"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css'}"/>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/js/bootstrap-datepicker.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <!--Range slider-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/js/ion.rangeSlider.min.js'}"></script>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.css'}"/>
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/ion.rangeSlider/css/ion.rangeSlider.skinNice.css'}"/>
+    <!--Input Mask-->
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-inputmask/jquery.inputmask.bundle.min.js'}"></script>
+
+    <!--Own-->
+    <script th:inline="javascript" charset="ISO-8859-1">
+        /*<![CDATA[*/
+        var errorMessage = /*[[${errorMessage}]]*/null;
+        var jsonFormValidation;
+
+        $(document).ready(function () {
+
+            if (errorMessage != null) {
+                $('#errorModal').find('p').html(errorMessage);
+                $('#errorModal').modal('show');
+            }
+
+            var validator = /*[[${loanApplicationStep1Form.validator.toJson(#locale)}]]*/null;
+            if (validator != null) {
+                console.log(validator);
+                var jsonValidator = JSON.parse(validator);
+                jsonFormValidation = createFormValidationJson(jsonValidator, $('#frmRegister'));
+
+                jsonFormValidation.rules.declarePEP = {};
+                jsonFormValidation.rules.declarePEP.required = true;
+
+                $('#frmRegister').validateForm(jsonFormValidation);
+            }
+
+            $('#maritalStatus').on('change', function () {
+                /* Reset Forms */
+                $('#frmRegister').data('validator').resetForm();
+                clearElementsInContainer($('#companionContainer'));
+                if (this.value == '') {
+                    $('#companionContainer').find('input,select').addClass('ignore_validation');
+                    return;
+                } else if (this.value == '2' || this.value == '4') {
+                    $('#companionContainer').find('input,select').removeClass('ignore_validation');
+                    $('#companionContainer').show(300, function () {
+                        closeSummaryPanelByIndex(0);
+                        openSummaryPanelByIndex(1);
+                    });
+                    if (this.value == '2') {
+                        $('#companionContainerTittle').html(/*[[#{registerLoanForm1.companionData.tittle.married}]]*/);
+                    } else if (this.value == '4') {
+                        $('#companionContainerTittle').html(/*[[#{registerLoanForm1.companionData.tittle.cohabitant}]]*/);
+                    }
+
+                } else {
+                    $('#companionContainer').find('input,select').addClass('ignore_validation');
+                    $('#companionContainer').hide(300, function () {
+                        closeSummaryPanelByIndex(0);
+                        openSummaryPanelByIndex(2);
+                    });
+                }
+            });
+
+            $('#companionDocNumber').on('blur', function () {
+                if ($('#companionDocNumber').val() != '') {
+                    if ($('#companionDocNumber').valid() != '') {
+                        if ($('#companionDocNumber').data('lastValue') != $('#companionDocNumber').val()) {
+                            $('#companionDocNumber').data('lastValue', $('#companionDocNumber').val());
+                            var url = /*[[@{/person/reniec/}]]*/;
+                            defaultAjax({
+                                url: url + "/" + $('#companionDocNumber').val(),
+                                type: 'GET',
+                                success: function (data) {
+                                    $('#companionName').val();
+                                    $('#companionFirstSurname').val('');
+                                    $('#companionLastSurname').val('');
+                                    if (isJsonString(data)) {
+                                        dataJson = JSON.parse(data)
+                                        $('#companionName').val(dataJson.name);
+                                        $('#companionName').change();
+                                        $('#companionFirstSurname').val(dataJson.firstSurname);
+                                        $('#companionFirstSurname').change();
+                                        $('#companionLastSurname').val(dataJson.lastSurname);
+                                        $('#companionLastSurname').change();
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            });
+
+            $('#birthday').datepicker({
+                endDate: "-18y",
+                autoclose: true,
+                startView: 2,
+                format: "dd/mm/yyyy",
+                focusOnShow: true
+//                endDate: "today"
+            });
+
+            configureSummaryPanel([
+                $('#docType'), $('#docNumber'), $('#name'), $('#firstSurname'), $('#lastSurname'), $('#birthday'), $('#gender'), $('#nationality'), $('#pep'), $('#maritalStatus')
+            ]);
+            configureSummaryPanel([
+                $('#companionDocType'), $('#companionDocNumber'), $('#companionName'), $('#companionFirstSurname'), $('#companionLastSurname')
+            ]);
+            configureSummaryPanel([
+                $('#phoneNumber'), $('#cityCode'), $('#landline'), $('#email')
+            ]);
+
+
+            $("#maritalStatus").change();
+
+            /*var options = $('#nationality option');
+             var arr = options.map(function (_, o) {
+             return {
+             t: $(o).text(),
+             v: o.value
+             };
+             }).get();
+             arr.sort(function (o1, o2) {
+             return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+             });
+             options.each(function (i, o) {
+             console.log(i);
+             o.value = arr[i].v;
+             $(o).text(arr[i].t);
+             });*/
+
+            $('#nationality option').sort(NASort).appendTo('#nationality');
+            $('#nationality option:eq(85)').insertBefore('#nationality option:eq(0)');
+
+            $("#nationality")[0].selectedIndex = 0;
+
+            $('#btnSubmit').click(function (e) {
+                e.preventDefault();
+                if($('#frmRegister').valid()){
+                    $('#loading-ajax').removeClass('loading-ajax-invisible');
+                    $('#loading-ajax').addClass('loading-ajax-visible');
+                    $('#text-button').text('Espere...');
+                    $(this).prop('disabled', true);
+                    defaultAjax({
+                        url: /*[[@{/loanapplication/personalInformation/__${loanAplicationToken}__}]]*/null,
+                        type: 'POST',
+                        form: $('#frmRegister'),
+                        data: $('#frmRegister').serializeObject(),
+                        error: function(){
+                            $('#loading-ajax').addClass('loading-ajax-invisible');
+                            $('#loading-ajax').removeClass('loading-ajax-visible');
+                            $('#text-button').text('Continuar');
+                            $(this).prop('disabled', false);
+                        }
+                    });
+                }
+            });
+
+            initSummaryPanel();
+        });
+
+        function NASort(a, b) {
+            if (a.innerHTML == 'NA') {
+                return 1;
+            }
+            else if (b.innerHTML == 'NA') {
+                return -1;
+            }
+            return (a.innerHTML > b.innerHTML) ? 1 : -1;
+        }
+
+        /*]]>*/
+    </script>
+</th:block>
+
+<th:block layout:fragment="contentTab1">
+
+    <div id="registerLoanForm1">
+
+        <form role="form" action="#" th:object="${loanApplicationStep1Form}" method="post" id="frmRegister" autocomplete="off">
+
+            <!-- PERSONAL INFORMATION PANEL -->
+            <div id="namesPanel" class="panel panel-default summarypanel">
+                <div class="panel-body">
+                    <div class="summarypanel-tittle">
+                        <h4>Datos Personales</h4>
+                    </div>
+                    <div class="summarypanel-summary" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4">
+                                <ul>
+                                    <li>
+                                        <label>Nombres</label>
+                                        <span id="nameSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.firstSurname}"></label>
+                                        <span id="firstSurnameSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.lastSurname}"></label>
+                                        <span id="lastSurnameSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.document}"></label>
+                                        <span id="docTypeSummaryPanel"></span>
+                                        <span id="docNumberSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.birthday}"></label>
+                                        <span id="birthdaySummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.nationality}"></label>
+                                        <span id="nationalitySummaryPanel"></span>
+                                    </li>
+
+
+                                </ul>
+
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.gender}"></label>
+                                        <span id="genderSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label>Persona politicamente expuesta <sub>1</sub></label>
+                                        <span id="pepSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.maritalStatus}"></label>
+                                        <span id="maritalStatusSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summarypanel-body" style="display: none">
+                        <div class="inputs-wrapper">
+
+                            <div class="cl">
+                                <label class="control-label" for="docType" th:text="#{form.field.document}"
+                                       style="margin-top: 0"></label>
+                                <div class="fields">
+                                    <select class="form-control" th:field="*{docType}"
+                                            th:disabled="*{!docTypeCanChange}">
+                                        <option value="1" th:text="#{form.field.documentType.dni}"></option>
+                                        <option value="2" th:text="#{form.field.documentType.ce}"></option>
+                                    </select>
+                                    <input type="text" th:field="*{docNumber}" class="form-control small-input-number"
+                                           th:placeholder="#{form.field.docNumber}"
+                                           th:disabled="*{!docNumberCanChange}"/>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.name.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="name" th:text="#{form.field.name}"></label>
+                                        <input type="text" th:field="*{name}" class="form-control input-name"
+                                               th:disabled="*{!nameCanChange}"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.name.hasErrors}"
+                                              th:text="*{validator.name.errors}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.firstSurname.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="firstSurname"
+                                               th:text="#{form.field.firstSurname}"></label>
+                                        <input type="text" th:field="*{firstSurname}"
+                                               class="form-control input-lastnames"
+                                               th:disabled="*{!firstSurnameCanChange}"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.firstSurname.hasErrors}"
+                                              th:text="*{validator.firstSurname.errors}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.lastSurname.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="lastSurname"
+                                               th:text="#{form.field.lastSurname}"></label>
+                                        <input type="text" th:field="*{lastSurname}"
+                                               class="form-control input-lastnames"
+                                               th:disabled="*{!lastSurnameCanChange}"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.lastSurname.hasErrors}"
+                                              th:text="*{validator.lastSurname.errors}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.birthday.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="birthday"
+                                               th:text="#{form.field.birthday}"></label>
+                                        <input type="text" th:field="*{birthday}"
+                                               class="form-control medium-number-input"
+                                               th:disabled="*{!birthdayCanChange}"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.birthday.hasErrors}"
+                                              th:text="*{validator.birthday.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: 13/04/1982</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.gender.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="gender"
+                                               th:text="#{form.field.gender}"></label>
+                                        <select th:field="*{gender}" class="form-control"
+                                                th:disabled="*{!genderCanChange}">
+                                            <!--<option value="" th:text="#{form.field.gender.placeholder}" hidden="hidden"></option>-->
+                                            <option value="" hidden="hidden"></option>
+                                            <option value="M" th:text="#{form.field.gender.m}"></option>
+                                            <option value="F" th:text="#{form.field.gender.f}"></option>
+                                        </select>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.gender.hasErrors}"
+                                              th:text="*{validator.gender.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Femenino</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.nationality.hasErrors?'has-error':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="nationality"
+                                               th:text="#{form.field.nationality}"></label>
+                                        <select th:field="*{nationality}" class="form-control">
+                                            <!--<option value="" hidden="hidden"></option>-->
+                                            <option th:each="nat : ${@catalogService.getNationalities(#locale)}"
+                                                    th:value="${nat.id}"
+                                                    th:text="${nat.name}"></option>
+                                        </select>
+                                        <small class="help-block muted">Ej: Peruano</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.pep.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="pep" data-toggle="tooltip"
+                                               alt="¿Persona políticamente expuesta?"
+                                               title="¿Persona políticamente expuesta??">PEP <sup>1</sup></label>
+                                        <select th:field="*{pep}" class="form-control" style="width: 50px;">
+                                            <!--<option value="" hidden="hidden"></option>-->
+                                            <option value="false">No</option>
+                                            <option value="true">Si</option>
+                                        </select>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.pep.hasErrors}"
+                                              th:text="*{validator.pep.errors}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.maritalStatus.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="maritalStatus"
+                                               th:text="#{form.field.maritalStatus}"></label>
+                                        <select th:field="*{maritalStatus}" class="form-control"
+                                                th:disabled="*{!maritalStatusCanChange}">
+                                            <!--<option value="" th:text="#{registerLoanForm1.maritalStatus.placeholder}"-->
+                                            <!--hidden="hidden"></option>-->
+                                            <option value="" hidden="hidden"></option>
+                                            <option th:each="status : ${@catalogService.getMaritalStatus(#locale)}"
+                                                    th:value="${status.id}"
+                                                    th:text="${status.status}"></option>
+                                        </select>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.maritalStatus.hasErrors}"
+                                              th:text="*{validator.maritalStatus.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Conviviente</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPANION PANEL -->
+            <div id="companionContainer" class="panel panel-default summarypanel" style="display: none">
+                <div class="panel-body">
+                    <div class="summarypanel-tittle">
+                        <h4 id="companionContainerTittle">Datos de Conyugue</h4>
+                    </div>
+                    <div class="summarypanel-summary" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.name}"></label>
+                                        <span id="companionNameSummaryPanel"></span>
+                                    </li>
+                                    <li>
+                                        <label th:text="#{form.field.document}"></label>
+                                        <span id="companionDocTypeSummaryPanel"></span>
+                                        <span id="companionDocNumberSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.firstSurname}"></label>
+                                        <span id="companionFirstSurnameSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-4">
+                                <ul>
+                                    <li>
+                                        <label th:text="#{form.field.lastSurname}"></label>
+                                        <span id="companionLastSurnameSummaryPanel"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summarypanel-body" style="display: none">
+                        <div class="inputs-wrapper">
+                            <div class="cl" style="margin-top: .4em">
+                                <div class="fields"
+                                     th:classappend="*{validator.companionDocNumber.hasErrors?'has-error':''}">
+                                    <label class="control-label" for="companionDocType"
+                                           th:text="#{form.field.document}"></label>
+                                    <select th:field="*{companionDocType}" class="form-control">
+                                        <!--<option value="" th:text="#{form.field.documentType.placeholder}"></option>-->
+                                        <option value="1" th:text="#{form.field.documentType.dni}"></option>
+                                        <option value="2" th:text="#{form.field.documentType.ce}"></option>
+                                    </select>
+                                    <div class="form-group label-floating">
+                                        <input type="text" th:field="*{companionDocNumber}"
+                                               class="form-control small-input-number"/>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message" style="display:inline"
+                                                  th:if="*{validator.companionDocNumber.hasErrors}"
+                                                  th:text="*{validator.companionDocNumber.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: 10161970</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.companionName.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="companionName"
+                                               th:text="#{form.field.name}"></label>
+                                        <input type="text" th:field="*{companionName}" class="form-control input-name"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.companionName.hasErrors}"
+                                              th:text="*{validator.companionName.errors}"
+                                              style="letter-spacing: -1px;">
+                                        </span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Roxana</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.companionFirstSurname.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="companionFirstSurname"
+                                               th:text="#{form.field.firstSurname}"></label>
+                                        <input type="text" th:field="*{companionFirstSurname}"
+                                               class="form-control lastnames"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.companionFirstSurname.hasErrors}"
+                                              th:text="*{validator.companionFirstSurname.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Bellido</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.companionLastSurname.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="companionLastSurname"
+                                               th:text="#{form.field.lastSurname}"></label>
+                                        <input type="text" th:field="*{companionLastSurname}"
+                                               class="form-control lastnames"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.companionLastSurname.hasErrors}"
+                                              th:text="*{validator.companionLastSurname.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Tirado</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT INFORMATION PANEL -->
+            <div class="panel panel-default summarypanel">
+                <div class="panel-body">
+                    <div class="summarypanel-tittle">
+                        <h4>Datos de Contacto</h4>
+                    </div>
+                    <div class="summarypanel-summary" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-4 col-md4">
+                                <label th:text="#{form.field.phoneNumber}"></label>
+                                <span id="phoneNumberSummaryPanel"></span>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <label>Ciudad</label>
+                                <span id="cityCodeSummaryPanel"></span>
+                                <br/>
+                                <label>Tel&eacute;fono fijo</label>
+                                <span id="landlineSummaryPanel"></span>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <label th:text="#{form.field.email}"></label>
+                                <span id="emailSummaryPanel"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summarypanel-body" style="display: none">
+                        <div class="inputs-wrapper">
+                            <div class="cl wp">
+                                <div class="fields cellphone"
+                                     th:classappend="*{validator.phoneNumber.hasErrors?'has-error has-feedback':''}">
+                                    <span class="input-group-addon" th:text="*{countryCode}"/>
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="phoneNumber"
+                                               th:text="#{form.field.phoneNumber}"></label>
+                                        <input th:field="*{phoneNumber}" type="text"
+                                               class="form-control small-input-number"
+                                               th:disabled="*{!phoneNumberCanChange}"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.phoneNumber.hasErrors}"
+                                              th:text="*{validator.phoneNumber.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: 998 931 909</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="cityCode"
+                                               th:text="#{form.field.cityCode}"></label>
+                                        <select th:field="*{cityCode}" class="form-control input-cities">
+                                            <option value="" hidden="hidden"></option>
+                                            <option th:each="department : ${@catalogService.getDepartments()}"
+                                                    th:value="${department.phonePrefix}"
+                                                    th:text="${department.getDepartmentPrefix()}"></option>
+                                        </select>
+                                        <div class="errorContainer">
+                                            <span class="help-block form-field-error-message"
+                                                  th:if="*{validator.cityCode.hasErrors}"
+                                                  th:text="*{validator.cityCode.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: Lima</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields"
+                                     th:classappend="*{validator.email.hasErrors?'has-error has-feedback':''}">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Tel&eacute;fono fijo</label>
+                                        <input th:field="*{landline}" type="text"
+                                               class="form-control small-input-number"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.landline.hasErrors}"
+                                              th:text="*{validator.landline.errors}"></span>
+
+                                        </div>
+                                        <small class="help-block muted">Ej: 2411850</small>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="cl">
+                                <div class="fields">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label" for="email" th:text="#{form.field.email}"></label>
+                                        <input type="text" th:field="*{email}" class="form-control input-email"/>
+                                        <div class="errorContainer">
+                                        <span class="help-block form-field-error-message"
+                                              th:if="*{validator.email.hasErrors}"
+                                              th:text="*{validator.email.errors}"></span>
+                                        </div>
+                                        <small class="help-block muted">Ej: roxanabt@gmail.com</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="control-group checkbox">-->
+            <!--<label><input type="checkbox" th:text="#{registerForm.aceptConditions}" name="termsAndConditions"-->
+            <!--id="termsAndConditions"/></label>-->
+            <!--</div>-->
+            <div class="actions">
+                <div class="loan-button">
+                    <button id="btnSubmit" type="submit" class="button red-button">
+                        <div id="loading-ajax" class="loading-ajax-invisible">
+                            <div class="sk-circle">
+                                <div class="sk-circle1 sk-child"></div>
+                                <div class="sk-circle2 sk-child"></div>
+                                <div class="sk-circle3 sk-child"></div>
+                                <div class="sk-circle4 sk-child"></div>
+                                <div class="sk-circle5 sk-child"></div>
+                                <div class="sk-circle6 sk-child"></div>
+                                <div class="sk-circle7 sk-child"></div>
+                                <div class="sk-circle8 sk-child"></div>
+                            </div>
+                            <span class="loading-text">Cargando<span>.</span><span>.</span><span>.</span></span>
+                        </div>
+                        <span id="text-button">Continuar</span>
+                    </button>
+                </div>
+            </div>
+            <div class="info-quote">
+                <div class="loanformdisclaimer2">
+                    <p th:text="#{form.field.declarePEPsup}"></p>
+                </div>
+            </div>
+        </form>
+    </div>
+</th:block>
+</body>
+</html>

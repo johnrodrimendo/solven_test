@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorator="templates/extranetTemplate(sidebarClosed=true)"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/jquery.validate.min.js'}">
+    </script>
+    <script
+        th:src="${@urlService.externalUrl(#httpServletRequest) + '/jquery-validation/dist/additional-methods.min.js'}">
+    </script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/dropzone/dist/min/dropzone.min.css'}"
+        rel="stylesheet" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.js'}">
+    </script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/ekko-lightbox/dist/ekko-lightbox.min.css'}"
+        rel="stylesheet" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.waypoints.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/counterup/jquery.counterup.min.js'}"
+        type="text/javascript"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&amp;subset=all" rel="stylesheet"
+        type="text/css" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/js/jquery.swipebox.min.js'}"></script>
+    <link th:href="${@urlService.externalUrl(#httpServletRequest) + '/swipebox/css/swipebox.min.css'}"
+        rel="stylesheet" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.resize.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.categories.min.js'}"
+        type="text/javascript"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/flot/jquery.flot.pie.min.js'}"
+        type="text/javascript"></script>
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet" th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/css/bootstrap-datepicker3.min.css'}" />
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/js/bootstrap-datepicker.min.js'}"></script>
+    <script th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-datepicker-1.9/dist/locales/bootstrap-datepicker.es.min.js'}"></script>
+    <script th:inline="javascript">
+        Dropzone.autoDiscover = false;
+    </script>
+    <link rel="stylesheet"
+        th:href="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/css/bootstrap-multiselect.css'}" />
+    <script
+        th:src="${@urlService.externalUrl(#httpServletRequest) + '/bootstrap-multiselect/js/bootstrap-multiselect.js'}">
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var REPORTE_SOLICITUDES_EN_PROCESO = /*[[${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_EN_PROCESO_EXT_BDS}]]*/;
+        var REPORTE_CREDITO_A_DESEMBOLSAR = /*[[${T(com.affirm.common.model.catalog.Report).REPORTE_CREDITOS_A_DESEMBOLSAR_EXT_BDS}]]*/;
+        var REPORTE_CREDITO_DESEMBOLSADOS = /*[[${T(com.affirm.common.model.catalog.Report).REPORTE_CREDITOS_DESEMBOLSADOS_EXT_BDS}]]*/;
+        var REPORTE_RIESGOS = /*[[${T(com.affirm.common.model.catalog.Report).REPORTE_RIESGOS_EXT_BDS}]]*/;
+        var REPORTE_SOLICITUDES_EN_PROCESO_FDLM = /*[[${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_EN_PROCESO_EXT_FDLM}]]*/;
+        var REPORTE_SOLICITUDES_LIGHT = /*[[${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_LIGHT}]]*/;
+
+        var EXPORT_REPORTE_SOLICITUDES_EN_PROCESO = /*[[@{/bds/reports/loanInProcess/export}]]*/ null;
+        var EXPORT_REPORTE_CREDITOS_A_DESEMBOLSAR = /*[[@{/bds/reports/disburseCredit/export}]]*/ null;
+        var EXPORT_REPORTE_CREDITOS_DESEMBOLSADOS = /*[[@{/bds/reports/disbursedCredit/export}]]*/ null;
+        var EXPORT_REPORTE_RIESGOS = /*[[@{/bds/reports/risk/export}]]*/ null;
+        var EXPORT_REPORTE_FUNNEL = /*[[@{/reports/funnelReport/export}]]*/ null;
+        var EXPORT_REPORTE_SOLICITUDES_EN_PROCESO_FDLM = /*[[@{/fdlm/reports/loanInProcess/export}]]*/ null;
+        var EXPORT_REPORTE_SOLICITUDES_LIGHT = /*[[@{/reports/loansLight/export}]]*/ null;
+
+        var loansLightHistoricReports = /*[[${loansLightHistoricReports}]]*/;
+
+        var organizers = /*[[${organizers}]]*/
+
+        function exportToExcel(tipoReporte){
+            var btnGenerateReport = $('#btnGenerateReport' + tipoReporte);
+            btnGenerateReport.loading('', 2);
+            tipoReporte = parseInt(tipoReporte);
+
+            var filters;
+            var path;
+
+            switch (tipoReporte) {
+                case REPORTE_SOLICITUDES_EN_PROCESO:
+                    filters = $('.loan-in-process-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_SOLICITUDES_EN_PROCESO;
+                    break;
+                case REPORTE_CREDITO_A_DESEMBOLSAR:
+                    filters = $('.credit-to-be-disbursed-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_CREDITOS_A_DESEMBOLSAR;
+                    break;
+                case REPORTE_CREDITO_DESEMBOLSADOS:
+                    filters = $('.disbursed-credit-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_CREDITOS_DESEMBOLSADOS;
+                    break;
+                case REPORTE_RIESGOS:
+                    filters = $('.loan-risks-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_RIESGOS;
+                    break;
+                case REPORTE_SOLICITUDES_EN_PROCESO_FDLM:
+                    filters = $('.loan-in-process-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_SOLICITUDES_EN_PROCESO_FDLM;
+                    break;
+                case REPORTE_SOLICITUDES_LIGHT:
+                    filters = $('.loans-light-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_SOLICITUDES_LIGHT;
+                    break;
+                default:
+                    filters = $('.funnel-report .form-control.input-sm.form-control-sm');
+                    path = EXPORT_REPORTE_FUNNEL;
+            }
+
+            var jsonParams = {};
+            for (var i = 0; i < filters.length; i++) {
+                if (jsonParams[filters[i].name] == undefined) {
+                    jsonParams[filters[i].name] = [];
+                }
+                jsonParams[filters[i].name][jsonParams[filters[i].name].length] = $(filters[i]).val();
+            }
+            defaultAjax({
+                url: path,
+                type: 'POST',
+                data: jsonParams,
+                success: function (data) {
+                    location.reload();
+                }, error: function(data) {
+                    btnGenerateReport.unloading();
+                }
+            });
+        }
+
+        function reloadResults() {
+            defaultAjax({
+                url: /*[[@{/reports/funnelReport/list}]]*/ ,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#resultTable').html(data);
+                }
+            });
+            setTimeout(reloadResults, 5000);
+        }
+        setTimeout(reloadResults, 5000);
+
+        function reloadResultsLoanInProcessList() {
+            defaultAjax({
+                url: /*[[@{/bds/reports/loan/inProcessList}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#loanInProcessResultTable').html(data);
+                }
+            });
+            setTimeout(reloadResultsLoanInProcessList, 5000);
+        }
+
+        function reloadResultsLoanToBeDisbursedList() {
+            defaultAjax({
+                url: /*[[@{/bds/reports/loan/toBeDisbursedList}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#loanToBeDisbursedResultTable').html(data);
+                }
+            });
+            setTimeout(reloadResultsLoanToBeDisbursedList, 5000);
+        }
+
+        function reloadResultsDisbursedLoanList(){
+            defaultAjax({
+                url: /*[[@{/bds/reports/loan/disbursedList}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#disbursedLoanResultTable').html(data);
+                }
+            });
+            setTimeout(reloadResultsDisbursedLoanList, 5000);
+        }
+
+        function reloadResultsLoanRisksList(){
+            defaultAjax({
+                url: /*[[@{/bds/reports/loan/riskList}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#loanRisksResultTable').html(data);
+                }
+            });
+            setTimeout(reloadResultsLoanRisksList, 5000);
+        }
+
+        function reloadResultsLoanInProcessListFDLM() {
+            defaultAjax({
+                url: /*[[@{/fdlm/reports/loan/inProcessList}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#loanInProcessResultTable').html(data);
+                }
+            });
+            setTimeout(reloadResultsLoanInProcessListFDLM, 5000);
+        }
+
+        function reloadResultsLoansLightList() {
+            defaultAjax({
+                url: /*[[@{/reports/loansLight/list}]]*/,
+                type: 'POST',
+                showLoading: false,
+                success: function (data) {
+                    $('#loansLightResultTable').html(data);
+                }
+            });
+            setTimeout(reloadResultsLoansLightList, 5000);
+        }
+
+        if (/*[[${entity}]] === [[${T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}]]*/) {
+            setTimeout(reloadResultsLoanInProcessList, 5000);
+            setTimeout(reloadResultsLoanToBeDisbursedList, 5000);
+            setTimeout(reloadResultsDisbursedLoanList, 5000);
+            setTimeout(reloadResultsLoanRisksList, 5000);
+        }
+
+        if (/*[[${entity}]] === [[${T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}]]*/) {
+            setTimeout(reloadResultsLoanInProcessListFDLM, 5000);
+        }
+
+        if (loansLightHistoricReports) {
+            setTimeout(reloadResultsLoansLightList, 5000);
+        }
+
+        $(function () {
+            $('#entityDiv').hide();
+            $('#originFilter').change(function () {
+                if ($('#originFilter').val() == '1') {
+                    $('#entityDiv').show();
+                } else {
+                    $('#entityDiv').hide();
+                    $('#entityFilter').multiselect('deselectAll', false);
+                    $('#entityFilter').multiselect('updateButtonText');
+                }
+            });
+        });
+
+        var selectedOptionsBefore = new Array();
+
+        var selectWithChanges = function(previousSelectedOptions, selectedOptions) {
+            if (selectedOptions.length !== previousSelectedOptions.length)
+                return true;
+
+            if (previousSelectedOptions.length === 0) {
+                return false;
+            }
+
+            for (var i = 0; i < selectedOptions.length; i++) {
+                seletedValue = selectedOptions[i].value;
+                previousSeletedValue = previousSelectedOptions[i].value;
+
+                if (seletedValue !== previousSeletedValue)
+                    return true;
+            }
+
+            return false;
+        };
+
+        function fillProducersDropdown(organizersDropdownId, producersDropdownId, selectedBefore) {
+            var selectedOptions = $(organizersDropdownId + ' option:selected');
+
+            if (!selectWithChanges(selectedBefore, selectedOptions))
+                return;
+
+            var producers = new Array();
+            var organizersClone = Array.from(organizers);
+
+            for (var i = 0; i < selectedOptions.length; i++) {
+                var selectedId = selectedOptions[i].value;
+
+                for (var j = 0; j < organizersClone.length; j++) {
+                    var organizerId = organizersClone[j].entityUserId;
+
+                    if (selectedId == organizerId) {
+
+                        var selectedProducers = organizersClone[j].producers;
+                        if (selectedProducers != null) {
+
+                            for (var k = 0; k < selectedProducers.length; k++) {
+                                if (selectedProducers[k] != null) {
+                                    producers.push(selectedProducers[k]);
+                                }
+                            }
+                        }
+
+                        organizersClone.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+
+            var dropdownProducers = new Array();
+
+            for (var i = 0; i < producers.length; i++) {
+                dropdownProducers.push({
+                    'label': producers[i].firstSurname + ' ' + producers[i].personName,
+                    'value': producers[i].entityUserId
+                });
+            }
+
+            dropdownProducers.sort(compare);
+
+            jQuery(producersDropdownId).multiselect('dataprovider', dropdownProducers);
+        }
+
+        function compare( a, b ) {
+            if ( a.label < b.label ){
+                return -1;
+            }
+            if ( a.label > b.label ){
+                return 1;
+            }
+            return 0;
+        }
+
+        var customTemplate = {
+            button: '<button type="button" style="font-size: 12px; color: #555; border: 1px solid #c2cad8; height: 30px;" ' +
+                'class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text pull-left"></span> ' +
+                '<b class="caret pull-right" style="margin-top: 6px;"></b></button>',
+            ul: '<ul class="multiselect-container dropdown-menu" style="font-size: 12px; color: #555; width: 100%;"></ul>'
+        };
+
+        var customOptionsMultiselect = {
+            buttonWidth: '100%',
+            nonSelectedText: 'Todos',
+            numberDisplayed: 1,
+            nSelectedText: ' seleccionados',
+            includeSelectAllOption: true,
+            selectAllText: ' Seleccionar todos',
+            selectAllValue: 0,
+            allSelectedText: 'Todos seleccionados',
+            templates: customTemplate
+        };
+
+        function buildOrganizerDropdown(organizersDropdownId, producersDropdownId) {
+            $(organizersDropdownId).multiselect({
+                buttonWidth: '100%',
+                nonSelectedText: 'Todos',
+                numberDisplayed: 1,
+                nSelectedText: ' seleccionados',
+                includeSelectAllOption: true,
+                selectAllText: ' Seleccionar todos',
+                selectAllValue: 0,
+                allSelectedText: 'Todos seleccionados',
+                templates: customTemplate,
+                onDropdownShown: function(event) {
+                    selectedOptionsBefore = $(organizersDropdownId + ' option:selected');
+                },
+                onDropdownHidden: function(event) {
+                    fillProducersDropdown(organizersDropdownId, producersDropdownId, selectedOptionsBefore)
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+    <style>
+        .loan-in-process-report .form-group,
+        .credit-to-be-disbursed-report .form-group,
+        .disbursed-credit-report .form-group,
+        .loan-risks-report .form-group,
+        .funnel-report .form-group,
+        .loans-light-report .form-group{
+            padding: 0px !important;
+        }
+        input[type=checkbox] {
+            margin-top: 0px;
+        }
+        .font-green-steel {
+            font-size: 16px !important;
+            text-transform: none !important;
+        }
+        .portlet-body form .row {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block layout:fragment="header">
+<!--        <th:block th:replace="fragments/headers :: entityDashboardHeader "></th:block>-->
+        <div class="clearfix"></div>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <th:block th:replace="fragments/extranetSidebarFragments :: extranetEntitySidebar(currentPage='reports')">
+        </th:block>
+        <div class="page-content-wrapper">
+            <div class="page-content">
+                <div class="row">
+                    <th:block th:replace="fragments/headers :: entityContentHeader(title='Reportes')"></th:block>
+                </div>
+                <div class="row" shiro:hasPermission="report:detalleVariables:execute">
+                    <div class="col-lg-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <span class="caption-subject font-green bold uppercase">Detalle de Variables</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="row">
+                                    <div class="col-lg-5">
+                                        <a id="downloadRipleyReports" class="btn red" target="_blank"
+                                            th:href="@{/entity/excel}">Descargar reporte</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <th:block th:if="${entity == T(com.affirm.common.model.catalog.Entity).EFL}">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject font-green bold uppercase">&Uacute;ltimos reportes descargados</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="row">
+                                        <div class="col-lg-5">
+                                            <a id="downloadRipleyReports" class="btn red" target="_blank" th:href="@{/entity/credits}">Descargar reporte</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+                <div class="row" shiro:hasPermission="report:funnel:execute">
+                    <div class="col-lg-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_FUNNEL}"
+                                   th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_FUNNEL} + '\')'">Generar reporte</button>
+                                <div class="caption">
+                                    <span class="caption-subject font-green bold uppercase">Reporte de Funnel</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="funnel-report">
+                                    <form role="form" method="post" autocomplete="off">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label class="control-label"><b></b><br />Fecha</label>
+                                                    <input id="creationFromFilter" autocomplete="off" name="creationFrom" type="text"
+                                                           class="form-control input-sm form-control-sm"
+                                                           placeholder="Desde" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label class="control-label"><b></b><br />&nbsp;</label>
+                                                    <input id="creationToFilter" autocomplete="off" name="creationTo" type="text"
+                                                           class="form-control input-sm form-control-sm"
+                                                           placeholder="Hasta" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><b></b><br />Visualización de estados</label>
+                                                    <select name="status[]" class="form-control input-sm form-control-sm">
+                                                        <option value="1"
+                                                                th:text="${@reportsService.FUNNEL_REPORT_DATETYPE_1}"></option>
+                                                        <option value="2"
+                                                                th:text="${@reportsService.FUNNEL_REPORT_DATETYPE_2}"></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $('#creationFromFilter').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('#creationToFilter').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('#creationFromFilter').on('change', function () {
+                                                    $('#creationToFilter').datepicker('setStartDate', $(
+                                                        '#creationFromFilter').val());
+                                                });
+                                            </script>
+                                            <div id="entityDiv" class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><b></b><br />Brandeados</label>
+                                                    <select id="entityFilter" name="entities[]"
+                                                            class="form-control input-sm form-control-sm"
+                                                            multiple="multiple">
+                                                        <option class="entityOption"
+                                                                th:each="branded : ${@catalogService.getBrandedEntities()}"
+                                                                th:value="${branded.entity.id}"
+                                                                th:text="${branded.entity.shortName}"></option>
+                                                    </select>
+                                                    <script>
+                                                        $('#entityFilter').multiselect({
+                                                            buttonWidth: '100%',
+                                                            nonSelectedText: 'Todos',
+                                                            numberDisplayed: 1,
+                                                            nSelectedText: ' seleccionados',
+                                                            includeSelectAllOption: true,
+                                                            selectAllText: ' Seleccionar todos',
+                                                            allSelectedText: 'Todos seleccionados',
+                                                            templates: customTemplate
+                                                        });
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="resultTable">
+                                                    <th:block th:replace="this :: results"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <th:block th:if="${entity == T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL}">
+                    <div class="row" shiro:hasPermission="report:solicitudesEnProceso:execute">
+                        <div class="col-lg-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_EN_PROCESO_EXT_BDS}"
+                                       th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_EN_PROCESO_EXT_BDS} + '\')'">Generar reporte</button>
+                                    <div class="caption">
+                                        <span class="caption-subject font-green bold uppercase">Reporte de Solicitudes en Proceso</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="loan-in-process-report">
+                                        <form role="form" method="post" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Cuit solicitante</label>
+                                                        <input id="cuitFormInProcess" name="documentNumber" type="text"
+                                                               class="form-control input-sm form-control-sm"
+                                                               placeholder="CUIT" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Organizador</label>
+
+                                                        <select id="organizerFilterInProcess" name="organizers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="organizer : ${organizers}"
+                                                                    th:value="${organizer.entityUserId}"
+                                                                    th:text="${organizer.firstSurname + ' ' + organizer.personName}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Productor</label>
+                                                        <select id="producerFilterInProcess" name="producers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Estado de solicitud</label>
+                                                        <select id="loanStatusFilterInProcess" name="loanStatuses[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="status : ${loanStatuses}"
+                                                                    th:value="${status.key}"
+                                                                    th:text="${status.value}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                        <input id="startDateFilterInProcess" name="startDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="endDateFilterInProcess" name="endDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $('#producerFilterInProcess, #loanStatusFilterInProcess')
+                                                    .multiselect(customOptionsMultiselect);
+
+                                                buildOrganizerDropdown('#organizerFilterInProcess', '#producerFilterInProcess');
+
+                                                $('.control-date-since').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-to').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-since').on('change', function () {
+                                                    $('.control-date-to').datepicker('setStartDate',
+                                                        $('.control-date-since').val());
+                                                });
+                                            </script>
+                                        </form>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="loanInProcessResultTable">
+                                                    <th:block th:replace="this :: loanInProcessResults"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" shiro:hasPermission="report:creditosADesembolsar:execute">
+                        <div class="col-lg-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_CREDITOS_A_DESEMBOLSAR_EXT_BDS}"
+                                       th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_CREDITOS_A_DESEMBOLSAR_EXT_BDS} + '\')'">Generar reporte</button>
+                                    <div class="caption">
+                                        <span class="caption-subject font-green bold uppercase">Reporte de Cr&eacute;ditos a Desembolsar</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="credit-to-be-disbursed-report">
+                                        <form role="form" method="post" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Cuit solicitante</label>
+                                                        <input id="cuitFormToBeDisbursed" name="documentNumber" type="text"
+                                                               class="form-control input-sm form-control-sm"
+                                                               placeholder="CUIT" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Organizador</label>
+
+                                                        <select id="organizerFilterToBeDisbursed" name="organizers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="organizer : ${organizers}"
+                                                                    th:value="${organizer.entityUserId}"
+                                                                    th:text="${organizer.firstSurname + ' ' + organizer.personName}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Productor</label>
+                                                        <select id="producerFilterToBeDisbursed" name="producers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                        <input id="startDateFilterToBeDisbursed" name="startDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="endDateFilterToBeDisbursed" name="endDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $('#producerFilterToBeDisbursed').multiselect(customOptionsMultiselect);
+
+                                                buildOrganizerDropdown('#organizerFilterToBeDisbursed', '#producerFilterToBeDisbursed');
+
+                                                $('.control-date-since').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-to').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-since').on('change', function () {
+                                                    $('.control-date-to').datepicker('setStartDate',
+                                                        $('.control-date-since').val());
+                                                });
+                                            </script>
+                                        </form>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="loanToBeDisbursedResultTable">
+                                                    <th:block th:replace="this :: loanToBeDisbursedResults"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" shiro:hasPermission="report:creditosDesembolsados:execute">
+                        <div class="col-lg-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_CREDITOS_DESEMBOLSADOS_EXT_BDS}"
+                                       th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_CREDITOS_DESEMBOLSADOS_EXT_BDS} + '\')'">Generar reporte</button>
+                                    <div class="caption">
+                                        <span class="caption-subject font-green bold uppercase">Reporte de Cr&eacute;ditos Desembolsados</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="disbursed-credit-report">
+                                        <form role="form" method="post" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Cuit solicitante</label>
+                                                        <input id="cuitFormDisbursed" name="documentNumber" type="text"
+                                                               class="form-control input-sm form-control-sm"
+                                                               placeholder="CUIT" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Organizador</label>
+
+                                                        <select id="organizerFilterDisbursed" name="organizers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="organizer : ${organizers}"
+                                                                    th:value="${organizer.entityUserId}"
+                                                                    th:text="${organizer.firstSurname + ' ' + organizer.personName}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Productor</label>
+                                                        <select id="producerFilterDisbursed" name="producers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Estado interno</label>
+                                                        <select id="internalStatusFilterDisbursed" name="internalStatuses[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="status : ${internalStatuses}"
+                                                                    th:value="${status}"
+                                                                    th:text="${status}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                        <input id="startDateFilterDisbursed" name="startDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="endDateFilterDisbursed" name="endDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de desembolso</b><br />Desde</label>
+                                                        <input id="disbursementStartDateFilterDisbursed" name="disbursementStartDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="disbursementEndDateFilterDisbursed" name="disbursementEndDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $('#producerFilterDisbursed, #internalStatusFilterDisbursed')
+                                                    .multiselect(customOptionsMultiselect);
+
+                                                buildOrganizerDropdown('#organizerFilterDisbursed', '#producerFilterDisbursed');
+
+                                                $('.control-date-since').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-to').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-since').on('change', function () {
+                                                    $('.control-date-to').datepicker('setStartDate',
+                                                        $('.control-date-since').val());
+                                                });
+                                            </script>
+                                        </form>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="disbursedLoanResultTable">
+                                                    <th:block th:replace="this :: disbursedLoanResults"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" shiro:hasPermission="report:riesgosBds:execute">
+                        <div class="col-lg-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_RIESGOS_EXT_BDS}"
+                                       th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_RIESGOS_EXT_BDS} + '\')'">Generar reporte</button>
+                                    <div class="caption">
+                                        <span class="caption-subject font-green bold uppercase">Reporte de Riesgos</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="loan-risks-report">
+                                        <form role="form" method="post" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Cuit solicitante</label>
+                                                        <input id="cuitFormRisks" name="documentNumber" type="text"
+                                                               class="form-control input-sm form-control-sm"
+                                                               placeholder="CUIT" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Organizador</label>
+
+                                                        <select id="organizerFilterRisks" name="organizers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="organizer : ${organizers}"
+                                                                    th:value="${organizer.entityUserId}"
+                                                                    th:text="${organizer.firstSurname + ' ' + organizer.personName}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Productor</label>
+                                                        <select id="producerFilterRisks" name="producers[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Estado de solicitud</label>
+                                                        <select id="loanStatusFilterRisks" name="loanStatuses[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="status : ${loanStatuses}"
+                                                                    th:value="${status.key}"
+                                                                    th:text="${status.value}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                        <input id="startDateFilterRisks" name="startDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="endDateFilterRisks" name="endDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Estado interno</label>
+                                                        <select id="internalStatusFilterRisks" name="internalStatuses[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="status : ${internalStatuses}"
+                                                                    th:value="${status}"
+                                                                    th:text="${status}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Estado de crédito</label>
+                                                        <select id="creditStatusFilterRisks" name="creditStatuses[]"
+                                                                class="form-control input-sm form-control-sm control-filter"
+                                                                multiple="multiple">
+                                                            <option class="entityOption" th:each="status : ${creditStatuses}"
+                                                                    th:value="${status.key}"
+                                                                    th:text="${status.value}">
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de última ejecución</b><br />Desde</label>
+                                                        <input id="lastExecutionStartDateFilterRisks" name="lastExecutionStartDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="lastExecutionEndDateFilterRisks" name="lastExecutionEndDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $('#producerFilterRisks, #loanStatusFilterRisks, #internalStatusFilterRisks, ' +
+                                                    '#creditStatusFilterRisks').multiselect(customOptionsMultiselect);
+
+                                                buildOrganizerDropdown('#organizerFilterRisks', '#producerFilterRisks');
+
+                                                $('.control-date-since').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-to').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-since').on('change', function () {
+                                                    $('.control-date-to').datepicker('setStartDate',
+                                                        $('.control-date-since').val());
+                                                });
+                                            </script>
+                                        </form>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="loanRisksResultTable">
+                                                    <th:block th:replace="this :: loanRisksResults"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${entity == T(com.affirm.common.model.catalog.Entity).FUNDACION_DE_LA_MUJER}">
+                    <div class="row" shiro:hasPermission="report:fdlmSolicitudesEnProceso:execute">
+                        <div class="col-lg-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_EN_PROCESO_EXT_FDLM}"
+                                            th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_EN_PROCESO_EXT_FDLM} + '\')'">Generar reporte</button>
+                                    <div class="caption">
+                                        <span class="caption-subject font-green bold uppercase">Reporte de Solicitudes en Proceso</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="loan-in-process-report">
+                                        <form role="form" method="post" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Cédula de Ciudadania</label>
+                                                        <input name="documentNumber" type="text" class="form-control input-sm form-control-sm" placeholder="Cédula de Ciudadania" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Apellido</label>
+                                                        <input name="lastname" type="text" class="form-control input-sm form-control-sm" placeholder="Apellido" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Estado de solicitud</label>
+                                                        <select id="loanStatusFilterInProcess" name="loanStatuses[]" class="form-control input-sm form-control-sm control-filter" multiple="multiple">
+                                                            <option class="entityOption" th:each="status : ${loanStatuses}" th:value="${status.key}" th:text="${status.value}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                        <input id="startDateFilterInProcess" name="startDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="endDateFilterInProcess" name="endDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b>Fecha de última actualización</b><br />Desde</label>
+                                                        <input id="startDateFilterUpdated" name="updatedStartDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-since"
+                                                               placeholder="Desde" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label"><b></b><br />Hasta</label>
+                                                        <input id="endDateFilterUpdated" name="updatedEndDate" type="text"
+                                                               class="form-control input-sm form-control-sm control-date-to"
+                                                               placeholder="Hasta" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $('#loanStatusFilterInProcess').multiselect(customOptionsMultiselect);
+
+                                                $('.control-date-since, .control-date-to').datepicker({
+                                                    autoclose: true,
+                                                    format: "dd/mm/yyyy",
+                                                    focusOnShow: true,
+                                                    endDate: "today"
+                                                });
+                                                $('.control-date-since').on('change', function () {
+                                                    $('.control-date-to').datepicker('setStartDate', $('.control-date-since').val());
+                                                });
+                                            </script>
+                                        </form>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="portlet">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive" id="loanInProcessResultTable">
+                                                    <th:block th:replace="this :: loanInProcessResultsFDLM"></th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+                <div class="row" shiro:hasPermission="report:loansLight:execute">
+                    <div class="col-lg-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <button class="btn red pull-right btn-generate-report principal-button" th:id="'btnGenerateReport' + ${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_LIGHT}"
+                                        th:onclick="'exportToExcel(\'' + ${T(com.affirm.common.model.catalog.Report).REPORTE_SOLICITUDES_LIGHT} + '\')'">Generar reporte</button>
+                                <div class="caption">
+                                    <span class="caption-subject font-green bold uppercase">Reporte de Solicitudes</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="loans-light-report">
+                                    <form role="form" method="post" autocomplete="off">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><b>Fecha de solicitud</b><br />Desde</label>
+                                                    <input id="startDateFilterLoansLight" name="startDate" type="text"
+                                                           class="form-control input-sm form-control-sm control-date-since"
+                                                           placeholder="Desde" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><b></b><br />Hasta</label>
+                                                    <input id="endDateFilterLoansLight" name="endDate" type="text"
+                                                           class="form-control input-sm form-control-sm control-date-to"
+                                                           placeholder="Hasta" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $('.control-date-since, .control-date-to').datepicker({
+                                                autoclose: true,
+                                                format: "dd/mm/yyyy",
+                                                focusOnShow: true,
+                                                endDate: "today"
+                                            });
+                                            $('.control-date-since').on('change', function () {
+                                                $('.control-date-to').datepicker('setStartDate', $('.control-date-since').val());
+                                            });
+                                        </script>
+                                    </form>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="portlet">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <span class="caption-subject font-green-steel bold">&Uacute;ltimos reportes descargados</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="table-responsive" id="loansLightResultTable">
+                                                <th:block th:replace="this :: loansLightResults"></th:block>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:fragment="results">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Fec. Registro</th>
+                    <th>Fec. Procesamiento</th>
+                    <th>Estatus</th>
+                    <th>Fecha de corte</th>
+                    <th>Visualización de estados</th>
+                    <th>Productos</th>
+                    <th>Url</th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:each="report : ${historicReports}">
+                    <tr>
+                        <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                        <td th:text="${@utilService.datetimeShortFormat(report.processDate)}"
+                            th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                        <th:block th:switch="${report.status}">
+                            <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                            <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                            <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                        </th:block>
+                        <td
+                            th:text="${report.params != null ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : '' }">
+                        </td>
+                        <td
+                            th:text="${report.params != null and !report.params.isNull('dateType') ? @utilService.getDateTypeFunnel(report.params.get('dateType')) : '' }">
+                        </td>
+                        <td
+                            th:text="${report.params != null and !report.params.isNull('products') ? @utilService.getProductsFunnelByIds(report.params.get('products')) : ''}">
+                        </td>
+                        <td>
+                            <a th:if="${report.url != null}"
+                                th:href="${@reportsService.createReportDownloadUrl(report.id)}"
+                                target="_blank">Descargar</a>
+                        </td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="loanInProcessResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>CUIT</th>
+                <th>Organizador/Productor</th>
+                <th>Fec. Solicitud</th>
+                <th>Estado de solicitud</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loanInProcessHistoricReports)}" th:each="report : ${loanInProcessHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${!report.params.isNull('documentNumber') ? report.params.get('documentNumber').toString() : '' }"></td>
+                    <td th:text="${report.params.isNull('producersNameConcat') ? 'Todos' : report.params.get('producersNameConcat').toString() }"></td>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td th:text="${report.params.get('loanStatuses').toString() == '[]' ? 'Todos' : @userService.getLoanStatusesByIds(report.params.get('loanStatuses')) }"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loanInProcessHistoricReports)}">
+                <tr>
+                    <td colspan="8">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="loanInProcessResultsFDLM">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>Documento</th>
+                <th>Apellido</th>
+                <th>Fec. Solicitud</th>
+                <th>Fec. Actualizacion</th>
+                <th>Estado de solicitud</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loanInProcessHistoricReports)}" th:each="report : ${loanInProcessHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${!report.params.isNull('documentNumber') ? report.params.get('documentNumber').toString() : '' }"></td>
+                    <td th:text="${!report.params.isNull('lastname') ? report.params.get('lastname').toString() : '' }"></td>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td th:text="${(!report.params.isNull('updatedStartDate') and !report.params.isNull('updatedEndDate')) ? report.params.get('updatedStartDate').toString() + ' - ' + report.params.get('updatedEndDate').toString() : ''}"></td>
+                    <td th:text="${!report.params.isNull('loanStatuses') ? @userService.getFDLMLoanStatusesByIds(report.params.get('loanStatuses')) : 'Todos'}"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loanInProcessHistoricReports)}">
+                <tr>
+                    <td colspan="9">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="loanToBeDisbursedResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>CUIT</th>
+                <th>Organizador/Productor</th>
+                <th>Fec. Solicitud</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loanToBeDisbursedHistoricReports)}" th:each="report : ${loanToBeDisbursedHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${!report.params.isNull('documentNumber') ? report.params.get('documentNumber').toString() : '' }"></td>
+                    <td th:text="${report.params.isNull('producersNameConcat') ? 'Todos' : report.params.get('producersNameConcat').toString() }"></td>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loanToBeDisbursedHistoricReports)}">
+                <tr>
+                    <td colspan="7">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="disbursedLoanResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>CUIT</th>
+                <th>Organizador/Productor</th>
+                <th>Fec. Solicitud</th>
+                <th>Fec. Desembolso</th>
+                <th>Estado Interno</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(disbursedLoanHistoricReports)}" th:each="report : ${disbursedLoanHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${!report.params.isNull('documentNumber') ? report.params.get('documentNumber').toString() : '' }"></td>
+                    <td th:text="${report.params.isNull('producersNameConcat') ? 'Todos' : report.params.get('producersNameConcat').toString() }"></td>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td th:text="${(!report.params.isNull('disbursementStartDate') and !report.params.isNull('disbursementEndDate')) ? report.params.get('disbursementStartDate').toString() + ' - ' + report.params.get('disbursementEndDate').toString() : ''}"></td>
+                    <td th:text="${report.params.get('internalStatuses').toString() == '[]' ? 'Todos' : @userService.formattedInternalStatuses(report.params.get('internalStatuses')) }"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(disbursedLoanHistoricReports)}">
+                <tr>
+                    <td colspan="8">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="loanRisksResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>CUIT</th>
+                <th>Organizador/Productor</th>
+                <th>Fec. Solicitud</th>
+                <th>Fec. Últ. Ejecución</th>
+                <th>Estado de solicitud</th>
+                <th>Estado interno</th>
+                <th>Estado de crédito</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loanRisksHistoricReports)}" th:each="report : ${loanRisksHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${!report.params.isNull('documentNumber') ? report.params.get('documentNumber').toString() : '' }"></td>
+                    <td th:text="${report.params.isNull('producersNameConcat') ? 'Todos' : report.params.get('producersNameConcat').toString() }"></td>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td th:text="${(!report.params.isNull('lastExecutionStartDate') and !report.params.isNull('lastExecutionEndDate')) ? report.params.get('lastExecutionStartDate').toString() + ' - ' + report.params.get('lastExecutionEndDate').toString() : ''}"></td>
+                    <td th:text="${report.params.get('loanStatuses').toString() == '[]' ? 'Todos' : @userService.getLoanStatusesByIds(report.params.get('loanStatuses')) }"></td>
+                    <td th:text="${report.params.get('internalStatuses').toString() == '[]' ? 'Todos' : @userService.formattedInternalStatuses(report.params.get('internalStatuses')) }"></td>
+                    <td th:text="${report.params.get('creditStatuses').toString() == '[]' ? 'Todos' : @userService.getCreditStatusesByIds(report.params.get('creditStatuses')) }"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loanRisksHistoricReports)}">
+                <tr>
+                    <td colspan="10">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="loansLightResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>Fec. Solicitud</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loansLightHistoricReports)}" th:each="report : ${loansLightHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loansLightHistoricReports)}">
+                <tr>
+                    <td colspan="4">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+    <th:block th:fragment="loansLightFunnelResults">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Fec. Registro</th>
+                <th>Fec. Procesamiento</th>
+                <th>Estatus</th>
+                <th>Fec. Solicitud</th>
+                <th>Url</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${not #lists.isEmpty(loansLightHistoricReports)}" th:each="report : ${loansLightHistoricReports}">
+                <tr>
+                    <td th:text="${@utilService.datetimeShortFormat(report.registerDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.registerDate)}"></td>
+                    <td th:text="${@utilService.datetimeShortFormat(report.processDate)}" th:attr="data-order=${@utilService.datetimeYearFirstFormat(report?.processDate)}"></td>
+                    <th:block th:switch="${report.status}">
+                        <td th:case="'P'"><span class="label label-xs label-warning">Pendiente</span></td>
+                        <td th:case="'F'"><span class="label label-xs label-danger">Fallido</span></td>
+                        <td th:case="'S'"><span class="label label-xs label-success">Procesada</span></td>
+                    </th:block>
+                    <td th:text="${(!report.params.isNull('startDate') and !report.params.isNull('endDate')) ? report.params.get('startDate').toString() + ' - ' + report.params.get('endDate').toString() : ''}"></td>
+                    <td>
+                        <a th:if="${report.url != null}" th:href="${@reportsService.createReportDownloadUrl(report.id)}" target="_blank">Descargar</a>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(loansLightHistoricReports)}">
+                <tr>
+                    <td colspan="4">
+                        No hay resultados.
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </th:block>
+
+</body>
+</html>

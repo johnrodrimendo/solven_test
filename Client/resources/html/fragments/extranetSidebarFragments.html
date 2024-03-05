@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+</head>
+<body>
+<th:block th:fragment="extranetSidebar">
+    <div class="page-sidebar-wrapper">
+        <div class="page-sidebar navbar-collapse collapse">
+            <ul class="page-sidebar-menu   " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+                <li class="nav-item start resume" th:classappend="${currentPage == 'dashboard' ? 'active open' : ''}">
+                    <a th:href="@{/client/dashboard}" class="nav-link ">
+                        <i class="icon-bar-chart"></i>
+                        <span class="title">Resumen</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'loans' ? 'active open' : ''}">
+                    <a th:href="@{/client/mis-creditos}" class="nav-link ">
+                        <i class="icon-grid"></i>
+                        <span class="title">Cr&eacute;ditos</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start requests" th:classappend="${currentPage == 'requests' ? 'active open' : ''}">
+                    <a th:href="@{/client/mis-solicitudes}" class="nav-link ">
+                        <i class="icon-layers"></i>
+                        <span class="title">Solicitudes</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="extranetCompanySidebar">
+    <div class="page-sidebar-wrapper">
+        <div class="page-sidebar navbar-collapse collapse">
+            <ul class="page-sidebar-menu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+                <li class="heading">
+                    <h3 class="uppercase">Empresas</h3>
+                </li>
+                <hr/>
+                <th:block th:each="company : ${@extranetCompanyService.getLoggedUserEmployer().companies}">
+                    <li class="nav-item start resume" th:classappend="${@extranetCompanyService.getLoggedUserEmployer().activeCompany.id == company.id ? 'active' : ''}" >
+                        <a th:attr="data-id=${company.id}" class="nav-link selectCompany">
+                        <span class="fit">
+                            <img th:if="${company.logoUrl == null}" class="user-pic rounded" th:src="@{/img/avatar-default.png}" width="32"/>
+                            <img th:if="${company.logoUrl != null}" class="user-pic rounded" th:src="${company.logoUrl}" width="32"/>
+                        </span>
+                            <span class="title" th:text="${company.name}"></span>
+                        </a>
+                    </li>
+                </th:block>
+                <hr/>
+                <th:block th:if="${@extranetCompanyService.validateAgreementProduct(@extranetCompanyService.getLoggedUserEmployer().activeCompany.id)}">
+                    <li class="nav-item start loans" th:classappend="${currentPage == 'dashboard' ? 'active' : ''}">
+                        <a th:href="@{/dashboard}" class="nav-link ">
+                            <i class="icon-bar-chart"></i>
+                            <span class="title">Resumen</span>
+                            <span class="selected"></span>
+                        </a>
+                    </li>
+                </th:block>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'paysheet-activa' ? 'active' : ''}">
+                    <a th:href="@{/planilla/activa}" class="nav-link ">
+                        <i class="icon-grid"></i>
+                        <span class="title">Planilla activa</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'paysheet-inactiva' ? 'active' : ''}">
+                    <a th:href="@{/planilla/inactiva}" class="nav-link ">
+                        <i class="icon-grid"></i>
+                        <span class="title">Planilla inactiva</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <th:block th:if="${@extranetCompanyService.validateProduct(@extranetCompanyService.getLoggedUserEmployer().activeCompany.id, T(com.affirm.common.model.catalog.Product).SALARY_ADVANCE)}">
+                    <li class="nav-item start requests" th:classappend="${currentPage == 'salaryAdvance' ? 'active' : ''}">
+                        <a th:href="@{/adelantos}" class="nav-link ">
+                            <i class="icon-layers"></i>
+                            <span class="title">Adelantos</span>
+                            <span class="selected"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item start requests" th:classappend="${currentPage == 'history' ? 'active' : ''}">
+                        <a th:href="@{/historicos}" class="nav-link ">
+                            <i class="icon-clock"></i>
+                            <span class="title">Hist&oacute;rico de Adelantos</span>
+                            <span class="selected"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item start requests" th:classappend="${currentPage == 'imputator' ? 'active' : ''}">
+                        <a th:href="@{/imputador}" class="nav-link ">
+                            <i class="icon-note"></i>
+                            <span class="title">Imputador</span>
+                            <span class="selected"></span>
+                        </a>
+                    </li>
+                </th:block>
+                <li class="nav-item start requests" th:classappend="${currentPage == 'historyLoan' ? 'active' : ''}">
+                    <a th:href="@{/historicLoans}" class="nav-link ">
+                        <i class="icon-clock"></i>
+                        <span class="title">Hist&oacute;rico de Cr&eacute;ditos</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'pending-authorization' ? 'active' : ''}">
+                    <a th:href="@{/pendingAuthorization}" class="nav-link ">
+                        <i class="icon-grid"></i>
+                        <span class="title">Pendiente Autorizaci&oacute;n</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans ">
+                    <a href="#" class="nav-link play-v">
+                        <i class="icon-control-play"></i>
+                        <span class="title">Video Tutorial</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        $(".play-v").click(function(){
+            $("#modalTutorial").modal();
+            $("#modalTutorial").addClass("modal-tutorial");
+            $(".modal-backdrop").addClass("modal-backdrop_tutorial");
+            $(".modalTutorial-close").click(function(){
+                $("#modalTutorial").modal('hide');
+
+            });
+        });
+
+    </script>
+    <div id="modalTutorial" class="modal fade">
+        <div class="modal-dialog ">
+            <div class="v-content">
+                <iframe class="modalTutorial-video" width="560" height="315" src="https://www.youtube.com/embed/gND2_79YMY8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen"></iframe>
+                <button class="modalTutorial-close">X</button>
+            </div>
+
+        </div>
+    </div>
+
+
+</th:block>
+<th:block th:fragment="extranetEntitySidebar">
+    <div class="page-sidebar-wrapper">
+        <div class="page-sidebar navbar-collapse collapse" id="page-sidebar-menu-container" th:classappend="${sidebarClosed != null and sidebarClosed ? 'menu-sidebar-closed' : ''}" style="display: flex !important;flex-direction: column;">
+            <div class="sidebar-menu-logo">
+                <div class="logo-sidebar">
+                    <a th:href="@{/}" class="text-red">
+                        <i class="icon icon-solven logo-default extranet-logo" style="font-size: 2.5em;"></i>
+                        <img class="custom-logo-img-header" th:src="${@brandingService.getExtranetBrandingImageHeader(#httpServletRequest)} != null ? ${@brandingService.getExtranetBrandingImageHeader(#httpServletRequest)} : ''" alt="" style="display: none"/>
+                    </a>
+                </div>
+                <div class="menu-toggler-sidebar">
+                    <div class="menu-toggler sidebar-toggler"></div>
+                </div>
+            </div>
+            <ul class="page-sidebar-menu" th:classappend="${sidebarClosed != null and sidebarClosed ? 'page-sidebar-menu-closed' : ''}" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="flex: 1;display: flex; flex-direction: column;">
+                <li class="nav-item start loans" th:classappend="${currentPage == 'funnel' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:report:funnelv2:view" th:href="@{/funnel}" class="nav-link ">
+<!--                        <i class="fa fa-bar-chart"></i>-->
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.18 22.57"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path id="Trazado_9860" data-name="Trazado 9860" class="svg-cls-1" d="M5.69,10.56a.47.47,0,0,0,.35.15h0v2.42a.42.42,0,0,0,.2.36l1.49,1,.1.05v6a.46.46,0,0,0,.31.43l4.52,1.49.15,0a.54.54,0,0,0,.28-.08.49.49,0,0,0,.2-.37V14.59l.08-.05,1.47-1a.4.4,0,0,0,.17-.36V10.71h.08a.47.47,0,0,0,.35-.15l5.6-6.68a.39.39,0,0,0,.11-.28V.48A.49.49,0,0,0,20.71,0H.45A.47.47,0,0,0,0,.48V3.6a.43.43,0,0,0,.11.28ZM12.43,21.5,8.76,20.3V14.6h3.67Zm1.72-8.61L13,13.7H8.17L7,12.89V10.7h7.18Zm.78-3.08H6.25L1.41,4.05H19.76ZM.9.9H20.3V3.15H.9Z"/></g></g></svg>
+                        <span class="title">Funnel</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'funnelv3' ? 'active' : ''}">
+                    <a th:href="@{/funnelv3}" shiro:hasPermission="menu:report:funnelv3:view" class="nav-link ">
+<!--                        <i class="fa fa-bar-chart"></i>-->
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.18 22.57"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path id="Trazado_9860" data-name="Trazado 9860" class="svg-cls-1" d="M5.69,10.56a.47.47,0,0,0,.35.15h0v2.42a.42.42,0,0,0,.2.36l1.49,1,.1.05v6a.46.46,0,0,0,.31.43l4.52,1.49.15,0a.54.54,0,0,0,.28-.08.49.49,0,0,0,.2-.37V14.59l.08-.05,1.47-1a.4.4,0,0,0,.17-.36V10.71h.08a.47.47,0,0,0,.35-.15l5.6-6.68a.39.39,0,0,0,.11-.28V.48A.49.49,0,0,0,20.71,0H.45A.47.47,0,0,0,0,.48V3.6a.43.43,0,0,0,.11.28ZM12.43,21.5,8.76,20.3V14.6h3.67Zm1.72-8.61L13,13.7H8.17L7,12.89V10.7h7.18Zm.78-3.08H6.25L1.41,4.05H19.76ZM.9.9H20.3V3.15H.9Z"/></g></g></svg>
+                        <span class="title">Funnel</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'funnelCollection' ? 'active' : ''}">
+                    <a th:href="@{/funnelCollection}" shiro:hasPermission="menu:funnelCollection:view" class="nav-link ">
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25.4 22.57"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M18.94,9.76V9.53a.47.47,0,1,0-.93,0h0v.23a1.64,1.64,0,0,0-1.13,1.54,1.61,1.61,0,0,0,1.61,1.61.68.68,0,1,1,0,1.36h0a.69.69,0,0,1-.67-.68.47.47,0,1,0-.94,0A1.64,1.64,0,0,0,18,15.13v.29a.47.47,0,1,0,.93,0h0v-.29a1.58,1.58,0,0,0,1.16-1.54A1.61,1.61,0,0,0,18.49,12h0a.68.68,0,1,1,.69-.68.46.46,0,1,0,.92,0h0A1.58,1.58,0,0,0,18.94,9.76Z"/><path class="svg-cls-1" d="M19.57,5.67l1.5-1.79a.39.39,0,0,0,.11-.28V.48A.49.49,0,0,0,20.71,0H.45A.47.47,0,0,0,0,.48V3.6a.43.43,0,0,0,.11.28l5.58,6.68a.44.44,0,0,0,.35.15h0v2.42a.42.42,0,0,0,.2.36l1.49,1,.1.05v6a.46.46,0,0,0,.31.43l4.52,1.49.15,0a.54.54,0,0,0,.28-.08.49.49,0,0,0,.2-.37V17A6.89,6.89,0,1,0,19.57,5.67ZM.9.9H20.3V3.15H.9ZM6.25,9.81,1.41,4.05H19.76L18.48,5.57a6.91,6.91,0,0,0-6.35,4.24ZM7,12.89V10.7h4.87a6.93,6.93,0,0,0-.23,1.77,7.12,7.12,0,0,0,.11,1.23H8.17Zm5.47,8.61L8.76,20.3V14.6h3.17a7.62,7.62,0,0,0,.5,1.17Zm6.07-3.06a6,6,0,0,1-5.18-3,6,6,0,0,1-.66-1.73,6.26,6.26,0,0,1-.13-1.23,6.12,6.12,0,0,1,.27-1.77,5.72,5.72,0,0,1,.36-.89,6,6,0,0,1,4.48-3.24,6.11,6.11,0,0,1,.86-.06h.35a6,6,0,0,1-.35,11.92Z"/></g></g></svg>
+                        <span class="title">Funnel Cobranzas</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item start loans" th:classappend="${currentPage == 'dashboard' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:loanApplication:register:view" th:href="@{/home}" class="nav-link ">
+                        <!--                        <i class="fa fa-gears"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="20.597" height="18.666" viewBox="0 0 20.597 18.666">
+                            <g id="Grupo_10085" data-name="Grupo 10085" transform="translate(-760.935 -595.324)">
+                                <path id="Trazado_9638" data-name="Trazado 9638" d="M769.681,608.951a.355.355,0,1,1,0-.71h.809a5.829,5.829,0,0,1,.263-1.278h-1.071a.355.355,0,1,1,0-.71h1.354a5.869,5.869,0,0,1,3.886-3.163v-6.777a.991.991,0,0,0-.99-.99H761.925a.991.991,0,0,0-.99.99v14.909a.991.991,0,0,0,.99.99h9.653a5.827,5.827,0,0,1-1.11-3.262Zm0-4.686H771.6a.355.355,0,1,1,0,.71h-1.917a.355.355,0,1,1,0-.71Zm-1.452,4.686h-5.04a.355.355,0,1,1,0-.71h5.04a.355.355,0,1,1,0,.71Zm0-1.988h-5.04a.355.355,0,0,1,0-.71h5.04a.355.355,0,1,1,0,.71Zm.055-1.988h-5.041a.355.355,0,1,1,0-.71h5.041a.355.355,0,1,1,0,.71Zm.011-3.739v.416a.355.355,0,1,1-.71,0v-.414a1.47,1.47,0,0,1-.649-.462.355.355,0,1,1,.543-.457.642.642,0,0,0,.461.268.355.355,0,0,0,0-.71,1.065,1.065,0,0,1-.355-2.068v-.416a.355.355,0,1,1,.71,0v.413a1.371,1.371,0,0,1,.523.327.355.355,0,0,1-.494.51.57.57,0,0,0-.384-.186.355.355,0,0,0,0,.71,1.065,1.065,0,0,1,.355,2.068Z" transform="translate(0)" fill="#a2aaad"/>
+                                <path id="Trazado_9639" data-name="Trazado 9639" d="M878.389,686.253h0a5.208,5.208,0,0,0-5.211,5.212c0,.058,0,.115,0,.172a5.211,5.211,0,1,0,5.207-5.384Zm2.936,4.28-3.478,3.479h0l0,0a.3.3,0,0,1-.427,0l-.428-.429-1.535-1.537h0a.3.3,0,0,1,0-.427l.428-.428a.3.3,0,0,1,.428,0l.679.679.645.645,2.835-2.838h0a.3.3,0,0,1,.427,0l.428.429h0A.3.3,0,0,1,881.325,690.533Z" transform="translate(-102.069 -82.687)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">Solicitud de Cr&eacute;dito</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'pending' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:pending:view" th:href="@{/pending}" class="nav-link ">
+<!--                        <i class="fa fa-clock-o"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                            <path id="clock" d="M8,0a8,8,0,1,0,8,8A8.009,8.009,0,0,0,8,0Zm3.8,12.138a.666.666,0,0,1-.943,0L7.529,8.8a.664.664,0,0,1-.2-.471V4A.667.667,0,0,1,8.667,4V8.057L11.8,11.2A.666.666,0,0,1,11.8,12.138Zm0,0" fill="#a2aaad"/>
+                        </svg>
+                        <span class="title">Solicitudes a verificar</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'toUpload' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:toUpload:view" th:href="@{/toUpload}" class="nav-link ">
+<!--                        <i class="fa fa-upload"></i>-->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="custom-menu-icon" width="15.081" height="17" viewBox="0 0 15.081 17">
+                            <g id="customer" transform="translate(-2.956 -32.757)">
+                                <circle id="Elipse_51" data-name="Elipse 51" cx="3.024" cy="3.024" r="3.024" transform="translate(5.16 32.757)" fill="#a2aaad"/>
+                                <circle id="Elipse_52" data-name="Elipse 52" cx="2.016" cy="2.016" r="2.016" transform="translate(13.224 34.773)" fill="#a2aaad"/>
+                                <path id="Trazado_9522" data-name="Trazado 9522" d="M126.329,239.9a5.715,5.715,0,0,0-4.408,1.043c-2.112,1.691-1.705,3.969-1.705,6.755a1.35,1.35,0,0,0,1.348,1.348c8.125,0,8.448.262,8.93-.8.158-.361.115-.246.115-3.7A4.666,4.666,0,0,0,126.329,239.9Z" transform="translate(-117.228 -199.312)" fill="#a2aaad"/>
+                                <path id="Trazado_9523" data-name="Trazado 9523" d="M380.362,240.533a3.421,3.421,0,0,0-2.552.592c2,2.042,1.662,4.078,1.662,7.221,0,.166-.27.116,2.33.116a1.171,1.171,0,0,0,1.172-1.168v-4.164A2.609,2.609,0,0,0,380.362,240.533Z" transform="translate(-364.938 -199.966)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">Creación de cliente/cr&eacute;dito</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'rejected' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:rejected:view" th:href="@{/rejected}" class="nav-link ">
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.02 22.1"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M17.61.27C17.5.18,17.38.08,17.26,0H6.82a3.53,3.53,0,0,0-.46.15A1.78,1.78,0,0,0,5.25,1.86v8.75H5.12a5.88,5.88,0,0,0-2.19.71A5.75,5.75,0,0,0,4.83,22a6.61,6.61,0,0,0,1,.08H20.29A1.83,1.83,0,0,0,22,20.18V5a.76.76,0,0,0-.24-.59C20.38,3,19,1.65,17.61.27Zm0,1.54,2.54,2.54H17.65ZM5.75,21.09h0a4.75,4.75,0,0,1,0-9.49h0a4.75,4.75,0,1,1,0,9.49ZM21,20.17a.79.79,0,0,1,0,.21.82.82,0,0,1-.81.71H9.05l.32-.27A5.77,5.77,0,0,0,11.47,17l0-.13h6.89a.54.54,0,0,0,.31-.06.51.51,0,0,0,.18-.69.51.51,0,0,0-.5-.26H11.48v-.13a6,6,0,0,0-.93-2.55l-.16-.24h8a.55.55,0,0,0,.26,0,.51.51,0,0,0,.26-.67.51.51,0,0,0-.51-.31H9.67a.77.77,0,0,1-.44-.14,5.88,5.88,0,0,0-2.84-1.13l-.13,0V1.94a.88.88,0,0,1,0-.23A.84.84,0,0,1,7.2,1h9.42V4.78a.42.42,0,0,0,0,.16.55.55,0,0,0,.2.35.58.58,0,0,0,.38.1H21Z"/><path class="svg-cls-1" d="M8.35,8.27a.64.64,0,0,0,0,.24A.52.52,0,0,0,8.85,9h9.52a.56.56,0,0,0,.53-.31.45.45,0,0,0,0-.23.51.51,0,0,0-.17-.35A.55.55,0,0,0,18.41,8H8.84A.53.53,0,0,0,8.35,8.27Z"/><path class="svg-cls-1" d="M7.2,17.08l-.64-.6-.11-.1.15-.16.13-.14.44-.44.9-.9a.51.51,0,0,0,0-.73.53.53,0,0,0-.72,0l-.26.26L5.76,15.62l-.1-.1-.17-.15L4.21,14.09A.67.67,0,0,0,4.09,14a.51.51,0,0,0-.82.48.5.5,0,0,0,.2.34l1.3,1.3a.65.65,0,0,1,.11.12l.14.15-.3.3L3.46,17.91,3.38,18a.57.57,0,0,0-.11.38.52.52,0,0,0,.18.34.53.53,0,0,0,.38.11.52.52,0,0,0,.34-.18l1.25-1.25.14-.22L5.64,17l.14.1a1.55,1.55,0,0,1,.27.24l.23.23c.35.36.7.71,1.06,1.06h0l0,0a.47.47,0,0,0,.37.13.51.51,0,0,0,.35-.15.52.52,0,0,0,0-.72Q7.64,17.5,7.2,17.08Z"/></g></g></svg>
+                        <span class="title">Solicitudes rechazadas</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'beingProcessed' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:beingProcessed:view" th:href="@{/beingProcessed}" class="nav-link ">
+<!--                        <i class="fa fa-clipboard"></i>-->
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.06 22.57"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M2.82,5.64c.05-.82-.15-1.67.52-2.33s1.5-.44,2.32-.49c0-.37,0-.72,0-1.07A1.66,1.66,0,0,1,7.35,0h9A1.64,1.64,0,0,1,18,1.62c0,.56,0,1.12,0,1.69,0,3.9,0,7.81,0,11.72a1.75,1.75,0,0,1-1.91,1.89c-.21,0-.42,0-.63,0h-.28v.95a1.72,1.72,0,0,1-1.88,1.86h-.95v1.08a1.66,1.66,0,0,1-1.69,1.74c-3,0-6,0-9,0A1.68,1.68,0,0,1,0,20.81c0-.5,0-1,0-1.51,0-3.9,0-7.8,0-11.69a1.79,1.79,0,0,1,2-2,5.42,5.42,0,0,0,.57,0Zm8.46,8.49h0c0-2.21,0-4.41,0-6.61,0-.57-.17-.74-.75-.74H1.88c-.56,0-.73.17-.73.73q0,6.59,0,13.17c0,.58.19.76.76.76h8.62c.59,0,.76-.17.76-.77Zm1.13,4.48h.91c.61,0,.79-.17.79-.78V4.72c0-.58-.18-.77-.77-.77H4.52A.54.54,0,0,0,4,4.47c0,.38,0,.76,0,1.18h6.56a2.56,2.56,0,0,1,.62,0,1.66,1.66,0,0,1,1.27,1.77V18.61ZM6.79,2.83h6.5a1.73,1.73,0,0,1,2,2v11h.87c.67,0,.81-.15.81-.82v-13c0-.63-.17-.8-.81-.8H7.36a.55.55,0,0,0-.57.59C6.78,2.08,6.79,2.43,6.79,2.83Z"/><path class="svg-cls-1" d="M6.2,13H3.63a1.42,1.42,0,0,1-.36,0,.55.55,0,0,1,0-1.08,3.1,3.1,0,0,1,.43,0h5a2.55,2.55,0,0,1,.39,0,.52.52,0,0,1,.43.52.51.51,0,0,1-.39.55,1.67,1.67,0,0,1-.39,0Z"/><path class="svg-cls-1" d="M5.1,19.74H3.49a.59.59,0,0,1-.66-.58c0-.33.27-.54.66-.54,1.07,0,2.13,0,3.2,0,.4,0,.64.2.64.54s-.23.58-.64.58-1.06,0-1.59,0Z"/><path class="svg-cls-1" d="M4.53,9.59H3.44a.56.56,0,1,1,0-1.12c.72,0,1.44,0,2.17,0A.55.55,0,0,1,6.2,9c0,.33-.21.54-.59.56Z"/><path class="svg-cls-1" d="M4.54,14.11H5.63a.54.54,0,0,1,.58.54.55.55,0,0,1-.55.58c-.76,0-1.52,0-2.27,0a.56.56,0,1,1,0-1.12Z"/><path class="svg-cls-1" d="M7.94,16.36H9a.54.54,0,0,1,.6.55.56.56,0,0,1-.59.57c-.73,0-1.45,0-2.18,0a.57.57,0,0,1-.6-.56c0-.33.24-.56.63-.57H7.94Z"/><path class="svg-cls-1" d="M4,16.36a5.81,5.81,0,0,1,.59,0,.56.56,0,0,1,0,1.11c-.41,0-.82,0-1.22,0a.55.55,0,0,1-.53-.57.56.56,0,0,1,.56-.54Z"/><path class="svg-cls-1" d="M8.5,14.11a5.23,5.23,0,0,1,.56,0,.5.5,0,0,1,.52.49.48.48,0,0,1-.4.58,9.49,9.49,0,0,1-1.41,0,.5.5,0,0,1-.42-.59.52.52,0,0,1,.52-.49C8.08,14.1,8.29,14.11,8.5,14.11Z"/></g></g></svg>
+                        <span class="title">Solicitudes en proceso</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'evaluation' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:loan:evaluate:view" th:href="@{/evaluation}" class="nav-link ">
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.6 21.22"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M4.16,10.12l2.31-2.7a.56.56,0,0,0-.06-.72A.46.46,0,0,0,6,6.54a.52.52,0,0,0-.4.18L4.07,8.51l-.89-.86a.56.56,0,0,0-.79,0,.55.55,0,0,0,0,.78Z"/><path class="svg-cls-1" d="M6.78,8.2a.55.55,0,0,0,.55.55H13a.55.55,0,0,0,.55-.55A.54.54,0,0,0,13,7.65H7.33A.55.55,0,0,0,6.78,8.2Z"/><path class="svg-cls-1" d="M5.62,10.51l-1.55,1.8-.89-.86a.58.58,0,0,0-.4-.16.56.56,0,0,0-.53.57.52.52,0,0,0,.17.39l1.74,1.67,2.31-2.7a.56.56,0,0,0-.06-.73A.56.56,0,0,0,5.62,10.51Z"/><path class="svg-cls-1" d="M13,11.44H7.33a.55.55,0,0,0-.55.55.55.55,0,0,0,.55.55H13a.54.54,0,0,0,.55-.55A.55.55,0,0,0,13,11.44Z"/><path class="svg-cls-1" d="M6,14.13H6a.54.54,0,0,0-.4.17L4.07,16.1l-.89-.86a.56.56,0,0,0-.79,0,.58.58,0,0,0-.15.39.52.52,0,0,0,.17.39l1.74,1.67L6.47,15a.58.58,0,0,0-.06-.73A.54.54,0,0,0,6,14.13Z"/><path class="svg-cls-1" d="M13,15.23H7.33a.56.56,0,0,0,0,1.11H13a.56.56,0,0,0,0-1.11Z"/><path class="svg-cls-1" d="M14.33,1.52H12.25V0h-9V1.52H1.27A1.28,1.28,0,0,0,0,2.8V20a1.27,1.27,0,0,0,1.27,1.27H14.33A1.27,1.27,0,0,0,15.6,20V2.8A1.28,1.28,0,0,0,14.33,1.52Zm-10,1.62v-2h6.83V2.7h0v.44A1.14,1.14,0,0,1,10,4.28H5.47A1.15,1.15,0,0,1,4.32,3.14Zm10-.51a.18.18,0,0,1,.17.17V20a.18.18,0,0,1-.17.17H1.27A.18.18,0,0,1,1.1,20V2.8a.18.18,0,0,1,.17-.17h2v.51A2.26,2.26,0,0,0,5.47,5.39H10a2.26,2.26,0,0,0,2.24-2.25V2.63Z"/></g></g></svg>
+                        <span class="title">Evaluación</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'callcenter' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:callcenter:view" th:href="@{/callcenter}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="19.344" height="19.39" class="custom-menu-icon" viewBox="0 0 19.344 19.39">
+                            <g id="Grupo_10604" data-name="Grupo 10604" transform="translate(2727.631 -70.693)">
+                                <path id="Trazado_9810" data-name="Trazado 9810" d="M-2723.205,78.532h-1.742l.017-.216a7,7,0,0,1,6.968-6.471c.173,0,.348.007.524.02a7.009,7.009,0,0,1,6.034,4.542.571.571,0,0,0,.733.336.566.566,0,0,0,.32-.3.569.569,0,0,0,.017-.436,8.125,8.125,0,0,0-10.415-4.819l-.03.011a8.121,8.121,0,0,0-5.31,7.546v.114l-.1.056a2.9,2.9,0,0,0-1.442,2.5V84.04a2.9,2.9,0,0,0,2.884,2.886h1.542a.572.572,0,0,0,.57-.569V79.1A.572.572,0,0,0-2723.205,78.532Zm-.566,1.138v6.112h-.976a1.755,1.755,0,0,1-1.745-1.743V81.416a1.756,1.756,0,0,1,1.744-1.746Z" fill="#6f6f6f"/>
+                                <path id="Trazado_9811" data-name="Trazado 9811" d="M-2711.172,78.531h-1.542a.572.572,0,0,0-.57.569v8.062a.978.978,0,0,1-.972.972h-2.15v1.14h2.151a2.124,2.124,0,0,0,2.113-2.112v-.239h.973a2.9,2.9,0,0,0,2.882-2.884V81.417A2.9,2.9,0,0,0-2711.172,78.531Zm1.745,2.883v2.625a1.754,1.754,0,0,1-1.744,1.743h-.973V79.67h.972A1.756,1.756,0,0,1-2709.427,81.414Z" fill="#6f6f6f"/>
+                                <path id="Trazado_9812" data-name="Trazado 9812" d="M-2717.914,87.324a1.381,1.381,0,0,0-1.38,1.38,1.381,1.381,0,0,0,1.38,1.379,1.38,1.38,0,0,0,1.378-1.379A1.381,1.381,0,0,0-2717.914,87.324Z" fill="#6f6f6f"/>
+                            </g>
+                        </svg>
+                        <span class="title">Call centers</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'generated' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:generated:view" th:href="@{/generated}" class="nav-link ">
+<!--                        <i class="fa fa-money"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23.03 21.92"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><g id="bill"><path id="Trazado_9646" data-name="Trazado 9646" class="svg-cls-1" d="M17.64,3.27h.09a.83.83,0,0,1,.81.83.38.38,0,0,0,.75,0h0a1.58,1.58,0,0,0-1.24-1.54V2.2a.38.38,0,0,0-.75,0h0v.37a1.58,1.58,0,0,0,.41,3.11.83.83,0,0,1,.83.83.83.83,0,1,1-1.66,0,.38.38,0,0,0-.75,0A1.58,1.58,0,0,0,17.3,8v.41a.38.38,0,0,0,.75,0V8.06a1.58,1.58,0,0,0-.34-3.13.82.82,0,0,1-.84-.82.83.83,0,0,1,.77-.84Z"/><path id="Trazado_9647" data-name="Trazado 9647" class="svg-cls-1" d="M17.73,0a5.36,5.36,0,0,0-5,3.5H3.48a.39.39,0,0,0-.37.39L3,17H.38a.37.37,0,0,0-.38.35H0V19a2.93,2.93,0,0,0,2.8,2.92H14.52A2.93,2.93,0,0,0,17.45,19v-8.4h.28a5.3,5.3,0,1,0,0-10.6ZM2.94,21.18h0A2.19,2.19,0,0,1,.75,19V17.73H11.57V19a2.92,2.92,0,0,0,.86,2.07,1.42,1.42,0,0,1,.13.12ZM16.7,19a2.18,2.18,0,0,1-2.18,2.19h0A2.2,2.2,0,0,1,12.31,19V17.34A.35.35,0,0,0,12,17H3.77L3.85,4.25h8.69a5.14,5.14,0,0,0-.1,1,5.23,5.23,0,0,0,.45,2.14H9.36a.38.38,0,0,0,0,.75h3.93A5.25,5.25,0,0,0,16.7,10.5Zm1-9.13A4.55,4.55,0,1,1,22.28,5.3h0a4.55,4.55,0,0,1-4.55,4.55Z"/><path id="Trazado_9648" data-name="Trazado 9648" class="svg-cls-1" d="M7,9.9a1.16,1.16,0,1,0,1.19,1.16A1.18,1.18,0,0,0,7,9.9Zm0,1.57a.41.41,0,1,1,.44-.41.42.42,0,0,1-.44.41Z"/><path id="Trazado_9649" data-name="Trazado 9649" class="svg-cls-1" d="M9,11.06a.37.37,0,0,0,.37.37h5a.38.38,0,0,0,.38-.37.37.37,0,0,0-.38-.37h-5a.36.36,0,0,0-.37.37Z"/><path id="Trazado_9650" data-name="Trazado 9650" class="svg-cls-1" d="M7,6.66A1.16,1.16,0,1,0,8.16,7.81,1.17,1.17,0,0,0,7,6.66ZM7,8.22a.41.41,0,1,1,.44-.41A.42.42,0,0,1,7,8.22Z"/><path id="Trazado_9651" data-name="Trazado 9651" class="svg-cls-1" d="M7,13.15A1.16,1.16,0,1,0,8.16,14.3,1.17,1.17,0,0,0,7,13.15Zm0,1.56a.41.41,0,1,1,.44-.41.42.42,0,0,1-.44.41Z"/><path id="Trazado_9652" data-name="Trazado 9652" class="svg-cls-1" d="M14.33,14h-5a.37.37,0,0,0,0,.74h5a.37.37,0,1,0,0-.74Z"/></g></g></g></svg>
+                        <span class="title">
+                            <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                                Créditos a desembolsar
+                            </th:block>
+                            <th:block th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                                Originados (Inactivos)
+                            </th:block>
+                        </span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'terminated' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:terminated:view" th:href="@{/terminated}" class="nav-link ">
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24.36 24.36"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><g id="hand"><path id="Trazado_9632" data-name="Trazado 9632" class="svg-cls-1" d="M8.94,5.23A5.24,5.24,0,1,0,14.18,0,5.23,5.23,0,0,0,8.94,5.23Zm9.52,0A4.29,4.29,0,1,1,14.18,1a4.28,4.28,0,0,1,4.28,4.28Z"/><path id="Trazado_9633" data-name="Trazado 9633" class="svg-cls-1" d="M5.48,24.22a.46.46,0,0,0,.67,0L8.46,22a1.44,1.44,0,0,0,.33-1.48l.5-.47a1.37,1.37,0,0,1,1-.4h6.33a4.26,4.26,0,0,0,3-1.22s-.25.3,4.32-5.15A1.9,1.9,0,1,0,21,10.76h0L18.2,13.65a1.9,1.9,0,0,0-1.48-.71h-5.3A6.1,6.1,0,0,0,9,12.46a5.9,5.9,0,0,0-5.37,3,1.43,1.43,0,0,0-1.27.4L.14,18.17a.46.46,0,0,0,0,.67ZM9,13.41a5.19,5.19,0,0,1,2.09.44.43.43,0,0,0,.19,0h5.4a1,1,0,1,1,.09,1.9h-4a.48.48,0,0,0,0,.95h3.92a1.91,1.91,0,0,0,1.91-1.9,2.11,2.11,0,0,0,0-.25l3.11-3.2a1,1,0,0,1,1.5,1.18l0,0-4.27,5.1a3.32,3.32,0,0,1-2.31.93H10.28a2.32,2.32,0,0,0-1.65.66l-.4.39L4.5,16A4.92,4.92,0,0,1,9,13.41Zm-6,3.16a.49.49,0,0,1,.59-.07c.09.05-.15-.16,4.12,4.1a.46.46,0,0,1,0,.67l-2,1.94L1.14,18.5Z"/><path id="Trazado_9634" data-name="Trazado 9634" class="svg-cls-1" d="M13.6,2.38v.56a1.43,1.43,0,0,0,.48,2.77.46.46,0,0,1,.45.49.47.47,0,0,1-.45.46.91.91,0,0,1-.62-.36.47.47,0,1,0-.72.61,1.82,1.82,0,0,0,.87.62v.56a.47.47,0,0,0,.49.45.48.48,0,0,0,.46-.45V7.53a1.43,1.43,0,0,0-.48-2.77.48.48,0,0,1,0-.95.72.72,0,0,1,.51.25.48.48,0,0,0,.68-.68h0a2,2,0,0,0-.7-.43V2.38a.49.49,0,0,0-.46-.5.47.47,0,0,0-.49.46,0,0,0,0,0,0,0Z"/></g></g></g></svg>
+                        <span class="title">
+                            <th:block th:if="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                                Cr&eacute;ditos desembolsados
+                            </th:block>
+                            <th:block th:unless="${@entityExtranetService.getLoggedUserEntity().containsEntityId(T(com.affirm.common.model.catalog.Entity).BANCO_DEL_SOL)}">
+                                Originados (Activos)
+                            </th:block>
+                        </span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'marketingCampaign' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:marketingCampaign:view" th:href="@{/marketingCampaign}" class="nav-link ">
+                        <svg  class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.48 20.47"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M11.71,8.79A.72.72,0,1,0,11,8.07.72.72,0,0,0,11.71,8.79Z"/><path class="svg-cls-1" d="M14.26,8.07a.72.72,0,0,0,1.44,0,.72.72,0,0,0-1.44,0Z"/><path class="svg-cls-1" d="M7.72,8.07a.72.72,0,0,0,1.44,0,.72.72,0,0,0-1.44,0Z"/><path class="svg-cls-1" d="M18.71,12.39a.54.54,0,0,0-.31-.32.57.57,0,0,0-.46,0,.58.58,0,0,0-.32.77l1.17,2.9-3.37-1.48a.55.55,0,0,0-.47,0,8.23,8.23,0,0,1-3.17.64h-.29A7.23,7.23,0,0,1,4.21,8.05c0-3.79,3.38-6.86,7.54-6.86S19.29,4.26,19.29,8a6.24,6.24,0,0,1-.08,1,.6.6,0,0,0,.12.44.59.59,0,0,0,.38.23.6.6,0,0,0,.68-.5A10.92,10.92,0,0,0,20.48,8,7.66,7.66,0,0,0,17.9,2.34,9,9,0,0,0,11.83,0h-.15A9,9,0,0,0,5.6,2.34a7.66,7.66,0,0,0-2.54,5l0,.11L3,7.52A6.38,6.38,0,0,0,0,12.84a6.17,6.17,0,0,0,1.21,3.65l.07.1,0,.12L0,19.66a.6.6,0,0,0,.33.77.57.57,0,0,0,.46,0l3.53-1.55.08,0a7.42,7.42,0,0,0,2.63.48h.08a7.58,7.58,0,0,0,3.74-1A6.84,6.84,0,0,0,13.28,16l.05-.08.1,0a9.74,9.74,0,0,0,1.66-.46l.09,0,.08,0,4.39,1.93a.58.58,0,0,0,.45,0,.61.61,0,0,0,.34-.78Zm-7.27,4.06a6.19,6.19,0,0,1-4.31,1.74H7.06a6.22,6.22,0,0,1-2.48-.51.64.64,0,0,0-.47,0L1.69,18.75l.82-2a.59.59,0,0,0-.09-.61,5,5,0,0,1-1.24-3.27A5.11,5.11,0,0,1,2.77,9.19l.29-.28.08.4a8.07,8.07,0,0,0,2.35,4.3,8.9,8.9,0,0,0,5.8,2.45l.53,0Z"/></g></g></svg>
+                        <span class="title">Comunicaciones</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'paymentCommitment' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:paymentCommitment:view" th:href="@{/paymentCommitment}" class="nav-link ">
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.36 20.36"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M10.18,20.36A10.18,10.18,0,1,1,20.36,10.18,10.2,10.2,0,0,1,10.18,20.36ZM10.18,1a9.18,9.18,0,1,0,9.18,9.18A9.19,9.19,0,0,0,10.18,1Z"/><path class="svg-cls-1" d="M12,10.22a2.44,2.44,0,0,0-1.71-.72,1.16,1.16,0,1,1,0-2.32h0a1.17,1.17,0,0,1,1.16,1.16.64.64,0,0,0,.63.64.61.61,0,0,0,.61-.62A2.37,2.37,0,0,0,10.92,6l-.07,0V5.56a.63.63,0,0,0-1.26,0V6L9.51,6a2.5,2.5,0,0,0-1.7,2.32,2.44,2.44,0,0,0,2.44,2.43h0a1.18,1.18,0,0,1,.81.33,1.16,1.16,0,0,1,.35.82,1.18,1.18,0,0,1-.33.82,1.16,1.16,0,0,1-.82.35h0A1.17,1.17,0,0,1,9.1,11.93a.64.64,0,0,0-.64-.63h0a.65.65,0,0,0-.65.63,2.48,2.48,0,0,0,1.71,2.32l.07,0v.52a.63.63,0,1,0,1.26,0v-.52l.08,0a2.42,2.42,0,0,0,1-4Z"/></g></g></svg>
+                        <span class="title">Gestión de Pagos</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'communications' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:communications:view" th:href="@{/communications}" class="nav-link ">
+                        <svg  class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.48 20.47"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><path class="svg-cls-1" d="M11.71,8.79A.72.72,0,1,0,11,8.07.72.72,0,0,0,11.71,8.79Z"/><path class="svg-cls-1" d="M14.26,8.07a.72.72,0,0,0,1.44,0,.72.72,0,0,0-1.44,0Z"/><path class="svg-cls-1" d="M7.72,8.07a.72.72,0,0,0,1.44,0,.72.72,0,0,0-1.44,0Z"/><path class="svg-cls-1" d="M18.71,12.39a.54.54,0,0,0-.31-.32.57.57,0,0,0-.46,0,.58.58,0,0,0-.32.77l1.17,2.9-3.37-1.48a.55.55,0,0,0-.47,0,8.23,8.23,0,0,1-3.17.64h-.29A7.23,7.23,0,0,1,4.21,8.05c0-3.79,3.38-6.86,7.54-6.86S19.29,4.26,19.29,8a6.24,6.24,0,0,1-.08,1,.6.6,0,0,0,.12.44.59.59,0,0,0,.38.23.6.6,0,0,0,.68-.5A10.92,10.92,0,0,0,20.48,8,7.66,7.66,0,0,0,17.9,2.34,9,9,0,0,0,11.83,0h-.15A9,9,0,0,0,5.6,2.34a7.66,7.66,0,0,0-2.54,5l0,.11L3,7.52A6.38,6.38,0,0,0,0,12.84a6.17,6.17,0,0,0,1.21,3.65l.07.1,0,.12L0,19.66a.6.6,0,0,0,.33.77.57.57,0,0,0,.46,0l3.53-1.55.08,0a7.42,7.42,0,0,0,2.63.48h.08a7.58,7.58,0,0,0,3.74-1A6.84,6.84,0,0,0,13.28,16l.05-.08.1,0a9.74,9.74,0,0,0,1.66-.46l.09,0,.08,0,4.39,1.93a.58.58,0,0,0,.45,0,.61.61,0,0,0,.34-.78Zm-7.27,4.06a6.19,6.19,0,0,1-4.31,1.74H7.06a6.22,6.22,0,0,1-2.48-.51.64.64,0,0,0-.47,0L1.69,18.75l.82-2a.59.59,0,0,0-.09-.61,5,5,0,0,1-1.24-3.27A5.11,5.11,0,0,1,2.77,9.19l.29-.28.08.4a8.07,8.07,0,0,0,2.35,4.3,8.9,8.9,0,0,0,5.8,2.45l.53,0Z"/></g></g></svg>
+                        <span class="title">Comunicaciones</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'actions' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:loan:create:view" th:href="@{/createLoanApplications}" class="nav-link ">
+                        <i class="fa fa-check"></i>
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="20.597" height="18.666" viewBox="0 0 20.597 18.666">
+                            <g id="Grupo_10085" data-name="Grupo 10085" transform="translate(-760.935 -595.324)">
+                                <path id="Trazado_9638" data-name="Trazado 9638" d="M769.681,608.951a.355.355,0,1,1,0-.71h.809a5.829,5.829,0,0,1,.263-1.278h-1.071a.355.355,0,1,1,0-.71h1.354a5.869,5.869,0,0,1,3.886-3.163v-6.777a.991.991,0,0,0-.99-.99H761.925a.991.991,0,0,0-.99.99v14.909a.991.991,0,0,0,.99.99h9.653a5.827,5.827,0,0,1-1.11-3.262Zm0-4.686H771.6a.355.355,0,1,1,0,.71h-1.917a.355.355,0,1,1,0-.71Zm-1.452,4.686h-5.04a.355.355,0,1,1,0-.71h5.04a.355.355,0,1,1,0,.71Zm0-1.988h-5.04a.355.355,0,0,1,0-.71h5.04a.355.355,0,1,1,0,.71Zm.055-1.988h-5.041a.355.355,0,1,1,0-.71h5.041a.355.355,0,1,1,0,.71Zm.011-3.739v.416a.355.355,0,1,1-.71,0v-.414a1.47,1.47,0,0,1-.649-.462.355.355,0,1,1,.543-.457.642.642,0,0,0,.461.268.355.355,0,0,0,0-.71,1.065,1.065,0,0,1-.355-2.068v-.416a.355.355,0,1,1,.71,0v.413a1.371,1.371,0,0,1,.523.327.355.355,0,0,1-.494.51.57.57,0,0,0-.384-.186.355.355,0,0,0,0,.71,1.065,1.065,0,0,1,.355,2.068Z" transform="translate(0)" fill="#a2aaad"/>
+                                <path id="Trazado_9639" data-name="Trazado 9639" d="M878.389,686.253h0a5.208,5.208,0,0,0-5.211,5.212c0,.058,0,.115,0,.172a5.211,5.211,0,1,0,5.207-5.384Zm2.936,4.28-3.478,3.479h0l0,0a.3.3,0,0,1-.427,0l-.428-.429-1.535-1.537h0a.3.3,0,0,1,0-.427l.428-.428a.3.3,0,0,1,.428,0l.679.679.645.645,2.835-2.838h0a.3.3,0,0,1,.427,0l.428.429h0A.3.3,0,0,1,881.325,690.533Z" transform="translate(-102.069 -82.687)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">Solicitudes de Cr&eacute;dito</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'reports' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:report:view" th:href="@{/reports}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="13.95" height="18.037" viewBox="0 0 13.95 18.037">
+                            <path id="Exclusión_3" data-name="Exclusión 3" d="M11.227,16.33H1.021A1.022,1.022,0,0,1,0,15.309V1.021A1.022,1.022,0,0,1,1.021,0H7.144V4.082A1.022,1.022,0,0,0,8.165,5.1h4.082V15.309A1.022,1.022,0,0,1,11.227,16.33ZM1.459,12a.5.5,0,0,0,0,1h6a.5.5,0,1,0,0-1Zm0-2a.5.5,0,0,0,0,1h6a.5.5,0,1,0,0-1Zm0-4a.5.5,0,0,0,0,1h3a.5.5,0,0,0,0-1ZM12.247,4.082H8.165V0l4.081,4.081Z" transform="translate(0.5 1.207)" fill="#a2aaad" stroke="rgba(0,0,0,0)" stroke-miterlimit="10" stroke-width="1"/>
+                        </svg>
+                        <span class="title">Reportes</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'actions' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:user:logs:view" th:href="@{/activityLog}" class="nav-link ">
+
+                        <i class="fa fa-check"></i>
+                        <span class="title">Log de actividades</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item" th:classappend="${currentPage == 'business' ? 'active': ''}">
+                    <a shiro:hasPermission="menu:company:register:view" th:href="@{/employers}" class="nav-link">
+                        <i class="fa fa-building"></i>
+                        <span class="title">ABM empresas</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'newLoanApplication' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:loanAffiliator:register:view" th:href="@{/newLoanApplication}" class="nav-link">
+<!--                        <i class="fa fa-gears"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="20.597" height="18.666" viewBox="0 0 20.597 18.666">
+                            <g id="Grupo_10085" data-name="Grupo 10085" transform="translate(-760.935 -595.324)">
+                                <path id="Trazado_9638" data-name="Trazado 9638" d="M769.681,608.951a.355.355,0,1,1,0-.71h.809a5.829,5.829,0,0,1,.263-1.278h-1.071a.355.355,0,1,1,0-.71h1.354a5.869,5.869,0,0,1,3.886-3.163v-6.777a.991.991,0,0,0-.99-.99H761.925a.991.991,0,0,0-.99.99v14.909a.991.991,0,0,0,.99.99h9.653a5.827,5.827,0,0,1-1.11-3.262Zm0-4.686H771.6a.355.355,0,1,1,0,.71h-1.917a.355.355,0,1,1,0-.71Zm-1.452,4.686h-5.04a.355.355,0,1,1,0-.71h5.04a.355.355,0,1,1,0,.71Zm0-1.988h-5.04a.355.355,0,0,1,0-.71h5.04a.355.355,0,1,1,0,.71Zm.055-1.988h-5.041a.355.355,0,1,1,0-.71h5.041a.355.355,0,1,1,0,.71Zm.011-3.739v.416a.355.355,0,1,1-.71,0v-.414a1.47,1.47,0,0,1-.649-.462.355.355,0,1,1,.543-.457.642.642,0,0,0,.461.268.355.355,0,0,0,0-.71,1.065,1.065,0,0,1-.355-2.068v-.416a.355.355,0,1,1,.71,0v.413a1.371,1.371,0,0,1,.523.327.355.355,0,0,1-.494.51.57.57,0,0,0-.384-.186.355.355,0,0,0,0,.71,1.065,1.065,0,0,1,.355,2.068Z" transform="translate(0)" fill="#a2aaad"/>
+                                <path id="Trazado_9639" data-name="Trazado 9639" d="M878.389,686.253h0a5.208,5.208,0,0,0-5.211,5.212c0,.058,0,.115,0,.172a5.211,5.211,0,1,0,5.207-5.384Zm2.936,4.28-3.478,3.479h0l0,0a.3.3,0,0,1-.427,0l-.428-.429-1.535-1.537h0a.3.3,0,0,1,0-.427l.428-.428a.3.3,0,0,1,.428,0l.679.679.645.645,2.835-2.838h0a.3.3,0,0,1,.427,0l.428.429h0A.3.3,0,0,1,881.325,690.533Z" transform="translate(-102.069 -82.687)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">Solicitud de Cr&eacute;dito (comercios)</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'affiliator' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:affiliator:register:view" th:href="@{/affiliators}" class="nav-link">
+                        <i class="fa fa-users"></i>
+                        <span class="title">Comercios</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li th:if="${@entityExtranetService.showVehicleLoad()}" class="nav-item" th:classappend="${currentPage == 'vehicles' ? 'active': ''}">
+                    <a shiro:hasPermission="menu:vehicle:upload:view" th:href="@{/vehicles}" class="nav-link">
+                        <i class="fa fa-upload"></i>
+                        <span class="title">ABM de veh&iacute;culos</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'dates' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:vehicle:appointments:view" th:href="@{/agenda}" class="nav-link ">
+                        <i class="fa fa-calendar-check-o"></i>
+                        <span class="title">Calendario de citas</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'leads' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:lead:view" th:href="@{/__${@entityExtranetLeadsController.URL}__}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="19.755" height="15.622" viewBox="0 0 19.755 15.622">
+                            <g id="Grupo_10068" data-name="Grupo 10068" transform="translate(-27.122 -376.189)">
+                                <g id="folder" transform="translate(27.122 333.51)">
+                                    <g id="Grupo_10056" data-name="Grupo 10056" transform="translate(0 44.743)">
+                                        <g id="Grupo_10055" data-name="Grupo 10055" transform="translate(0 0)">
+                                            <path id="Trazado_9556" data-name="Trazado 9556" d="M16.075,87.091H8.948L7.53,85.406a.242.242,0,0,0-.194-.087H1.586A1.6,1.6,0,0,0,0,86.917V97.28a1.6,1.6,0,0,0,1.6,1.6H16.075a1.6,1.6,0,0,0,1.6-1.6V88.687A1.6,1.6,0,0,0,16.075,87.091Z" transform="translate(0 -85.319)" fill="#a2aaad"/>
+                                        </g>
+                                    </g>
+                                    <g id="Grupo_10058" data-name="Grupo 10058" transform="translate(2.101 42.679)">
+                                        <g id="Grupo_10057" data-name="Grupo 10057" transform="translate(0 0)">
+                                            <path id="Trazado_9557" data-name="Trazado 9557" d="M59.467,44.451H52.338L50.92,42.766a.242.242,0,0,0-.194-.087H44.978A1.6,1.6,0,0,0,43.4,44.058h5.243a.928.928,0,0,1,.713.331l1.21,1.439h6.808a2.285,2.285,0,0,1,2.282,2.282v8.111a1.6,1.6,0,0,0,1.4-1.582V46.045A1.6,1.6,0,0,0,59.467,44.451Z" transform="translate(-43.4 -42.679)" fill="#a2aaad"/>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <span class="title">Leads</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'partner' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:associated:load:view" th:href="@{/__${@entityExtranetPartnerClientController.URL}__}" class="nav-link ">
+                        <i class="fa fa-check"></i>
+                        <span class="title">Socios / Clientes actuales</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'comercial' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:commercial:view" th:href="@{/__${@entityExtranetComercialController.URL}__}" class="nav-link ">
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="17.453" height="19.6" viewBox="0 0 17.453 19.6">
+                            <g id="Grupo_10084" data-name="Grupo 10084" transform="translate(-897.316 -899.489)">
+                                <path id="Trazado_9640" data-name="Trazado 9640" d="M998.949,1240.178c0-.842-.009-1.684.01-2.525a4.165,4.165,0,0,1,2.369-3.839,3.471,3.471,0,0,1,1.577-.414,16.934,16.934,0,0,1,2.177.046,4.142,4.142,0,0,1,3.516,3.427,6.136,6.136,0,0,1,.07.875c.011.81.008,1.62.01,2.429Z" transform="translate(-97.733 -321.089)" fill="#a2aaad"/>
+                                <path id="Trazado_9641" data-name="Trazado 9641" d="M903.679,911.42a5.442,5.442,0,0,0-3.345,3.385l-1.717-1.642.252-.41c.274-.445.552-.889.818-1.339a.331.331,0,0,0,.017-.237c-.042-.14-.135-.266-.165-.406-.054-.254-.215-.331-.448-.38-.592-.124-1.179-.275-1.776-.417v-3.511c.655-.157,1.3-.316,1.955-.466a.257.257,0,0,0,.211-.187c.065-.186.158-.363.22-.549a.322.322,0,0,0-.014-.238c-.346-.58-.7-1.154-1.06-1.737.042-.046.078-.089.118-.128.74-.74,1.484-1.477,2.217-2.224.116-.118.19-.112.319-.03q.775.492,1.566.96a.323.323,0,0,0,.238.016c.187-.062.364-.154.55-.22a.258.258,0,0,0,.186-.211c.15-.652.308-1.3.465-1.958h3.51c.1.426.207.857.31,1.288.055.229.1.462.166.687a.358.358,0,0,0,.161.179c.1.06.236.074.333.141a.569.569,0,0,0,.72-.058c.443-.3.909-.566,1.364-.849.074-.046.13-.085.213,0q1.173,1.183,2.353,2.359a.316.316,0,0,1,.035.061c-.341.555-.681,1.115-1.031,1.67a.275.275,0,0,0-.021.345.455.455,0,0,1,.077.174c.071.4.328.539.706.6.532.091,1.054.243,1.588.37v3.512c-.313.076-.633.154-.952.23-.335.08-.669.161-1.005.235a.239.239,0,0,0-.21.186.86.86,0,0,1-.1.267.632.632,0,0,0,.054.8c.3.421.548.875.82,1.315.045.073.088.129.006.215-.5.527-1,1.061-1.494,1.591-.008.008-.022.01-.048.021a5.435,5.435,0,0,0-3.346-3.417,3.865,3.865,0,1,0-4.813,0Z" transform="translate(0 0)" fill="#a2aaad"/>
+                                <path id="Trazado_9642" data-name="Trazado 9642" d="M1061.009,1063.8a2.691,2.691,0,1,1-2.694-2.689A2.691,2.691,0,0,1,1061.009,1063.8Z" transform="translate(-152.238 -155.42)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">M&oacute;dulo de Administraci&oacute;n Comercial</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'generatedtc' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:generatedtc:view" th:href="@{/generatedtc}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="19.755" height="14.11" viewBox="0 0 19.755 14.11">
+                            <g id="Icon_ionic-ios-card" data-name="Icon ionic-ios-card" transform="translate(-2.25 -6.75)">
+                                <path id="Trazado_9551" data-name="Trazado 9551" d="M22,8.161A1.415,1.415,0,0,0,20.594,6.75H3.661A1.415,1.415,0,0,0,2.25,8.161v2.117H22Z" transform="translate(0 0)" fill="#a2aaad"/>
+                                <path id="Trazado_9552" data-name="Trazado 9552" d="M2.25,22.805a1.415,1.415,0,0,0,1.411,1.411H20.594A1.415,1.415,0,0,0,22,22.805V15.75H2.25Zm6.262-2.117h7.232a.619.619,0,0,1,.617.617h0a.619.619,0,0,1-.617.617H8.512a.619.619,0,0,1-.617-.617h0A.619.619,0,0,1,8.512,20.689Zm-3.175,0h.529a.619.619,0,0,1,.617.617h0a.619.619,0,0,1-.617.617H5.337a.619.619,0,0,1-.617-.617h0A.619.619,0,0,1,5.337,20.689Z" transform="translate(0 -3.356)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">Tarjetas a entregar</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'terminatedtc' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:credit:terminatedtc:view" th:href="@{/terminatedtc}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="25.621" height="20" viewBox="0 0 25.621 20">
+                            <g id="Grupo_10071" data-name="Grupo 10071" transform="translate(-82.776 -7052)">
+                                <g id="Grupo_10068" data-name="Grupo 10068" transform="translate(799.763 6877.659)">
+                                    <path id="Trazado_9553" data-name="Trazado 9553" d="M-697.114,179.456a1.415,1.415,0,0,0-1.406-1.411h-16.934a1.415,1.415,0,0,0-1.411,1.411v2.117h19.751Z" transform="translate(0 0)" fill="#a2aaad"/>
+                                    <path id="Trazado_9554" data-name="Trazado 9554" d="M-699.569,240.285h-17.3v7.055a1.415,1.415,0,0,0,1.411,1.411h14.139a5.822,5.822,0,0,1-1.116-3.435A5.847,5.847,0,0,1-699.569,240.285Zm-13.68,6.172h-.529a.619.619,0,0,1-.617-.617.619.619,0,0,1,.617-.616h.529a.619.619,0,0,1,.617.617A.619.619,0,0,1-713.249,246.457Zm9.878,0H-710.6a.619.619,0,0,1-.617-.617.619.619,0,0,1,.617-.616h7.232a.619.619,0,0,1,.617.617A.619.619,0,0,1-703.37,246.457Z" transform="translate(0 -56.596)" fill="#a2aaad"/>
+                                    <path id="Trazado_9555" data-name="Trazado 9555" d="M-545.462,238.263h0a5.214,5.214,0,0,0-5.213,5.214,5.214,5.214,0,0,0,5.214,5.213,5.214,5.214,0,0,0,5.213-5.214A5.214,5.214,0,0,0-545.462,238.263Zm2.937,4.282-3.479,3.48h0l0,0a.3.3,0,0,1-.427,0l-1.964-1.966h0a.3.3,0,0,1,0-.427l.428-.428a.3.3,0,0,1,.428,0l1.325,1.325,2.837-2.839h0a.3.3,0,0,1,.427,0l.428.43h0A.3.3,0,0,1-542.526,242.545Z" transform="translate(-151.118 -54.757)" fill="#a2aaad"/>
+                                </g>
+                                <rect id="Rectángulo_17020" data-name="Rectángulo 17020" width="20" height="20" transform="translate(82.776 7052)" fill="none"/>
+                            </g>
+                        </svg>
+                        <span class="title">Tarjetas entregadas</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'leadsToDeliver' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:leads:leadsToDeliver:view" th:href="@{/leadsToDeliver}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="19.755" height="15.622" viewBox="0 0 19.755 15.622">
+                            <g id="Grupo_10068" data-name="Grupo 10068" transform="translate(-27.122 -376.189)">
+                                <g id="folder" transform="translate(27.122 333.51)">
+                                    <g id="Grupo_10056" data-name="Grupo 10056" transform="translate(0 44.743)">
+                                        <g id="Grupo_10055" data-name="Grupo 10055" transform="translate(0 0)">
+                                            <path id="Trazado_9556" data-name="Trazado 9556" d="M16.075,87.091H8.948L7.53,85.406a.242.242,0,0,0-.194-.087H1.586A1.6,1.6,0,0,0,0,86.917V97.28a1.6,1.6,0,0,0,1.6,1.6H16.075a1.6,1.6,0,0,0,1.6-1.6V88.687A1.6,1.6,0,0,0,16.075,87.091Z" transform="translate(0 -85.319)" fill="#a2aaad"/>
+                                        </g>
+                                    </g>
+                                    <g id="Grupo_10058" data-name="Grupo 10058" transform="translate(2.101 42.679)">
+                                        <g id="Grupo_10057" data-name="Grupo 10057" transform="translate(0 0)">
+                                            <path id="Trazado_9557" data-name="Trazado 9557" d="M59.467,44.451H52.338L50.92,42.766a.242.242,0,0,0-.194-.087H44.978A1.6,1.6,0,0,0,43.4,44.058h5.243a.928.928,0,0,1,.713.331l1.21,1.439h6.808a2.285,2.285,0,0,1,2.282,2.282v8.111a1.6,1.6,0,0,0,1.4-1.582V46.045A1.6,1.6,0,0,0,59.467,44.451Z" transform="translate(-43.4 -42.679)" fill="#a2aaad"/>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <span class="title">Leads</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'leadsDelivered' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:leads:leadsDelivered:view" th:href="@{/leadsDelivered}" class="nav-link ">
+<!--                        <i class="fa fa-check"></i>-->
+
+                        <svg class="custom-menu-icon"  xmlns="http://www.w3.org/2000/svg" width="25.482" height="15.888" viewBox="0 0 25.482 15.888">
+                            <g id="Grupo_10069" data-name="Grupo 10069" transform="translate(716.69 -400.143)">
+                                <path id="Trazado_9558" data-name="Trazado 9558" d="M-700.728,425.535v-1.8a1.445,1.445,0,0,0-1.445-1.441h-6.436l-1.281-1.522a.218.218,0,0,0-.175-.079h-5.193a1.445,1.445,0,0,0-1.432,1.443V431.5a1.445,1.445,0,0,0,1.445,1.445h13.072a1.437,1.437,0,0,0,.828-.262,5.83,5.83,0,0,1-.936-3.174A5.838,5.838,0,0,1-700.728,425.535Z" transform="translate(0 -18.69)" fill="#a2aaad"/>
+                                <path id="Trazado_9559" data-name="Trazado 9559" d="M-679.823,403.183a1.445,1.445,0,0,0-1.435-1.439H-687.7l-1.281-1.522a.219.219,0,0,0-.175-.079h-5.191a1.445,1.445,0,0,0-1.425,1.245h4.735a.838.838,0,0,1,.644.3l1.093,1.3h6.148a2.064,2.064,0,0,1,2.061,2.061v1.22a5.859,5.859,0,0,1,1.264-.783Z" transform="translate(-19.025 0)" fill="#a2aaad"/>
+                                <path id="Trazado_9560" data-name="Trazado 9560" d="M-545.462,460.36h0a5.214,5.214,0,0,0-5.213,5.215,5.214,5.214,0,0,0,5.214,5.213,5.213,5.213,0,0,0,5.213-5.215A5.214,5.214,0,0,0-545.462,460.36Zm2.937,4.282-3.479,3.48h0l0,0a.3.3,0,0,1-.427,0l-1.964-1.966h0a.3.3,0,0,1,0-.427l.428-.428a.3.3,0,0,1,.428,0l1.325,1.325,2.837-2.839h0a.3.3,0,0,1,.427,0l.428.429h0A.3.3,0,0,1-542.526,464.642Z" transform="translate(-150.959 -54.756)" fill="#a2aaad"/>
+                            </g>
+                        </svg>
+                        <span class="title">Leads entregados</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'users' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:user:managementv2" th:href="@{/users}" class="nav-link ">
+<!--                        <i class="fa fa-user"></i>-->
+                        <svg class="custom-menu-icon" xmlns="http://www.w3.org/2000/svg" width="15.081" height="17" viewBox="0 0 15.081 17">
+                            <g id="Grupo_10073" data-name="Grupo 10073" transform="translate(-85.235 -6918.5)">
+                                <g id="customer" transform="translate(82.279 6885.743)">
+                                    <circle id="Elipse_51" data-name="Elipse 51" cx="3.024" cy="3.024" r="3.024" transform="translate(5.16 32.757)" fill="#a2aaad"/>
+                                    <circle id="Elipse_52" data-name="Elipse 52" cx="2.016" cy="2.016" r="2.016" transform="translate(13.224 34.773)" fill="#a2aaad"/>
+                                    <path id="Trazado_9522" data-name="Trazado 9522" d="M126.329,239.9a5.715,5.715,0,0,0-4.408,1.043c-2.112,1.691-1.705,3.969-1.705,6.755a1.35,1.35,0,0,0,1.348,1.348c8.125,0,8.448.262,8.93-.8.158-.361.115-.246.115-3.7A4.666,4.666,0,0,0,126.329,239.9Z" transform="translate(-117.228 -199.312)" fill="#a2aaad"/>
+                                    <path id="Trazado_9523" data-name="Trazado 9523" d="M380.362,240.533a3.421,3.421,0,0,0-2.552.592c2,2.042,1.662,4.078,1.662,7.221,0,.166-.27.116,2.33.116a1.171,1.171,0,0,0,1.172-1.168v-4.164A2.609,2.609,0,0,0,380.362,240.533Z" transform="translate(-364.938 -199.966)" fill="#a2aaad"/>
+                                </g>
+                            </g>
+                        </svg>
+                        <span class="title">ABM de usuarios</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'loadPreApprovedBase' ? 'active' : ''}">
+                    <a th:href="@{/__${@entityExtranetLoadPreApprovedBaseController.URL}__}" class="nav-link " shiro:hasPermission="menu:loadPreApprovedBase:view">
+                        <i class="fa fa-upload"></i>
+                        <span class="title">Base Preaprobada</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'loadNegativeBase' ? 'active' : ''}">
+                    <a th:href="@{/__${@entityExtranetLoadNegativeBaseController.URL}__}" class="nav-link " shiro:hasPermission="menu:loadNegativeBase:view">
+                        <i class="fa fa-upload"></i>
+                        <span class="title">Base negativa</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+<!--                FIXED BOTTOM FROM HERE -->
+                <li style="flex: 1;visibility: hidden;"></li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'monitorApps' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:system:monitorApps:view" th:href="@{/monitorApps}" class="nav-link">
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.27 18.35"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><g id="analytics"><g id="Grupo_10717" data-name="Grupo 10717"><g id="Grupo_10716" data-name="Grupo 10716"><path id="Trazado_9852" data-name="Trazado 9852" class="svg-cls-1" d="M20.51,0H.76A.76.76,0,0,0,0,.76V13a.76.76,0,0,0,.76.76h.36l-.93.93a.64.64,0,0,0,0,.89.63.63,0,0,0,.88,0h0l1.82-1.82H8.65v2.52a13.06,13.06,0,0,0-3,.87.63.63,0,0,0-.32.82.61.61,0,0,0,.81.33,11.22,11.22,0,0,1,4.5-.92h0a11.21,11.21,0,0,1,4.49.92h0A.62.62,0,0,0,16,18a.62.62,0,0,0-.32-.82h0a13.06,13.06,0,0,0-3-.87V13.76h7.89a.76.76,0,0,0,.76-.76V.76A.76.76,0,0,0,20.51,0ZM11.38,16.15h0l-.74,0h0l-.74,0V13.76h1.48v2.39ZM20,12.51H4.13L5.7,11a3.66,3.66,0,1,0-1-.76L2.37,12.51H1.25V1.25H20V12.51ZM5,7.7a2.4,2.4,0,1,1,2.4,2.4A2.39,2.39,0,0,1,5,7.7Z"/></g></g><g id="Grupo_10719" data-name="Grupo 10719"><g id="Grupo_10718" data-name="Grupo 10718"><path id="Trazado_9853" data-name="Trazado 9853" class="svg-cls-1" d="M12.6,7.79a.62.62,0,0,0-.62.63v2.4a.62.62,0,0,0,.62.62.62.62,0,0,0,.62-.62V8.42a.63.63,0,0,0-.62-.63Z"/></g></g><g id="Grupo_10721" data-name="Grupo 10721"><g id="Grupo_10720" data-name="Grupo 10720"><path id="Trazado_9854" data-name="Trazado 9854" class="svg-cls-1" d="M14.55,3.64a.62.62,0,0,0-.62.62v6.56a.63.63,0,0,0,1.25,0V4.26a.63.63,0,0,0-.63-.62Z"/></g></g><g id="Grupo_10723" data-name="Grupo 10723"><g id="Grupo_10722" data-name="Grupo 10722"><path id="Trazado_9855" data-name="Trazado 9855" class="svg-cls-1" d="M16.54,5.3a.63.63,0,0,0-.63.62v4.9a.63.63,0,1,0,1.25,0V5.92a.62.62,0,0,0-.62-.62Z"/></g></g><g id="Grupo_10725" data-name="Grupo 10725"><g id="Grupo_10724" data-name="Grupo 10724"><path id="Trazado_9856" data-name="Trazado 9856" class="svg-cls-1" d="M18.52,7a.62.62,0,0,0-.62.62v3.24a.63.63,0,0,0,1.25,0V7.58A.63.63,0,0,0,18.52,7Z"/></g></g></g></g></g></svg>
+                        <span class="title">Monitor</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+                <li class="nav-item start loans" th:classappend="${currentPage == 'users' ? 'active' : ''}">
+                    <a shiro:hasPermission="menu:user:management:view" th:href="@{/userManagement}" class="nav-link ">
+<!--                        <i class="fa fa-users"></i>-->
+                        <svg class="custom-menu-icon stroke-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.53 17.12"><defs><style>.svg-cls-1{fill:#a2aaad;}</style></defs><g id="Capa_2" data-name="Capa 2"><g id="Capa_1-2" data-name="Capa 1"><g id="Icon_feather-users" data-name="Icon feather-users"><g id="Trazado_9848" data-name="Trazado 9848"><path class="svg-cls-1" d="M14.52,17.12a.9.9,0,0,1-.9-.9v-1.7a2.5,2.5,0,0,0-2.5-2.5H4.3a2.5,2.5,0,0,0-2.5,2.5v1.7a.9.9,0,1,1-1.8,0v-1.7a4.31,4.31,0,0,1,4.3-4.31h6.82a4.32,4.32,0,0,1,4.3,4.31v1.7A.9.9,0,0,1,14.52,17.12Z"/></g><g id="Trazado_9849" data-name="Trazado 9849"><path class="svg-cls-1" d="M7.71,8.61A4.31,4.31,0,1,1,12,4.3,4.32,4.32,0,0,1,7.71,8.61Zm0-6.81a2.51,2.51,0,1,0,2.5,2.5A2.5,2.5,0,0,0,7.71,1.8Z"/></g><g id="Trazado_9850" data-name="Trazado 9850"><path class="svg-cls-1" d="M19.63,17.12a.9.9,0,0,1-.9-.9v-1.7a2.5,2.5,0,0,0-1.88-2.42A.9.9,0,0,1,16.2,11a.91.91,0,0,1,1.1-.65,4.3,4.3,0,0,1,3.23,4.16v1.7A.9.9,0,0,1,19.63,17.12Z"/></g><g id="Trazado_9851" data-name="Trazado 9851"><path class="svg-cls-1" d="M13.67,8.51a.9.9,0,0,1-.87-.68.88.88,0,0,1,.65-1.09,2.51,2.51,0,0,0,0-4.86A.88.88,0,0,1,12.8.79.89.89,0,0,1,13.89.14a4.3,4.3,0,0,1,0,8.34A.83.83,0,0,1,13.67,8.51Z"/></g></g></g></g></svg>
+                        <span class="title">Usuarios</span>
+                        <span class="selected"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

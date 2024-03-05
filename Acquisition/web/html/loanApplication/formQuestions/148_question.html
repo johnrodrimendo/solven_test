@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="question">
+    <th:block th:replace="loanApplication/formQuestions/questionConfig :: config"></th:block>
+    <div class="questions-section animated fadeInRight">
+        <div class="questions-section animated fadeInRight">
+            <div class="forms q148">
+                <form id="questionForm">
+                    <p th:utext="#{question.148.title}"></p>
+                    <div class="field inline">
+                        <select data-width="245" id="area" name="area" data-placeholder="Selecciona tu área">
+                            <option value="" hidden="hidden"></option>
+                            <option th:each="area : ${areas}"
+                                    th:value="${area.id}" th:text="${area.area}"></option>
+                        </select>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field inline">
+                        <select data-width="245" id="occupation" name="occupation" data-placeholder="Selecciona tu cargo">
+                            <option value="" hidden="hidden"></option>
+                            <option th:each="occupation : ${occupations}"
+                                    th:value="${occupation.id}" th:text="${occupation.ocupation}"></option>
+                        </select>
+                        <div class="errorContainer"></div>
+                    </div>
+                    <div class="field inline field-button">
+                        <button id="sendButton" type="button" class="button bg-red" th:text="#{button.next}"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        questionFw.validateForm($('#questionForm'), JSON.parse(/*[[${form.validator.toJson(#locale)}]]*/));
+
+        $('#sendButton').on('click', function () {
+            if ($('#questionForm').valid()) {
+                questionFw.ajaxToCurrentQuestionController({
+                    button: $('#sendButton'),
+                    type: "POST",
+                    form: $('#questionForm'),
+                    data: $('#questionForm').serializeObject()
+                }, "");
+            }
+        });
+        /*]]>*/
+    </script>
+
+</th:block>
+</html>
